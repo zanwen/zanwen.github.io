@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
@@ -17,28 +17,30 @@
 
 <script id="hexo-configurations">
     var NexT = window.NexT || {};
-    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+    var CONFIG = {"hostname":"zanwen.github.io","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
   </script>
 
   <meta name="description" content="BIO（Blocking IO）在早期的JDK版本中，只提供了位于java.net包下的ServerSocket以及Socket供开发者进行C&#x2F;S网络通信编程，以下是简单示例： 单线程Server端：用于接收客户端发送的消息并原样返回 123456789101112131415161718192021public class BIOServer &amp;#123;    public static fi">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Hexo">
-<meta property="og:url" content="http://example.com/2021/08/18/netty_source_code_1_io_model/index.html">
-<meta property="og:site_name" content="Hexo">
+<meta property="og:title" content="Netty源码剖析（一）—— IO模型演进之路">
+<meta property="og:url" content="https://zanwen.github.io/2021/08/18/netty_source_code_1_io_model/index.html">
+<meta property="og:site_name" content="Anwen">
 <meta property="og:description" content="BIO（Blocking IO）在早期的JDK版本中，只提供了位于java.net包下的ServerSocket以及Socket供开发者进行C&#x2F;S网络通信编程，以下是简单示例： 单线程Server端：用于接收客户端发送的消息并原样返回 123456789101112131415161718192021public class BIOServer &amp;#123;    public static fi">
-<meta property="og:locale" content="en_US">
-<meta property="og:image" content="d:/Document/markdown/netty_source_code_1_io_model/1629252299975-b55b9df7-f466-44da-91af-8b5b93709624.png">
-<meta property="og:image" content="d:/Document/markdown/netty_source_code_1_io_model/1629252336285-e430f5aa-2527-42d1-8908-7484eb316560.png">
-<meta property="og:image" content="d:/Document/markdown/netty_source_code_1_io_model/1629253563589-554f526b-8584-41e9-81e4-f79ca88a397a.png">
-<meta property="og:image" content="d:/Document/markdown/netty_source_code_1_io_model/1629255993752-0b026d17-20f6-4929-9716-d63631cc5dde.png">
-<meta property="og:image" content="d:/Document/markdown/netty_source_code_1_io_model/1629268718845-ed5ef67a-8c87-40f4-917a-beb746ed32bb.png">
-<meta property="article:published_time" content="2021-08-18T07:05:48.054Z">
-<meta property="article:modified_time" content="2021-08-18T07:37:22.302Z">
-<meta property="article:author" content="John Doe">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://raw.githubusercontent.com/zanwen/picgo/master/1629252299975-b55b9df7-f466-44da-91af-8b5b93709624.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/zanwen/picgo/master/1629252336285-e430f5aa-2527-42d1-8908-7484eb316560.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/zanwen/picgo/master/1629253563589-554f526b-8584-41e9-81e4-f79ca88a397a.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/zanwen/picgo/master/1629255993752-0b026d17-20f6-4929-9716-d63631cc5dde.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/zanwen/picgo/master/1629268718845-ed5ef67a-8c87-40f4-917a-beb746ed32bb.png">
+<meta property="article:published_time" content="2021-08-18T08:20:38.000Z">
+<meta property="article:modified_time" content="2021-08-18T08:22:04.672Z">
+<meta property="article:author" content="Anwen">
+<meta property="article:tag" content="Netty">
+<meta property="article:tag" content="NIO">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="d:/Document/markdown/netty_source_code_1_io_model/1629252299975-b55b9df7-f466-44da-91af-8b5b93709624.png">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/zanwen/picgo/master/1629252299975-b55b9df7-f466-44da-91af-8b5b93709624.png">
 
-<link rel="canonical" href="http://example.com/2021/08/18/netty_source_code_1_io_model/">
+<link rel="canonical" href="https://zanwen.github.io/2021/08/18/netty_source_code_1_io_model/">
 
 
 <script id="page-configurations">
@@ -47,11 +49,11 @@
     sidebar: "",
     isHome : false,
     isPost : true,
-    lang   : 'en'
+    lang   : 'zh-CN'
   };
 </script>
 
-  <title> | Hexo</title>
+  <title>Netty源码剖析（一）—— IO模型演进之路 | Anwen</title>
   
 
 
@@ -91,7 +93,7 @@
     <header class="header" itemscope itemtype="http://schema.org/WPHeader">
       <div class="header-inner"><div class="site-brand-container">
   <div class="site-nav-toggle">
-    <div class="toggle" aria-label="Toggle navigation bar">
+    <div class="toggle" aria-label="切换导航栏">
       <span class="toggle-line toggle-line-first"></span>
       <span class="toggle-line toggle-line-middle"></span>
       <span class="toggle-line toggle-line-last"></span>
@@ -102,7 +104,7 @@
 
     <a href="/" class="brand" rel="start">
       <span class="logo-line-before"><i></i></span>
-      <h1 class="site-title">Hexo</h1>
+      <h1 class="site-title">Anwen</h1>
       <span class="logo-line-after"><i></i></span>
     </a>
   </div>
@@ -120,12 +122,12 @@
   <ul id="menu" class="main-menu menu">
         <li class="menu-item menu-item-home">
 
-    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
 
   </li>
         <li class="menu-item menu-item-archives">
 
-    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
 
   </li>
   </ul>
@@ -155,21 +157,21 @@
     
   
   
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2021/08/18/netty_source_code_1_io_model/">
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://zanwen.github.io/2021/08/18/netty_source_code_1_io_model/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="John Doe">
+      <meta itemprop="name" content="Anwen">
       <meta itemprop="description" content="">
     </span>
 
     <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Hexo">
+      <meta itemprop="name" content="Anwen">
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
-          
+          Netty源码剖析（一）—— IO模型演进之路
         </h1>
 
         <div class="post-meta">
@@ -177,10 +179,19 @@
               <span class="post-meta-item-icon">
                 <i class="far fa-calendar"></i>
               </span>
-              <span class="post-meta-item-text">Posted on</span>
+              <span class="post-meta-item-text">发表于</span>
               
 
-              <time title="Created: 2021-08-18 15:05:48 / Modified: 15:37:22" itemprop="dateCreated datePublished" datetime="2021-08-18T15:05:48+08:00">2021-08-18</time>
+              <time title="创建时间：2021-08-18 16:20:38 / 修改时间：16:22:04" itemprop="dateCreated datePublished" datetime="2021-08-18T16:20:38+08:00">2021-08-18</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%88%86%E5%B8%83%E5%BC%8F/" itemprop="url" rel="index"><span itemprop="name">分布式</span></a>
+                </span>
             </span>
 
           
@@ -202,8 +213,8 @@
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">BIOClient</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> String HOST = <span class="string">&quot;localhost&quot;</span>;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> PORT = <span class="number">9001</span>;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> Charset CHARSET = StandardCharsets.UTF_8;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> IOException </span>&#123;</span><br><span class="line">        <span class="comment">// connect</span></span><br><span class="line">        Socket socket = <span class="keyword">new</span> Socket(HOST, PORT);</span><br><span class="line">        <span class="comment">// write</span></span><br><span class="line">        OutputStream outputStream = socket.getOutputStream();</span><br><span class="line">        outputStream.write(<span class="string">&quot;hello bio&quot;</span>.getBytes(StandardCharsets.UTF_8));</span><br><span class="line">        <span class="comment">// read</span></span><br><span class="line">        <span class="keyword">byte</span>[] buf = <span class="keyword">new</span> <span class="keyword">byte</span>[<span class="number">1024</span>];</span><br><span class="line">        <span class="keyword">int</span> len = socket.getInputStream().read(buf);</span><br><span class="line">        String msg = <span class="keyword">new</span> String(buf, <span class="number">0</span>, len, CHARSET);</span><br><span class="line">        System.out.println(<span class="string">&quot;server: &quot;</span> + msg);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <p>服务端单线程的问题是，<code>serverSocket.accept()</code>和<code>inputStream.read(buf)</code>都是阻塞操作：</p>
-<p><img src="D:\Document\markdown\netty_source_code_1_io_model\1629252299975-b55b9df7-f466-44da-91af-8b5b93709624.png" alt="image.png"></p>
-<p><img src="D:\Document\markdown\netty_source_code_1_io_model\1629252336285-e430f5aa-2527-42d1-8908-7484eb316560.png" alt="image.png"></p>
+<p><img src="https://raw.githubusercontent.com/zanwen/picgo/master/1629252299975-b55b9df7-f466-44da-91af-8b5b93709624.png"></p>
+<p><img src="https://raw.githubusercontent.com/zanwen/picgo/master/1629252336285-e430f5aa-2527-42d1-8908-7484eb316560.png"></p>
 <ul>
 <li>accept：调用此方法将阻塞当前线程直到一个TCP连接被建立</li>
 <li>read：调用此方法将阻塞当前线程直到输入流中有数据可读</li>
@@ -214,19 +225,19 @@
 <li>后续到来的客户发现门是关的，只能再门口等着客户经理服务完内部客户后再来迎宾一个进去，门外客户体验度差</li>
 <li>客户经理在内部服务客户时，如果客户不说自己想办理什么业务或者客户在自助填写一些表格准备一些材料时，经理只能再一旁无所事事地等着，银行人效低下</li>
 </ul>
-<p><img src="D:\Document\markdown\netty_source_code_1_io_model\1629253563589-554f526b-8584-41e9-81e4-f79ca88a397a.png" alt="image.png"></p>
+<p><img src="https://raw.githubusercontent.com/zanwen/picgo/master/1629253563589-554f526b-8584-41e9-81e4-f79ca88a397a.png"></p>
 <p>下列代码模仿了一个客户先被迎入银行，但他进入银行后（被<code>accept</code>到）就睡着了，经理没有办法只能一直等着（阻塞在<code>inputStream.read</code>上），然而门外还有一个客户需要办理很急的只需两份钟就能办理好的业务</p>
 <p><strong>Client1</strong></p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">Socket socket = new Socket(HOST, PORT);</span><br><span class="line">// 不是很急，有点困，先睡一下吧~</span><br><span class="line">Thread.sleep(10000);</span><br><span class="line">OutputStream outputStream = socket.getOutputStream();</span><br><span class="line">outputStream.write(&quot;client1&quot;.getBytes(StandardCharsets.UTF_8));</span><br></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">Socket socket = <span class="keyword">new</span> Socket(HOST, PORT);</span><br><span class="line"><span class="comment">// 不是很急，有点困，先睡一下吧~</span></span><br><span class="line">Thread.sleep(<span class="number">10000</span>);</span><br><span class="line">OutputStream outputStream = socket.getOutputStream();</span><br><span class="line">outputStream.write(<span class="string">&quot;client1&quot;</span>.getBytes(StandardCharsets.UTF_8));</span><br></pre></td></tr></table></figure>
 
 <p><strong>Client2</strong></p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">// connect</span><br><span class="line">Socket socket = new Socket(HOST, PORT);</span><br><span class="line">// 急着办理业务嘞</span><br><span class="line">OutputStream outputStream = socket.getOutputStream();</span><br><span class="line">outputStream.write(&quot;client2&quot;.getBytes(StandardCharsets.UTF_8));</span><br></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// connect</span></span><br><span class="line">Socket socket = <span class="keyword">new</span> Socket(HOST, PORT);</span><br><span class="line"><span class="comment">// 急着办理业务嘞</span></span><br><span class="line">OutputStream outputStream = socket.getOutputStream();</span><br><span class="line">outputStream.write(<span class="string">&quot;client2&quot;</span>.getBytes(StandardCharsets.UTF_8));</span><br></pre></td></tr></table></figure>
 
 <h2 id="主从多线程"><a href="#主从多线程" class="headerlink" title="主从多线程"></a>主从多线程</h2><p>经理想，生意越来越好了，一个人搞不过来，那就雇几个人来帮我吧</p>
-<p><img src="D:\Document\markdown\netty_source_code_1_io_model\1629255993752-0b026d17-20f6-4929-9716-d63631cc5dde.png" alt="image.png"></p>
+<p><img src="https://raw.githubusercontent.com/zanwen/picgo/master/1629255993752-0b026d17-20f6-4929-9716-d63631cc5dde.png"></p>
 <p>来者就是客呀，怎么能拒之门外呢，来办理业务的朋友跟我进来，我帮你们取号，你们拿号在休息区等待叫号后去相应柜台即可。办理业务就交给柜台专员吧，我只用负责揽客就好啦~</p>
 <p><strong>Server-2.0</strong></p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line">public class BIOServer &#123;</span><br><span class="line"></span><br><span class="line">    public static final int PORT = 9001;</span><br><span class="line">    public static final Charset CHARSET = StandardCharsets.UTF_8;</span><br><span class="line">    // 雇了5个柜台专员</span><br><span class="line">    public static final Executor WORKERS = Executors.newFixedThreadPool(5);</span><br><span class="line"></span><br><span class="line">    public static void main(String[] args) throws IOException &#123;</span><br><span class="line">        ServerSocket serverSocket = new ServerSocket(PORT);</span><br><span class="line">        while (true) &#123;</span><br><span class="line">            // accept</span><br><span class="line">            Socket clientSocket = serverSocket.accept();</span><br><span class="line">            WORKERS.execute(new ReadClient(clientSocket));</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    private static class ReadClient implements Runnable &#123;</span><br><span class="line"></span><br><span class="line">        private final Socket clientSocket;</span><br><span class="line">        public ReadClient(Socket clientSocket) &#123;</span><br><span class="line">            this.clientSocket = clientSocket;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        @Override</span><br><span class="line">        public void run() &#123;</span><br><span class="line">            try &#123;</span><br><span class="line">                // read</span><br><span class="line">                InputStream inputStream = clientSocket.getInputStream();</span><br><span class="line">                byte[] buf = new byte[1024];</span><br><span class="line">                int len = inputStream.read(buf);</span><br><span class="line">                String msg = new String(buf, 0, len, CHARSET);</span><br><span class="line">                System.out.println(String.format(&quot;client[%s]: &quot; + msg, clientSocket.getRemoteSocketAddress()));</span><br><span class="line">                // write</span><br><span class="line">                clientSocket.getOutputStream().write(msg.getBytes(CHARSET));</span><br><span class="line">            &#125; catch (IOException e) &#123;</span><br><span class="line">                e.printStackTrace();</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">BIOServer</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> PORT = <span class="number">9001</span>;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> Charset CHARSET = StandardCharsets.UTF_8;</span><br><span class="line">    <span class="comment">// 雇了5个柜台专员</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> Executor WORKERS = Executors.newFixedThreadPool(<span class="number">5</span>);</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> IOException </span>&#123;</span><br><span class="line">        ServerSocket serverSocket = <span class="keyword">new</span> ServerSocket(PORT);</span><br><span class="line">        <span class="keyword">while</span> (<span class="keyword">true</span>) &#123;</span><br><span class="line">            <span class="comment">// accept</span></span><br><span class="line">            Socket clientSocket = serverSocket.accept();</span><br><span class="line">            WORKERS.execute(<span class="keyword">new</span> ReadClient(clientSocket));</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">ReadClient</span> <span class="keyword">implements</span> <span class="title">Runnable</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">private</span> <span class="keyword">final</span> Socket clientSocket;</span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="title">ReadClient</span><span class="params">(Socket clientSocket)</span> </span>&#123;</span><br><span class="line">            <span class="keyword">this</span>.clientSocket = clientSocket;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</span><br><span class="line">            <span class="keyword">try</span> &#123;</span><br><span class="line">                <span class="comment">// read</span></span><br><span class="line">                InputStream inputStream = clientSocket.getInputStream();</span><br><span class="line">                <span class="keyword">byte</span>[] buf = <span class="keyword">new</span> <span class="keyword">byte</span>[<span class="number">1024</span>];</span><br><span class="line">                <span class="keyword">int</span> len = inputStream.read(buf);</span><br><span class="line">                String msg = <span class="keyword">new</span> String(buf, <span class="number">0</span>, len, CHARSET);</span><br><span class="line">                System.out.println(String.format(<span class="string">&quot;client[%s]: &quot;</span> + msg, clientSocket.getRemoteSocketAddress()));</span><br><span class="line">                <span class="comment">// write</span></span><br><span class="line">                clientSocket.getOutputStream().write(msg.getBytes(CHARSET));</span><br><span class="line">            &#125; <span class="keyword">catch</span> (IOException e) &#123;</span><br><span class="line">                e.printStackTrace();</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <ul>
 <li>取号：<code>WORKERS.execute</code>，读取客户端的任务入队</li>
@@ -249,10 +260,10 @@
 <li>事件：客人招收示意点菜、后厅传菜通知、后勤食材已就绪通知</li>
 <li>事件轮询者/工人：此例中的服务员、厨师</li>
 </ul>
-<h2 id="单一Reactor"><a href="#单一Reactor" class="headerlink" title="单一Reactor"></a>单一Reactor</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br></pre></td><td class="code"><pre><span class="line">public class NioServer &#123;</span><br><span class="line">    public static void main(String[] args) throws IOException &#123;</span><br><span class="line"></span><br><span class="line">        // 迎宾专员</span><br><span class="line">        ServerSocketChannel serverSocketChannel = ServerSocketChannel.open();</span><br><span class="line">        // 设置其accept调用非阻塞模式</span><br><span class="line">        serverSocketChannel.configureBlocking(false);</span><br><span class="line"></span><br><span class="line">        // 注册簿</span><br><span class="line">        Selector selector = Selector.open();</span><br><span class="line">        // 将迎宾专员注册到注册簿，轮序其客人到店事件</span><br><span class="line">        serverSocketChannel.register(selector, SelectionKey.OP_ACCEPT);</span><br><span class="line"></span><br><span class="line">        // 绑定端口开启监听</span><br><span class="line">        serverSocketChannel.bind(new InetSocketAddress( 9001));</span><br><span class="line"></span><br><span class="line">        while (true) &#123;</span><br><span class="line"></span><br><span class="line">            // 无事件就绪时阻塞，有事件时返回已就绪事件数</span><br><span class="line">            if (selector.select() &gt; 0) &#123;</span><br><span class="line"></span><br><span class="line">                // 轮询注册簿，选择出已就绪的事件key（key关联了对应的被服务对象/客户端）</span><br><span class="line">                Set&lt;SelectionKey&gt; selectionKeys = selector.selectedKeys();</span><br><span class="line">                Iterator&lt;SelectionKey&gt; iterator = selectionKeys.iterator();</span><br><span class="line"></span><br><span class="line">                // 对所有就绪事件进行串行处理</span><br><span class="line">                while (iterator.hasNext()) &#123;</span><br><span class="line">                    SelectionKey selectionKey = iterator.next();</span><br><span class="line">                    // 客人来店事件</span><br><span class="line">                    if (selectionKey.isAcceptable()) &#123;</span><br><span class="line">                        // 迎宾</span><br><span class="line">                        ServerSocketChannel serverChannel = (ServerSocketChannel) selectionKey.channel();</span><br><span class="line">                        SocketChannel clientChannel = serverChannel.accept();</span><br><span class="line">                        // 设置其read/write非阻塞模式</span><br><span class="line">                        clientChannel.configureBlocking(false);</span><br><span class="line">                        System.out.println(&quot;客人到店：&quot; + clientChannel.getRemoteAddress());</span><br><span class="line">                        // 注册客人到注册簿，轮询其点单事件</span><br><span class="line">                        clientChannel.register(selector, SelectionKey.OP_READ);</span><br><span class="line">                    &#125;</span><br><span class="line">                    // 客人点单事件</span><br><span class="line">                    else if (selectionKey.isReadable()) &#123;</span><br><span class="line">                        SocketChannel clientChannel = (SocketChannel) selectionKey.channel();</span><br><span class="line">                        ByteBuffer buf = ByteBuffer.allocate(1024);</span><br><span class="line">                        // 读取客人所点菜品</span><br><span class="line">                        int len = clientChannel.read(buf);</span><br><span class="line">                        String msg = new String(buf.array(), 0, len, StandardCharsets.UTF_8);</span><br><span class="line">                        System.out.println(&quot;客人点单：&quot; + msg);</span><br><span class="line">                    &#125;</span><br><span class="line"></span><br><span class="line">                    // 该事件key已处理过了，从已就绪事件key的集合中移除，避免下次重复处理（客人已经点过单啦，不要再问客人想吃什么了）</span><br><span class="line">                    iterator.remove();</span><br><span class="line"></span><br><span class="line">                &#125;</span><br><span class="line"></span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="单一Reactor"><a href="#单一Reactor" class="headerlink" title="单一Reactor"></a>单一Reactor</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">NioServer</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> IOException </span>&#123;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 迎宾专员</span></span><br><span class="line">        ServerSocketChannel serverSocketChannel = ServerSocketChannel.open();</span><br><span class="line">        <span class="comment">// 设置其accept调用非阻塞模式</span></span><br><span class="line">        serverSocketChannel.configureBlocking(<span class="keyword">false</span>);</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 注册簿</span></span><br><span class="line">        Selector selector = Selector.open();</span><br><span class="line">        <span class="comment">// 将迎宾专员注册到注册簿，轮序其客人到店事件</span></span><br><span class="line">        serverSocketChannel.register(selector, SelectionKey.OP_ACCEPT);</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 绑定端口开启监听</span></span><br><span class="line">        serverSocketChannel.bind(<span class="keyword">new</span> InetSocketAddress( <span class="number">9001</span>));</span><br><span class="line"></span><br><span class="line">        <span class="keyword">while</span> (<span class="keyword">true</span>) &#123;</span><br><span class="line"></span><br><span class="line">            <span class="comment">// 无事件就绪时阻塞，有事件时返回已就绪事件数</span></span><br><span class="line">            <span class="keyword">if</span> (selector.select() &gt; <span class="number">0</span>) &#123;</span><br><span class="line"></span><br><span class="line">                <span class="comment">// 轮询注册簿，选择出已就绪的事件key（key关联了对应的被服务对象/客户端）</span></span><br><span class="line">                Set&lt;SelectionKey&gt; selectionKeys = selector.selectedKeys();</span><br><span class="line">                Iterator&lt;SelectionKey&gt; iterator = selectionKeys.iterator();</span><br><span class="line"></span><br><span class="line">                <span class="comment">// 对所有就绪事件进行串行处理</span></span><br><span class="line">                <span class="keyword">while</span> (iterator.hasNext()) &#123;</span><br><span class="line">                    SelectionKey selectionKey = iterator.next();</span><br><span class="line">                    <span class="comment">// 客人来店事件</span></span><br><span class="line">                    <span class="keyword">if</span> (selectionKey.isAcceptable()) &#123;</span><br><span class="line">                        <span class="comment">// 迎宾</span></span><br><span class="line">                        ServerSocketChannel serverChannel = (ServerSocketChannel) selectionKey.channel();</span><br><span class="line">                        SocketChannel clientChannel = serverChannel.accept();</span><br><span class="line">                        <span class="comment">// 设置其read/write非阻塞模式</span></span><br><span class="line">                        clientChannel.configureBlocking(<span class="keyword">false</span>);</span><br><span class="line">                        System.out.println(<span class="string">&quot;客人到店：&quot;</span> + clientChannel.getRemoteAddress());</span><br><span class="line">                        <span class="comment">// 注册客人到注册簿，轮询其点单事件</span></span><br><span class="line">                        clientChannel.register(selector, SelectionKey.OP_READ);</span><br><span class="line">                    &#125;</span><br><span class="line">                    <span class="comment">// 客人点单事件</span></span><br><span class="line">                    <span class="keyword">else</span> <span class="keyword">if</span> (selectionKey.isReadable()) &#123;</span><br><span class="line">                        SocketChannel clientChannel = (SocketChannel) selectionKey.channel();</span><br><span class="line">                        ByteBuffer buf = ByteBuffer.allocate(<span class="number">1024</span>);</span><br><span class="line">                        <span class="comment">// 读取客人所点菜品</span></span><br><span class="line">                        <span class="keyword">int</span> len = clientChannel.read(buf);</span><br><span class="line">                        String msg = <span class="keyword">new</span> String(buf.array(), <span class="number">0</span>, len, StandardCharsets.UTF_8);</span><br><span class="line">                        System.out.println(<span class="string">&quot;客人点单：&quot;</span> + msg);</span><br><span class="line">                    &#125;</span><br><span class="line"></span><br><span class="line">                    <span class="comment">// 该事件key已处理过了，从已就绪事件key的集合中移除，避免下次重复处理（客人已经点过单啦，不要再问客人想吃什么了）</span></span><br><span class="line">                    iterator.remove();</span><br><span class="line"></span><br><span class="line">                &#125;</span><br><span class="line"></span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <p>在上述程序中，仍从我们的单线程开始对多路复用模型进行实现。此例中，小伙子一个人创业，为了降低成本啥事都一个人干，迎宾、点单、做饭，忙个不停：</p>
-<p><img src="D:\Document\markdown\netty_source_code_1_io_model\1629268718845-ed5ef67a-8c87-40f4-917a-beb746ed32bb.png" alt="image.png"></p>
+<p><img src="https://raw.githubusercontent.com/zanwen/picgo/master/1629268718845-ed5ef67a-8c87-40f4-917a-beb746ed32bb.png"></p>
 <h2 id="主从Reactor"><a href="#主从Reactor" class="headerlink" title="主从Reactor"></a>主从Reactor</h2><p>熬过艰难的创业期，小伙子凭借其独特的手艺收获了一批忠实的吃货。小伙子想着不要那么累了，雇几个人帮忙打理，自己也享享清福</p>
 
     </div>
@@ -262,6 +273,10 @@
     
 
       <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Netty/" rel="tag"># Netty</a>
+              <a href="/tags/NIO/" rel="tag"># NIO</a>
+          </div>
 
         
 
@@ -315,10 +330,10 @@
 
       <ul class="sidebar-nav motion-element">
         <li class="sidebar-nav-toc">
-          Table of Contents
+          文章目录
         </li>
         <li class="sidebar-nav-overview">
-          Overview
+          站点概览
         </li>
       </ul>
 
@@ -330,7 +345,7 @@
 
       <div class="site-overview-wrap sidebar-panel">
         <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
-  <p class="site-author-name" itemprop="name">John Doe</p>
+  <p class="site-author-name" itemprop="name">Anwen</p>
   <div class="site-description" itemprop="description"></div>
 </div>
 <div class="site-state-wrap motion-element">
@@ -339,8 +354,16 @@
           <a href="/archives/">
         
           <span class="site-state-item-count">1</span>
-          <span class="site-state-item-name">posts</span>
+          <span class="site-state-item-name">日志</span>
         </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+        <span class="site-state-item-count">1</span>
+        <span class="site-state-item-name">分类</span>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">2</span>
+        <span class="site-state-item-name">标签</span>
       </div>
   </nav>
 </div>
@@ -370,9 +393,9 @@
   <span class="with-love">
     <i class="fa fa-heart"></i>
   </span>
-  <span class="author" itemprop="copyrightHolder">John Doe</span>
+  <span class="author" itemprop="copyrightHolder">Anwen</span>
 </div>
-  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
   </div>
 
         
