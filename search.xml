@@ -97,10 +97,74 @@ source [find target/stm32f4x.cfg]
     <span class="token comment">/* USER CODE END 3 */</span>
 <span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
+<h1 id="源码分析"><a href="#源码分析" class="headerlink" title="源码分析"></a>源码分析</h1><h2 id="启用接收中断HAL-UART-Receive-IT"><a href="#启用接收中断HAL-UART-Receive-IT" class="headerlink" title="启用接收中断HAL_UART_Receive_IT"></a>启用接收中断HAL_UART_Receive_IT</h2><pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token class-name">uint8_t</span> rxbuf<span class="token punctuation">[</span><span class="token number">7</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token punctuation">{</span><span class="token number">0</span><span class="token punctuation">}</span><span class="token punctuation">;</span>
 
+<span class="token function">HAL_UART_Receive_IT</span><span class="token punctuation">(</span><span class="token operator">&amp;</span>huart1<span class="token punctuation">,</span> rxbuf<span class="token punctuation">,</span> <span class="token number">7</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
 
+<p><code>HAL_UART_Receive_IT -&gt; UART_Start_Receive_IT</code></p>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c">huart<span class="token operator">-&gt;</span>pRxBuffPtr <span class="token operator">=</span> pData<span class="token punctuation">;</span>
+huart<span class="token operator">-&gt;</span>RxXferSize <span class="token operator">=</span> Size<span class="token punctuation">;</span>
+huart<span class="token operator">-&gt;</span>RxXferCount <span class="token operator">=</span> Size<span class="token punctuation">;</span>
 
+huart<span class="token operator">-&gt;</span>ErrorCode <span class="token operator">=</span> HAL_UART_ERROR_NONE<span class="token punctuation">;</span>
+huart<span class="token operator">-&gt;</span>RxState <span class="token operator">=</span> HAL_UART_STATE_BUSY_RX<span class="token punctuation">;</span>
 
+<span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+    
+<span class="token comment">/* Enable the UART Error Interrupt: (Frame error, noise error, overrun error) */</span>
+<span class="token function">__HAL_UART_ENABLE_IT</span><span class="token punctuation">(</span>huart<span class="token punctuation">,</span> UART_IT_ERR<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token comment">/* Enable the UART Data Register not empty Interrupt */</span>
+<span class="token function">__HAL_UART_ENABLE_IT</span><span class="token punctuation">(</span>huart<span class="token punctuation">,</span> UART_IT_RXNE<span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<ul>
+<li><code>pRxBuffPtr</code> ：保存我们传入的buf指针</li>
+<li><code>RxXferSize</code> ：保存我们传入的buf大小</li>
+<li><code>RxXferCount</code>： 初始化待接收数据数量</li>
+<li><code>ErrorCode</code>：初始化错误码为 no error</li>
+<li><code>RxState</code>：标识UART处于接收状态（Data Reception process is ongoing）</li>
+<li>开启UART异常中断<ul>
+<li>帧异常（Frame error）</li>
+<li>噪声异常（noise error）</li>
+<li>==接收缓冲区溢出异常（overrun error）==</li>
+</ul>
+</li>
+<li>开启接收寄存器非空中断（Enable the UART Data Register not empty Interrupt）</li>
+</ul>
+<h2 id="UART中断向量表"><a href="#UART中断向量表" class="headerlink" title="UART中断向量表"></a>UART中断向量表</h2><p><em><strong>startup_stm32f407vetx.s</strong></em></p>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token punctuation">.</span>word     USART1_IRQHandler                 <span class="token comment">/* USART1                       */</span>       <span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
+<p><em><strong>stm32f4xx_it.c</strong></em></p>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token keyword">void</span> <span class="token function">USART1_IRQHandler</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+  <span class="token comment">/* USER CODE BEGIN USART1_IRQn 0 */</span>
+
+  <span class="token comment">/* USER CODE END USART1_IRQn 0 */</span>
+  <span class="token function">HAL_UART_IRQHandler</span><span class="token punctuation">(</span><span class="token operator">&amp;</span>huart1<span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token comment">/* USER CODE BEGIN USART1_IRQn 1 */</span>
+
+  <span class="token comment">/* USER CODE END USART1_IRQn 1 */</span>
+<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<h2 id="数据接收处理"><a href="#数据接收处理" class="headerlink" title="数据接收处理"></a>数据接收处理</h2><p><em><strong>stm32f4xx_it.c</strong></em></p>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token keyword">void</span> <span class="token function">HAL_UART_IRQHandler</span><span class="token punctuation">(</span>UART_HandleTypeDef <span class="token operator">*</span>huart<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token comment">/* If no error occurs */</span>
+    errorflags <span class="token operator">=</span> <span class="token punctuation">(</span>isrflags <span class="token operator">&amp;</span> <span class="token punctuation">(</span><span class="token class-name">uint32_t</span><span class="token punctuation">)</span> <span class="token punctuation">(</span>USART_SR_PE <span class="token operator">|</span> USART_SR_FE <span class="token operator">|</span> USART_SR_ORE <span class="token operator">|</span> USART_SR_NE<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>errorflags <span class="token operator">==</span> RESET<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token comment">/* UART in mode Receiver -------------------------------------------------*/</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token punctuation">(</span>isrflags <span class="token operator">&amp;</span> USART_SR_RXNE<span class="token punctuation">)</span> <span class="token operator">!=</span> RESET<span class="token punctuation">)</span> <span class="token operator">&amp;&amp;</span> <span class="token punctuation">(</span><span class="token punctuation">(</span>cr1its <span class="token operator">&amp;</span> USART_CR1_RXNEIE<span class="token punctuation">)</span> <span class="token operator">!=</span> RESET<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token function">UART_Receive_IT</span><span class="token punctuation">(</span>huart<span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token keyword">return</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>执行接收数据逻辑（UART_Receive_IT）的前置条件：</p>
+<ul>
+<li>没有UART相关的异常（errorflags）</li>
+<li>接收寄存器非空（USART_SR_RXNE）</li>
+<li>接收寄存器非空中断使能是开启的（USART_CR1_RXNEIE）</li>
+</ul>
 ]]></content>
       <categories>
         <category>嵌入式</category>
@@ -112,6 +176,7 @@ source [find target/stm32f4x.cfg]
         <tag>STM32</tag>
         <tag>GD32</tag>
         <tag>HAL</tag>
+        <tag>UART</tag>
       </tags>
   </entry>
   <entry>
