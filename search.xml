@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="utf-8"?>
+<search>
+  <entry>
+    <title>UART接收缓冲区溢出异常（HAL_UART_ERROR_ORE）问题记录</title>
+    <url>/2024/11/12/13750.html</url>
+    <content><![CDATA[<h1 id="问题背景"><a href="#问题背景" class="headerlink" title="问题背景"></a>问题背景</h1><h2 id="开发环境"><a href="#开发环境" class="headerlink" title="开发环境"></a>开发环境</h2><ul>
+<li>硬件：GD32F407VET6开发版</li>
+<li>IDE：STM32CubeMX + Clion + ARM GNU</li>
+<li>烧录：OpenOCD</li>
+</ul>
+<h2 id="实验目标"><a href="#实验目标" class="headerlink" title="实验目标"></a>实验目标</h2><p>使用Cube配置串口USART1及其中断，引脚复用PA9/PA10，通过使能接收中断 <code>Receive_IT</code>，实现接收7字节时，在中断回调中处理该7个字节数据（简单回传，即echo），并再次开启接收中断，从而实现不断接收7字节、回传7字节的功能。</p>
+<h2 id="遇到问题"><a href="#遇到问题" class="headerlink" title="遇到问题"></a>遇到问题</h2><p>发送字节数为7时，能够正常echo；但是不为7时，本来期望是单次发送字节数：</p>
+<ul>
+<li>大于7字节时，应该也能每次触发中断，只是多余的字节数被丢弃了而已</li>
+<li>少于7字节时（例如5），则通过再次发送也能触发中断</li>
+</ul>
+<p>但实验过程中发现这两种情况下，会发送echo了一两次之后，后面无论发送多少数据都无法再echo的情况</p>
+<h1 id="情景再现"><a href="#情景再现" class="headerlink" title="情景再现"></a>情景再现</h1><h2 id="Cube配置"><a href="#Cube配置" class="headerlink" title="Cube配置"></a>Cube配置</h2><p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241112212649840.png" alt="image-20241112212649840"></p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241112212742297.png" alt="image-20241112212742297"></p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241112212813159.png" alt="image-20241112212813159"></p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241112212840656.png" alt="image-20241112212840656"></p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241112212935188.png" alt="image-20241112212935188"></p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241112212959621.png" alt="image-20241112212959621"></p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241112213059038.png" alt="image-20241112213059038"></p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241112213254243.png" alt="image-20241112213254243"></p>
+<h2 id="导入Clion"><a href="#导入Clion" class="headerlink" title="导入Clion"></a>导入Clion</h2><h3 id="编译配置-交叉编译"><a href="#编译配置-交叉编译" class="headerlink" title="编译配置-交叉编译"></a>编译配置-交叉编译</h3><p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241112213601046.png" alt="image-20241112213601046"></p>
+<h3 id="Cmake配置"><a href="#Cmake配置" class="headerlink" title="Cmake配置"></a>Cmake配置</h3><p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241112213656961.png" alt="image-20241112213656961"></p>
+<h3 id="OpenOCD烧录配置"><a href="#OpenOCD烧录配置" class="headerlink" title="OpenOCD烧录配置"></a>OpenOCD烧录配置</h3><p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241112213740944.png" alt="image-20241112213740944"></p>
+<p><code>daplink.cfg</code>：</p>
+<pre class="line-numbers language-none"><code class="language-none"># choose st-link/j-link/dap-link etc.
+adapter driver cmsis-dap
+transport select swd
+
+# 0x10000 = 64K Flash Size
+# set FLASH_SIZE 0x20000
+
+# 512KB Flash
+set FLASH_SIZE 0x80000
+
+source [find target/stm32f4x.cfg]
+
+# download speed = 10MHz
+# adapter speed 10000<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<h2 id="代码流程"><a href="#代码流程" class="headerlink" title="代码流程"></a>代码流程</h2><ul>
+<li>上电后启用接收中断</li>
+<li>在接收完毕回调中echo，并再次启用接收中断</li>
+</ul>
+<p><code>main.c</code></p>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token comment">/* USER CODE BEGIN 0 */</span>
+<span class="token class-name">uint8_t</span> rxbuf<span class="token punctuation">[</span><span class="token number">7</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token punctuation">{</span><span class="token number">0</span><span class="token punctuation">}</span><span class="token punctuation">;</span>
+<span class="token keyword">void</span> <span class="token function">HAL_UART_RxCpltCallback</span><span class="token punctuation">(</span>UART_HandleTypeDef <span class="token operator">*</span>huart<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token function">HAL_UART_Transmit</span><span class="token punctuation">(</span><span class="token operator">&amp;</span>huart1<span class="token punctuation">,</span> rxbuf<span class="token punctuation">,</span> <span class="token number">7</span><span class="token punctuation">,</span> <span class="token number">100</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">HAL_UART_Receive_IT</span><span class="token punctuation">(</span><span class="token operator">&amp;</span>huart1<span class="token punctuation">,</span> rxbuf<span class="token punctuation">,</span> <span class="token number">7</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+<span class="token comment">/* USER CODE END 0 */</span>
+
+<span class="token keyword">int</span> <span class="token function">main</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+
+    <span class="token comment">/* USER CODE BEGIN 1 */</span>
+    <span class="token function">__HAL_RCC_HSI_ENABLE</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">__HAL_RCC_SYSCLK_CONFIG</span><span class="token punctuation">(</span>RCC_SYSCLKSOURCE_HSI<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token comment">/* USER CODE END 1 */</span>
+
+    <span class="token comment">/* MCU Configuration--------------------------------------------------------*/</span>
+
+    <span class="token comment">/* Reset of all peripherals, Initializes the Flash interface and the Systick. */</span>
+    <span class="token function">HAL_Init</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token comment">/* USER CODE BEGIN Init */</span>
+
+    <span class="token comment">/* USER CODE END Init */</span>
+
+    <span class="token comment">/* Configure the system clock */</span>
+    <span class="token function">SystemClock_Config</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token comment">/* USER CODE BEGIN SysInit */</span>
+
+    <span class="token comment">/* USER CODE END SysInit */</span>
+
+    <span class="token comment">/* Initialize all configured peripherals */</span>
+    <span class="token function">MX_GPIO_Init</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">MX_USART1_UART_Init</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token comment">/* USER CODE BEGIN 2 */</span>
+    <span class="token function">HAL_UART_Receive_IT</span><span class="token punctuation">(</span><span class="token operator">&amp;</span>huart1<span class="token punctuation">,</span> rxbuf<span class="token punctuation">,</span> <span class="token number">7</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token comment">/* USER CODE END 2 */</span>
+
+    <span class="token comment">/* Infinite loop */</span>
+    <span class="token comment">/* USER CODE BEGIN WHILE */</span>
+    <span class="token keyword">while</span> <span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token comment">//        HAL_UART_Transmit_IT(&amp;huart1, (uint8_t *)"Hello, World!\r\n", 14);</span>
+        <span class="token comment">//        HAL_Delay(1000);</span>
+        <span class="token comment">/* USER CODE END WHILE */</span>
+
+        <span class="token comment">/* USER CODE BEGIN 3 */</span>
+    <span class="token punctuation">}</span>
+    <span class="token comment">/* USER CODE END 3 */</span>
+<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+
+
+
+
+]]></content>
+      <categories>
+        <category>嵌入式</category>
+        <category>问题记录</category>
+      </categories>
+      <tags>
+        <tag>Clion</tag>
+        <tag>ARM</tag>
+        <tag>STM32</tag>
+        <tag>GD32</tag>
+        <tag>HAL</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Hello World</title>
+    <url>/2024/11/12/16107.html</url>
+    <content><![CDATA[<p>Welcome to <a href="https://hexo.io/">Hexo</a>! This is your very first post. Check <a href="https://hexo.io/docs/">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="https://hexo.io/docs/troubleshooting.html">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues">GitHub</a>.</p>
+<h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><pre class="line-numbers language-bash" data-language="bash"><code class="language-bash">$ hexo new <span class="token string">"My New Post"</span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
+<p>More info: <a href="https://hexo.io/docs/writing.html">Writing</a></p>
+<h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><pre class="line-numbers language-bash" data-language="bash"><code class="language-bash">$ hexo server<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
+<p>More info: <a href="https://hexo.io/docs/server.html">Server</a></p>
+<h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><pre class="line-numbers language-bash" data-language="bash"><code class="language-bash">$ hexo generate<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
+<p>More info: <a href="https://hexo.io/docs/generating.html">Generating</a></p>
+<h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><pre class="line-numbers language-bash" data-language="bash"><code class="language-bash">$ hexo deploy<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
+<p>More info: <a href="https://hexo.io/docs/one-command-deployment.html">Deployment</a></p>
+]]></content>
+  </entry>
+</search>

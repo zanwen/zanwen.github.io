@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <title>安文的博客</title>
+  
+  <subtitle>热爱可抵岁月漫长</subtitle>
+  <link href="https://zanwen.github.io/atom.xml" rel="self"/>
+  
+  <link href="https://zanwen.github.io/"/>
+  <updated>2024-11-12T13:43:40.967Z</updated>
+  <id>https://zanwen.github.io/</id>
+  
+  <author>
+    <name>安文</name>
+    
+  </author>
+  
+  <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>UART接收缓冲区溢出异常（HAL_UART_ERROR_ORE）问题记录</title>
+    <link href="https://zanwen.github.io/2024/11/12/13750.html"/>
+    <id>https://zanwen.github.io/2024/11/12/13750.html</id>
+    <published>2024-11-12T12:40:06.000Z</published>
+    <updated>2024-11-12T13:43:40.967Z</updated>
+    
+    
+      
+      
+        
+        
+    <summary type="html">&lt;h1 id=&quot;问题背景&quot;&gt;&lt;a href=&quot;#问题背景&quot; class=&quot;headerlink&quot; title=&quot;问题背景&quot;&gt;&lt;/a&gt;问题背景&lt;/h1&gt;&lt;h2 id=&quot;开发环境&quot;&gt;&lt;a href=&quot;#开发环境&quot; class=&quot;headerlink&quot;</summary>
+        
+      
+    
+    
+    
+    <category term="嵌入式" scheme="https://zanwen.github.io/categories/%E5%B5%8C%E5%85%A5%E5%BC%8F/"/>
+    
+    <category term="问题记录" scheme="https://zanwen.github.io/categories/%E5%B5%8C%E5%85%A5%E5%BC%8F/%E9%97%AE%E9%A2%98%E8%AE%B0%E5%BD%95/"/>
+    
+    
+    <category term="Clion" scheme="https://zanwen.github.io/tags/Clion/"/>
+    
+    <category term="ARM" scheme="https://zanwen.github.io/tags/ARM/"/>
+    
+    <category term="STM32" scheme="https://zanwen.github.io/tags/STM32/"/>
+    
+    <category term="GD32" scheme="https://zanwen.github.io/tags/GD32/"/>
+    
+    <category term="HAL" scheme="https://zanwen.github.io/tags/HAL/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Hello World</title>
+    <link href="https://zanwen.github.io/2024/11/12/16107.html"/>
+    <id>https://zanwen.github.io/2024/11/12/16107.html</id>
+    <published>2024-11-12T07:26:24.388Z</published>
+    <updated>2024-11-12T12:10:52.330Z</updated>
+    
+    
+      
+      
+        
+        
+    <summary type="html">&lt;p&gt;Welcome to &lt;a href=&quot;https://hexo.io/&quot;&gt;Hexo&lt;/a&gt;! This is your very first post. Check &lt;a href=&quot;https://hexo.io/docs/&quot;&gt;documentation&lt;/a&gt;</summary>
+        
+      
+    
+    
+    
+    
+  </entry>
+  
+</feed>
