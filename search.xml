@@ -118,15 +118,15 @@ huart<span class="token operator">-&gt;</span>RxState <span class="token operato
 <span class="token function">__HAL_UART_ENABLE_IT</span><span class="token punctuation">(</span>huart<span class="token punctuation">,</span> UART_IT_RXNE<span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
 <ul>
-<li><code>pRxBuffPtr</code> ：保存我们传入的buf指针</li>
-<li><code>RxXferSize</code> ：保存我们传入的buf大小</li>
-<li><code>RxXferCount</code>： 初始化待接收数据数量</li>
+<li><code>pRxBuffPtr</code> ：<strong>保存我们传入的buf指针</strong></li>
+<li><code>RxXferSize</code> ：<strong>保存我们传入的buf大小</strong></li>
+<li><code>RxXferCount</code>： <strong>初始化待接收数据数量</strong></li>
 <li><code>ErrorCode</code>：初始化错误码为 no error</li>
-<li><code>RxState</code>：标识UART处于接收状态（Data Reception process is ongoing）</li>
+<li><code>RxState</code>：<strong>标识UART处于接收状态（Data Reception process is ongoing）</strong></li>
 <li>开启UART异常中断<ul>
 <li>帧异常（Frame error）</li>
 <li>噪声异常（noise error）</li>
-<li>==接收缓冲区溢出异常（overrun error）==</li>
+<li><em><strong>接收缓冲区溢出异常（overrun error）</strong></em></li>
 </ul>
 </li>
 <li>开启接收寄存器非空中断（Enable the UART Data Register not empty Interrupt）</li>
@@ -165,6 +165,81 @@ huart<span class="token operator">-&gt;</span>RxState <span class="token operato
 <li>接收寄存器非空（USART_SR_RXNE）</li>
 <li>接收寄存器非空中断使能是开启的（USART_CR1_RXNEIE）</li>
 </ul>
+<h2 id="逐字接收数据（Data-Register）"><a href="#逐字接收数据（Data-Register）" class="headerlink" title="逐字接收数据（Data Register）"></a>逐字接收数据（Data Register）</h2><p><em><strong>stm32f4xx_hal_uart.c/UART_Receive_IT</strong></em></p>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token comment">/* Check that a Rx process is ongoing */</span>
+<span class="token keyword">if</span> <span class="token punctuation">(</span>huart<span class="token operator">-&gt;</span>RxState <span class="token operator">==</span> HAL_UART_STATE_BUSY_RX<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+    <span class="token operator">*</span>pdata8bits <span class="token operator">=</span> <span class="token punctuation">(</span><span class="token class-name">uint8_t</span><span class="token punctuation">)</span> <span class="token punctuation">(</span>huart<span class="token operator">-&gt;</span>Instance<span class="token operator">-&gt;</span>DR <span class="token operator">&amp;</span> <span class="token punctuation">(</span><span class="token class-name">uint8_t</span><span class="token punctuation">)</span> <span class="token number">0x00FF</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+	huart<span class="token operator">-&gt;</span>pRxBuffPtr <span class="token operator">+=</span> <span class="token number">1U</span><span class="token punctuation">;</span>
+    <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">--</span>huart<span class="token operator">-&gt;</span>RxXferCount <span class="token operator">==</span> <span class="token number">0U</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token comment">/*Call legacy weak Rx complete callback*/</span>
+		<span class="token function">HAL_UART_RxCpltCallback</span><span class="token punctuation">(</span>huart<span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<ul>
+<li>判断UART是不是处于接收进程中<ul>
+<li>我们之前调用过 <code>HAL_UART_Receive_IT</code>，里面会置位这个状态 <code>huart-&gt;RxState = HAL_UART_STATE_BUSY_RX</code></li>
+</ul>
+</li>
+<li>从DR（UART数据寄存器）中读取一个字节到用户自定义缓冲区中（我们调用 <code>HAL_UART_Receive_IT</code> 时传入过一个7字节的<code>buf</code>）</li>
+<li>递减剩余待接收数据数量 <code>huart-&gt;RxXferCount</code>（之前被初始化为7）<ul>
+<li>如果递减为0，则说明接收的字节数填满了用户指定缓冲区大小</li>
+<li>然后调用 <code>HAL_UART_RxCpltCallback</code>，这是一个 <code>weak</code>函数（默认是一个空实现），用户可以声明一个对应的非 <code>weak</code>版以实现回调处理。这个理念是经典的<strong>hook钩子函数</strong>。</li>
+</ul>
+</li>
+</ul>
+<h2 id="重写缓冲区接收完毕回调"><a href="#重写缓冲区接收完毕回调" class="headerlink" title="重写缓冲区接收完毕回调"></a>重写缓冲区接收完毕回调</h2><p>原型：</p>
+<p><em><strong>stm32f4xx_hal_uart.c</strong></em></p>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c">__weak <span class="token keyword">void</span> <span class="token function">HAL_UART_RxCpltCallback</span><span class="token punctuation">(</span>UART_HandleTypeDef <span class="token operator">*</span>huart<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token comment">/* Prevent unused argument(s) compilation warning */</span>
+    <span class="token function">UNUSED</span><span class="token punctuation">(</span>huart<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token comment">/* NOTE: This function should not be modified, when the callback is needed,
+             the HAL_UART_RxCpltCallback could be implemented in the user file
+     */</span>
+<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>重写：</p>
+<p><em><strong>main.c</strong></em></p>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token comment">/* USER CODE BEGIN 0 */</span>
+<span class="token class-name">uint8_t</span> rxbuf<span class="token punctuation">[</span><span class="token number">7</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token punctuation">{</span><span class="token number">0</span><span class="token punctuation">}</span><span class="token punctuation">;</span>
+<span class="token keyword">void</span> <span class="token function">HAL_UART_RxCpltCallback</span><span class="token punctuation">(</span>UART_HandleTypeDef <span class="token operator">*</span>huart<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token function">HAL_UART_Transmit</span><span class="token punctuation">(</span><span class="token operator">&amp;</span>huart1<span class="token punctuation">,</span> rxbuf<span class="token punctuation">,</span> <span class="token number">7</span><span class="token punctuation">,</span> <span class="token number">100</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">HAL_UART_Receive_IT</span><span class="token punctuation">(</span><span class="token operator">&amp;</span>huart1<span class="token punctuation">,</span> rxbuf<span class="token punctuation">,</span> <span class="token number">7</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+<span class="token comment">/* USER CODE END 0 */</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<ul>
+<li>将缓冲区7字节数据通过UART TX发送，采用轮询方式（每发一个字节轮询发送状态），超时时间100ms</li>
+<li>重新开启接收中断，以实现下一次的echo</li>
+</ul>
+<h2 id="定长7字节echo测试"><a href="#定长7字节echo测试" class="headerlink" title="定长7字节echo测试"></a>定长7字节echo测试</h2><p>至此，定长7字节数据echo功能就实现了</p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241113084959956.png" alt="image-20241113084959956"></p>
+<h2 id="超7字节echo测试"><a href="#超7字节echo测试" class="headerlink" title="超7字节echo测试"></a>超7字节echo测试</h2><p><img src="C:/Users/86157/AppData/Roaming/Typora/typora-user-images/image-20241113085040298.png" alt="image-20241113085040298"></p>
+<p>为什么超过我们指定的缓冲区大小（<code>HAL_UART_Transmit</code>的入参 <code>Size</code>）后，功能就不整行了呢？</p>
+<h2 id="UART中断ISR-异常流程"><a href="#UART中断ISR-异常流程" class="headerlink" title="UART中断ISR-异常流程"></a>UART中断ISR-异常流程</h2><pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token keyword">void</span> <span class="token function">HAL_UART_IRQHandler</span><span class="token punctuation">(</span>UART_HandleTypeDef <span class="token operator">*</span>huart<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token comment">/* If no error occurs */</span>
+    errorflags <span class="token operator">=</span> <span class="token punctuation">(</span>isrflags <span class="token operator">&amp;</span> <span class="token punctuation">(</span><span class="token class-name">uint32_t</span><span class="token punctuation">)</span> <span class="token punctuation">(</span>USART_SR_PE <span class="token operator">|</span> USART_SR_FE <span class="token operator">|</span> USART_SR_ORE <span class="token operator">|</span> USART_SR_NE<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>errorflags <span class="token operator">==</span> RESET<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token function">UART_Receive_IT</span><span class="token punctuation">(</span>huart<span class="token punctuation">)</span><span class="token punctuation">;</span>
+     
+     <span class="token comment">/* If some errors occur */</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token punctuation">(</span>errorflags <span class="token operator">!=</span> RESET<span class="token punctuation">)</span> <span class="token operator">&amp;&amp;</span> <span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token punctuation">(</span>cr3its <span class="token operator">&amp;</span> USART_CR3_EIE<span class="token punctuation">)</span> <span class="token operator">!=</span> RESET<span class="token punctuation">)</span>
+                                  <span class="token operator">||</span> <span class="token punctuation">(</span><span class="token punctuation">(</span>cr1its <span class="token operator">&amp;</span> <span class="token punctuation">(</span>USART_CR1_RXNEIE <span class="token operator">|</span> USART_CR1_PEIE<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token operator">!=</span> RESET<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token comment">/* UART Over-Run interrupt occurred
+         huart-&gt;ErrorCode |= HAL_UART_ERROR_ORE;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<ul>
+<li>没有异常时，会执行 <code>UART_Receive_IT</code>逐字接收数据并在填满缓冲区后触发接收完毕回调 <code>HAL_UART_RxCpltCallback</code></li>
+<li>但是当我们发送8字节时，会触发UART的接收溢出错误，继而转向异常处理流程</li>
+</ul>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"> <span class="token comment">/* Call UART Error Call back function if need be --------------------------*/</span>
+<span class="token keyword">if</span> <span class="token punctuation">(</span>huart<span class="token operator">-&gt;</span>ErrorCode <span class="token operator">!=</span> HAL_UART_ERROR_NONE<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+     <span class="token comment">/*Call legacy weak error callback*/</span>
+    <span class="token function">HAL_UART_ErrorCallback</span><span class="token punctuation">(</span>huart<span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>因为异常处理流程不会执行我们自定义的 <code>HAL_UART_RxCpltCallback</code>，也就没有重新开启接收中断 <code>HAL_UART_RxCpltCallback</code>，所以就出现了发送8字节时，后续没有回传的现象：</p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241113085040298.png" alt="image-20241113085040298"></p>
+<h1 id="思考-遗留问题"><a href="#思考-遗留问题" class="headerlink" title="思考/遗留问题"></a>思考/遗留问题</h1><h2 id="USART-SR-ORE是如何被设置的"><a href="#USART-SR-ORE是如何被设置的" class="headerlink" title="USART_SR_ORE是如何被设置的"></a>USART_SR_ORE是如何被设置的</h2><p>为什么发送8字节时会触发USART_SR_ORE错误？</p>
 ]]></content>
       <categories>
         <category>嵌入式</category>
