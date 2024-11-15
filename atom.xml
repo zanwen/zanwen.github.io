@@ -6,7 +6,7 @@
   <link href="https://zanwen.github.io/atom.xml" rel="self"/>
   
   <link href="https://zanwen.github.io/"/>
-  <updated>2024-11-15T09:38:26.289Z</updated>
+  <updated>2024-11-15T11:33:54.943Z</updated>
   <id>https://zanwen.github.io/</id>
   
   <author>
@@ -21,7 +21,7 @@
     <link href="https://zanwen.github.io/2024/11/15/31801.html"/>
     <id>https://zanwen.github.io/2024/11/15/31801.html</id>
     <published>2024-11-15T08:10:55.000Z</published>
-    <updated>2024-11-15T09:38:26.289Z</updated>
+    <updated>2024-11-15T11:33:54.943Z</updated>
     
     
       
@@ -35,6 +35,8 @@
     
     
     <category term="嵌入式" scheme="https://zanwen.github.io/categories/%E5%B5%8C%E5%85%A5%E5%BC%8F/"/>
+    
+    <category term="踩坑记录" scheme="https://zanwen.github.io/categories/%E5%B5%8C%E5%85%A5%E5%BC%8F/%E8%B8%A9%E5%9D%91%E8%AE%B0%E5%BD%95/"/>
     
     
     <category term="SN74HC595NSR" scheme="https://zanwen.github.io/tags/SN74HC595NSR/"/>
@@ -52,7 +54,7 @@
     <link href="https://zanwen.github.io/2024/11/12/13750.html"/>
     <id>https://zanwen.github.io/2024/11/12/13750.html</id>
     <published>2024-11-12T12:40:06.000Z</published>
-    <updated>2024-11-13T02:01:51.364Z</updated>
+    <updated>2024-11-15T11:33:43.559Z</updated>
     
     
       
@@ -67,7 +69,7 @@
     
     <category term="嵌入式" scheme="https://zanwen.github.io/categories/%E5%B5%8C%E5%85%A5%E5%BC%8F/"/>
     
-    <category term="问题记录" scheme="https://zanwen.github.io/categories/%E5%B5%8C%E5%85%A5%E5%BC%8F/%E9%97%AE%E9%A2%98%E8%AE%B0%E5%BD%95/"/>
+    <category term="踩坑记录" scheme="https://zanwen.github.io/categories/%E5%B5%8C%E5%85%A5%E5%BC%8F/%E8%B8%A9%E5%9D%91%E8%AE%B0%E5%BD%95/"/>
     
     
     <category term="Clion" scheme="https://zanwen.github.io/tags/Clion/"/>

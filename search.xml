@@ -243,7 +243,7 @@ huart<span class="token operator">-&gt;</span>RxState <span class="token operato
 ]]></content>
       <categories>
         <category>嵌入式</category>
-        <category>问题记录</category>
+        <category>踩坑记录</category>
       </categories>
       <tags>
         <tag>Clion</tag>
@@ -410,6 +410,7 @@ RCLK = 1;<span aria-hidden="true" class="line-numbers-rows"><span></span><span><
 ]]></content>
       <categories>
         <category>嵌入式</category>
+        <category>踩坑记录</category>
       </categories>
       <tags>
         <tag>SN74HC595NSR</tag>
