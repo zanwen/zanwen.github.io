@@ -221,8 +221,9 @@ cite {
 }
 
 mark {
-    background-color: #fcf8e3;
+    background-color: #fff143; // 中国传统颜色——鹅黄
     padding: .2em;
+    border-radius: 5px;
 }
 
 .card {
