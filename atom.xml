@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom">
-  <title>安文的博客</title>
+  <title>Andy&#39;s Blog</title>
   
   <subtitle>热爱可抵岁月漫长</subtitle>
   <link href="https://zanwen.github.io/atom.xml" rel="self"/>
@@ -10,7 +10,7 @@
   <id>https://zanwen.github.io/</id>
   
   <author>
-    <name>安文</name>
+    <name>Andy</name>
     
   </author>
   
