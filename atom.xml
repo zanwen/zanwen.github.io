@@ -6,7 +6,7 @@
   <link href="https://zanwen.github.io/atom.xml" rel="self"/>
   
   <link href="https://zanwen.github.io/"/>
-  <updated>2024-11-16T11:54:18.631Z</updated>
+  <updated>2024-11-16T12:10:43.749Z</updated>
   <id>https://zanwen.github.io/</id>
   
   <author>
@@ -21,14 +21,20 @@
     <link href="https://zanwen.github.io/2024/11/16/31289.html"/>
     <id>https://zanwen.github.io/2024/11/16/31289.html</id>
     <published>2024-11-16T11:36:55.000Z</published>
-    <updated>2024-11-16T11:54:18.631Z</updated>
+    <updated>2024-11-16T12:10:43.749Z</updated>
     
     
       
       
         
         
-    <summary type="html">&lt;h1 id=&quot;1-前言&quot;&gt;&lt;a href=&quot;#1-前言&quot; class=&quot;headerlink&quot; title=&quot;1. 前言&quot;&gt;&lt;/a&gt;1. 前言&lt;/h1&gt;&lt;h2 id=&quot;硬件背景&quot;&gt;&lt;a href=&quot;#硬件背景&quot; class=&quot;headerlink&quot;</summary>
+    <summary type="html">&lt;h1 id=&quot;1-qian-yan&quot;&gt;1. 前言&lt;/h1&gt;
+&lt;h2 id=&quot;ying-jian-bei-jing&quot;&gt;硬件背景&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;GD32F407VET6&lt;/li&gt;
+&lt;li&gt;I2C实时时钟PCF8563&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2</summary>
         
       
     
@@ -57,7 +63,10 @@
       
         
         
-    <summary type="html">&lt;h1 id=&quot;1-问题背景&quot;&gt;&lt;a href=&quot;#1-问题背景&quot; class=&quot;headerlink&quot; title=&quot;1. 问题背景&quot;&gt;&lt;/a&gt;1. 问题背景&lt;/h1&gt;&lt;h2 id=&quot;硬件背景&quot;&gt;&lt;a href=&quot;#硬件背景&quot; class=&quot;headerlink&quot;</summary>
+    <summary type="html">&lt;h1 id=&quot;1-wen-ti-bei-jing&quot;&gt;1. 问题背景&lt;/h1&gt;
+&lt;h2 id=&quot;ying-jian-bei-jing&quot;&gt;硬件背景&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;移位寄存器：&lt;a</summary>
         
       
     
@@ -90,7 +99,11 @@
       
         
         
-    <summary type="html">&lt;h1 id=&quot;问题背景&quot;&gt;&lt;a href=&quot;#问题背景&quot; class=&quot;headerlink&quot; title=&quot;问题背景&quot;&gt;&lt;/a&gt;问题背景&lt;/h1&gt;&lt;h2 id=&quot;开发环境&quot;&gt;&lt;a href=&quot;#开发环境&quot; class=&quot;headerlink&quot;</summary>
+    <summary type="html">&lt;h1 id=&quot;wen-ti-bei-jing&quot;&gt;问题背景&lt;/h1&gt;
+&lt;h2 id=&quot;kai-fa-huan-jing&quot;&gt;开发环境&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;硬件：GD32F407VET6开发版&lt;/li&gt;
+&lt;li&gt;IDE：STM32CubeMX + Clion + ARM</summary>
         
       
     

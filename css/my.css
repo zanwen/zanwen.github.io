@@ -1,1 +1,7 @@
 /* Here is your custom css styles. */
+/* <input type="checkbox"> 不显示 bug 修复 */
+#articleContent input[type="checkbox"]:not(:checked), 
+#articleContent input[type="checkbox"]:checked {
+    opacity: 1;
+    pointer-events: auto;
+}

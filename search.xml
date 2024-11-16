@@ -3,19 +3,25 @@
   <entry>
     <title>UART接收缓冲区溢出异常（HAL_UART_ERROR_ORE）问题记录</title>
     <url>/2024/11/12/13750.html</url>
-    <content><![CDATA[<h1 id="问题背景"><a href="#问题背景" class="headerlink" title="问题背景"></a>问题背景</h1><h2 id="开发环境"><a href="#开发环境" class="headerlink" title="开发环境"></a>开发环境</h2><ul>
+    <content><![CDATA[<h1 id="wen-ti-bei-jing">问题背景</h1>
+<h2 id="kai-fa-huan-jing">开发环境</h2>
+<ul>
 <li>硬件：GD32F407VET6开发版</li>
 <li>IDE：STM32CubeMX + Clion + ARM GNU</li>
 <li>烧录：OpenOCD</li>
 </ul>
-<h2 id="实验目标"><a href="#实验目标" class="headerlink" title="实验目标"></a>实验目标</h2><p>使用Cube配置串口USART1及其中断，引脚复用PA9/PA10，通过使能接收中断 <code>Receive_IT</code>，实现接收7字节时，在中断回调中处理该7个字节数据（简单回传，即echo），并再次开启接收中断，从而实现不断接收7字节、回传7字节的功能。</p>
-<h2 id="遇到问题"><a href="#遇到问题" class="headerlink" title="遇到问题"></a>遇到问题</h2><p>发送字节数为7时，能够正常echo；但是不为7时，本来期望是单次发送字节数：</p>
+<h2 id="shi-yan-mu-biao">实验目标</h2>
+<p>使用Cube配置串口USART1及其中断，引脚复用PA9/PA10，通过使能接收中断 <code>Receive_IT</code>，实现接收7字节时，在中断回调中处理该7个字节数据（简单回传，即echo），并再次开启接收中断，从而实现不断接收7字节、回传7字节的功能。</p>
+<h2 id="yu-dao-wen-ti">遇到问题</h2>
+<p>发送字节数为7时，能够正常echo；但是不为7时，本来期望是单次发送字节数：</p>
 <ul>
 <li>大于7字节时，应该也能每次触发中断，只是多余的字节数被丢弃了而已</li>
 <li>少于7字节时（例如5），则通过再次发送也能触发中断</li>
 </ul>
 <p>但实验过程中发现这两种情况下，会发送echo了一两次之后，后面无论发送多少数据都无法再echo的情况</p>
-<h1 id="情景再现"><a href="#情景再现" class="headerlink" title="情景再现"></a>情景再现</h1><h2 id="Cube配置"><a href="#Cube配置" class="headerlink" title="Cube配置"></a>Cube配置</h2><p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241112212649840.png" alt="image-20241112212649840"></p>
+<h1 id="qing-jing-zai-xian">情景再现</h1>
+<h2 id="cube-pei-zhi">Cube配置</h2>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241112212649840.png" alt="image-20241112212649840"></p>
 <p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241112212742297.png" alt="image-20241112212742297"></p>
 <p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241112212813159.png" alt="image-20241112212813159"></p>
 <p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241112212840656.png" alt="image-20241112212840656"></p>
@@ -23,9 +29,13 @@
 <p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241112212959621.png" alt="image-20241112212959621"></p>
 <p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241112213059038.png" alt="image-20241112213059038"></p>
 <p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241112213254243.png" alt="image-20241112213254243"></p>
-<h2 id="导入Clion"><a href="#导入Clion" class="headerlink" title="导入Clion"></a>导入Clion</h2><h3 id="编译配置-交叉编译"><a href="#编译配置-交叉编译" class="headerlink" title="编译配置-交叉编译"></a>编译配置-交叉编译</h3><p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241112213601046.png" alt="image-20241112213601046"></p>
-<h3 id="Cmake配置"><a href="#Cmake配置" class="headerlink" title="Cmake配置"></a>Cmake配置</h3><p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241112213656961.png" alt="image-20241112213656961"></p>
-<h3 id="OpenOCD烧录配置"><a href="#OpenOCD烧录配置" class="headerlink" title="OpenOCD烧录配置"></a>OpenOCD烧录配置</h3><p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241112213740944.png" alt="image-20241112213740944"></p>
+<h2 id="dao-ru-clion">导入Clion</h2>
+<h3 id="bian-yi-pei-zhi-jiao-cha-bian-yi">编译配置-交叉编译</h3>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241112213601046.png" alt="image-20241112213601046"></p>
+<h3 id="cmake-pei-zhi">Cmake配置</h3>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241112213656961.png" alt="image-20241112213656961"></p>
+<h3 id="open-ocd-shao-lu-pei-zhi">OpenOCD烧录配置</h3>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241112213740944.png" alt="image-20241112213740944"></p>
 <p><code>daplink.cfg</code>：</p>
 <pre class="line-numbers language-none"><code class="language-none"># choose st-link/j-link/dap-link etc.
 adapter driver cmsis-dap
@@ -41,8 +51,8 @@ source [find target/stm32f4x.cfg]
 
 # download speed = 10MHz
 # adapter speed 10000<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
-<h2 id="代码流程"><a href="#代码流程" class="headerlink" title="代码流程"></a>代码流程</h2><ul>
+<h2 id="dai-ma-liu-cheng">代码流程</h2>
+<ul>
 <li>上电后启用接收中断</li>
 <li>在接收完毕回调中echo，并再次启用接收中断</li>
 </ul>
@@ -96,11 +106,11 @@ source [find target/stm32f4x.cfg]
     <span class="token punctuation">}</span>
     <span class="token comment">/* USER CODE END 3 */</span>
 <span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
-<h1 id="源码分析"><a href="#源码分析" class="headerlink" title="源码分析"></a>源码分析</h1><h2 id="启用接收中断HAL-UART-Receive-IT"><a href="#启用接收中断HAL-UART-Receive-IT" class="headerlink" title="启用接收中断HAL_UART_Receive_IT"></a>启用接收中断HAL_UART_Receive_IT</h2><pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token class-name">uint8_t</span> rxbuf<span class="token punctuation">[</span><span class="token number">7</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token punctuation">{</span><span class="token number">0</span><span class="token punctuation">}</span><span class="token punctuation">;</span>
+<h1 id="yuan-ma-fen-xi">源码分析</h1>
+<h2 id="qi-yong-jie-shou-zhong-duan-hal-uart-receive-it">启用接收中断HAL_UART_Receive_IT</h2>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token class-name">uint8_t</span> rxbuf<span class="token punctuation">[</span><span class="token number">7</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token punctuation">{</span><span class="token number">0</span><span class="token punctuation">}</span><span class="token punctuation">;</span>
 
 <span class="token function">HAL_UART_Receive_IT</span><span class="token punctuation">(</span><span class="token operator">&amp;</span>huart1<span class="token punctuation">,</span> rxbuf<span class="token punctuation">,</span> <span class="token number">7</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
-
 <p><code>HAL_UART_Receive_IT -&gt; UART_Start_Receive_IT</code></p>
 <pre class="line-numbers language-c" data-language="c"><code class="language-c">huart<span class="token operator">-&gt;</span>pRxBuffPtr <span class="token operator">=</span> pData<span class="token punctuation">;</span>
 huart<span class="token operator">-&gt;</span>RxXferSize <span class="token operator">=</span> Size<span class="token punctuation">;</span>
@@ -116,14 +126,14 @@ huart<span class="token operator">-&gt;</span>RxState <span class="token operato
 
 <span class="token comment">/* Enable the UART Data Register not empty Interrupt */</span>
 <span class="token function">__HAL_UART_ENABLE_IT</span><span class="token punctuation">(</span>huart<span class="token punctuation">,</span> UART_IT_RXNE<span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
 <ul>
 <li><code>pRxBuffPtr</code> ：<strong>保存我们传入的buf指针</strong></li>
 <li><code>RxXferSize</code> ：<strong>保存我们传入的buf大小</strong></li>
 <li><code>RxXferCount</code>： <strong>初始化待接收数据数量</strong></li>
 <li><code>ErrorCode</code>：初始化错误码为 no error</li>
 <li><code>RxState</code>：<strong>标识UART处于接收状态（Data Reception process is ongoing）</strong></li>
-<li>开启UART异常中断<ul>
+<li>开启UART异常中断
+<ul>
 <li>帧异常（Frame error）</li>
 <li>噪声异常（noise error）</li>
 <li><em><strong>接收缓冲区溢出异常（overrun error）</strong></em></li>
@@ -131,9 +141,9 @@ huart<span class="token operator">-&gt;</span>RxState <span class="token operato
 </li>
 <li>开启接收寄存器非空中断（Enable the UART Data Register not empty Interrupt）</li>
 </ul>
-<h2 id="UART中断向量表"><a href="#UART中断向量表" class="headerlink" title="UART中断向量表"></a>UART中断向量表</h2><p><em><strong>startup_stm32f407vetx.s</strong></em></p>
+<h2 id="uart-zhong-duan-xiang-liang-biao">UART中断向量表</h2>
+<p><em><strong>startup_stm32f407vetx.s</strong></em></p>
 <pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token punctuation">.</span>word     USART1_IRQHandler                 <span class="token comment">/* USART1                       */</span>       <span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
-
 <p><em><strong>stm32f4xx_it.c</strong></em></p>
 <pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token keyword">void</span> <span class="token function">USART1_IRQHandler</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span>
 <span class="token punctuation">{</span>
@@ -145,8 +155,8 @@ huart<span class="token operator">-&gt;</span>RxState <span class="token operato
 
   <span class="token comment">/* USER CODE END USART1_IRQn 1 */</span>
 <span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
-<h2 id="数据接收处理"><a href="#数据接收处理" class="headerlink" title="数据接收处理"></a>数据接收处理</h2><p><em><strong>stm32f4xx_it.c</strong></em></p>
+<h2 id="shu-ju-jie-shou-chu-li">数据接收处理</h2>
+<p><em><strong>stm32f4xx_it.c</strong></em></p>
 <pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token keyword">void</span> <span class="token function">HAL_UART_IRQHandler</span><span class="token punctuation">(</span>UART_HandleTypeDef <span class="token operator">*</span>huart<span class="token punctuation">)</span> <span class="token punctuation">{</span>
     <span class="token comment">/* If no error occurs */</span>
     errorflags <span class="token operator">=</span> <span class="token punctuation">(</span>isrflags <span class="token operator">&amp;</span> <span class="token punctuation">(</span><span class="token class-name">uint32_t</span><span class="token punctuation">)</span> <span class="token punctuation">(</span>USART_SR_PE <span class="token operator">|</span> USART_SR_FE <span class="token operator">|</span> USART_SR_ORE <span class="token operator">|</span> USART_SR_NE<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
@@ -158,14 +168,14 @@ huart<span class="token operator">-&gt;</span>RxState <span class="token operato
         <span class="token punctuation">}</span>
     <span class="token punctuation">}</span>
 <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
 <p>执行接收数据逻辑（UART_Receive_IT）的前置条件：</p>
 <ul>
 <li>没有UART相关的异常（errorflags）</li>
 <li>接收寄存器非空（USART_SR_RXNE）</li>
 <li>接收寄存器非空中断使能是开启的（USART_CR1_RXNEIE）</li>
 </ul>
-<h2 id="逐字接收数据（Data-Register）"><a href="#逐字接收数据（Data-Register）" class="headerlink" title="逐字接收数据（Data Register）"></a>逐字接收数据（Data Register）</h2><p><em><strong>stm32f4xx_hal_uart.c/UART_Receive_IT</strong></em></p>
+<h2 id="zhu-zi-jie-shou-shu-ju-data-register">逐字接收数据（Data Register）</h2>
+<p><em><strong>stm32f4xx_hal_uart.c/UART_Receive_IT</strong></em></p>
 <pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token comment">/* Check that a Rx process is ongoing */</span>
 <span class="token keyword">if</span> <span class="token punctuation">(</span>huart<span class="token operator">-&gt;</span>RxState <span class="token operator">==</span> HAL_UART_STATE_BUSY_RX<span class="token punctuation">)</span> <span class="token punctuation">{</span>
     <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
@@ -175,20 +185,22 @@ huart<span class="token operator">-&gt;</span>RxState <span class="token operato
     <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">--</span>huart<span class="token operator">-&gt;</span>RxXferCount <span class="token operator">==</span> <span class="token number">0U</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
         <span class="token comment">/*Call legacy weak Rx complete callback*/</span>
 		<span class="token function">HAL_UART_RxCpltCallback</span><span class="token punctuation">(</span>huart<span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
 <ul>
-<li>判断UART是不是处于接收进程中<ul>
+<li>判断UART是不是处于接收进程中
+<ul>
 <li>我们之前调用过 <code>HAL_UART_Receive_IT</code>，里面会置位这个状态 <code>huart-&gt;RxState = HAL_UART_STATE_BUSY_RX</code></li>
 </ul>
 </li>
 <li>从DR（UART数据寄存器）中读取一个字节到用户自定义缓冲区中（我们调用 <code>HAL_UART_Receive_IT</code> 时传入过一个7字节的<code>buf</code>）</li>
-<li>递减剩余待接收数据数量 <code>huart-&gt;RxXferCount</code>（之前被初始化为7）<ul>
+<li>递减剩余待接收数据数量 <code>huart-&gt;RxXferCount</code>（之前被初始化为7）
+<ul>
 <li>如果递减为0，则说明接收的字节数填满了用户指定缓冲区大小</li>
 <li>然后调用 <code>HAL_UART_RxCpltCallback</code>，这是一个 <code>weak</code>函数（默认是一个空实现），用户可以声明一个对应的非 <code>weak</code>版以实现回调处理。这个理念是经典的<strong>hook钩子函数</strong>。</li>
 </ul>
 </li>
 </ul>
-<h2 id="重写缓冲区接收完毕回调"><a href="#重写缓冲区接收完毕回调" class="headerlink" title="重写缓冲区接收完毕回调"></a>重写缓冲区接收完毕回调</h2><p>原型：</p>
+<h2 id="zhong-xie-huan-chong-qu-jie-shou-wan-bi-hui-diao">重写缓冲区接收完毕回调</h2>
+<p>原型：</p>
 <p><em><strong>stm32f4xx_hal_uart.c</strong></em></p>
 <pre class="line-numbers language-c" data-language="c"><code class="language-c">__weak <span class="token keyword">void</span> <span class="token function">HAL_UART_RxCpltCallback</span><span class="token punctuation">(</span>UART_HandleTypeDef <span class="token operator">*</span>huart<span class="token punctuation">)</span> <span class="token punctuation">{</span>
     <span class="token comment">/* Prevent unused argument(s) compilation warning */</span>
@@ -197,7 +209,6 @@ huart<span class="token operator">-&gt;</span>RxState <span class="token operato
              the HAL_UART_RxCpltCallback could be implemented in the user file
      */</span>
 <span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
 <p>重写：</p>
 <p><em><strong>main.c</strong></em></p>
 <pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token comment">/* USER CODE BEGIN 0 */</span>
@@ -207,16 +218,18 @@ huart<span class="token operator">-&gt;</span>RxState <span class="token operato
     <span class="token function">HAL_UART_Receive_IT</span><span class="token punctuation">(</span><span class="token operator">&amp;</span>huart1<span class="token punctuation">,</span> rxbuf<span class="token punctuation">,</span> <span class="token number">7</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 <span class="token punctuation">}</span>
 <span class="token comment">/* USER CODE END 0 */</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
 <ul>
 <li>将缓冲区7字节数据通过UART TX发送，采用轮询方式（每发一个字节轮询发送状态），超时时间100ms</li>
 <li>重新开启接收中断，以实现下一次的echo</li>
 </ul>
-<h2 id="定长7字节echo测试"><a href="#定长7字节echo测试" class="headerlink" title="定长7字节echo测试"></a>定长7字节echo测试</h2><p>至此，定长7字节数据echo功能就实现了</p>
+<h2 id="ding-chang-7-zi-jie-echo-ce-shi">定长7字节echo测试</h2>
+<p>至此，定长7字节数据echo功能就实现了</p>
 <p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241113084959956.png" alt="image-20241113084959956"></p>
-<h2 id="超7字节echo测试"><a href="#超7字节echo测试" class="headerlink" title="超7字节echo测试"></a>超7字节echo测试</h2><p><img src="C:/Users/86157/AppData/Roaming/Typora/typora-user-images/image-20241113085040298.png" alt="image-20241113085040298"></p>
+<h2 id="chao-7-zi-jie-echo-ce-shi">超7字节echo测试</h2>
+<p><img src="C:/Users/86157/AppData/Roaming/Typora/typora-user-images/image-20241113085040298.png" alt="image-20241113085040298"></p>
 <p>为什么超过我们指定的缓冲区大小（<code>HAL_UART_Transmit</code>的入参 <code>Size</code>）后，功能就不整行了呢？</p>
-<h2 id="UART中断ISR-异常流程"><a href="#UART中断ISR-异常流程" class="headerlink" title="UART中断ISR-异常流程"></a>UART中断ISR-异常流程</h2><pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token keyword">void</span> <span class="token function">HAL_UART_IRQHandler</span><span class="token punctuation">(</span>UART_HandleTypeDef <span class="token operator">*</span>huart<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+<h2 id="uart-zhong-duan-isr-yi-chang-liu-cheng">UART中断ISR-异常流程</h2>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token keyword">void</span> <span class="token function">HAL_UART_IRQHandler</span><span class="token punctuation">(</span>UART_HandleTypeDef <span class="token operator">*</span>huart<span class="token punctuation">)</span> <span class="token punctuation">{</span>
     <span class="token comment">/* If no error occurs */</span>
     errorflags <span class="token operator">=</span> <span class="token punctuation">(</span>isrflags <span class="token operator">&amp;</span> <span class="token punctuation">(</span><span class="token class-name">uint32_t</span><span class="token punctuation">)</span> <span class="token punctuation">(</span>USART_SR_PE <span class="token operator">|</span> USART_SR_FE <span class="token operator">|</span> USART_SR_ORE <span class="token operator">|</span> USART_SR_NE<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
     <span class="token keyword">if</span> <span class="token punctuation">(</span>errorflags <span class="token operator">==</span> RESET<span class="token punctuation">)</span> <span class="token punctuation">{</span>
@@ -227,7 +240,6 @@ huart<span class="token operator">-&gt;</span>RxState <span class="token operato
                                   <span class="token operator">||</span> <span class="token punctuation">(</span><span class="token punctuation">(</span>cr1its <span class="token operator">&amp;</span> <span class="token punctuation">(</span>USART_CR1_RXNEIE <span class="token operator">|</span> USART_CR1_PEIE<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token operator">!=</span> RESET<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
         <span class="token comment">/* UART Over-Run interrupt occurred
          huart-&gt;ErrorCode |= HAL_UART_ERROR_ORE;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
 <ul>
 <li>没有异常时，会执行 <code>UART_Receive_IT</code>逐字接收数据并在填满缓冲区后触发接收完毕回调 <code>HAL_UART_RxCpltCallback</code></li>
 <li>但是当我们发送8字节时，会触发UART的接收溢出错误，继而转向异常处理流程</li>
@@ -236,10 +248,11 @@ huart<span class="token operator">-&gt;</span>RxState <span class="token operato
 <span class="token keyword">if</span> <span class="token punctuation">(</span>huart<span class="token operator">-&gt;</span>ErrorCode <span class="token operator">!=</span> HAL_UART_ERROR_NONE<span class="token punctuation">)</span> <span class="token punctuation">{</span>
      <span class="token comment">/*Call legacy weak error callback*/</span>
     <span class="token function">HAL_UART_ErrorCallback</span><span class="token punctuation">(</span>huart<span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
-
 <p>因为异常处理流程不会执行我们自定义的 <code>HAL_UART_RxCpltCallback</code>，也就没有重新开启接收中断 <code>HAL_UART_RxCpltCallback</code>，所以就出现了发送8字节时，后续没有回传的现象：</p>
 <p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241113085040298.png" alt="image-20241113085040298"></p>
-<h1 id="思考-遗留问题"><a href="#思考-遗留问题" class="headerlink" title="思考/遗留问题"></a>思考/遗留问题</h1><h2 id="USART-SR-ORE是如何被设置的"><a href="#USART-SR-ORE是如何被设置的" class="headerlink" title="USART_SR_ORE是如何被设置的"></a>USART_SR_ORE是如何被设置的</h2><p>为什么发送8字节时会触发USART_SR_ORE错误？</p>
+<h1 id="si-kao-yi-liu-wen-ti">思考/遗留问题</h1>
+<h2 id="usart-sr-ore-shi-ru-he-bei-she-zhi-de">USART_SR_ORE是如何被设置的</h2>
+<p>为什么发送8字节时会触发USART_SR_ORE错误？</p>
 ]]></content>
       <categories>
         <category>嵌入式</category>
@@ -258,42 +271,47 @@ huart<span class="token operator">-&gt;</span>RxState <span class="token operato
     <title>Hello World</title>
     <url>/2024/11/12/16107.html</url>
     <content><![CDATA[<p>Welcome to <a href="https://hexo.io/">Hexo</a>! This is your very first post. Check <a href="https://hexo.io/docs/">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="https://hexo.io/docs/troubleshooting.html">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues">GitHub</a>.</p>
-<h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><pre class="line-numbers language-bash" data-language="bash"><code class="language-bash">$ hexo new <span class="token string">"My New Post"</span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
-
+<h2 id="quick-start">Quick Start</h2>
+<h3 id="create-a-new-post">Create a new post</h3>
+<pre class="line-numbers language-bash" data-language="bash"><code class="language-bash">$ hexo new <span class="token string">"My New Post"</span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
 <p>More info: <a href="https://hexo.io/docs/writing.html">Writing</a></p>
-<h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><pre class="line-numbers language-bash" data-language="bash"><code class="language-bash">$ hexo server<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
-
+<h3 id="run-server">Run server</h3>
+<pre class="line-numbers language-bash" data-language="bash"><code class="language-bash">$ hexo server<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
 <p>More info: <a href="https://hexo.io/docs/server.html">Server</a></p>
-<h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><pre class="line-numbers language-bash" data-language="bash"><code class="language-bash">$ hexo generate<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
-
+<h3 id="generate-static-files">Generate static files</h3>
+<pre class="line-numbers language-bash" data-language="bash"><code class="language-bash">$ hexo generate<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
 <p>More info: <a href="https://hexo.io/docs/generating.html">Generating</a></p>
-<h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><pre class="line-numbers language-bash" data-language="bash"><code class="language-bash">$ hexo deploy<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
-
+<h3 id="deploy-to-remote-sites">Deploy to remote sites</h3>
+<pre class="line-numbers language-bash" data-language="bash"><code class="language-bash">$ hexo deploy<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
 <p>More info: <a href="https://hexo.io/docs/one-command-deployment.html">Deployment</a></p>
 ]]></content>
   </entry>
   <entry>
     <title>深入理解I2C时序（以I2C实时时钟PCF8563为案例）</title>
     <url>/2024/11/16/31289.html</url>
-    <content><![CDATA[<h1 id="1-前言"><a href="#1-前言" class="headerlink" title="1. 前言"></a>1. 前言</h1><h2 id="硬件背景"><a href="#硬件背景" class="headerlink" title="硬件背景"></a>硬件背景</h2><ul>
+    <content><![CDATA[<h1 id="1-qian-yan">1. 前言</h1>
+<h2 id="ying-jian-bei-jing">硬件背景</h2>
+<ul>
 <li>GD32F407VET6</li>
 <li>I2C实时时钟PCF8563</li>
 </ul>
-<h2 id="原理图"><a href="#原理图" class="headerlink" title="原理图"></a>原理图</h2><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241116194724707.png" alt="image-20241116194724707" style="zoom: 33%;">
-
+<h2 id="yuan-li-tu">原理图</h2>
+<img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241116194724707.png" alt="image-20241116194724707" style="zoom: 33%;">
 <img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241116194750339.png" alt="image-20241116194750339" style="zoom:33%;">
-
-<h2 id="文档资料"><a href="#文档资料" class="headerlink" title="文档资料"></a>文档资料</h2><ul>
+<h2 id="wen-dang-zi-liao">文档资料</h2>
+<ul>
 <li><a href="https://www.nxp.com/docs/en/user-guide/UM10204.pdf">NXP（恩智浦）I2C总线协议说明书和用户手册</a></li>
 <li><a href="https://atta.szlcsc.com/upload/public/pdf/source/20230921/9DB04F89E1E4336DD7CCB7C268B77442.pdf">I 2 C 实时时钟/日历芯片 PCF8563</a></li>
 </ul>
-<h1 id="2-恩智浦（NXP）I2C总线协议时序解析"><a href="#2-恩智浦（NXP）I2C总线协议时序解析" class="headerlink" title="2. 恩智浦（NXP）I2C总线协议时序解析"></a>2. 恩智浦（NXP）I2C总线协议时序解析</h1><blockquote>
+<h1 id="2-en-zhi-pu-nxp-i-2-c-zong-xian-xie-yi-shi-xu-jie-xi">2. 恩智浦（NXP）I2C总线协议时序解析</h1>
+<blockquote>
 <p>参见<a href="https://www.nxp.com/docs/en/user-guide/UM10204.pdf">NXP（恩智浦）I2C总线协议说明书和用户手册</a>中的</p>
-<p> **6 Electrical specifications and timing for I/O stages and bus lines  **</p>
+<p>**6 Electrical specifications and timing for I/O stages and bus lines  **</p>
 <p>**Table 11. Characteristics of the SDA and SCL bus lines for Standard, Fast, and Fast-mode Plus I2C-bus devices **</p>
 </blockquote>
 <p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241116195121046.png" alt="image-20241116195121046"></p>
-<h2 id="fSCL"><a href="#fSCL" class="headerlink" title="fSCL"></a>f<del>SCL</del></h2>]]></content>
+<h2 id="f-sub-scl-sub">f<sub>SCL</sub></h2>
+]]></content>
       <categories>
         <category>嵌入式</category>
       </categories>
@@ -306,12 +324,15 @@ huart<span class="token operator">-&gt;</span>RxState <span class="token operato
   <entry>
     <title>论时序要求的重要性（移位寄存器控制数码管）</title>
     <url>/2024/11/15/31801.html</url>
-    <content><![CDATA[<h1 id="1-问题背景"><a href="#1-问题背景" class="headerlink" title="1. 问题背景"></a>1. 问题背景</h1><h2 id="硬件背景"><a href="#硬件背景" class="headerlink" title="硬件背景"></a>硬件背景</h2><ul>
+    <content><![CDATA[<h1 id="1-wen-ti-bei-jing">1. 问题背景</h1>
+<h2 id="ying-jian-bei-jing">硬件背景</h2>
+<ul>
 <li>移位寄存器：<a href="https://item.szlcsc.com/79848.html?fromZone=s_s__%2274HC595N%22">SN74HC595N</a></li>
 <li>两个4位共阳数码管</li>
 </ul>
-<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/20241115163627.png"></p>
-<h2 id="移位-锁存逻辑——set-reset"><a href="#移位-锁存逻辑——set-reset" class="headerlink" title="移位/锁存逻辑——set/reset"></a>移位/锁存逻辑——set/reset</h2><p>在学习GD32F407VET时，将学习STC8实现的数码管模块移植过来，发现了一个很奇怪的问题。其中移位操作的实现如下（封装了对两个串联移位寄存器的移位操作，控制8个数码管中显示哪一个，以及控制数码管显示内容）：</p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/20241115163627.png" alt=""></p>
+<h2 id="yi-wei-suo-cun-luo-ji-set-reset">移位/锁存逻辑——set/reset</h2>
+<p>在学习GD32F407VET时，将学习STC8实现的数码管模块移植过来，发现了一个很奇怪的问题。其中移位操作的实现如下（封装了对两个串联移位寄存器的移位操作，控制8个数码管中显示哪一个，以及控制数码管显示内容）：</p>
 <pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">shift</span><span class="token punctuation">(</span><span class="token class-name">uint8_t</span> data<span class="token punctuation">)</span> <span class="token punctuation">{</span>
     <span class="token keyword">for</span> <span class="token punctuation">(</span><span class="token class-name">uint8_t</span> i <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span> i <span class="token operator">&lt;</span> <span class="token number">8</span><span class="token punctuation">;</span> <span class="token operator">++</span>i<span class="token punctuation">)</span> <span class="token punctuation">{</span>
         <span class="token function">gpio_bit_write</span><span class="token punctuation">(</span>NIX_DI_PORT<span class="token punctuation">,</span> NIX_DI_PIN<span class="token punctuation">,</span> <span class="token punctuation">(</span>data <span class="token operator">&amp;</span> <span class="token punctuation">(</span><span class="token number">0x80</span> <span class="token operator">&gt;&gt;</span> i<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token operator">?</span> SET <span class="token operator">:</span> RESET<span class="token punctuation">)</span><span class="token punctuation">;</span>
@@ -328,19 +349,17 @@ huart<span class="token operator">-&gt;</span>RxState <span class="token operato
     <span class="token function">gpio_bit_set</span><span class="token punctuation">(</span>NIX_RCK_PORT<span class="token punctuation">,</span> NIX_RCK_PIN<span class="token punctuation">)</span><span class="token punctuation">;</span>
     <span class="token function">__NOP</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 <span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
 <p>发现单独指定某个数码管显示某个数是没有问题的：</p>
 <pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token comment">// 要显示1~8对应的码表</span>
 <span class="token class-name">uint8_t</span> code<span class="token punctuation">[</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token punctuation">{</span><span class="token number">0xF9</span><span class="token punctuation">,</span> <span class="token number">0xA4</span><span class="token punctuation">,</span> <span class="token number">0xB0</span><span class="token punctuation">,</span> <span class="token number">0x99</span><span class="token punctuation">,</span> <span class="token number">0x92</span><span class="token punctuation">,</span> <span class="token number">0x82</span><span class="token punctuation">,</span> <span class="token number">0xF8</span><span class="token punctuation">,</span> <span class="token number">0x80</span><span class="token punctuation">,</span><span class="token punctuation">}</span><span class="token punctuation">;</span>
 <span class="token function">Int_NixieTube_DisplaySingle</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">,</span> code<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
-
 <p>但是想使用 <code>for</code>控制数码管轮流显示1~8时，就发现显示的内容并不符合预期：</p>
 <pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token keyword">for</span> <span class="token punctuation">(</span><span class="token class-name">uint8_t</span> i <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span> i <span class="token operator">&lt;</span> <span class="token number">8</span><span class="token punctuation">;</span> <span class="token operator">++</span>i<span class="token punctuation">)</span> <span class="token punctuation">{</span>
     <span class="token function">Int_NixieTube_DisplaySingle</span><span class="token punctuation">(</span>i<span class="token punctuation">,</span> code<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
     <span class="token function">delay_1ms</span><span class="token punctuation">(</span><span class="token number">1000</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 <span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
-
-<h2 id="移位-锁存逻辑——write"><a href="#移位-锁存逻辑——write" class="headerlink" title="移位/锁存逻辑——write"></a>移位/锁存逻辑——write</h2><p>但是将其中 <code>gpio_bit</code> 的 <code>set/reset</code>换成 <code>write</code>之后，发现数码管能够按照预期显示了：</p>
+<h2 id="yi-wei-suo-cun-luo-ji-write">移位/锁存逻辑——write</h2>
+<p>但是将其中 <code>gpio_bit</code> 的 <code>set/reset</code>换成 <code>write</code>之后，发现数码管能够按照预期显示了：</p>
 <pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">shift</span><span class="token punctuation">(</span><span class="token class-name">uint8_t</span> data<span class="token punctuation">)</span> <span class="token punctuation">{</span>
     <span class="token keyword">for</span> <span class="token punctuation">(</span><span class="token class-name">uint8_t</span> i <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span> i <span class="token operator">&lt;</span> <span class="token number">8</span><span class="token punctuation">;</span> <span class="token operator">++</span>i<span class="token punctuation">)</span> <span class="token punctuation">{</span>
         <span class="token function">gpio_bit_write</span><span class="token punctuation">(</span>NIX_DI_PORT<span class="token punctuation">,</span> NIX_DI_PIN<span class="token punctuation">,</span> <span class="token punctuation">(</span>data <span class="token operator">&amp;</span> <span class="token punctuation">(</span><span class="token number">0x80</span> <span class="token operator">&gt;&gt;</span> i<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token operator">?</span> SET <span class="token operator">:</span> RESET<span class="token punctuation">)</span><span class="token punctuation">;</span>
@@ -357,7 +376,6 @@ huart<span class="token operator">-&gt;</span>RxState <span class="token operato
     <span class="token function">gpio_bit_write</span><span class="token punctuation">(</span>NIX_RCK_PORT<span class="token punctuation">,</span> NIX_RCK_PIN<span class="token punctuation">,</span> SET<span class="token punctuation">)</span><span class="token punctuation">;</span>
     <span class="token function">__NOP</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 <span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
 <p>查看这些函数的实现：</p>
 <pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token keyword">void</span> <span class="token function">gpio_bit_set</span><span class="token punctuation">(</span><span class="token class-name">uint32_t</span> gpio_periph<span class="token punctuation">,</span> <span class="token class-name">uint32_t</span> pin<span class="token punctuation">)</span>
 <span class="token punctuation">{</span>
@@ -377,33 +395,38 @@ huart<span class="token operator">-&gt;</span>RxState <span class="token operato
         <span class="token function">GPIO_BC</span><span class="token punctuation">(</span>gpio_periph<span class="token punctuation">)</span> <span class="token operator">=</span> <span class="token punctuation">(</span><span class="token class-name">uint32_t</span><span class="token punctuation">)</span>pin<span class="token punctuation">;</span>
     <span class="token punctuation">}</span>
 <span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
 <p>发现 <code>write</code>只不过将 <code>set/reset</code>包成了一个函数，唯一不同的就是多了一个 <code>if</code>判断。</p>
 <p>但是，一个<code>if</code> 的耗时又能对程序产生什么影响呢？我百思不得其解。</p>
-<h1 id="2-时序要求引发的血案"><a href="#2-时序要求引发的血案" class="headerlink" title="2. 时序要求引发的血案"></a>2. 时序要求引发的血案</h1><h2 id="小小if暗藏玄机"><a href="#小小if暗藏玄机" class="headerlink" title="小小if暗藏玄机"></a>小小if暗藏玄机</h2><p>在各种 <code>Google, GPT</code>之后，结合代码上下文，发现代码中使用了 <code>nop</code>来增加时延，再结合移位寄存器需要根据我们通过GPIO发送的SRCLK（移位时钟）、RCLK（锁存时钟）的上升沿来进行移位操作和锁存操作（将移位寄存器更新到锁存寄存器 storage register）。</p>
+<h1 id="2-shi-xu-yao-qiu-yin-fa-de-xie-an">2. 时序要求引发的血案</h1>
+<h2 id="xiao-xiao-if-an-cang-xuan-ji">小小if暗藏玄机</h2>
+<p>在各种 <code>Google, GPT</code>之后，结合代码上下文，发现代码中使用了 <code>nop</code>来增加时延，再结合移位寄存器需要根据我们通过GPIO发送的SRCLK（移位时钟）、RCLK（锁存时钟）的上升沿来进行移位操作和锁存操作（将移位寄存器更新到锁存寄存器 storage register）。</p>
 <p>我设置的GD32F407的主频是168MHz，这个比STC8时的24MHz还是要快几倍的，计算一下<code>nop</code>对应一个时钟周期的时间为 <code>1/168MHz</code>约为 <code>5.95ns</code>、<code>1/24MHz</code>约为 <code>41.67ns</code>。</p>
 <p>这样看来，一个 <code>if</code>判断还真有可能引发了血案，其所消耗的时钟周期（增加的时延）可能正好满足了移位寄存器的<strong>时序要求</strong>，从而使得数码管能够正常显示。</p>
-<h2 id="数据手册不可少"><a href="#数据手册不可少" class="headerlink" title="数据手册不可少"></a>数据手册不可少</h2><p>在想到可能时时延导致的问题后，不妨看一下芯片对应的官方手册，看能否找到答案。</p>
+<h2 id="shu-ju-shou-ce-bu-ke-shao">数据手册不可少</h2>
+<p>在想到可能时时延导致的问题后，不妨看一下芯片对应的官方手册，看能否找到答案。</p>
 <p>这里要注意的是，一定要找与芯片型号、品牌一致的：</p>
 <p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241115170556369.png" alt="image-20241115170556369"></p>
-<h2 id="Timing-Requirements"><a href="#Timing-Requirements" class="headerlink" title="Timing Requirements"></a>Timing Requirements</h2><p>这里我们主要看时序要求（Timing Requirements ）相关的章节</p>
+<h2 id="timing-requirements">Timing Requirements</h2>
+<p>这里我们主要看时序要求（Timing Requirements ）相关的章节</p>
 <p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241115170729345.png" alt="image-20241115170729345"></p>
-<h3 id="Set-up-time"><a href="#Set-up-time" class="headerlink" title="Set-up time"></a>Set-up time</h3><p>其中描述了，我们在使用串行信号线 <code>SER</code>、移位寄存器时钟线 <code>SRCLK</code>、锁存器时钟线 <code>RCLK</code> 来操作 <a href="https://item.szlcsc.com/79848.html?fromZone=s_s__%2274HC595N%22">SN74HC595N</a> 时，需要的准备时间，例如</p>
-<h4 id="SER-before-SRCLK↑"><a href="#SER-before-SRCLK↑" class="headerlink" title="SER before SRCLK↑"></a>SER before SRCLK↑</h4><p>在操作SRCLK上升沿将SER存入移位寄存器之前，SER应该预备的时间，以125ns为例，伪代码如下</p>
+<h3 id="set-up-time">Set-up time</h3>
+<p>其中描述了，我们在使用串行信号线 <code>SER</code>、移位寄存器时钟线 <code>SRCLK</code>、锁存器时钟线 <code>RCLK</code> 来操作 <a href="https://item.szlcsc.com/79848.html?fromZone=s_s__%2274HC595N%22">SN74HC595N</a> 时，需要的准备时间，例如</p>
+<h4 id="ser-before-srclk">SER before SRCLK↑</h4>
+<p>在操作SRCLK上升沿将SER存入移位寄存器之前，SER应该预备的时间，以125ns为例，伪代码如下</p>
 <pre class="line-numbers language-none"><code class="language-none">set SER
 wait 125ns
 SRCLK = 0;
 SRCLK = 1;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
-
-<h4 id="SRCLK↑-before-RCLK↑"><a href="#SRCLK↑-before-RCLK↑" class="headerlink" title="SRCLK↑ before RCLK↑"></a>SRCLK↑ before RCLK↑</h4><p>在操作完所有的移位后，将移位寄存器更新到锁存寄存器（即更新到电路，控制数码管的段选和片选），需要操作RCLK上升沿。</p>
+<h4 id="srclk-before-rclk">SRCLK↑ before RCLK↑</h4>
+<p>在操作完所有的移位后，将移位寄存器更新到锁存寄存器（即更新到电路，控制数码管的段选和片选），需要操作RCLK上升沿。</p>
 <p>该参数规定了，RCLK上升沿应该与SRCLK上升沿保持的时间间隔</p>
-<h3 id="Pulse-duration"><a href="#Pulse-duration" class="headerlink" title="Pulse duration"></a>Pulse duration</h3><p>其中描述了SRCLK、RCLK被置位后应该持续一段时间，所以我们还需要在上述基础上增加两个延时（以100ns为例）</p>
+<h3 id="pulse-duration">Pulse duration</h3>
+<p>其中描述了SRCLK、RCLK被置位后应该持续一段时间，所以我们还需要在上述基础上增加两个延时（以100ns为例）</p>
 <pre class="line-numbers language-none"><code class="language-none">set SER
 wait 125ns
 SRCLK = 0;
 wait 100ns
 SRCLK = 1;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
 <p>再加上锁存的操作：</p>
 <pre class="line-numbers language-none"><code class="language-none">set SER
 wait 125ns
@@ -415,8 +438,8 @@ wait 100ns
 RCLK = 0;
 wait 100ns
 RCLK = 1;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
-<h2 id="再看if和nop"><a href="#再看if和nop" class="headerlink" title="再看if和nop"></a>再看if和nop</h2><p>之前对于时序控制的理解并不深刻，简单的以为使用 <code>nop</code>停顿一下就好。现在看来，无论是不同主频对应的 <code>nop</code>时延不同，还是 <code>if</code>耗时也能影响数码管的生死，都在提醒我们时序控制不可小觑。</p>
+<h2 id="zai-kan-if-he-nop">再看if和nop</h2>
+<p>之前对于时序控制的理解并不深刻，简单的以为使用 <code>nop</code>停顿一下就好。现在看来，无论是不同主频对应的 <code>nop</code>时延不同，还是 <code>if</code>耗时也能影响数码管的生死，都在提醒我们时序控制不可小觑。</p>
 <p>在使用MCU对外围设备/芯片交互</p>
 <p>、控制时，一定要严格按照芯片要求的时序控制，结合MCU自身指令耗时来编写程序。</p>
 <pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">shift</span><span class="token punctuation">(</span><span class="token class-name">uint8_t</span> data<span class="token punctuation">)</span> <span class="token punctuation">{</span>
@@ -436,7 +459,6 @@ RCLK = 1;<span aria-hidden="true" class="line-numbers-rows"><span></span><span><
     <span class="token function">gpio_bit_set</span><span class="token punctuation">(</span>NIX_RCK_PORT<span class="token punctuation">,</span> NIX_RCK_PIN<span class="token punctuation">)</span><span class="token punctuation">;</span>
     <span class="token function">delay_1us</span><span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 <span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
 <p>这里宁愿多等一点，也不要让 SN74HC595N 无法准确移位、锁存数据。</p>
 ]]></content>
       <categories>
