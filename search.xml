@@ -273,6 +273,37 @@ huart<span class="token operator">-&gt;</span>RxState <span class="token operato
 ]]></content>
   </entry>
   <entry>
+    <title>深入理解I2C时序（以I2C实时时钟PCF8563为案例）</title>
+    <url>/2024/11/16/31289.html</url>
+    <content><![CDATA[<h1 id="1-前言"><a href="#1-前言" class="headerlink" title="1. 前言"></a>1. 前言</h1><h2 id="硬件背景"><a href="#硬件背景" class="headerlink" title="硬件背景"></a>硬件背景</h2><ul>
+<li>GD32F407VET6</li>
+<li>I2C实时时钟PCF8563</li>
+</ul>
+<h2 id="原理图"><a href="#原理图" class="headerlink" title="原理图"></a>原理图</h2><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241116194724707.png" alt="image-20241116194724707" style="zoom: 33%;">
+
+<img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241116194750339.png" alt="image-20241116194750339" style="zoom:33%;">
+
+<h2 id="文档资料"><a href="#文档资料" class="headerlink" title="文档资料"></a>文档资料</h2><ul>
+<li><a href="https://www.nxp.com/docs/en/user-guide/UM10204.pdf">NXP（恩智浦）I2C总线协议说明书和用户手册</a></li>
+<li><a href="https://atta.szlcsc.com/upload/public/pdf/source/20230921/9DB04F89E1E4336DD7CCB7C268B77442.pdf">I 2 C 实时时钟/日历芯片 PCF8563</a></li>
+</ul>
+<h1 id="2-恩智浦（NXP）I2C总线协议时序解析"><a href="#2-恩智浦（NXP）I2C总线协议时序解析" class="headerlink" title="2. 恩智浦（NXP）I2C总线协议时序解析"></a>2. 恩智浦（NXP）I2C总线协议时序解析</h1><blockquote>
+<p>参见<a href="https://www.nxp.com/docs/en/user-guide/UM10204.pdf">NXP（恩智浦）I2C总线协议说明书和用户手册</a>中的</p>
+<p> **6 Electrical specifications and timing for I/O stages and bus lines  **</p>
+<p>**Table 11. Characteristics of the SDA and SCL bus lines for Standard, Fast, and Fast-mode Plus I2C-bus devices **</p>
+</blockquote>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241116195121046.png" alt="image-20241116195121046"></p>
+<h2 id="fSCL"><a href="#fSCL" class="headerlink" title="fSCL"></a>f<del>SCL</del></h2>]]></content>
+      <categories>
+        <category>嵌入式</category>
+      </categories>
+      <tags>
+        <tag>I2C</tag>
+        <tag>时序要求</tag>
+        <tag>PCF8563</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>论时序要求的重要性（移位寄存器控制数码管）</title>
     <url>/2024/11/15/31801.html</url>
     <content><![CDATA[<h1 id="1-问题背景"><a href="#1-问题背景" class="headerlink" title="1. 问题背景"></a>1. 问题背景</h1><h2 id="硬件背景"><a href="#硬件背景" class="headerlink" title="硬件背景"></a>硬件背景</h2><ul>
@@ -413,8 +444,8 @@ RCLK = 1;<span aria-hidden="true" class="line-numbers-rows"><span></span><span><
         <category>踩坑记录</category>
       </categories>
       <tags>
-        <tag>SN74HC595NSR</tag>
         <tag>时序要求</tag>
+        <tag>SN74HC595NSR</tag>
         <tag>移位寄存器</tag>
         <tag>数码管</tag>
       </tags>
