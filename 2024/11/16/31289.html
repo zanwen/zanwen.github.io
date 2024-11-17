@@ -420,7 +420,7 @@ I 2 C 实时时钟/日历芯片 PCF8563
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-check fa-fw"></i>更新日期:&nbsp;&nbsp;
-                    2024-11-16
+                    2024-11-17
                 </div>
                 
 
@@ -502,7 +502,7 @@ I 2 C 实时时钟/日历芯片 PCF8563
 <p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241116214423843.png" alt="image-20241116214423843"></p>
 <h2 id="f-sub-scl-sub-shi-zhong-xian-pin-lu-frequency-for-scl">f<sub>SCL</sub>时钟线频率（frequency for SCL）</h2>
 <p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241116201656138.png" alt="image-20241116201656138"></p>
-<p>该参数规定了I2C的SCL时钟线的频率，以Fast-mode为例，最大为400kHz。这意味着我们在操作SCL时，将SCL置0的时间+随后将SCL置1的时间之和不能超过 1/400kHz = 2.5us：</p>
+<p>该参数规定了I2C的SCL时钟线的频率，以Fast-mode为例，最大为400kHz。这意味着我们在操作SCL时，将SCL置0的时间+随后将SCL置1的时间之和不能小于 1/400kHz = 2.5us：</p>
 <p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241116201725124.png" alt="image-20241116201725124"></p>
 <h2 id="t-sub-hd-sta-sub-qi-shi-xin-hao-bao-chi-shi-jian-hol-d-time-for-start-condition">t<sub>HD;STA</sub>起始信号保持时间（HolD time for START condition）</h2>
 <p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241116202607065.png" alt="image-20241116202607065"></p>
@@ -645,7 +645,7 @@ for(i = 0 ; i &lt; 8 ; i++) {
 <h2 id="t-sub-buf-sub-zong-xian-shi-fang-shi-jian-b-us-free-time">t<sub>BUF</sub>总线释放时间（BUs Free time）</h2>
 <p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241116222447598.png" alt="image-20241116222447598"></p>
 <p>该参数规定了在一个终止信号（P）和下一个起始信号（S）之间，总线应该被释放（SCL/SDA保持高电平）的时间：</p>
-<p><img src="C:%5CUsers%5C86157%5CAppData%5CRoaming%5CTypora%5Ctypora-user-images%5Cimage-20241116222631166.png" alt="image-20241116222631166"></p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241116222631166.png" alt="image-20241116222631166"></p>
 <h2 id="zhong-zhi-xin-hao-de-shi-xian">终止信号的实现</h2>
 <p>至此，我们可以实现终止信号的伪代码了：</p>
 <p><code>I2C_Stop</code></p>
