@@ -380,12 +380,12 @@ I 2 C 实时时钟/日历芯片 PCF8563
                     
                     <div class="article-tag">
                         
-                            <a href="/tags/I2C/">
-                                <span class="chip bg-color">I2C</span>
-                            </a>
-                        
                             <a href="/tags/%E6%97%B6%E5%BA%8F%E8%A6%81%E6%B1%82/">
                                 <span class="chip bg-color">时序要求</span>
+                            </a>
+                        
+                            <a href="/tags/I2C/">
+                                <span class="chip bg-color">I2C</span>
                             </a>
                         
                             <a href="/tags/PCF8563/">
@@ -420,7 +420,7 @@ I 2 C 实时时钟/日历芯片 PCF8563
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-check fa-fw"></i>更新日期:&nbsp;&nbsp;
-                    2024-11-17
+                    2024-11-20
                 </div>
                 
 
@@ -724,194 +724,194 @@ bool <span class="token function">hal_i2c_soft_read</span><span class="token pun
 <span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">endif</span> <span class="token comment">//HAL_I2C_SOFT_H</span></span>
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <h2 id="code-hal-i-2-c-soft-c-code"><code>hal_i2c_soft.c</code></h2>
-<pre class="line-numbers language-none"><code class="language-none">//
-// Created by 86157 on 2024/11/16.
-//
-#include &lt;stdbool.h&gt;
-#include "hal_i2c_soft.h"
-#include "systick.h"
-#include "logger.h"
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token comment">//</span>
+<span class="token comment">// Created by 86157 on 2024/11/16.</span>
+<span class="token comment">//</span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;stdbool.h&gt;</span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">"hal_i2c_soft.h"</span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">"systick.h"</span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">"logger.h"</span></span>
 
-#define I2C_SCL_PIN    GPIO_PIN_6
-#define I2C_SDA_PIN    GPIO_PIN_7
-#define I2C_GPIO_PORT  GPIOB
-#define I2C_GPIO_RCU   RCU_GPIOB
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name">I2C_SCL_PIN</span>    <span class="token expression">GPIO_PIN_6</span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name">I2C_SDA_PIN</span>    <span class="token expression">GPIO_PIN_7</span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name">I2C_GPIO_PORT</span>  <span class="token expression">GPIOB</span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name">I2C_GPIO_RCU</span>   <span class="token expression">RCU_GPIOB</span></span>
 
-#define SDA_HIGH() gpio_bit_set(I2C_GPIO_PORT, I2C_SDA_PIN)
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name function">SDA_HIGH</span><span class="token expression"><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token function">gpio_bit_set</span><span class="token punctuation">(</span>I2C_GPIO_PORT<span class="token punctuation">,</span> I2C_SDA_PIN<span class="token punctuation">)</span></span></span>
 
-#define SDA_LOW() gpio_bit_reset(I2C_GPIO_PORT, I2C_SDA_PIN)
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name function">SDA_LOW</span><span class="token expression"><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token function">gpio_bit_reset</span><span class="token punctuation">(</span>I2C_GPIO_PORT<span class="token punctuation">,</span> I2C_SDA_PIN<span class="token punctuation">)</span></span></span>
 
-#define SCL_HIGH() gpio_bit_set(I2C_GPIO_PORT, I2C_SCL_PIN)
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name function">SCL_HIGH</span><span class="token expression"><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token function">gpio_bit_set</span><span class="token punctuation">(</span>I2C_GPIO_PORT<span class="token punctuation">,</span> I2C_SCL_PIN<span class="token punctuation">)</span></span></span>
 
-#define SCL_LOW() gpio_bit_reset(I2C_GPIO_PORT, I2C_SCL_PIN)
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name function">SCL_LOW</span><span class="token expression"><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token function">gpio_bit_reset</span><span class="token punctuation">(</span>I2C_GPIO_PORT<span class="token punctuation">,</span> I2C_SCL_PIN<span class="token punctuation">)</span></span></span>
 
-#define SDA_IN() gpio_mode_set(I2C_GPIO_PORT, GPIO_MODE_INPUT, GPIO_PUPD_PULLUP, I2C_SDA_PIN)
-#define SDA_OUT() gpio_mode_set(I2C_GPIO_PORT, GPIO_MODE_OUTPUT, GPIO_PUPD_PULLUP, I2C_SDA_PIN)
-#define SDA_READ() gpio_input_bit_get(I2C_GPIO_PORT, I2C_SDA_PIN)
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name function">SDA_IN</span><span class="token expression"><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token function">gpio_mode_set</span><span class="token punctuation">(</span>I2C_GPIO_PORT<span class="token punctuation">,</span> GPIO_MODE_INPUT<span class="token punctuation">,</span> GPIO_PUPD_PULLUP<span class="token punctuation">,</span> I2C_SDA_PIN<span class="token punctuation">)</span></span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name function">SDA_OUT</span><span class="token expression"><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token function">gpio_mode_set</span><span class="token punctuation">(</span>I2C_GPIO_PORT<span class="token punctuation">,</span> GPIO_MODE_OUTPUT<span class="token punctuation">,</span> GPIO_PUPD_PULLUP<span class="token punctuation">,</span> I2C_SDA_PIN<span class="token punctuation">)</span></span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name function">SDA_READ</span><span class="token expression"><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token function">gpio_input_bit_get</span><span class="token punctuation">(</span>I2C_GPIO_PORT<span class="token punctuation">,</span> I2C_SDA_PIN<span class="token punctuation">)</span></span></span>
 
-void hal_i2c_soft_init() {
-    // 使能GPIOB时钟
-    rcu_periph_clock_enable(I2C_GPIO_RCU);
+<span class="token keyword">void</span> <span class="token function">hal_i2c_soft_init</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token comment">// 使能GPIOB时钟</span>
+    <span class="token function">rcu_periph_clock_enable</span><span class="token punctuation">(</span>I2C_GPIO_RCU<span class="token punctuation">)</span><span class="token punctuation">;</span>
 
-    // 配置PB6（SCL）和PB7（SDA）为开漏输出模式
-    gpio_mode_set(I2C_GPIO_PORT, GPIO_MODE_OUTPUT, GPIO_PUPD_PULLUP, I2C_SCL_PIN | I2C_SDA_PIN);
-    gpio_output_options_set(I2C_GPIO_PORT, GPIO_OTYPE_OD, GPIO_OSPEED_50MHZ, I2C_SCL_PIN | I2C_SDA_PIN);
+    <span class="token comment">// 配置PB6（SCL）和PB7（SDA）为开漏输出模式</span>
+    <span class="token function">gpio_mode_set</span><span class="token punctuation">(</span>I2C_GPIO_PORT<span class="token punctuation">,</span> GPIO_MODE_OUTPUT<span class="token punctuation">,</span> GPIO_PUPD_PULLUP<span class="token punctuation">,</span> I2C_SCL_PIN <span class="token operator">|</span> I2C_SDA_PIN<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">gpio_output_options_set</span><span class="token punctuation">(</span>I2C_GPIO_PORT<span class="token punctuation">,</span> GPIO_OTYPE_OD<span class="token punctuation">,</span> GPIO_OSPEED_50MHZ<span class="token punctuation">,</span> I2C_SCL_PIN <span class="token operator">|</span> I2C_SDA_PIN<span class="token punctuation">)</span><span class="token punctuation">;</span>
 
-    // 将SCL和SDA线拉高
-    gpio_bit_set(I2C_GPIO_PORT, I2C_SCL_PIN | I2C_SDA_PIN);
-}
+    <span class="token comment">// 将SCL和SDA线拉高</span>
+    <span class="token function">gpio_bit_set</span><span class="token punctuation">(</span>I2C_GPIO_PORT<span class="token punctuation">,</span> I2C_SCL_PIN <span class="token operator">|</span> I2C_SDA_PIN<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
 
-static void start() {
-    SDA_HIGH();
-    SCL_HIGH();
-    delay_1us(1); //start setup
-    SDA_LOW();
-    delay_1us(1); //start hold
+<span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">start</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token function">SDA_HIGH</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">SCL_HIGH</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">delay_1us</span><span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment">//start setup</span>
+    <span class="token function">SDA_LOW</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">delay_1us</span><span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment">//start hold</span>
 
-    SCL_LOW();
-    delay_1us(1);
-}
+    <span class="token function">SCL_LOW</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">delay_1us</span><span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
 
-static void stop() {
-    SDA_LOW();
-    SCL_HIGH();
-    delay_1us(1); //stop setup
-    SDA_HIGH();
-    delay_1us(2); //bus free time between a STOP and START condition
-}
+<span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">stop</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token function">SDA_LOW</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">SCL_HIGH</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">delay_1us</span><span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment">//stop setup</span>
+    <span class="token function">SDA_HIGH</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">delay_1us</span><span class="token punctuation">(</span><span class="token number">2</span><span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment">//bus free time between a STOP and START condition</span>
+<span class="token punctuation">}</span>
 
-static bool wait_ack() {
-    bool success = false;
-    SDA_HIGH(); // release bus
-    SCL_HIGH();
-    delay_1us(1); // scl high
+<span class="token keyword">static</span> bool <span class="token function">wait_ack</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    bool success <span class="token operator">=</span> false<span class="token punctuation">;</span>
+    <span class="token function">SDA_HIGH</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment">// release bus</span>
+    <span class="token function">SCL_HIGH</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">delay_1us</span><span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment">// scl high</span>
 
-    SDA_IN();
-    success = SDA_READ() == RESET; // read ack
-    SDA_OUT();
+    <span class="token function">SDA_IN</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    success <span class="token operator">=</span> <span class="token function">SDA_READ</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">==</span> RESET<span class="token punctuation">;</span> <span class="token comment">// read ack</span>
+    <span class="token function">SDA_OUT</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 
-    SCL_LOW();
-    delay_1us(1); // scl low
-    return success;
-}
+    <span class="token function">SCL_LOW</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">delay_1us</span><span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment">// scl low</span>
+    <span class="token keyword">return</span> success<span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
 
-static void send_ack(bool ack) {
-    // set sda to reponse ack/nack
-    if (ack) {
-        SDA_LOW();
-    } else {
-        SDA_HIGH();
-    }
-    delay_1us(1); // sda setup
+<span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">send_ack</span><span class="token punctuation">(</span>bool ack<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token comment">// set sda to reponse ack/nack</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>ack<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token function">SDA_LOW</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
+        <span class="token function">SDA_HIGH</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    <span class="token function">delay_1us</span><span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment">// sda setup</span>
 
-    SCL_HIGH(); // let slave read ack
-    delay_1us(1);
+    <span class="token function">SCL_HIGH</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment">// let slave read ack</span>
+    <span class="token function">delay_1us</span><span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 
-    SCL_LOW();
-    delay_1us(1); // reset scl for next operation
-}
+    <span class="token function">SCL_LOW</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">delay_1us</span><span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment">// reset scl for next operation</span>
+<span class="token punctuation">}</span>
 
-static void send_byte(uint8_t byte) {
-    for (int i = 0; i &lt; 8; ++i) {
-        if (byte &amp; (0x80 &gt;&gt; i)) {
-            SDA_HIGH();
-        } else {
-            SDA_LOW();
-        }
-        delay_1us(1); // data set-up
+<span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">send_byte</span><span class="token punctuation">(</span><span class="token class-name">uint8_t</span> byte<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">for</span> <span class="token punctuation">(</span><span class="token keyword">int</span> i <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span> i <span class="token operator">&lt;</span> <span class="token number">8</span><span class="token punctuation">;</span> <span class="token operator">++</span>i<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>byte <span class="token operator">&amp;</span> <span class="token punctuation">(</span><span class="token number">0x80</span> <span class="token operator">&gt;&gt;</span> i<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token function">SDA_HIGH</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
+            <span class="token function">SDA_LOW</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+        <span class="token function">delay_1us</span><span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment">// data set-up</span>
 
-        SCL_HIGH();
-        delay_1us(1); // scl high
+        <span class="token function">SCL_HIGH</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token function">delay_1us</span><span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment">// scl high</span>
 
-        SCL_LOW();
-        delay_1us(1);
-    }
-}
+        <span class="token function">SCL_LOW</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token function">delay_1us</span><span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
 
-static void receive_byte(uint8_t *buf) {
-    SDA_IN();
-    for (int i = 0; i &lt; 8; ++i) {
-        SCL_HIGH(); // slave keep data
-        delay_1us(1);
+<span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">receive_byte</span><span class="token punctuation">(</span><span class="token class-name">uint8_t</span> <span class="token operator">*</span>buf<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token function">SDA_IN</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">for</span> <span class="token punctuation">(</span><span class="token keyword">int</span> i <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span> i <span class="token operator">&lt;</span> <span class="token number">8</span><span class="token punctuation">;</span> <span class="token operator">++</span>i<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token function">SCL_HIGH</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment">// slave keep data</span>
+        <span class="token function">delay_1us</span><span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 
-        // read data
-        (*buf) &lt;&lt;= 1;
-        if(SDA_READ() == SET) {
-            (*buf) |= 0x01;
-        }
+        <span class="token comment">// read data</span>
+        <span class="token punctuation">(</span><span class="token operator">*</span>buf<span class="token punctuation">)</span> <span class="token operator">&lt;&lt;=</span> <span class="token number">1</span><span class="token punctuation">;</span>
+        <span class="token keyword">if</span><span class="token punctuation">(</span><span class="token function">SDA_READ</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">==</span> SET<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token punctuation">(</span><span class="token operator">*</span>buf<span class="token punctuation">)</span> <span class="token operator">|=</span> <span class="token number">0x01</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
 
-        SCL_LOW(); // let slave prepare next data
-        delay_1us(1);
-    }
-    SDA_OUT();
-}
+        <span class="token function">SCL_LOW</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment">// let slave prepare next data</span>
+        <span class="token function">delay_1us</span><span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    <span class="token function">SDA_OUT</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
 
-static bool start_for_write(uint8_t dev_addr, uint8_t reg_addr) {
-    start();
+<span class="token keyword">static</span> bool <span class="token function">start_for_write</span><span class="token punctuation">(</span><span class="token class-name">uint8_t</span> dev_addr<span class="token punctuation">,</span> <span class="token class-name">uint8_t</span> reg_addr<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token function">start</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 
-    send_byte(dev_addr);
-    if (!wait_ack()) {
-        stop();
-        LOG_DEBUG("write dev_addr failed")
-        return false;
-    }
+    <span class="token function">send_byte</span><span class="token punctuation">(</span>dev_addr<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span><span class="token function">wait_ack</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token function">stop</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token function">LOG_DEBUG</span><span class="token punctuation">(</span><span class="token string">"write dev_addr failed"</span><span class="token punctuation">)</span>
+        <span class="token keyword">return</span> false<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
 
-    send_byte(reg_addr);
-    if (!wait_ack()) {
-        stop();
-        LOG_DEBUG("write reg_addr failed")
-        return false;
-    }
-    return true;
-}
+    <span class="token function">send_byte</span><span class="token punctuation">(</span>reg_addr<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span><span class="token function">wait_ack</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token function">stop</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token function">LOG_DEBUG</span><span class="token punctuation">(</span><span class="token string">"write reg_addr failed"</span><span class="token punctuation">)</span>
+        <span class="token keyword">return</span> false<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    <span class="token keyword">return</span> true<span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
 
-static bool start_for_read(uint8_t dev_addr) {
-    start();
-    send_byte(dev_addr | 0x01); // read from slave
-    if (!wait_ack()) {
-        stop();
-        LOG_DEBUG("write dev_addr for read failed")
-        return false;
-    }
-    return true;
-}
+<span class="token keyword">static</span> bool <span class="token function">start_for_read</span><span class="token punctuation">(</span><span class="token class-name">uint8_t</span> dev_addr<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token function">start</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">send_byte</span><span class="token punctuation">(</span>dev_addr <span class="token operator">|</span> <span class="token number">0x01</span><span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment">// read from slave</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span><span class="token function">wait_ack</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token function">stop</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token function">LOG_DEBUG</span><span class="token punctuation">(</span><span class="token string">"write dev_addr for read failed"</span><span class="token punctuation">)</span>
+        <span class="token keyword">return</span> false<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    <span class="token keyword">return</span> true<span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
 
-bool hal_i2c_soft_write(uint8_t dev_addr, uint8_t reg_addr, uint8_t *data, uint16_t size) {
-    if (!start_for_write(dev_addr, reg_addr)) {
-        return false;
-    }
-    for (uint16_t i = 0; i &lt; size; ++i) {
-        send_byte(*data);
-        if (!wait_ack()) {
-            stop();
-            LOG_DEBUG("write data[%d] failed", *data)
-            return false;
-        }
-        data++;
-    }
-    stop();
-    return true;
-}
+bool <span class="token function">hal_i2c_soft_write</span><span class="token punctuation">(</span><span class="token class-name">uint8_t</span> dev_addr<span class="token punctuation">,</span> <span class="token class-name">uint8_t</span> reg_addr<span class="token punctuation">,</span> <span class="token class-name">uint8_t</span> <span class="token operator">*</span>data<span class="token punctuation">,</span> <span class="token class-name">uint16_t</span> size<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span><span class="token function">start_for_write</span><span class="token punctuation">(</span>dev_addr<span class="token punctuation">,</span> reg_addr<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">return</span> false<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    <span class="token keyword">for</span> <span class="token punctuation">(</span><span class="token class-name">uint16_t</span> i <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span> i <span class="token operator">&lt;</span> size<span class="token punctuation">;</span> <span class="token operator">++</span>i<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token function">send_byte</span><span class="token punctuation">(</span><span class="token operator">*</span>data<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span><span class="token function">wait_ack</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token function">stop</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token function">LOG_DEBUG</span><span class="token punctuation">(</span><span class="token string">"write data[%d] failed"</span><span class="token punctuation">,</span> <span class="token operator">*</span>data<span class="token punctuation">)</span>
+            <span class="token keyword">return</span> false<span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+        data<span class="token operator">++</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    <span class="token function">stop</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">return</span> true<span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
 
-bool hal_i2c_soft_read(uint8_t dev_addr, uint8_t reg_addr, uint8_t *buf, uint16_t size) {
-    // dummy write for register address
-    if (!start_for_write(dev_addr, reg_addr)) {
-        return false;
-    }
-    // continuous read
-    if (!start_for_read(dev_addr)) {
-        return false;
-    }
-    for (uint16_t i = 0; i &lt; size - 1; ++i) {
-        receive_byte(buf++);
-        send_ack(true);
-    }
-    receive_byte(buf);
-    send_ack(false);
+bool <span class="token function">hal_i2c_soft_read</span><span class="token punctuation">(</span><span class="token class-name">uint8_t</span> dev_addr<span class="token punctuation">,</span> <span class="token class-name">uint8_t</span> reg_addr<span class="token punctuation">,</span> <span class="token class-name">uint8_t</span> <span class="token operator">*</span>buf<span class="token punctuation">,</span> <span class="token class-name">uint16_t</span> size<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token comment">// dummy write for register address</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span><span class="token function">start_for_write</span><span class="token punctuation">(</span>dev_addr<span class="token punctuation">,</span> reg_addr<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">return</span> false<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    <span class="token comment">// continuous read</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span><span class="token function">start_for_read</span><span class="token punctuation">(</span>dev_addr<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">return</span> false<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    <span class="token keyword">for</span> <span class="token punctuation">(</span><span class="token class-name">uint16_t</span> i <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span> i <span class="token operator">&lt;</span> size <span class="token operator">-</span> <span class="token number">1</span><span class="token punctuation">;</span> <span class="token operator">++</span>i<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token function">receive_byte</span><span class="token punctuation">(</span>buf<span class="token operator">++</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token function">send_ack</span><span class="token punctuation">(</span>true<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    <span class="token function">receive_byte</span><span class="token punctuation">(</span>buf<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">send_ack</span><span class="token punctuation">(</span>false<span class="token punctuation">)</span><span class="token punctuation">;</span>
 
-    stop();
-    return true;
-}
+    <span class="token function">stop</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">return</span> true<span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
 
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
@@ -978,12 +978,12 @@ bool hal_i2c_soft_read(uint8_t dev_addr, uint8_t reg_addr, uint8_t *buf, uint16_
                     
                         <div class="article-tag">
                             
-                                <a href="/tags/I2C/">
-                                    <span class="chip bg-color">I2C</span>
-                                </a>
-                            
                                 <a href="/tags/%E6%97%B6%E5%BA%8F%E8%A6%81%E6%B1%82/">
                                     <span class="chip bg-color">时序要求</span>
+                                </a>
+                            
+                                <a href="/tags/I2C/">
+                                    <span class="chip bg-color">I2C</span>
                                 </a>
                             
                                 <a href="/tags/PCF8563/">
@@ -1105,12 +1105,12 @@ bool hal_i2c_soft_read(uint8_t dev_addr, uint8_t reg_addr, uint8_t *buf, uint16_
                 
                 <div class="card-action article-tags">
                     
-                    <a href="/tags/I2C/">
-                        <span class="chip bg-color">I2C</span>
-                    </a>
-                    
                     <a href="/tags/%E6%97%B6%E5%BA%8F%E8%A6%81%E6%B1%82/">
                         <span class="chip bg-color">时序要求</span>
+                    </a>
+                    
+                    <a href="/tags/I2C/">
+                        <span class="chip bg-color">I2C</span>
                     </a>
                     
                     <a href="/tags/PCF8563/">
@@ -1165,12 +1165,12 @@ bool hal_i2c_soft_read(uint8_t dev_addr, uint8_t reg_addr, uint8_t *buf, uint16_
                 
                 <div class="card-action article-tags">
                     
-                    <a href="/tags/%E6%97%B6%E5%BA%8F%E8%A6%81%E6%B1%82/">
-                        <span class="chip bg-color">时序要求</span>
-                    </a>
-                    
                     <a href="/tags/SN74HC595NSR/">
                         <span class="chip bg-color">SN74HC595NSR</span>
+                    </a>
+                    
+                    <a href="/tags/%E6%97%B6%E5%BA%8F%E8%A6%81%E6%B1%82/">
+                        <span class="chip bg-color">时序要求</span>
                     </a>
                     
                     <a href="/tags/%E7%A7%BB%E4%BD%8D%E5%AF%84%E5%AD%98%E5%99%A8/">
