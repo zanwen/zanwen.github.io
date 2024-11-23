@@ -4,8 +4,17 @@
 
 <head>
     <meta charset="utf-8">
-    <meta name="keywords" content="Hello World, 安文的博客">
-    <meta name="description" content="Welcome to Hexo! This is your very first post. Check documentation for more info. If you get any problems when using Hex">
+    <meta name="keywords" content="STM32系统时钟初始化源码解析（SPL库，STM32F103ZE）, 安文的博客">
+    <meta name="description" content="一、背景
+开发环境
+
+STM32F103ZET6
+
+原理图
+
+HSE-高速外部晶振High Speed External oscillator
+通过23、24号引脚接入8M的高速外部晶振。
+HSI-低速外部晶振Low Speed Exter">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <meta name="renderer" content="webkit|ie-stand|ie-comp">
@@ -17,7 +26,7 @@
     <!-- Global site tag (gtag.js) - Google Analytics -->
 
 
-    <title>Hello World | 安文的博客</title>
+    <title>STM32系统时钟初始化源码解析（SPL库，STM32F103ZE） | 安文的博客</title>
     <link rel="icon" type="image/png" href="/medias/logo.png">
     
 
@@ -337,12 +346,12 @@
 
 
 
-<div class="bg-cover pd-header post-cover" style="background-image: url('/medias/featureimages/12.jpg')">
+<div class="bg-cover pd-header post-cover" style="background-image: url('https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/pexels-vikashkr50-17863401.jpg')">
     <div class="container" style="right: 0px;left: 0px;">
         <div class="row">
             <div class="col s12 m12 l12">
                 <div class="brand">
-                    <h1 class="description center-align post-title">Hello World</h1>
+                    <h1 class="description center-align post-title">STM32系统时钟初始化源码解析（SPL库，STM32F103ZE）</h1>
                 </div>
             </div>
         </div>
@@ -364,12 +373,45 @@
             <div class="row tag-cate">
                 <div class="col s7">
                     
-                          <div class="article-tag">
-                            <span class="chip bg-color">无标签</span>
-                          </div>
+                    <div class="article-tag">
+                        
+                            <a href="/tags/STM32/">
+                                <span class="chip bg-color">STM32</span>
+                            </a>
+                        
+                            <a href="/tags/HAL/">
+                                <span class="chip bg-color">HAL</span>
+                            </a>
+                        
+                            <a href="/tags/STM32F103/">
+                                <span class="chip bg-color">STM32F103</span>
+                            </a>
+                        
+                            <a href="/tags/%E6%97%B6%E9%92%9F/">
+                                <span class="chip bg-color">时钟</span>
+                            </a>
+                        
+                    </div>
                     
                 </div>
                 <div class="col s5 right-align">
+                    
+                    <div class="post-cate">
+                        <i class="fas fa-bookmark fa-fw icon-category"></i>
+                        
+                            <a href="/categories/STM32/" class="post-category">
+                                STM32
+                            </a>
+                        
+                            <a href="/categories/STM32/%E5%B5%8C%E5%85%A5%E5%BC%8F/" class="post-category">
+                                嵌入式
+                            </a>
+                        
+                            <a href="/categories/STM32/%E5%B5%8C%E5%85%A5%E5%BC%8F/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/" class="post-category">
+                                源码分析
+                            </a>
+                        
+                    </div>
                     
                 </div>
             </div>
@@ -378,28 +420,28 @@
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-minus fa-fw"></i>发布日期:&nbsp;&nbsp;
-                    2024-11-12
+                    2024-11-23
                 </div>
                 
 
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-check fa-fw"></i>更新日期:&nbsp;&nbsp;
-                    2024-11-12
+                    2024-11-23
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
-                    74
+                    1.2k
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-clock fa-fw"></i>阅读时长:&nbsp;&nbsp;
-                    1 分
+                    4 分
                 </div>
                 
 
@@ -422,20 +464,137 @@
 
         <div class="card-content article-card-content">
             <div id="articleContent">
-                <p>Welcome to <a target="_blank" rel="noopener" href="https://hexo.io/">Hexo</a>! This is your very first post. Check <a target="_blank" rel="noopener" href="https://hexo.io/docs/">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a target="_blank" rel="noopener" href="https://hexo.io/docs/troubleshooting.html">troubleshooting</a> or you can ask me on <a target="_blank" rel="noopener" href="https://github.com/hexojs/hexo/issues">GitHub</a>.</p>
-<h2 id="quick-start">Quick Start</h2>
-<h3 id="create-a-new-post">Create a new post</h3>
-<pre class="line-numbers language-bash" data-language="bash"><code class="language-bash">$ hexo new <span class="token string">"My New Post"</span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
-<p>More info: <a target="_blank" rel="noopener" href="https://hexo.io/docs/writing.html">Writing</a></p>
-<h3 id="run-server">Run server</h3>
-<pre class="line-numbers language-bash" data-language="bash"><code class="language-bash">$ hexo server<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
-<p>More info: <a target="_blank" rel="noopener" href="https://hexo.io/docs/server.html">Server</a></p>
-<h3 id="generate-static-files">Generate static files</h3>
-<pre class="line-numbers language-bash" data-language="bash"><code class="language-bash">$ hexo generate<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
-<p>More info: <a target="_blank" rel="noopener" href="https://hexo.io/docs/generating.html">Generating</a></p>
-<h3 id="deploy-to-remote-sites">Deploy to remote sites</h3>
-<pre class="line-numbers language-bash" data-language="bash"><code class="language-bash">$ hexo deploy<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
-<p>More info: <a target="_blank" rel="noopener" href="https://hexo.io/docs/one-command-deployment.html">Deployment</a></p>
+                <h1 id="yi-bei-jing">一、背景</h1>
+<h2 id="kai-fa-huan-jing">开发环境</h2>
+<ul>
+<li>STM32F103ZET6</li>
+</ul>
+<h2 id="yuan-li-tu">原理图</h2>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241123160212385.png" alt="image-20241123160212385"></p>
+<h3 id="hse-gao-su-wai-bu-jing-zhen-high-speed-external-oscillator">HSE-高速外部晶振High Speed External oscillator</h3>
+<p>通过23、24号引脚接入8M的高速外部晶振。</p>
+<h3 id="hsi-di-su-wai-bu-jing-zhen-low-speed-external-oscillator">HSI-低速外部晶振Low Speed External oscillator</h3>
+<p>通过GPIO引脚PC14和PC15的复用接入32.768kHz低速外部晶振。</p>
+<h2 id="yi-cube-de-tu-xing-hua-pei-zhi-wei-li-shuo-ming">以Cube的图形化配置为例说明</h2>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241123160112667.png" alt="image-20241123160112667"></p>
+<p>MCU内置了两个RC震荡电路：</p>
+<ul>
+<li>HSI RC，High Speed Internal RC，8M高速内部RC震荡电路</li>
+<li>LSI RC，Low Speed Internal RC，40kHz低速内部RC震荡电路</li>
+</ul>
+<h3 id="wei-shi-yao-mcu-nei-zhi-liao-huan-xu-yao-wai-jie-jing-zhen">为什么MCU内置了，还需要外接晶振</h3>
+<ul>
+<li>
+<p>RC震荡电路容易受到其他电路干扰，导致信号不稳定，且精度远比晶振低。</p>
+</li>
+<li>
+<p>由于MCU的微小封装，无法内嵌较大的晶振</p>
+</li>
+<li>
+<p>将晶振的灵活选择权交给开发者</p>
+</li>
+</ul>
+<h3 id="cube-pei-zhi-jie-xi">Cube配置解析</h3>
+<p>外接晶振通过引脚接入MCU，但由于MCU的主频较高，一般将HSE通过PLL（锁相环，用来倍频）提高频率再作为系统时钟SYSCLK的来源。</p>
+<p>图中 <mark>Mux</mark>是多路选择器 <mark>Multiplex</mark>的缩写，可以看到我们的8M HSE经过了1分频（即不分频），连接到了PLL Source Mux，通过这个多路选择器，我们使用HSE而不是HSI作为PLL的时钟来源（HSE在精度和稳定性上要比HSI好很多）。</p>
+<p>接着经过了PLLMul，即锁相环倍频（PLL Multiply），将HSE的频率放大了9倍得到PLLCLK（8M * 9 = 72M），并连接到了System Clock Mux（即系统时钟多路选择器），这里我们当然选择稳定、高精度、高频的PLLCLK作为系统时钟。</p>
+<h1 id="er-shi-zhong-chu-shi-hua-guo-cheng-yuan-ma-fen-xi-spl-ku">二、时钟初始化过程源码分析（SPL库）</h1>
+<h2 id="shang-dian-fu-wei-hou-hui-fa-sheng-shi-yao">上电/复位后会发生什么？</h2>
+<p>MCU启动的汇编文件 <code>startup.s</code>会被执行：</p>
+<p><code>startup_stm32f10x_hd.s</code></p>
+<pre class="line-numbers language-asm" data-language="asm"><code class="language-asm">Reset_Handler   PROC
+                EXPORT  Reset_Handler             [WEAK]
+                IMPORT  __main
+                IMPORT  SystemInit
+                LDR     R0, =SystemInit
+                BLX     R0               
+                LDR     R0, =__main
+                BX      R0<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p><mark>执行SystemInit函数</mark></p>
+<p>将 <code>SystemInit</code> 函数的入口地址加载到寄存器R0，通过 <code>BLX</code>跳转到其对应的代码段执行该函数，其中就包括了系统时钟的初始化过程。</p>
+<p><mark>执行main函数</mark></p>
+<p>将 <code>main</code> 函数的入口地址加载到寄存器R0，通过 <code>BX</code>跳转到其对应的代码段执行该函数，执行用户代码。</p>
+<blockquote>
+<p>该初始化顺序遵循ARM的CMSIS（Cortex Microcontroller Software Interface Standard）标准</p>
+</blockquote>
+<h2 id="system-init">SystemInit</h2>
+<p><a target="_blank" rel="noopener" href="https://www.st.com/resource/en/reference_manual/rm0008-stm32f101xx-stm32f102xx-stm32f103xx-stm32f105xx-and-stm32f107xx-advanced-armbased-32bit-mcus-stmicroelectronics.pdf">STM32F107参考手册</a></p>
+<h3 id="qi-yong-hsi-xian-rang-mcu-you-xin-tiao">启用HSI，先让MCU有心跳</h3>
+<p>在<code>system_stm32f10x.c</code>中找到 <code>SystemInit</code>函数，条件编译显示灰色的部分可以忽略</p>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token comment">/* Set HSION bit */</span>
+RCC<span class="token operator">-&gt;</span>CR <span class="token operator">|=</span> <span class="token punctuation">(</span><span class="token class-name">uint32_t</span><span class="token punctuation">)</span><span class="token number">0x00000001</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<p>先开启HSI高速内部时钟（时钟相当于MCU心跳，先让MCU有心跳能够工作，后面再将时钟源通过多路选择器切换为我们配置的HSE），将寄存器的第0位设置为1：</p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241123165840693.png" alt="image-20241123165840693"></p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241123165911410.png" alt="image-20241123165911410"></p>
+<h3 id="fu-wei-shi-zhong-xiang-guan-ji-cun-qi-bi-te-wei">复位时钟相关寄存器比特位</h3>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token comment">/* Reset SW, HPRE, PPRE1, PPRE2, ADCPRE and MCO bits */</span>
+RCC<span class="token operator">-&gt;</span>CFGR <span class="token operator">&amp;=</span> <span class="token punctuation">(</span><span class="token class-name">uint32_t</span><span class="token punctuation">)</span><span class="token number">0xF8FF0000</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<p>该操作会将CFGR（时钟配置）寄存器如下比特位清零：</p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241123170556835.png" alt="image-20241123170556835"></p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241123170704055.png" alt="image-20241123170704055"></p>
+<p>选择HSI（上一步已经开启了）作为系统时钟，其他的（HPRE, PPRE1, PPRE2, ADCPRE and MCO）分析过程类似。</p>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token comment">/* Reset HSEON, CSSON and PLLON bits */</span>
+RCC<span class="token operator">-&gt;</span>CR <span class="token operator">&amp;=</span> <span class="token punctuation">(</span><span class="token class-name">uint32_t</span><span class="token punctuation">)</span><span class="token number">0xFEF6FFFF</span><span class="token punctuation">;</span>
+
+<span class="token comment">/* Reset HSEBYP bit */</span>
+RCC<span class="token operator">-&gt;</span>CR <span class="token operator">&amp;=</span> <span class="token punctuation">(</span><span class="token class-name">uint32_t</span><span class="token punctuation">)</span><span class="token number">0xFFFBFFFF</span><span class="token punctuation">;</span>
+
+<span class="token comment">/* Reset PLLSRC, PLLXTPRE, PLLMUL and USBPRE/OTGFSPRE bits */</span>
+RCC<span class="token operator">-&gt;</span>CFGR <span class="token operator">&amp;=</span> <span class="token punctuation">(</span><span class="token class-name">uint32_t</span><span class="token punctuation">)</span><span class="token number">0xFF80FFFF</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>同样的，也是将一些位清零，将系统时钟初始化为仅由HSI作为时钟源的初始状态</p>
+<h3 id="set-sys-clock-she-zhi-xi-tong-shi-zhong">SetSysClock设置系统时钟</h3>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token comment">/* Enable HSE */</span>    
+RCC<span class="token operator">-&gt;</span>CR <span class="token operator">|=</span> <span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token class-name">uint32_t</span><span class="token punctuation">)</span>RCC_CR_HSEON<span class="token punctuation">)</span><span class="token punctuation">;</span>
+ 
+<span class="token comment">/* Wait till HSE is ready and if Time out is reached exit */</span>
+<span class="token keyword">do</span>
+<span class="token punctuation">{</span>
+  HSEStatus <span class="token operator">=</span> RCC<span class="token operator">-&gt;</span>CR <span class="token operator">&amp;</span> RCC_CR_HSERDY<span class="token punctuation">;</span>
+  StartUpCounter<span class="token operator">++</span><span class="token punctuation">;</span>  
+<span class="token punctuation">}</span> <span class="token keyword">while</span><span class="token punctuation">(</span><span class="token punctuation">(</span>HSEStatus <span class="token operator">==</span> <span class="token number">0</span><span class="token punctuation">)</span> <span class="token operator">&amp;&amp;</span> <span class="token punctuation">(</span>StartUpCounter <span class="token operator">!=</span> HSE_STARTUP_TIMEOUT<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>这里开启了HSE外部高速时钟，并等待HSE的状态转变为READY（由硬件置位）。</p>
+<h3 id="xi-tong-shi-zhong-shu">系统时钟树</h3>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token comment">/* HCLK = SYSCLK */</span>
+RCC<span class="token operator">-&gt;</span>CFGR <span class="token operator">|=</span> <span class="token punctuation">(</span><span class="token class-name">uint32_t</span><span class="token punctuation">)</span>RCC_CFGR_HPRE_DIV1<span class="token punctuation">;</span>
+  
+<span class="token comment">/* PCLK2 = HCLK */</span>
+RCC<span class="token operator">-&gt;</span>CFGR <span class="token operator">|=</span> <span class="token punctuation">(</span><span class="token class-name">uint32_t</span><span class="token punctuation">)</span>RCC_CFGR_PPRE2_DIV1<span class="token punctuation">;</span>
+
+<span class="token comment">/* PCLK1 = HCLK */</span>
+RCC<span class="token operator">-&gt;</span>CFGR <span class="token operator">|=</span> <span class="token punctuation">(</span><span class="token class-name">uint32_t</span><span class="token punctuation">)</span>RCC_CFGR_PPRE1_DIV2<span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>将系统时钟作为AHB和APB2的时钟源（对应HCLK和PCLK2），将系统时钟2分频，作为APB1的时钟源（对应PCLK2）。</p>
+<blockquote>
+<p>AHB挂载了Cortex核、DMA等主动单元</p>
+<p>APB2挂载了GPIO、USRAT1、ADC等需要高速率时钟的单元</p>
+<p>APB1则挂载了TIMER、I2C等不需要那么高频的单元</p>
+</blockquote>
+<img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241123172121666.png" alt="image-20241123172121666" style="zoom: 50%;">
+<h3 id="pll-bei-pin">PLL倍频</h3>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token comment">/*  PLL configuration: PLLCLK = HSE * 9 = 72 MHz */</span>
+    RCC<span class="token operator">-&gt;</span>CFGR <span class="token operator">&amp;=</span> <span class="token punctuation">(</span><span class="token class-name">uint32_t</span><span class="token punctuation">)</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token class-name">uint32_t</span><span class="token punctuation">)</span><span class="token operator">~</span><span class="token punctuation">(</span>RCC_CFGR_PLLSRC <span class="token operator">|</span> RCC_CFGR_PLLXTPRE <span class="token operator">|</span>
+                                        RCC_CFGR_PLLMULL<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    RCC<span class="token operator">-&gt;</span>CFGR <span class="token operator">|=</span> <span class="token punctuation">(</span><span class="token class-name">uint32_t</span><span class="token punctuation">)</span><span class="token punctuation">(</span>RCC_CFGR_PLLSRC_HSE <span class="token operator">|</span> RCC_CFGR_PLLMULL9<span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li>将PLL时钟来源RCC_CFGR_PLLSRC、HSE进入PLL后的分频RCC_CFGR_PLLXTPRE、PLL倍频系数RCC_CFGR_PLLMULL清零；</li>
+<li>选择PLL时钟来源为HSE（RCC_CFGR_PLLSRC_HSE），倍频系数为9（RCC_CFGR_PLLMULL9）</li>
+</ul>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token comment">/* Enable PLL */</span>
+    RCC<span class="token operator">-&gt;</span>CR <span class="token operator">|=</span> RCC_CR_PLLON<span class="token punctuation">;</span>
+
+    <span class="token comment">/* Wait till PLL is ready */</span>
+    <span class="token keyword">while</span><span class="token punctuation">(</span><span class="token punctuation">(</span>RCC<span class="token operator">-&gt;</span>CR <span class="token operator">&amp;</span> RCC_CR_PLLRDY<span class="token punctuation">)</span> <span class="token operator">==</span> <span class="token number">0</span><span class="token punctuation">)</span>
+    <span class="token punctuation">{</span>
+    <span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>启动PLL锁相环，并等待它稳定。</p>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token comment">/* Select PLL as system clock source */</span>
+   RCC<span class="token operator">-&gt;</span>CFGR <span class="token operator">&amp;=</span> <span class="token punctuation">(</span><span class="token class-name">uint32_t</span><span class="token punctuation">)</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token class-name">uint32_t</span><span class="token punctuation">)</span><span class="token operator">~</span><span class="token punctuation">(</span>RCC_CFGR_SW<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+   RCC<span class="token operator">-&gt;</span>CFGR <span class="token operator">|=</span> <span class="token punctuation">(</span><span class="token class-name">uint32_t</span><span class="token punctuation">)</span>RCC_CFGR_SW_PLL<span class="token punctuation">;</span>    
+
+   <span class="token comment">/* Wait till PLL is used as system clock source */</span>
+   <span class="token keyword">while</span> <span class="token punctuation">(</span><span class="token punctuation">(</span>RCC<span class="token operator">-&gt;</span>CFGR <span class="token operator">&amp;</span> <span class="token punctuation">(</span><span class="token class-name">uint32_t</span><span class="token punctuation">)</span>RCC_CFGR_SWS<span class="token punctuation">)</span> <span class="token operator">!=</span> <span class="token punctuation">(</span><span class="token class-name">uint32_t</span><span class="token punctuation">)</span><span class="token number">0x08</span><span class="token punctuation">)</span>
+   <span class="token punctuation">{</span>
+   <span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>通过系统时钟的多路选择器将PLL选择为系统时钟源，并等待此切换完成。</p>
 
                 
             </div>
@@ -462,7 +621,7 @@
                     </i>
                 </span>
                 <span class="reprint-info">
-                    <a href="https://zanwen.github.io/2024/11/12/16107.html">https://zanwen.github.io/2024/11/12/16107.html</a>
+                    <a href="https://zanwen.github.io/2024/11/23/19447.html">https://zanwen.github.io/2024/11/23/19447.html</a>
                 </span>
             </div>
             <div class="reprint__notice">
@@ -499,7 +658,23 @@
                 <div class="post-meta__tag-list" style="display: inline-block;">
                     
                         <div class="article-tag">
-                            <span class="chip bg-color">无标签</span>
+                            
+                                <a href="/tags/STM32/">
+                                    <span class="chip bg-color">STM32</span>
+                                </a>
+                            
+                                <a href="/tags/HAL/">
+                                    <span class="chip bg-color">HAL</span>
+                                </a>
+                            
+                                <a href="/tags/STM32F103/">
+                                    <span class="chip bg-color">STM32F103</span>
+                                </a>
+                            
+                                <a href="/tags/%E6%97%B6%E9%92%9F/">
+                                    <span class="chip bg-color">时钟</span>
+                                </a>
+                            
                         </div>
                     
                 </div>
@@ -576,17 +751,17 @@
 <article id="prenext-posts" class="prev-next articles">
     <div class="row article-row">
         
-        <div class="article col s12 m6" data-aos="fade-up">
+        <div class="article col s12 m6" data-aos="fade-up" data-aos="fade-up">
             <div class="article-badge left-badge text-color">
-                <i class="fas fa-chevron-left"></i>&nbsp;上一篇</div>
+                <i class="far fa-dot-circle"></i>&nbsp;本篇
+            </div>
             <div class="card">
-                <a href="/2024/11/12/13750.html">
+                <a href="/2024/11/23/19447.html">
                     <div class="card-image">
                         
+                        <img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/pexels-vikashkr50-17863401.jpg" class="responsive-img" alt="STM32系统时钟初始化源码解析（SPL库，STM32F103ZE）">
                         
-                        <img src="/medias/featureimages/4.jpg" class="responsive-img" alt="UART接收缓冲区溢出异常（HAL_UART_ERROR_ORE）问题记录">
-                        
-                        <span class="card-title">UART接收缓冲区溢出异常（HAL_UART_ERROR_ORE）问题记录</span>
+                        <span class="card-title">STM32系统时钟初始化源码解析（SPL库，STM32F103ZE）</span>
                     </div>
                 </a>
                 <div class="card-content article-content">
@@ -596,25 +771,30 @@
                         
                     </div>
                     <div class="publish-info">
-                        <span class="publish-date">
-                            <i class="far fa-clock fa-fw icon-date"></i>2024-11-12
-                        </span>
+                            <span class="publish-date">
+                                <i class="far fa-clock fa-fw icon-date"></i>2024-11-23
+                            </span>
                         <span class="publish-author">
                             
                             <i class="fas fa-bookmark fa-fw icon-category"></i>
                             
-                            <a href="/categories/%E5%B5%8C%E5%85%A5%E5%BC%8F/" class="post-category">
+                            <a href="/categories/STM32/" class="post-category">
+                                    STM32
+                                </a>
+                            
+                            <a href="/categories/STM32/%E5%B5%8C%E5%85%A5%E5%BC%8F/" class="post-category">
                                     嵌入式
                                 </a>
                             
-                            <a href="/categories/%E5%B5%8C%E5%85%A5%E5%BC%8F/%E8%B8%A9%E5%9D%91%E8%AE%B0%E5%BD%95/" class="post-category">
-                                    踩坑记录
+                            <a href="/categories/STM32/%E5%B5%8C%E5%85%A5%E5%BC%8F/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/" class="post-category">
+                                    源码分析
                                 </a>
                             
                             
                         </span>
                     </div>
                 </div>
+
                 
                 <div class="card-action article-tags">
                     
@@ -626,20 +806,12 @@
                         <span class="chip bg-color">HAL</span>
                     </a>
                     
-                    <a href="/tags/Clion/">
-                        <span class="chip bg-color">Clion</span>
+                    <a href="/tags/STM32F103/">
+                        <span class="chip bg-color">STM32F103</span>
                     </a>
                     
-                    <a href="/tags/ARM/">
-                        <span class="chip bg-color">ARM</span>
-                    </a>
-                    
-                    <a href="/tags/GD32/">
-                        <span class="chip bg-color">GD32</span>
-                    </a>
-                    
-                    <a href="/tags/UART/">
-                        <span class="chip bg-color">UART</span>
+                    <a href="/tags/%E6%97%B6%E9%92%9F/">
+                        <span class="chip bg-color">时钟</span>
                     </a>
                     
                 </div>
@@ -650,16 +822,15 @@
         
         <div class="article col s12 m6" data-aos="fade-up">
             <div class="article-badge right-badge text-color">
-                本篇&nbsp;<i class="far fa-dot-circle"></i>
+                下一篇&nbsp;<i class="fas fa-chevron-right"></i>
             </div>
             <div class="card">
-                <a href="/2024/11/12/16107.html">
+                <a href="/2024/11/16/31289.html">
                     <div class="card-image">
                         
+                        <img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/pexels-photo-16783492.jpeg" class="responsive-img" alt="深入理解I2C时序（以I2C实时时钟PCF8563为案例）">
                         
-                        <img src="/medias/featureimages/12.jpg" class="responsive-img" alt="Hello World">
-                        
-                        <span class="card-title">Hello World</span>
+                        <span class="card-title">深入理解I2C时序（以I2C实时时钟PCF8563为案例）</span>
                     </div>
                 </a>
                 <div class="card-content article-content">
@@ -670,17 +841,36 @@
                     </div>
                     <div class="publish-info">
                             <span class="publish-date">
-                                <i class="far fa-clock fa-fw icon-date"></i>2024-11-12
+                                <i class="far fa-clock fa-fw icon-date"></i>2024-11-16
                             </span>
                         <span class="publish-author">
                             
-                            <i class="fas fa-user fa-fw"></i>
-                            安文
+                            <i class="fas fa-bookmark fa-fw icon-category"></i>
+                            
+                            <a href="/categories/%E5%B5%8C%E5%85%A5%E5%BC%8F/" class="post-category">
+                                    嵌入式
+                                </a>
+                            
                             
                         </span>
                     </div>
                 </div>
-
+                
+                <div class="card-action article-tags">
+                    
+                    <a href="/tags/I2C/">
+                        <span class="chip bg-color">I2C</span>
+                    </a>
+                    
+                    <a href="/tags/%E6%97%B6%E5%BA%8F%E8%A6%81%E6%B1%82/">
+                        <span class="chip bg-color">时序要求</span>
+                    </a>
+                    
+                    <a href="/tags/PCF8563/">
+                        <span class="chip bg-color">PCF8563</span>
+                    </a>
+                    
+                </div>
                 
             </div>
         </div>
