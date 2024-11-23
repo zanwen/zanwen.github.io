@@ -1,25 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
-    <title>Hello World</title>
-    <url>/2024/11/12/16107.html</url>
-    <content><![CDATA[<p>Welcome to <a href="https://hexo.io/">Hexo</a>! This is your very first post. Check <a href="https://hexo.io/docs/">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="https://hexo.io/docs/troubleshooting.html">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues">GitHub</a>.</p>
-<h2 id="quick-start">Quick Start</h2>
-<h3 id="create-a-new-post">Create a new post</h3>
-<pre class="line-numbers language-bash" data-language="bash"><code class="language-bash">$ hexo new <span class="token string">"My New Post"</span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
-<p>More info: <a href="https://hexo.io/docs/writing.html">Writing</a></p>
-<h3 id="run-server">Run server</h3>
-<pre class="line-numbers language-bash" data-language="bash"><code class="language-bash">$ hexo server<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
-<p>More info: <a href="https://hexo.io/docs/server.html">Server</a></p>
-<h3 id="generate-static-files">Generate static files</h3>
-<pre class="line-numbers language-bash" data-language="bash"><code class="language-bash">$ hexo generate<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
-<p>More info: <a href="https://hexo.io/docs/generating.html">Generating</a></p>
-<h3 id="deploy-to-remote-sites">Deploy to remote sites</h3>
-<pre class="line-numbers language-bash" data-language="bash"><code class="language-bash">$ hexo deploy<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
-<p>More info: <a href="https://hexo.io/docs/one-command-deployment.html">Deployment</a></p>
-]]></content>
-  </entry>
-  <entry>
     <title>UART接收缓冲区溢出异常（HAL_UART_ERROR_ORE）问题记录</title>
     <url>/2024/11/12/13750.html</url>
     <content><![CDATA[<h1 id="wen-ti-bei-jing">问题背景</h1>
@@ -336,7 +317,6 @@ huart<span class="token operator">-&gt;</span>RxState <span class="token operato
 <p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241116201656138.png" alt="image-20241116201656138"></p>
 <p>该参数规定了I2C的SCL时钟线的频率，以Fast-mode为例，最大为400kHz。这意味着我们在操作SCL时，将SCL置0的时间+随后将SCL置1的时间之和不能小于 1/400kHz = 2.5us：</p>
 <p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241116201725124.png" alt="image-20241116201725124"></p>
-<p>以GD32F4为例，对应标准库函数 <code>gpio_output_options_set</code>中的 <code>speed</code>参数。即通过GPIO输出方波脉冲时，输出信号的最大频率。</p>
 <h2 id="t-sub-hd-sta-sub-qi-shi-xin-hao-bao-chi-shi-jian-hol-d-time-for-start-condition">t<sub>HD;STA</sub>起始信号保持时间（HolD time for START condition）</h2>
 <p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241116202607065.png" alt="image-20241116202607065"></p>
 <p>该参数规定了起始信号（START condition）需要保持的时间（在SCL为高电平时，将SDA由高拉低后需要保持的时间）</p>
@@ -466,6 +446,7 @@ for(i = 0 ; i &lt; 8 ; i++) {
 <p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241116220318791.png" alt="image-20241116220318791"></p>
 <img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241116220810270.png" alt="image-20241116220810270" style="zoom:33%;">
 <p>这两个参数规定了SCL和SDA的上升沿（r-rising edge）、下降沿（f-falling edge）的时间控制。这个参数和GPIO对应电气特性中的压摆率（<mark>Slew&nbsp;Rate</mark>）。</p>
+<p>以GD32F4为例，对应标准库函数 <code>gpio_output_options_set</code>中的 <code>speed</code>参数，即控制GPIO引脚跳变时，物理电路电平转换所需的时延（例如电容充放电过程需要一定的时间）。</p>
 <h2 id="t-sub-su-sto-sub-zhong-zhi-xin-hao-jian-li-zhun-bei-shi-jian-set-up-time-for-stop">t<sub>SU;STO</sub>终止信号建立（准备）时间（SetUp time for STOP）</h2>
 <p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241116221510344.png" alt="image-20241116221510344"></p>
 <p>由于终止信号（拉高SDA）是有前置条件的（SCL为高，SDA为低），该参数规定了在拉高SDA之前，SDA在SCL为高期间保持低电平的时间：</p>
@@ -751,6 +732,25 @@ bool <span class="token function">hal_i2c_soft_read</span><span class="token pun
         <tag>时序要求</tag>
         <tag>PCF8563</tag>
       </tags>
+  </entry>
+  <entry>
+    <title>Hello World</title>
+    <url>/2024/11/12/16107.html</url>
+    <content><![CDATA[<p>Welcome to <a href="https://hexo.io/">Hexo</a>! This is your very first post. Check <a href="https://hexo.io/docs/">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="https://hexo.io/docs/troubleshooting.html">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues">GitHub</a>.</p>
+<h2 id="quick-start">Quick Start</h2>
+<h3 id="create-a-new-post">Create a new post</h3>
+<pre class="line-numbers language-bash" data-language="bash"><code class="language-bash">$ hexo new <span class="token string">"My New Post"</span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<p>More info: <a href="https://hexo.io/docs/writing.html">Writing</a></p>
+<h3 id="run-server">Run server</h3>
+<pre class="line-numbers language-bash" data-language="bash"><code class="language-bash">$ hexo server<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<p>More info: <a href="https://hexo.io/docs/server.html">Server</a></p>
+<h3 id="generate-static-files">Generate static files</h3>
+<pre class="line-numbers language-bash" data-language="bash"><code class="language-bash">$ hexo generate<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<p>More info: <a href="https://hexo.io/docs/generating.html">Generating</a></p>
+<h3 id="deploy-to-remote-sites">Deploy to remote sites</h3>
+<pre class="line-numbers language-bash" data-language="bash"><code class="language-bash">$ hexo deploy<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<p>More info: <a href="https://hexo.io/docs/one-command-deployment.html">Deployment</a></p>
+]]></content>
   </entry>
   <entry>
     <title>论时序要求的重要性（移位寄存器控制数码管）</title>

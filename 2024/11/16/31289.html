@@ -420,7 +420,7 @@ I 2 C 实时时钟/日历芯片 PCF8563
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-check fa-fw"></i>更新日期:&nbsp;&nbsp;
-                    2024-11-22
+                    2024-11-23
                 </div>
                 
 
@@ -504,7 +504,6 @@ I 2 C 实时时钟/日历芯片 PCF8563
 <p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241116201656138.png" alt="image-20241116201656138"></p>
 <p>该参数规定了I2C的SCL时钟线的频率，以Fast-mode为例，最大为400kHz。这意味着我们在操作SCL时，将SCL置0的时间+随后将SCL置1的时间之和不能小于 1/400kHz = 2.5us：</p>
 <p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241116201725124.png" alt="image-20241116201725124"></p>
-<p>以GD32F4为例，对应标准库函数 <code>gpio_output_options_set</code>中的 <code>speed</code>参数。即通过GPIO输出方波脉冲时，输出信号的最大频率。</p>
 <h2 id="t-sub-hd-sta-sub-qi-shi-xin-hao-bao-chi-shi-jian-hol-d-time-for-start-condition">t<sub>HD;STA</sub>起始信号保持时间（HolD time for START condition）</h2>
 <p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241116202607065.png" alt="image-20241116202607065"></p>
 <p>该参数规定了起始信号（START condition）需要保持的时间（在SCL为高电平时，将SDA由高拉低后需要保持的时间）</p>
@@ -634,6 +633,7 @@ for(i = 0 ; i &lt; 8 ; i++) {
 <p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241116220318791.png" alt="image-20241116220318791"></p>
 <img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241116220810270.png" alt="image-20241116220810270" style="zoom:33%;">
 <p>这两个参数规定了SCL和SDA的上升沿（r-rising edge）、下降沿（f-falling edge）的时间控制。这个参数和GPIO对应电气特性中的压摆率（<mark>Slew&nbsp;Rate</mark>）。</p>
+<p>以GD32F4为例，对应标准库函数 <code>gpio_output_options_set</code>中的 <code>speed</code>参数，即控制GPIO引脚跳变时，物理电路电平转换所需的时延（例如电容充放电过程需要一定的时间）。</p>
 <h2 id="t-sub-su-sto-sub-zhong-zhi-xin-hao-jian-li-zhun-bei-shi-jian-set-up-time-for-stop">t<sub>SU;STO</sub>终止信号建立（准备）时间（SetUp time for STOP）</h2>
 <p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241116221510344.png" alt="image-20241116221510344"></p>
 <p>由于终止信号（拉高SDA）是有前置条件的（SCL为高，SDA为低），该参数规定了在拉高SDA之前，SDA在SCL为高期间保持低电平的时间：</p>
