@@ -191,6 +191,134 @@ corresponding exception, meaning it cannot be taken</p>
       </tags>
   </entry>
   <entry>
+    <title>ARM核学习（二）指令流水线分析及伪指令</title>
+    <url>/2024/11/24/14899.html</url>
+    <content><![CDATA[<h1 id="zhi-ling-liu-shui-xian-fen-xi">指令流水线分析</h1>
+<h2 id="qian-yan">前言</h2>
+<p>在ARM核中，为增加处理器指令流的速度，ARM7系列使用3级流水线。允许多个操作同时处理，而非顺<br>
+序执行。<mark>不同的ARM核，流水线的级数是不一样的，ARM核版本越高，流水线级数越多。对于软件工</mark><br>
+<mark>程师编程而言，统一按照三级流水线来分析就可以了。</mark></p>
+<img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241124174742518.png" alt="image-20241124174742518" style="zoom: 33%;">
+<blockquote>
+<p>在MDK中断点调试时会发现PC指向的当前代码行，这是因为MDK调试屏蔽了底层流水线细节，以避免产生歧义。</p>
+</blockquote>
+<p>在ARM状态，指令位宽为32位4字节，因此当PC预取（例如）0x8地址的指令时，0x4地址的指令正在被解码、0x0地址的指令正在被执行。Thumb状态是压缩格式的指令集，指令位宽是16位2字节，因此偏差是2。</p>
+<h2 id="zui-jia-liu-shui-xian-fen-xi-jin-cao-zuo-ji-cun-qi">最佳流水线分析（仅操作寄存器）</h2>
+<img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241124175951254.png" alt="image-20241124175951254" style="zoom:50%;">
+<h2 id="nei-cun-fang-wen-zhi-ling-liu-shui-xian">内存访问指令流水线</h2>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241124180204732.png" alt="image-20241124180204732"></p>
+<p>由于内存访问效率较低，因此在执行LDR指令时，无法在一个指令周期内完成（需要E、M、W三个周期）。这样，即使它前面的D跑得快，但解码的指令无法移交给E（它手上的活还没干完），只能干等，F也是一样。</p>
+<h2 id="fen-zhi-tiao-zhuan-liu-shui-xian-ju-li">分支（跳转）流水线举例</h2>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241124181209542.png" alt="image-20241124181209542"></p>
+<p>在E执行跳转指令时，跑在它前面的F、D不得不丢弃已完成的工（解码 <code>0x3004 SUB</code>，预取 <code>0x3008 AND</code>）作，转而从目标地址重新开始F、D、E流程。</p>
+<p>图中E执行 <code>BL 0X8FEC</code>时，F正在预取 <code>0x3008</code>地址的指令，在该指令周期结束时，PC指向 <code>0x3008</code>，且由于是 <code>BL</code>跳转，因此该值会被保存到 <code>LR</code>寄存器中。</p>
+<p>当执行 <code>L</code>指令时，会将<code>LR</code>回写到 <code>PC</code>中，但是由于此前对于 <code>0X3004</code>的解码工作被丢弃了，因此处理器会自动执行一个 <code>A</code>指令，将 <code>PC</code>调整到 <code>0x3004</code>的位置接着执行。</p>
+<h2 id="zong-jie">总结</h2>
+<ul>
+<li>当只有寄存器操作（操作效率和CPU处于同一量级）时，指令流线效率是最高的：在每个指令周期，流水线上的三个工人F、D、E都在不停互相配合，高效完成指令执行所需的三个阶段的工作。</li>
+<li>当访问内存（外设）时，由于物理特性，处理器的工作效率远高于外设，因此工人E只能放慢节奏和外设协同把活干了，这期间即使F、D完成了手头上的活，由于不能向D、E移交，因此也只能干等着。导致了级联停顿（stall）的效应。</li>
+<li>当发生跳转时，工人F、D超前完成的工作只能被迫丢弃，转而从新的指令地址重新开始干活，且如果跳转回来，之前干完的活还得重新再干一次。</li>
+</ul>
+<h1 id="chang-yong-wei-zhi-ling-fen-xi">常用伪指令分析</h1>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241124183925641.png" alt="image-20241124183925641"></p>
+<h2 id="ldr-r-0-0-x-12345678-fen-xi">LDR R0,=0x12345678 分析</h2>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241124184043373.png" alt="image-20241124184043373"></p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241124184314696.png" alt="image-20241124184314696"></p>
+<p>编译器会将常量 <code>0x12345678</code>预先放到某个内存中（通常是所有代码指令之后），并将LDR翻译成一条读内存的指令。</p>
+<h2 id="ldr-r-0-label-fen-xi">LDR R0,=label 分析</h2>
+<p>标签本质上是一个常量，它的值就是标签后第一条指令的地址，可以理解为给这个地址取了个别名。</p>
+<h3 id="dai-ma-duan-qi-shi-di-zhi-wei-0-x-0">代码段起始地址为0x0</h3>
+<p>对于给定的代码段起始地址和指令位宽，每条指令的存放地址在编译阶段都可以确定，如下将代码段的起始地址配置为 <code>0x0</code>：</p>
+<img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241124185737443.png" alt="image-20241124185737443" style="zoom:33%;">
+<p>对于ARM状态下（指令位宽为4字节），如下代码的每条指令都可以顺序计算其存储地址</p>
+<pre class="line-numbers language-assembly" data-language="assembly"><code class="language-assembly">.global _start
+
+_start:
+	mov r1,#1			@0x00000000
+	mov r2,#2			@0x00000004
+	ldr r3,=addr		@0x00000008
+	ldr r4,[r3]			@0x0000000C
+	
+stop:
+	b stop				@0x00000010
+	
+addr:					@给0x00000014取了个别名叫addr
+	.word 0x12345678	@0x00000014 在这个地址存放一个字的数据
+		<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>需要注意的是：标签的声明并不属于指令，因此不占用地址空间。其中 <code>ldr r3,=addr</code>等价于 <code>ldr r3,=0x00000014</code>。</p>
+<p><code>ldr r3,=addr</code>（将addr表示的地址值加载到R3）分析如下：</p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241124190511217.png" alt="image-20241124190511217"></p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241124190550278.png" alt="image-20241124190550278"></p>
+<p><code>ldr r4,[r3]</code>：从R3对应的地址读取数据（该数据 <code>0x12345678</code> 在编译阶段通过 <code>.word</code>伪指令预先存储在了内存空间中）</p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241124190809542.png" alt="image-20241124190809542"></p>
+<h3 id="dai-ma-duan-qi-shi-di-zhi-wei-0-x-2000">代码段起始地址为0x2000</h3>
+<p>将代码段起始地址改为0x2000，计算规则是一样的，在编译阶段就能确定各个指令以及 <code>.word</code>数据存放的地址（注意修改后需要重新编译下）：</p>
+<img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241124200510540.png" alt="image-20241124200510540" style="zoom:33%;">
+<p>调试前需要修改下内存映射，默认是从0x0开始执行的，我们需要让0x0到0x2000及其后的一段内存都可执行：</p>
+<img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241124200751229.png" alt="image-20241124200751229" style="zoom:50%;">
+<p>然后在 <code>_start</code>的第一条指令打个断点，跳过从0x0到0x2000之间的无效指令：</p>
+<img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241124201005483.png" alt="image-20241124201005483" style="zoom: 33%;">
+<img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241124200325028.png" alt="image-20241124200325028" style="zoom:33%;">
+<h3 id="zong-jie-1">总结</h3>
+<img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241124195231017.png" alt="image-20241124195231017" style="zoom: 50%;">
+<h2 id="ldr-r-0-label-fen-xi-1">LDR R0,label 分析</h2>
+<pre class="line-numbers language-assembly" data-language="assembly"><code class="language-assembly">.global _start
+
+_start:
+	mov r1,#1			
+	mov r2,#2			
+	ldr r3,addr			
+	mov r4,r3			
+stop:
+	b stop				
+addr:	
+	.word 0x12345678	
+		<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p><code>ldr r3,=addr</code>可以理解为将标签 <code>addr</code>的值当做常量加载到R3中，而 <code>ldr r3,addr</code>则是从 <code>addr</code>对应的地址加载数据到R3中，相当于 <code>R3=p</code>和 <code>R3=*p</code>的关系</p>
+<img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241124201244164.png" alt="image-20241124201244164" style="zoom: 33%;">
+<h2 id="adr-r-0-label-dong-tai-huo-qu-biao-qian-di-zhi">ADR R0,label 动态获取标签地址</h2>
+<blockquote>
+<p>This instruction adds an immediate value to the PC value to form a PC-relative address, and writes the result to the destination register.</p>
+</blockquote>
+<p>ADR 是 “Address” 的缩写，它是一条用于生成地址的伪指令。ADR 指令用于计算一个目标地址，并将其存储到指定的寄存器中。目标地址是基于当前 PC 加上一个偏移量计算得出的，因此它只能访问当前代码段附近的地址。</p>
+<h3 id="strong-zhi-ling-ge-shi-strong"><strong>指令格式</strong></h3>
+<pre class="line-numbers language-assembly" data-language="assembly"><code class="language-assembly">ADR &lt;Rd&gt;, &lt;label&gt;<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<ul>
+<li><code>&lt;Rd&gt;</code>：目标寄存器，用于存储计算出的地址。</li>
+<li><code>&lt;label&gt;</code>：目标地址标签，必须位于当前指令前后一定范围内。</li>
+</ul>
+<h3 id="shi-li">示例</h3>
+<pre class="line-numbers language-assembly" data-language="assembly"><code class="language-assembly">.global _start
+
+_start:
+	mov r1,#1			
+	mov r2,#2			
+	adr r3,addr			
+	ldr r4,[r3]		
+stop:
+	b stop				
+addr:	
+	.word 0x12345678	
+		<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241124202620567.png" alt="image-20241124202620567"></p>
+<h3 id="dui-bi-ldr-r-0-label">对比 LDR R0,=label</h3>
+<p>如下图，<code>LDR R0,=label</code>编译时，编译器会根据代码段起始地址和指令位宽计算出label对应的地址值（<code>0x00000014</code>），并单独开辟一个内存（<code>0x00000018</code>）存放这个<mark>写死</mark>的数据，在运行时通过LDR读取这个内存中写死的label地址值到R3中。</p>
+<p>如果起始地址为 <code>0x2000</code>，那么编译器就会在内存中存放一个写死的 <code>0x2014</code>，显然这是一种<mark>静态的做法</mark>（和编译时设置的代码段起始地址是<mark>强绑定的</mark>），如果程序换一个地址空间运行，这个写死的地址值就没有意义了。</p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241124203311920.png" alt="image-20241124203311920"></p>
+<p>而 <code>ADR R0,label</code>则是运行时动态获取标签对应的地址值，例如编译器知道执行当前指令时，通过在PC上偏移4个字节就能寻址到label对应的地址，那么通过 <code>ADD</code>指令就能在<mark>运行时动态获取</mark>该label对应的地址。这种做法是<mark>不依赖编译时设定的代码段起始地址的，无论使用什么起始地址，都能够得到一个正确的标签地址</mark>。</p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241124204230866.png" alt="image-20241124204230866"></p>
+<h2 id="ru-he-pan-bie-dai-ma-zai-shi-ji-nei-cun-zhong-yun-xing-de-di-zhi">🌟如何判别代码在实际内存中运行的地址？</h2>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241124204803253.png" alt="image-20241124204803253"></p>
+]]></content>
+      <categories>
+        <category>ARM</category>
+      </categories>
+      <tags>
+        <tag>ARM</tag>
+        <tag>ARMv7</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>ARM核学习（二）指令集</title>
     <url>/2024/11/24/18972.html</url>
     <content><![CDATA[<h1 id="can-kao-zi-liao">参考资料</h1>
@@ -790,7 +918,7 @@ _start:
 stop:
 	b stop
 	<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<h1 id="end">END</h1>
+<h1 id="the-end">The END</h1>
 ]]></content>
       <categories>
         <category>ARM</category>
@@ -799,171 +927,6 @@ stop:
         <tag>ARM</tag>
         <tag>ARMv7</tag>
       </tags>
-  </entry>
-  <entry>
-    <title>STM32系统时钟初始化源码解析（SPL库，STM32F103ZE）</title>
-    <url>/2024/11/23/19447.html</url>
-    <content><![CDATA[<h1 id="yi-bei-jing">一、背景</h1>
-<h2 id="kai-fa-huan-jing">开发环境</h2>
-<ul>
-<li>STM32F103ZET6</li>
-</ul>
-<h2 id="yuan-li-tu">原理图</h2>
-<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241123160212385.png" alt="image-20241123160212385"></p>
-<h3 id="hse-gao-su-wai-bu-jing-zhen-high-speed-external-oscillator">HSE-高速外部晶振High Speed External oscillator</h3>
-<p>通过23、24号引脚接入8M的高速外部晶振。</p>
-<h3 id="hsi-di-su-wai-bu-jing-zhen-low-speed-external-oscillator">HSI-低速外部晶振Low Speed External oscillator</h3>
-<p>通过GPIO引脚PC14和PC15的复用接入32.768kHz低速外部晶振。</p>
-<h2 id="yi-cube-de-tu-xing-hua-pei-zhi-wei-li-shuo-ming">以Cube的图形化配置为例说明</h2>
-<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241123160112667.png" alt="image-20241123160112667"></p>
-<p>MCU内置了两个RC震荡电路：</p>
-<ul>
-<li>HSI RC，High Speed Internal RC，8M高速内部RC震荡电路</li>
-<li>LSI RC，Low Speed Internal RC，40kHz低速内部RC震荡电路</li>
-</ul>
-<h3 id="wei-shi-yao-mcu-nei-zhi-liao-huan-xu-yao-wai-jie-jing-zhen">为什么MCU内置了，还需要外接晶振</h3>
-<ul>
-<li>
-<p>RC震荡电路容易受到其他电路干扰，导致信号不稳定，且精度远比晶振低。</p>
-</li>
-<li>
-<p>由于MCU的微小封装，无法内嵌较大的晶振</p>
-</li>
-<li>
-<p>将晶振的灵活选择权交给开发者</p>
-</li>
-</ul>
-<h3 id="cube-pei-zhi-jie-xi">Cube配置解析</h3>
-<p>外接晶振通过引脚接入MCU，但由于MCU的主频较高，一般将HSE通过PLL（锁相环，用来倍频）提高频率再作为系统时钟SYSCLK的来源。</p>
-<p>图中 <mark>Mux</mark>是多路选择器 <mark>Multiplex</mark>的缩写，可以看到我们的8M HSE经过了1分频（即不分频），连接到了PLL Source Mux，通过这个多路选择器，我们使用HSE而不是HSI作为PLL的时钟来源（HSE在精度和稳定性上要比HSI好很多）。</p>
-<p>接着经过了PLLMul，即锁相环倍频（PLL Multiply），将HSE的频率放大了9倍得到PLLCLK（8M * 9 = 72M），并连接到了System Clock Mux（即系统时钟多路选择器），这里我们当然选择稳定、高精度、高频的PLLCLK作为系统时钟。</p>
-<h1 id="er-shi-zhong-chu-shi-hua-guo-cheng-yuan-ma-fen-xi-spl-ku">二、时钟初始化过程源码分析（SPL库）</h1>
-<h2 id="shang-dian-fu-wei-hou-hui-fa-sheng-shi-yao">上电/复位后会发生什么？</h2>
-<p>MCU启动的汇编文件 <code>startup.s</code>会被执行：</p>
-<p><code>startup_stm32f10x_hd.s</code></p>
-<pre class="line-numbers language-asm" data-language="asm"><code class="language-asm">Reset_Handler   PROC
-                EXPORT  Reset_Handler             [WEAK]
-                IMPORT  __main
-                IMPORT  SystemInit
-                LDR     R0, =SystemInit
-                BLX     R0               
-                LDR     R0, =__main
-                BX      R0<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<p><mark>执行SystemInit函数</mark></p>
-<p>将 <code>SystemInit</code> 函数的入口地址加载到寄存器R0，通过 <code>BLX</code>跳转到其对应的代码段执行该函数，其中就包括了系统时钟的初始化过程。</p>
-<p><mark>执行main函数</mark></p>
-<p>将 <code>main</code> 函数的入口地址加载到寄存器R0，通过 <code>BX</code>跳转到其对应的代码段执行该函数，执行用户代码。</p>
-<blockquote>
-<p>该初始化顺序遵循ARM的CMSIS（Cortex Microcontroller Software Interface Standard）标准</p>
-</blockquote>
-<h2 id="system-init">SystemInit</h2>
-<p><a href="https://www.st.com/resource/en/reference_manual/rm0008-stm32f101xx-stm32f102xx-stm32f103xx-stm32f105xx-and-stm32f107xx-advanced-armbased-32bit-mcus-stmicroelectronics.pdf">STM32F107参考手册</a></p>
-<h3 id="qi-yong-hsi-xian-rang-mcu-you-xin-tiao">启用HSI，先让MCU有心跳</h3>
-<p>在<code>system_stm32f10x.c</code>中找到 <code>SystemInit</code>函数，条件编译显示灰色的部分可以忽略</p>
-<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token comment">/* Set HSION bit */</span>
-RCC<span class="token operator">-&gt;</span>CR <span class="token operator">|=</span> <span class="token punctuation">(</span><span class="token class-name">uint32_t</span><span class="token punctuation">)</span><span class="token number">0x00000001</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
-<p>先开启HSI高速内部时钟（时钟相当于MCU心跳，先让MCU有心跳能够工作，后面再将时钟源通过多路选择器切换为我们配置的HSE），将寄存器的第0位设置为1：</p>
-<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241123165840693.png" alt="image-20241123165840693"></p>
-<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241123165911410.png" alt="image-20241123165911410"></p>
-<h3 id="fu-wei-shi-zhong-xiang-guan-ji-cun-qi-bi-te-wei">复位时钟相关寄存器比特位</h3>
-<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token comment">/* Reset SW, HPRE, PPRE1, PPRE2, ADCPRE and MCO bits */</span>
-RCC<span class="token operator">-&gt;</span>CFGR <span class="token operator">&amp;=</span> <span class="token punctuation">(</span><span class="token class-name">uint32_t</span><span class="token punctuation">)</span><span class="token number">0xF8FF0000</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
-<p>该操作会将CFGR（时钟配置）寄存器如下比特位清零：</p>
-<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241123170556835.png" alt="image-20241123170556835"></p>
-<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241123170704055.png" alt="image-20241123170704055"></p>
-<p>选择HSI（上一步已经开启了）作为系统时钟，其他的（HPRE, PPRE1, PPRE2, ADCPRE and MCO）分析过程类似。</p>
-<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token comment">/* Reset HSEON, CSSON and PLLON bits */</span>
-RCC<span class="token operator">-&gt;</span>CR <span class="token operator">&amp;=</span> <span class="token punctuation">(</span><span class="token class-name">uint32_t</span><span class="token punctuation">)</span><span class="token number">0xFEF6FFFF</span><span class="token punctuation">;</span>
-
-<span class="token comment">/* Reset HSEBYP bit */</span>
-RCC<span class="token operator">-&gt;</span>CR <span class="token operator">&amp;=</span> <span class="token punctuation">(</span><span class="token class-name">uint32_t</span><span class="token punctuation">)</span><span class="token number">0xFFFBFFFF</span><span class="token punctuation">;</span>
-
-<span class="token comment">/* Reset PLLSRC, PLLXTPRE, PLLMUL and USBPRE/OTGFSPRE bits */</span>
-RCC<span class="token operator">-&gt;</span>CFGR <span class="token operator">&amp;=</span> <span class="token punctuation">(</span><span class="token class-name">uint32_t</span><span class="token punctuation">)</span><span class="token number">0xFF80FFFF</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<p>同样的，也是将一些位清零，将系统时钟初始化为仅由HSI作为时钟源的初始状态</p>
-<h3 id="set-sys-clock-she-zhi-xi-tong-shi-zhong">SetSysClock设置系统时钟</h3>
-<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token comment">/* Enable HSE */</span>    
-RCC<span class="token operator">-&gt;</span>CR <span class="token operator">|=</span> <span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token class-name">uint32_t</span><span class="token punctuation">)</span>RCC_CR_HSEON<span class="token punctuation">)</span><span class="token punctuation">;</span>
- 
-<span class="token comment">/* Wait till HSE is ready and if Time out is reached exit */</span>
-<span class="token keyword">do</span>
-<span class="token punctuation">{</span>
-  HSEStatus <span class="token operator">=</span> RCC<span class="token operator">-&gt;</span>CR <span class="token operator">&amp;</span> RCC_CR_HSERDY<span class="token punctuation">;</span>
-  StartUpCounter<span class="token operator">++</span><span class="token punctuation">;</span>  
-<span class="token punctuation">}</span> <span class="token keyword">while</span><span class="token punctuation">(</span><span class="token punctuation">(</span>HSEStatus <span class="token operator">==</span> <span class="token number">0</span><span class="token punctuation">)</span> <span class="token operator">&amp;&amp;</span> <span class="token punctuation">(</span>StartUpCounter <span class="token operator">!=</span> HSE_STARTUP_TIMEOUT<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<p>这里开启了HSE外部高速时钟，并等待HSE的状态转变为READY（由硬件置位）。</p>
-<h3 id="xi-tong-shi-zhong-shu">系统时钟树</h3>
-<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token comment">/* HCLK = SYSCLK */</span>
-RCC<span class="token operator">-&gt;</span>CFGR <span class="token operator">|=</span> <span class="token punctuation">(</span><span class="token class-name">uint32_t</span><span class="token punctuation">)</span>RCC_CFGR_HPRE_DIV1<span class="token punctuation">;</span>
-  
-<span class="token comment">/* PCLK2 = HCLK */</span>
-RCC<span class="token operator">-&gt;</span>CFGR <span class="token operator">|=</span> <span class="token punctuation">(</span><span class="token class-name">uint32_t</span><span class="token punctuation">)</span>RCC_CFGR_PPRE2_DIV1<span class="token punctuation">;</span>
-
-<span class="token comment">/* PCLK1 = HCLK */</span>
-RCC<span class="token operator">-&gt;</span>CFGR <span class="token operator">|=</span> <span class="token punctuation">(</span><span class="token class-name">uint32_t</span><span class="token punctuation">)</span>RCC_CFGR_PPRE1_DIV2<span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<p>将系统时钟作为AHB和APB2的时钟源（对应HCLK和PCLK2），将系统时钟2分频，作为APB1的时钟源（对应PCLK2）。</p>
-<blockquote>
-<p>AHB挂载了Cortex核、DMA等主动单元</p>
-<p>APB2挂载了GPIO、USRAT1、ADC等需要高速率时钟的单元</p>
-<p>APB1则挂载了TIMER、I2C等不需要那么高频的单元</p>
-</blockquote>
-<img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241123172121666.png" alt="image-20241123172121666" style="zoom: 50%;">
-<h3 id="pll-bei-pin">PLL倍频</h3>
-<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token comment">/*  PLL configuration: PLLCLK = HSE * 9 = 72 MHz */</span>
-    RCC<span class="token operator">-&gt;</span>CFGR <span class="token operator">&amp;=</span> <span class="token punctuation">(</span><span class="token class-name">uint32_t</span><span class="token punctuation">)</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token class-name">uint32_t</span><span class="token punctuation">)</span><span class="token operator">~</span><span class="token punctuation">(</span>RCC_CFGR_PLLSRC <span class="token operator">|</span> RCC_CFGR_PLLXTPRE <span class="token operator">|</span>
-                                        RCC_CFGR_PLLMULL<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-    RCC<span class="token operator">-&gt;</span>CFGR <span class="token operator">|=</span> <span class="token punctuation">(</span><span class="token class-name">uint32_t</span><span class="token punctuation">)</span><span class="token punctuation">(</span>RCC_CFGR_PLLSRC_HSE <span class="token operator">|</span> RCC_CFGR_PLLMULL9<span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
-<ul>
-<li>将PLL时钟来源RCC_CFGR_PLLSRC、HSE进入PLL后的分频RCC_CFGR_PLLXTPRE、PLL倍频系数RCC_CFGR_PLLMULL清零；</li>
-<li>选择PLL时钟来源为HSE（RCC_CFGR_PLLSRC_HSE），倍频系数为9（RCC_CFGR_PLLMULL9）</li>
-</ul>
-<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token comment">/* Enable PLL */</span>
-    RCC<span class="token operator">-&gt;</span>CR <span class="token operator">|=</span> RCC_CR_PLLON<span class="token punctuation">;</span>
-
-    <span class="token comment">/* Wait till PLL is ready */</span>
-    <span class="token keyword">while</span><span class="token punctuation">(</span><span class="token punctuation">(</span>RCC<span class="token operator">-&gt;</span>CR <span class="token operator">&amp;</span> RCC_CR_PLLRDY<span class="token punctuation">)</span> <span class="token operator">==</span> <span class="token number">0</span><span class="token punctuation">)</span>
-    <span class="token punctuation">{</span>
-    <span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<p>启动PLL锁相环，并等待它稳定。</p>
-<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token comment">/* Select PLL as system clock source */</span>
-   RCC<span class="token operator">-&gt;</span>CFGR <span class="token operator">&amp;=</span> <span class="token punctuation">(</span><span class="token class-name">uint32_t</span><span class="token punctuation">)</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token class-name">uint32_t</span><span class="token punctuation">)</span><span class="token operator">~</span><span class="token punctuation">(</span>RCC_CFGR_SW<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-   RCC<span class="token operator">-&gt;</span>CFGR <span class="token operator">|=</span> <span class="token punctuation">(</span><span class="token class-name">uint32_t</span><span class="token punctuation">)</span>RCC_CFGR_SW_PLL<span class="token punctuation">;</span>    
-
-   <span class="token comment">/* Wait till PLL is used as system clock source */</span>
-   <span class="token keyword">while</span> <span class="token punctuation">(</span><span class="token punctuation">(</span>RCC<span class="token operator">-&gt;</span>CFGR <span class="token operator">&amp;</span> <span class="token punctuation">(</span><span class="token class-name">uint32_t</span><span class="token punctuation">)</span>RCC_CFGR_SWS<span class="token punctuation">)</span> <span class="token operator">!=</span> <span class="token punctuation">(</span><span class="token class-name">uint32_t</span><span class="token punctuation">)</span><span class="token number">0x08</span><span class="token punctuation">)</span>
-   <span class="token punctuation">{</span>
-   <span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<p>通过系统时钟的多路选择器将PLL选择为系统时钟源，并等待此切换完成。</p>
-]]></content>
-      <categories>
-        <category>STM32</category>
-        <category>源码分析</category>
-      </categories>
-      <tags>
-        <tag>STM32</tag>
-        <tag>SPL</tag>
-        <tag>STM32F103ZE</tag>
-        <tag>时钟</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>Hello World</title>
-    <url>/2024/11/12/16107.html</url>
-    <content><![CDATA[<p>Welcome to <a href="https://hexo.io/">Hexo</a>! This is your very first post. Check <a href="https://hexo.io/docs/">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="https://hexo.io/docs/troubleshooting.html">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues">GitHub</a>.</p>
-<h2 id="quick-start">Quick Start</h2>
-<h3 id="create-a-new-post">Create a new post</h3>
-<pre class="line-numbers language-bash" data-language="bash"><code class="language-bash">$ hexo new <span class="token string">"My New Post"</span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
-<p>More info: <a href="https://hexo.io/docs/writing.html">Writing</a></p>
-<h3 id="run-server">Run server</h3>
-<pre class="line-numbers language-bash" data-language="bash"><code class="language-bash">$ hexo server<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
-<p>More info: <a href="https://hexo.io/docs/server.html">Server</a></p>
-<h3 id="generate-static-files">Generate static files</h3>
-<pre class="line-numbers language-bash" data-language="bash"><code class="language-bash">$ hexo generate<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
-<p>More info: <a href="https://hexo.io/docs/generating.html">Generating</a></p>
-<h3 id="deploy-to-remote-sites">Deploy to remote sites</h3>
-<pre class="line-numbers language-bash" data-language="bash"><code class="language-bash">$ hexo deploy<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
-<p>More info: <a href="https://hexo.io/docs/one-command-deployment.html">Deployment</a></p>
-]]></content>
   </entry>
   <entry>
     <title>UART接收缓冲区溢出异常（HAL_UART_ERROR_ORE）问题记录</title>
@@ -1224,163 +1187,177 @@ huart<span class="token operator">-&gt;</span>RxState <span class="token operato
         <category>踩坑记录</category>
       </categories>
       <tags>
-        <tag>STM32</tag>
         <tag>Clion</tag>
+        <tag>STM32</tag>
         <tag>GD32</tag>
         <tag>HAL</tag>
         <tag>UART</tag>
       </tags>
   </entry>
   <entry>
-    <title>论时序要求的重要性（移位寄存器控制数码管）</title>
-    <url>/2024/11/15/31801.html</url>
-    <content><![CDATA[<h1 id="1-wen-ti-bei-jing">1. 问题背景</h1>
-<h2 id="ying-jian-bei-jing">硬件背景</h2>
+    <title>STM32系统时钟初始化源码解析（SPL库，STM32F103ZE）</title>
+    <url>/2024/11/23/19447.html</url>
+    <content><![CDATA[<h1 id="yi-bei-jing">一、背景</h1>
+<h2 id="kai-fa-huan-jing">开发环境</h2>
 <ul>
-<li>移位寄存器：<a href="https://item.szlcsc.com/79848.html?fromZone=s_s__%2274HC595N%22">SN74HC595N</a></li>
-<li>两个4位共阳数码管</li>
+<li>STM32F103ZET6</li>
 </ul>
-<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/20241115163627.png" alt=""></p>
-<h2 id="yi-wei-suo-cun-luo-ji-set-reset">移位/锁存逻辑——set/reset</h2>
-<p>在学习GD32F407VET时，将学习STC8实现的数码管模块移植过来，发现了一个很奇怪的问题。其中移位操作的实现如下（封装了对两个串联移位寄存器的移位操作，控制8个数码管中显示哪一个，以及控制数码管显示内容）：</p>
-<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">shift</span><span class="token punctuation">(</span><span class="token class-name">uint8_t</span> data<span class="token punctuation">)</span> <span class="token punctuation">{</span>
-    <span class="token keyword">for</span> <span class="token punctuation">(</span><span class="token class-name">uint8_t</span> i <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span> i <span class="token operator">&lt;</span> <span class="token number">8</span><span class="token punctuation">;</span> <span class="token operator">++</span>i<span class="token punctuation">)</span> <span class="token punctuation">{</span>
-        <span class="token function">gpio_bit_write</span><span class="token punctuation">(</span>NIX_DI_PORT<span class="token punctuation">,</span> NIX_DI_PIN<span class="token punctuation">,</span> <span class="token punctuation">(</span>data <span class="token operator">&amp;</span> <span class="token punctuation">(</span><span class="token number">0x80</span> <span class="token operator">&gt;&gt;</span> i<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token operator">?</span> SET <span class="token operator">:</span> RESET<span class="token punctuation">)</span><span class="token punctuation">;</span>
-        <span class="token function">gpio_bit_reset</span><span class="token punctuation">(</span>NIX_SCK_PORT<span class="token punctuation">,</span> NIX_SCK_PIN<span class="token punctuation">)</span><span class="token punctuation">;</span>
-        <span class="token function">__NOP</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-        <span class="token function">gpio_bit_set</span><span class="token punctuation">(</span>NIX_SCK_PORT<span class="token punctuation">,</span> NIX_SCK_PIN<span class="token punctuation">)</span><span class="token punctuation">;</span>
-        <span class="token function">__NOP</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-    <span class="token punctuation">}</span>
-<span class="token punctuation">}</span>
+<h2 id="yuan-li-tu">原理图</h2>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241123160212385.png" alt="image-20241123160212385"></p>
+<h3 id="hse-gao-su-wai-bu-jing-zhen-high-speed-external-oscillator">HSE-高速外部晶振High Speed External oscillator</h3>
+<p>通过23、24号引脚接入8M的高速外部晶振。</p>
+<h3 id="hsi-di-su-wai-bu-jing-zhen-low-speed-external-oscillator">HSI-低速外部晶振Low Speed External oscillator</h3>
+<p>通过GPIO引脚PC14和PC15的复用接入32.768kHz低速外部晶振。</p>
+<h2 id="yi-cube-de-tu-xing-hua-pei-zhi-wei-li-shuo-ming">以Cube的图形化配置为例说明</h2>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241123160112667.png" alt="image-20241123160112667"></p>
+<p>MCU内置了两个RC震荡电路：</p>
+<ul>
+<li>HSI RC，High Speed Internal RC，8M高速内部RC震荡电路</li>
+<li>LSI RC，Low Speed Internal RC，40kHz低速内部RC震荡电路</li>
+</ul>
+<h3 id="wei-shi-yao-mcu-nei-zhi-liao-huan-xu-yao-wai-jie-jing-zhen">为什么MCU内置了，还需要外接晶振</h3>
+<ul>
+<li>
+<p>RC震荡电路容易受到其他电路干扰，导致信号不稳定，且精度远比晶振低。</p>
+</li>
+<li>
+<p>由于MCU的微小封装，无法内嵌较大的晶振</p>
+</li>
+<li>
+<p>将晶振的灵活选择权交给开发者</p>
+</li>
+</ul>
+<h3 id="cube-pei-zhi-jie-xi">Cube配置解析</h3>
+<p>外接晶振通过引脚接入MCU，但由于MCU的主频较高，一般将HSE通过PLL（锁相环，用来倍频）提高频率再作为系统时钟SYSCLK的来源。</p>
+<p>图中 <mark>Mux</mark>是多路选择器 <mark>Multiplex</mark>的缩写，可以看到我们的8M HSE经过了1分频（即不分频），连接到了PLL Source Mux，通过这个多路选择器，我们使用HSE而不是HSI作为PLL的时钟来源（HSE在精度和稳定性上要比HSI好很多）。</p>
+<p>接着经过了PLLMul，即锁相环倍频（PLL Multiply），将HSE的频率放大了9倍得到PLLCLK（8M * 9 = 72M），并连接到了System Clock Mux（即系统时钟多路选择器），这里我们当然选择稳定、高精度、高频的PLLCLK作为系统时钟。</p>
+<h1 id="er-shi-zhong-chu-shi-hua-guo-cheng-yuan-ma-fen-xi-spl-ku">二、时钟初始化过程源码分析（SPL库）</h1>
+<h2 id="shang-dian-fu-wei-hou-hui-fa-sheng-shi-yao">上电/复位后会发生什么？</h2>
+<p>MCU启动的汇编文件 <code>startup.s</code>会被执行：</p>
+<p><code>startup_stm32f10x_hd.s</code></p>
+<pre class="line-numbers language-asm" data-language="asm"><code class="language-asm">Reset_Handler   PROC
+                EXPORT  Reset_Handler             [WEAK]
+                IMPORT  __main
+                IMPORT  SystemInit
+                LDR     R0, =SystemInit
+                BLX     R0               
+                LDR     R0, =__main
+                BX      R0<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p><mark>执行SystemInit函数</mark></p>
+<p>将 <code>SystemInit</code> 函数的入口地址加载到寄存器R0，通过 <code>BLX</code>跳转到其对应的代码段执行该函数，其中就包括了系统时钟的初始化过程。</p>
+<p><mark>执行main函数</mark></p>
+<p>将 <code>main</code> 函数的入口地址加载到寄存器R0，通过 <code>BX</code>跳转到其对应的代码段执行该函数，执行用户代码。</p>
+<blockquote>
+<p>该初始化顺序遵循ARM的CMSIS（Cortex Microcontroller Software Interface Standard）标准</p>
+</blockquote>
+<h2 id="system-init">SystemInit</h2>
+<p><a href="https://www.st.com/resource/en/reference_manual/rm0008-stm32f101xx-stm32f102xx-stm32f103xx-stm32f105xx-and-stm32f107xx-advanced-armbased-32bit-mcus-stmicroelectronics.pdf">STM32F107参考手册</a></p>
+<h3 id="qi-yong-hsi-xian-rang-mcu-you-xin-tiao">启用HSI，先让MCU有心跳</h3>
+<p>在<code>system_stm32f10x.c</code>中找到 <code>SystemInit</code>函数，条件编译显示灰色的部分可以忽略</p>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token comment">/* Set HSION bit */</span>
+RCC<span class="token operator">-&gt;</span>CR <span class="token operator">|=</span> <span class="token punctuation">(</span><span class="token class-name">uint32_t</span><span class="token punctuation">)</span><span class="token number">0x00000001</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<p>先开启HSI高速内部时钟（时钟相当于MCU心跳，先让MCU有心跳能够工作，后面再将时钟源通过多路选择器切换为我们配置的HSE），将寄存器的第0位设置为1：</p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241123165840693.png" alt="image-20241123165840693"></p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241123165911410.png" alt="image-20241123165911410"></p>
+<h3 id="fu-wei-shi-zhong-xiang-guan-ji-cun-qi-bi-te-wei">复位时钟相关寄存器比特位</h3>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token comment">/* Reset SW, HPRE, PPRE1, PPRE2, ADCPRE and MCO bits */</span>
+RCC<span class="token operator">-&gt;</span>CFGR <span class="token operator">&amp;=</span> <span class="token punctuation">(</span><span class="token class-name">uint32_t</span><span class="token punctuation">)</span><span class="token number">0xF8FF0000</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<p>该操作会将CFGR（时钟配置）寄存器如下比特位清零：</p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241123170556835.png" alt="image-20241123170556835"></p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241123170704055.png" alt="image-20241123170704055"></p>
+<p>选择HSI（上一步已经开启了）作为系统时钟，其他的（HPRE, PPRE1, PPRE2, ADCPRE and MCO）分析过程类似。</p>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token comment">/* Reset HSEON, CSSON and PLLON bits */</span>
+RCC<span class="token operator">-&gt;</span>CR <span class="token operator">&amp;=</span> <span class="token punctuation">(</span><span class="token class-name">uint32_t</span><span class="token punctuation">)</span><span class="token number">0xFEF6FFFF</span><span class="token punctuation">;</span>
 
-<span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">rck_action</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
-    <span class="token function">gpio_bit_reset</span><span class="token punctuation">(</span>NIX_RCK_PORT<span class="token punctuation">,</span> NIX_RCK_PIN<span class="token punctuation">)</span><span class="token punctuation">;</span>
-    <span class="token function">__NOP</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-    <span class="token function">gpio_bit_set</span><span class="token punctuation">(</span>NIX_RCK_PORT<span class="token punctuation">,</span> NIX_RCK_PIN<span class="token punctuation">)</span><span class="token punctuation">;</span>
-    <span class="token function">__NOP</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<p>发现单独指定某个数码管显示某个数是没有问题的：</p>
-<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token comment">// 要显示1~8对应的码表</span>
-<span class="token class-name">uint8_t</span> code<span class="token punctuation">[</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token punctuation">{</span><span class="token number">0xF9</span><span class="token punctuation">,</span> <span class="token number">0xA4</span><span class="token punctuation">,</span> <span class="token number">0xB0</span><span class="token punctuation">,</span> <span class="token number">0x99</span><span class="token punctuation">,</span> <span class="token number">0x92</span><span class="token punctuation">,</span> <span class="token number">0x82</span><span class="token punctuation">,</span> <span class="token number">0xF8</span><span class="token punctuation">,</span> <span class="token number">0x80</span><span class="token punctuation">,</span><span class="token punctuation">}</span><span class="token punctuation">;</span>
-<span class="token function">Int_NixieTube_DisplaySingle</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">,</span> code<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
-<p>但是想使用 <code>for</code>控制数码管轮流显示1~8时，就发现显示的内容并不符合预期：</p>
-<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token keyword">for</span> <span class="token punctuation">(</span><span class="token class-name">uint8_t</span> i <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span> i <span class="token operator">&lt;</span> <span class="token number">8</span><span class="token punctuation">;</span> <span class="token operator">++</span>i<span class="token punctuation">)</span> <span class="token punctuation">{</span>
-    <span class="token function">Int_NixieTube_DisplaySingle</span><span class="token punctuation">(</span>i<span class="token punctuation">,</span> code<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-    <span class="token function">delay_1ms</span><span class="token punctuation">(</span><span class="token number">1000</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
-<h2 id="yi-wei-suo-cun-luo-ji-write">移位/锁存逻辑——write</h2>
-<p>但是将其中 <code>gpio_bit</code> 的 <code>set/reset</code>换成 <code>write</code>之后，发现数码管能够按照预期显示了：</p>
-<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">shift</span><span class="token punctuation">(</span><span class="token class-name">uint8_t</span> data<span class="token punctuation">)</span> <span class="token punctuation">{</span>
-    <span class="token keyword">for</span> <span class="token punctuation">(</span><span class="token class-name">uint8_t</span> i <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span> i <span class="token operator">&lt;</span> <span class="token number">8</span><span class="token punctuation">;</span> <span class="token operator">++</span>i<span class="token punctuation">)</span> <span class="token punctuation">{</span>
-        <span class="token function">gpio_bit_write</span><span class="token punctuation">(</span>NIX_DI_PORT<span class="token punctuation">,</span> NIX_DI_PIN<span class="token punctuation">,</span> <span class="token punctuation">(</span>data <span class="token operator">&amp;</span> <span class="token punctuation">(</span><span class="token number">0x80</span> <span class="token operator">&gt;&gt;</span> i<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token operator">?</span> SET <span class="token operator">:</span> RESET<span class="token punctuation">)</span><span class="token punctuation">;</span>
-        <span class="token function">gpio_bit_write</span><span class="token punctuation">(</span>NIX_SCK_PORT<span class="token punctuation">,</span> NIX_SCK_PIN<span class="token punctuation">,</span> RESET<span class="token punctuation">)</span><span class="token punctuation">;</span>
-        <span class="token function">__NOP</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-        <span class="token function">gpio_bit_write</span><span class="token punctuation">(</span>NIX_SCK_PORT<span class="token punctuation">,</span> NIX_SCK_PIN<span class="token punctuation">,</span> SET<span class="token punctuation">)</span><span class="token punctuation">;</span>
-        <span class="token function">__NOP</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-    <span class="token punctuation">}</span>
-<span class="token punctuation">}</span>
+<span class="token comment">/* Reset HSEBYP bit */</span>
+RCC<span class="token operator">-&gt;</span>CR <span class="token operator">&amp;=</span> <span class="token punctuation">(</span><span class="token class-name">uint32_t</span><span class="token punctuation">)</span><span class="token number">0xFFFBFFFF</span><span class="token punctuation">;</span>
 
-<span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">rck_action</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
-    <span class="token function">gpio_bit_write</span><span class="token punctuation">(</span>NIX_RCK_PORT<span class="token punctuation">,</span> NIX_RCK_PIN<span class="token punctuation">,</span> RESET<span class="token punctuation">)</span><span class="token punctuation">;</span>
-    <span class="token function">__NOP</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-    <span class="token function">gpio_bit_write</span><span class="token punctuation">(</span>NIX_RCK_PORT<span class="token punctuation">,</span> NIX_RCK_PIN<span class="token punctuation">,</span> SET<span class="token punctuation">)</span><span class="token punctuation">;</span>
-    <span class="token function">__NOP</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<p>查看这些函数的实现：</p>
-<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token keyword">void</span> <span class="token function">gpio_bit_set</span><span class="token punctuation">(</span><span class="token class-name">uint32_t</span> gpio_periph<span class="token punctuation">,</span> <span class="token class-name">uint32_t</span> pin<span class="token punctuation">)</span>
+<span class="token comment">/* Reset PLLSRC, PLLXTPRE, PLLMUL and USBPRE/OTGFSPRE bits */</span>
+RCC<span class="token operator">-&gt;</span>CFGR <span class="token operator">&amp;=</span> <span class="token punctuation">(</span><span class="token class-name">uint32_t</span><span class="token punctuation">)</span><span class="token number">0xFF80FFFF</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>同样的，也是将一些位清零，将系统时钟初始化为仅由HSI作为时钟源的初始状态</p>
+<h3 id="set-sys-clock-she-zhi-xi-tong-shi-zhong">SetSysClock设置系统时钟</h3>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token comment">/* Enable HSE */</span>    
+RCC<span class="token operator">-&gt;</span>CR <span class="token operator">|=</span> <span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token class-name">uint32_t</span><span class="token punctuation">)</span>RCC_CR_HSEON<span class="token punctuation">)</span><span class="token punctuation">;</span>
+ 
+<span class="token comment">/* Wait till HSE is ready and if Time out is reached exit */</span>
+<span class="token keyword">do</span>
 <span class="token punctuation">{</span>
-    <span class="token function">GPIO_BOP</span><span class="token punctuation">(</span>gpio_periph<span class="token punctuation">)</span> <span class="token operator">=</span> <span class="token punctuation">(</span><span class="token class-name">uint32_t</span><span class="token punctuation">)</span>pin<span class="token punctuation">;</span>
-<span class="token punctuation">}</span>
+  HSEStatus <span class="token operator">=</span> RCC<span class="token operator">-&gt;</span>CR <span class="token operator">&amp;</span> RCC_CR_HSERDY<span class="token punctuation">;</span>
+  StartUpCounter<span class="token operator">++</span><span class="token punctuation">;</span>  
+<span class="token punctuation">}</span> <span class="token keyword">while</span><span class="token punctuation">(</span><span class="token punctuation">(</span>HSEStatus <span class="token operator">==</span> <span class="token number">0</span><span class="token punctuation">)</span> <span class="token operator">&amp;&amp;</span> <span class="token punctuation">(</span>StartUpCounter <span class="token operator">!=</span> HSE_STARTUP_TIMEOUT<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>这里开启了HSE外部高速时钟，并等待HSE的状态转变为READY（由硬件置位）。</p>
+<h3 id="xi-tong-shi-zhong-shu">系统时钟树</h3>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token comment">/* HCLK = SYSCLK */</span>
+RCC<span class="token operator">-&gt;</span>CFGR <span class="token operator">|=</span> <span class="token punctuation">(</span><span class="token class-name">uint32_t</span><span class="token punctuation">)</span>RCC_CFGR_HPRE_DIV1<span class="token punctuation">;</span>
+  
+<span class="token comment">/* PCLK2 = HCLK */</span>
+RCC<span class="token operator">-&gt;</span>CFGR <span class="token operator">|=</span> <span class="token punctuation">(</span><span class="token class-name">uint32_t</span><span class="token punctuation">)</span>RCC_CFGR_PPRE2_DIV1<span class="token punctuation">;</span>
 
-<span class="token keyword">void</span> <span class="token function">gpio_bit_reset</span><span class="token punctuation">(</span><span class="token class-name">uint32_t</span> gpio_periph<span class="token punctuation">,</span> <span class="token class-name">uint32_t</span> pin<span class="token punctuation">)</span>
-<span class="token punctuation">{</span>
-    <span class="token function">GPIO_BC</span><span class="token punctuation">(</span>gpio_periph<span class="token punctuation">)</span> <span class="token operator">=</span> <span class="token punctuation">(</span><span class="token class-name">uint32_t</span><span class="token punctuation">)</span>pin<span class="token punctuation">;</span>
-<span class="token punctuation">}</span>
+<span class="token comment">/* PCLK1 = HCLK */</span>
+RCC<span class="token operator">-&gt;</span>CFGR <span class="token operator">|=</span> <span class="token punctuation">(</span><span class="token class-name">uint32_t</span><span class="token punctuation">)</span>RCC_CFGR_PPRE1_DIV2<span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>将系统时钟作为AHB和APB2的时钟源（对应HCLK和PCLK2），将系统时钟2分频，作为APB1的时钟源（对应PCLK2）。</p>
+<blockquote>
+<p>AHB挂载了Cortex核、DMA等主动单元</p>
+<p>APB2挂载了GPIO、USRAT1、ADC等需要高速率时钟的单元</p>
+<p>APB1则挂载了TIMER、I2C等不需要那么高频的单元</p>
+</blockquote>
+<img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241123172121666.png" alt="image-20241123172121666" style="zoom: 50%;">
+<h3 id="pll-bei-pin">PLL倍频</h3>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token comment">/*  PLL configuration: PLLCLK = HSE * 9 = 72 MHz */</span>
+    RCC<span class="token operator">-&gt;</span>CFGR <span class="token operator">&amp;=</span> <span class="token punctuation">(</span><span class="token class-name">uint32_t</span><span class="token punctuation">)</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token class-name">uint32_t</span><span class="token punctuation">)</span><span class="token operator">~</span><span class="token punctuation">(</span>RCC_CFGR_PLLSRC <span class="token operator">|</span> RCC_CFGR_PLLXTPRE <span class="token operator">|</span>
+                                        RCC_CFGR_PLLMULL<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    RCC<span class="token operator">-&gt;</span>CFGR <span class="token operator">|=</span> <span class="token punctuation">(</span><span class="token class-name">uint32_t</span><span class="token punctuation">)</span><span class="token punctuation">(</span>RCC_CFGR_PLLSRC_HSE <span class="token operator">|</span> RCC_CFGR_PLLMULL9<span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li>将PLL时钟来源RCC_CFGR_PLLSRC、HSE进入PLL后的分频RCC_CFGR_PLLXTPRE、PLL倍频系数RCC_CFGR_PLLMULL清零；</li>
+<li>选择PLL时钟来源为HSE（RCC_CFGR_PLLSRC_HSE），倍频系数为9（RCC_CFGR_PLLMULL9）</li>
+</ul>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token comment">/* Enable PLL */</span>
+    RCC<span class="token operator">-&gt;</span>CR <span class="token operator">|=</span> RCC_CR_PLLON<span class="token punctuation">;</span>
 
-<span class="token keyword">void</span> <span class="token function">gpio_bit_write</span><span class="token punctuation">(</span><span class="token class-name">uint32_t</span> gpio_periph<span class="token punctuation">,</span> <span class="token class-name">uint32_t</span> pin<span class="token punctuation">,</span> bit_status bit_value<span class="token punctuation">)</span>
-<span class="token punctuation">{</span>
-    <span class="token keyword">if</span><span class="token punctuation">(</span>RESET <span class="token operator">!=</span> bit_value<span class="token punctuation">)</span> <span class="token punctuation">{</span>
-        <span class="token function">GPIO_BOP</span><span class="token punctuation">(</span>gpio_periph<span class="token punctuation">)</span> <span class="token operator">=</span> <span class="token punctuation">(</span><span class="token class-name">uint32_t</span><span class="token punctuation">)</span>pin<span class="token punctuation">;</span>
-    <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
-        <span class="token function">GPIO_BC</span><span class="token punctuation">(</span>gpio_periph<span class="token punctuation">)</span> <span class="token operator">=</span> <span class="token punctuation">(</span><span class="token class-name">uint32_t</span><span class="token punctuation">)</span>pin<span class="token punctuation">;</span>
-    <span class="token punctuation">}</span>
-<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<p>发现 <code>write</code>只不过将 <code>set/reset</code>包成了一个函数，唯一不同的就是多了一个 <code>if</code>判断。</p>
-<p>但是，一个<code>if</code> 的耗时又能对程序产生什么影响呢？我百思不得其解。</p>
-<h1 id="2-shi-xu-yao-qiu-yin-fa-de-xie-an">2. 时序要求引发的血案</h1>
-<h2 id="xiao-xiao-if-an-cang-xuan-ji">小小if暗藏玄机</h2>
-<p>在各种 <code>Google, GPT</code>之后，结合代码上下文，发现代码中使用了 <code>nop</code>来增加时延，再结合移位寄存器需要根据我们通过GPIO发送的SRCLK（移位时钟）、RCLK（锁存时钟）的上升沿来进行移位操作和锁存操作（将移位寄存器更新到锁存寄存器 storage register）。</p>
-<p>我设置的GD32F407的主频是168MHz，这个比STC8时的24MHz还是要快几倍的，计算一下<code>nop</code>对应一个时钟周期的时间为 <code>1/168MHz</code>约为 <code>5.95ns</code>、<code>1/24MHz</code>约为 <code>41.67ns</code>。</p>
-<p>这样看来，一个 <code>if</code>判断还真有可能引发了血案，其所消耗的时钟周期（增加的时延）可能正好满足了移位寄存器的<strong>时序要求</strong>，从而使得数码管能够正常显示。</p>
-<h2 id="shu-ju-shou-ce-bu-ke-shao">数据手册不可少</h2>
-<p>在想到可能时时延导致的问题后，不妨看一下芯片对应的官方手册，看能否找到答案。</p>
-<p>这里要注意的是，一定要找与芯片型号、品牌一致的：</p>
-<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241115170556369.png" alt="image-20241115170556369"></p>
-<h2 id="timing-requirements">Timing Requirements</h2>
-<p>这里我们主要看时序要求（Timing Requirements ）相关的章节</p>
-<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241115170729345.png" alt="image-20241115170729345"></p>
-<h3 id="set-up-time">Set-up time</h3>
-<p>其中描述了，我们在使用串行信号线 <code>SER</code>、移位寄存器时钟线 <code>SRCLK</code>、锁存器时钟线 <code>RCLK</code> 来操作 <a href="https://item.szlcsc.com/79848.html?fromZone=s_s__%2274HC595N%22">SN74HC595N</a> 时，需要的准备时间，例如</p>
-<h4 id="ser-before-srclk">SER before SRCLK↑</h4>
-<p>在操作SRCLK上升沿将SER存入移位寄存器之前，SER应该预备的时间，以125ns为例，伪代码如下</p>
-<pre class="line-numbers language-none"><code class="language-none">set SER
-wait 125ns
-SRCLK = 0;
-SRCLK = 1;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
-<h4 id="srclk-before-rclk">SRCLK↑ before RCLK↑</h4>
-<p>在操作完所有的移位后，将移位寄存器更新到锁存寄存器（即更新到电路，控制数码管的段选和片选），需要操作RCLK上升沿。</p>
-<p>该参数规定了，RCLK上升沿应该与SRCLK上升沿保持的时间间隔</p>
-<h3 id="pulse-duration">Pulse duration</h3>
-<p>其中描述了SRCLK、RCLK被置位后应该持续一段时间，所以我们还需要在上述基础上增加两个延时（以100ns为例）</p>
-<pre class="line-numbers language-none"><code class="language-none">set SER
-wait 125ns
-SRCLK = 0;
-wait 100ns
-SRCLK = 1;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<p>再加上锁存的操作：</p>
-<pre class="line-numbers language-none"><code class="language-none">set SER
-wait 125ns
-SRCLK = 0;
-wait 100ns
-SRCLK = 1;
+    <span class="token comment">/* Wait till PLL is ready */</span>
+    <span class="token keyword">while</span><span class="token punctuation">(</span><span class="token punctuation">(</span>RCC<span class="token operator">-&gt;</span>CR <span class="token operator">&amp;</span> RCC_CR_PLLRDY<span class="token punctuation">)</span> <span class="token operator">==</span> <span class="token number">0</span><span class="token punctuation">)</span>
+    <span class="token punctuation">{</span>
+    <span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>启动PLL锁相环，并等待它稳定。</p>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token comment">/* Select PLL as system clock source */</span>
+   RCC<span class="token operator">-&gt;</span>CFGR <span class="token operator">&amp;=</span> <span class="token punctuation">(</span><span class="token class-name">uint32_t</span><span class="token punctuation">)</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token class-name">uint32_t</span><span class="token punctuation">)</span><span class="token operator">~</span><span class="token punctuation">(</span>RCC_CFGR_SW<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+   RCC<span class="token operator">-&gt;</span>CFGR <span class="token operator">|=</span> <span class="token punctuation">(</span><span class="token class-name">uint32_t</span><span class="token punctuation">)</span>RCC_CFGR_SW_PLL<span class="token punctuation">;</span>    
 
-wait 100ns
-RCLK = 0;
-wait 100ns
-RCLK = 1;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<h2 id="zai-kan-if-he-nop">再看if和nop</h2>
-<p>之前对于时序控制的理解并不深刻，简单的以为使用 <code>nop</code>停顿一下就好。现在看来，无论是不同主频对应的 <code>nop</code>时延不同，还是 <code>if</code>耗时也能影响数码管的生死，都在提醒我们时序控制不可小觑。</p>
-<p>在使用MCU对外围设备/芯片交互</p>
-<p>、控制时，一定要严格按照芯片要求的时序控制，结合MCU自身指令耗时来编写程序。</p>
-<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">shift</span><span class="token punctuation">(</span><span class="token class-name">uint8_t</span> data<span class="token punctuation">)</span> <span class="token punctuation">{</span>
-    <span class="token keyword">for</span> <span class="token punctuation">(</span><span class="token class-name">uint8_t</span> i <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span> i <span class="token operator">&lt;</span> <span class="token number">8</span><span class="token punctuation">;</span> <span class="token operator">++</span>i<span class="token punctuation">)</span> <span class="token punctuation">{</span>
-        <span class="token function">gpio_bit_write</span><span class="token punctuation">(</span>NIX_DI_PORT<span class="token punctuation">,</span> NIX_DI_PIN<span class="token punctuation">,</span> <span class="token punctuation">(</span>data <span class="token operator">&amp;</span> <span class="token punctuation">(</span><span class="token number">0x80</span> <span class="token operator">&gt;&gt;</span> i<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token operator">?</span> SET <span class="token operator">:</span> RESET<span class="token punctuation">)</span><span class="token punctuation">;</span>
-        <span class="token function">delay_1us</span><span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-        <span class="token function">gpio_bit_reset</span><span class="token punctuation">(</span>NIX_SCK_PORT<span class="token punctuation">,</span> NIX_SCK_PIN<span class="token punctuation">)</span><span class="token punctuation">;</span>
-        <span class="token function">delay_1us</span><span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-        <span class="token function">gpio_bit_set</span><span class="token punctuation">(</span>NIX_SCK_PORT<span class="token punctuation">,</span> NIX_SCK_PIN<span class="token punctuation">)</span><span class="token punctuation">;</span>
-        <span class="token function">delay_1us</span><span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-    <span class="token punctuation">}</span>
-<span class="token punctuation">}</span>
-
-<span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">rck_action</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
-    <span class="token function">gpio_bit_reset</span><span class="token punctuation">(</span>NIX_RCK_PORT<span class="token punctuation">,</span> NIX_RCK_PIN<span class="token punctuation">)</span><span class="token punctuation">;</span>
-    <span class="token function">delay_1us</span><span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-    <span class="token function">gpio_bit_set</span><span class="token punctuation">(</span>NIX_RCK_PORT<span class="token punctuation">,</span> NIX_RCK_PIN<span class="token punctuation">)</span><span class="token punctuation">;</span>
-    <span class="token function">delay_1us</span><span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<p>这里宁愿多等一点，也不要让 SN74HC595N 无法准确移位、锁存数据。</p>
+   <span class="token comment">/* Wait till PLL is used as system clock source */</span>
+   <span class="token keyword">while</span> <span class="token punctuation">(</span><span class="token punctuation">(</span>RCC<span class="token operator">-&gt;</span>CFGR <span class="token operator">&amp;</span> <span class="token punctuation">(</span><span class="token class-name">uint32_t</span><span class="token punctuation">)</span>RCC_CFGR_SWS<span class="token punctuation">)</span> <span class="token operator">!=</span> <span class="token punctuation">(</span><span class="token class-name">uint32_t</span><span class="token punctuation">)</span><span class="token number">0x08</span><span class="token punctuation">)</span>
+   <span class="token punctuation">{</span>
+   <span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>通过系统时钟的多路选择器将PLL选择为系统时钟源，并等待此切换完成。</p>
 ]]></content>
       <categories>
-        <category>GD32</category>
-        <category>踩坑记录</category>
+        <category>STM32</category>
+        <category>源码分析</category>
       </categories>
       <tags>
-        <tag>GD32</tag>
-        <tag>SN74HC595NSR</tag>
-        <tag>时序要求</tag>
-        <tag>移位寄存器</tag>
+        <tag>STM32</tag>
+        <tag>SPL</tag>
+        <tag>STM32F103ZE</tag>
+        <tag>时钟</tag>
       </tags>
+  </entry>
+  <entry>
+    <title>Hello World</title>
+    <url>/2024/11/12/16107.html</url>
+    <content><![CDATA[<p>Welcome to <a href="https://hexo.io/">Hexo</a>! This is your very first post. Check <a href="https://hexo.io/docs/">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="https://hexo.io/docs/troubleshooting.html">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues">GitHub</a>.</p>
+<h2 id="quick-start">Quick Start</h2>
+<h3 id="create-a-new-post">Create a new post</h3>
+<pre class="line-numbers language-bash" data-language="bash"><code class="language-bash">$ hexo new <span class="token string">"My New Post"</span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<p>More info: <a href="https://hexo.io/docs/writing.html">Writing</a></p>
+<h3 id="run-server">Run server</h3>
+<pre class="line-numbers language-bash" data-language="bash"><code class="language-bash">$ hexo server<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<p>More info: <a href="https://hexo.io/docs/server.html">Server</a></p>
+<h3 id="generate-static-files">Generate static files</h3>
+<pre class="line-numbers language-bash" data-language="bash"><code class="language-bash">$ hexo generate<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<p>More info: <a href="https://hexo.io/docs/generating.html">Generating</a></p>
+<h3 id="deploy-to-remote-sites">Deploy to remote sites</h3>
+<pre class="line-numbers language-bash" data-language="bash"><code class="language-bash">$ hexo deploy<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<p>More info: <a href="https://hexo.io/docs/one-command-deployment.html">Deployment</a></p>
+]]></content>
   </entry>
   <entry>
     <title>深入理解I2C时序（以I2C实时时钟PCF8563为案例）</title>
@@ -1843,9 +1820,160 @@ bool <span class="token function">hal_i2c_soft_read</span><span class="token pun
         <category>协议</category>
       </categories>
       <tags>
-        <tag>时序要求</tag>
         <tag>I2C</tag>
+        <tag>时序要求</tag>
         <tag>PCF8563</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>论时序要求的重要性（移位寄存器控制数码管）</title>
+    <url>/2024/11/15/31801.html</url>
+    <content><![CDATA[<h1 id="1-wen-ti-bei-jing">1. 问题背景</h1>
+<h2 id="ying-jian-bei-jing">硬件背景</h2>
+<ul>
+<li>移位寄存器：<a href="https://item.szlcsc.com/79848.html?fromZone=s_s__%2274HC595N%22">SN74HC595N</a></li>
+<li>两个4位共阳数码管</li>
+</ul>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/20241115163627.png" alt=""></p>
+<h2 id="yi-wei-suo-cun-luo-ji-set-reset">移位/锁存逻辑——set/reset</h2>
+<p>在学习GD32F407VET时，将学习STC8实现的数码管模块移植过来，发现了一个很奇怪的问题。其中移位操作的实现如下（封装了对两个串联移位寄存器的移位操作，控制8个数码管中显示哪一个，以及控制数码管显示内容）：</p>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">shift</span><span class="token punctuation">(</span><span class="token class-name">uint8_t</span> data<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">for</span> <span class="token punctuation">(</span><span class="token class-name">uint8_t</span> i <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span> i <span class="token operator">&lt;</span> <span class="token number">8</span><span class="token punctuation">;</span> <span class="token operator">++</span>i<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token function">gpio_bit_write</span><span class="token punctuation">(</span>NIX_DI_PORT<span class="token punctuation">,</span> NIX_DI_PIN<span class="token punctuation">,</span> <span class="token punctuation">(</span>data <span class="token operator">&amp;</span> <span class="token punctuation">(</span><span class="token number">0x80</span> <span class="token operator">&gt;&gt;</span> i<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token operator">?</span> SET <span class="token operator">:</span> RESET<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token function">gpio_bit_reset</span><span class="token punctuation">(</span>NIX_SCK_PORT<span class="token punctuation">,</span> NIX_SCK_PIN<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token function">__NOP</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token function">gpio_bit_set</span><span class="token punctuation">(</span>NIX_SCK_PORT<span class="token punctuation">,</span> NIX_SCK_PIN<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token function">__NOP</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">rck_action</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token function">gpio_bit_reset</span><span class="token punctuation">(</span>NIX_RCK_PORT<span class="token punctuation">,</span> NIX_RCK_PIN<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">__NOP</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">gpio_bit_set</span><span class="token punctuation">(</span>NIX_RCK_PORT<span class="token punctuation">,</span> NIX_RCK_PIN<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">__NOP</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>发现单独指定某个数码管显示某个数是没有问题的：</p>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token comment">// 要显示1~8对应的码表</span>
+<span class="token class-name">uint8_t</span> code<span class="token punctuation">[</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token punctuation">{</span><span class="token number">0xF9</span><span class="token punctuation">,</span> <span class="token number">0xA4</span><span class="token punctuation">,</span> <span class="token number">0xB0</span><span class="token punctuation">,</span> <span class="token number">0x99</span><span class="token punctuation">,</span> <span class="token number">0x92</span><span class="token punctuation">,</span> <span class="token number">0x82</span><span class="token punctuation">,</span> <span class="token number">0xF8</span><span class="token punctuation">,</span> <span class="token number">0x80</span><span class="token punctuation">,</span><span class="token punctuation">}</span><span class="token punctuation">;</span>
+<span class="token function">Int_NixieTube_DisplaySingle</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">,</span> code<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+<p>但是想使用 <code>for</code>控制数码管轮流显示1~8时，就发现显示的内容并不符合预期：</p>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token keyword">for</span> <span class="token punctuation">(</span><span class="token class-name">uint8_t</span> i <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span> i <span class="token operator">&lt;</span> <span class="token number">8</span><span class="token punctuation">;</span> <span class="token operator">++</span>i<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token function">Int_NixieTube_DisplaySingle</span><span class="token punctuation">(</span>i<span class="token punctuation">,</span> code<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">delay_1ms</span><span class="token punctuation">(</span><span class="token number">1000</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
+<h2 id="yi-wei-suo-cun-luo-ji-write">移位/锁存逻辑——write</h2>
+<p>但是将其中 <code>gpio_bit</code> 的 <code>set/reset</code>换成 <code>write</code>之后，发现数码管能够按照预期显示了：</p>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">shift</span><span class="token punctuation">(</span><span class="token class-name">uint8_t</span> data<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">for</span> <span class="token punctuation">(</span><span class="token class-name">uint8_t</span> i <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span> i <span class="token operator">&lt;</span> <span class="token number">8</span><span class="token punctuation">;</span> <span class="token operator">++</span>i<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token function">gpio_bit_write</span><span class="token punctuation">(</span>NIX_DI_PORT<span class="token punctuation">,</span> NIX_DI_PIN<span class="token punctuation">,</span> <span class="token punctuation">(</span>data <span class="token operator">&amp;</span> <span class="token punctuation">(</span><span class="token number">0x80</span> <span class="token operator">&gt;&gt;</span> i<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token operator">?</span> SET <span class="token operator">:</span> RESET<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token function">gpio_bit_write</span><span class="token punctuation">(</span>NIX_SCK_PORT<span class="token punctuation">,</span> NIX_SCK_PIN<span class="token punctuation">,</span> RESET<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token function">__NOP</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token function">gpio_bit_write</span><span class="token punctuation">(</span>NIX_SCK_PORT<span class="token punctuation">,</span> NIX_SCK_PIN<span class="token punctuation">,</span> SET<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token function">__NOP</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">rck_action</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token function">gpio_bit_write</span><span class="token punctuation">(</span>NIX_RCK_PORT<span class="token punctuation">,</span> NIX_RCK_PIN<span class="token punctuation">,</span> RESET<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">__NOP</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">gpio_bit_write</span><span class="token punctuation">(</span>NIX_RCK_PORT<span class="token punctuation">,</span> NIX_RCK_PIN<span class="token punctuation">,</span> SET<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">__NOP</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>查看这些函数的实现：</p>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token keyword">void</span> <span class="token function">gpio_bit_set</span><span class="token punctuation">(</span><span class="token class-name">uint32_t</span> gpio_periph<span class="token punctuation">,</span> <span class="token class-name">uint32_t</span> pin<span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+    <span class="token function">GPIO_BOP</span><span class="token punctuation">(</span>gpio_periph<span class="token punctuation">)</span> <span class="token operator">=</span> <span class="token punctuation">(</span><span class="token class-name">uint32_t</span><span class="token punctuation">)</span>pin<span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">void</span> <span class="token function">gpio_bit_reset</span><span class="token punctuation">(</span><span class="token class-name">uint32_t</span> gpio_periph<span class="token punctuation">,</span> <span class="token class-name">uint32_t</span> pin<span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+    <span class="token function">GPIO_BC</span><span class="token punctuation">(</span>gpio_periph<span class="token punctuation">)</span> <span class="token operator">=</span> <span class="token punctuation">(</span><span class="token class-name">uint32_t</span><span class="token punctuation">)</span>pin<span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">void</span> <span class="token function">gpio_bit_write</span><span class="token punctuation">(</span><span class="token class-name">uint32_t</span> gpio_periph<span class="token punctuation">,</span> <span class="token class-name">uint32_t</span> pin<span class="token punctuation">,</span> bit_status bit_value<span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+    <span class="token keyword">if</span><span class="token punctuation">(</span>RESET <span class="token operator">!=</span> bit_value<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token function">GPIO_BOP</span><span class="token punctuation">(</span>gpio_periph<span class="token punctuation">)</span> <span class="token operator">=</span> <span class="token punctuation">(</span><span class="token class-name">uint32_t</span><span class="token punctuation">)</span>pin<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
+        <span class="token function">GPIO_BC</span><span class="token punctuation">(</span>gpio_periph<span class="token punctuation">)</span> <span class="token operator">=</span> <span class="token punctuation">(</span><span class="token class-name">uint32_t</span><span class="token punctuation">)</span>pin<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>发现 <code>write</code>只不过将 <code>set/reset</code>包成了一个函数，唯一不同的就是多了一个 <code>if</code>判断。</p>
+<p>但是，一个<code>if</code> 的耗时又能对程序产生什么影响呢？我百思不得其解。</p>
+<h1 id="2-shi-xu-yao-qiu-yin-fa-de-xie-an">2. 时序要求引发的血案</h1>
+<h2 id="xiao-xiao-if-an-cang-xuan-ji">小小if暗藏玄机</h2>
+<p>在各种 <code>Google, GPT</code>之后，结合代码上下文，发现代码中使用了 <code>nop</code>来增加时延，再结合移位寄存器需要根据我们通过GPIO发送的SRCLK（移位时钟）、RCLK（锁存时钟）的上升沿来进行移位操作和锁存操作（将移位寄存器更新到锁存寄存器 storage register）。</p>
+<p>我设置的GD32F407的主频是168MHz，这个比STC8时的24MHz还是要快几倍的，计算一下<code>nop</code>对应一个时钟周期的时间为 <code>1/168MHz</code>约为 <code>5.95ns</code>、<code>1/24MHz</code>约为 <code>41.67ns</code>。</p>
+<p>这样看来，一个 <code>if</code>判断还真有可能引发了血案，其所消耗的时钟周期（增加的时延）可能正好满足了移位寄存器的<strong>时序要求</strong>，从而使得数码管能够正常显示。</p>
+<h2 id="shu-ju-shou-ce-bu-ke-shao">数据手册不可少</h2>
+<p>在想到可能时时延导致的问题后，不妨看一下芯片对应的官方手册，看能否找到答案。</p>
+<p>这里要注意的是，一定要找与芯片型号、品牌一致的：</p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241115170556369.png" alt="image-20241115170556369"></p>
+<h2 id="timing-requirements">Timing Requirements</h2>
+<p>这里我们主要看时序要求（Timing Requirements ）相关的章节</p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241115170729345.png" alt="image-20241115170729345"></p>
+<h3 id="set-up-time">Set-up time</h3>
+<p>其中描述了，我们在使用串行信号线 <code>SER</code>、移位寄存器时钟线 <code>SRCLK</code>、锁存器时钟线 <code>RCLK</code> 来操作 <a href="https://item.szlcsc.com/79848.html?fromZone=s_s__%2274HC595N%22">SN74HC595N</a> 时，需要的准备时间，例如</p>
+<h4 id="ser-before-srclk">SER before SRCLK↑</h4>
+<p>在操作SRCLK上升沿将SER存入移位寄存器之前，SER应该预备的时间，以125ns为例，伪代码如下</p>
+<pre class="line-numbers language-none"><code class="language-none">set SER
+wait 125ns
+SRCLK = 0;
+SRCLK = 1;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
+<h4 id="srclk-before-rclk">SRCLK↑ before RCLK↑</h4>
+<p>在操作完所有的移位后，将移位寄存器更新到锁存寄存器（即更新到电路，控制数码管的段选和片选），需要操作RCLK上升沿。</p>
+<p>该参数规定了，RCLK上升沿应该与SRCLK上升沿保持的时间间隔</p>
+<h3 id="pulse-duration">Pulse duration</h3>
+<p>其中描述了SRCLK、RCLK被置位后应该持续一段时间，所以我们还需要在上述基础上增加两个延时（以100ns为例）</p>
+<pre class="line-numbers language-none"><code class="language-none">set SER
+wait 125ns
+SRCLK = 0;
+wait 100ns
+SRCLK = 1;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>再加上锁存的操作：</p>
+<pre class="line-numbers language-none"><code class="language-none">set SER
+wait 125ns
+SRCLK = 0;
+wait 100ns
+SRCLK = 1;
+
+wait 100ns
+RCLK = 0;
+wait 100ns
+RCLK = 1;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<h2 id="zai-kan-if-he-nop">再看if和nop</h2>
+<p>之前对于时序控制的理解并不深刻，简单的以为使用 <code>nop</code>停顿一下就好。现在看来，无论是不同主频对应的 <code>nop</code>时延不同，还是 <code>if</code>耗时也能影响数码管的生死，都在提醒我们时序控制不可小觑。</p>
+<p>在使用MCU对外围设备/芯片交互</p>
+<p>、控制时，一定要严格按照芯片要求的时序控制，结合MCU自身指令耗时来编写程序。</p>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">shift</span><span class="token punctuation">(</span><span class="token class-name">uint8_t</span> data<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">for</span> <span class="token punctuation">(</span><span class="token class-name">uint8_t</span> i <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span> i <span class="token operator">&lt;</span> <span class="token number">8</span><span class="token punctuation">;</span> <span class="token operator">++</span>i<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token function">gpio_bit_write</span><span class="token punctuation">(</span>NIX_DI_PORT<span class="token punctuation">,</span> NIX_DI_PIN<span class="token punctuation">,</span> <span class="token punctuation">(</span>data <span class="token operator">&amp;</span> <span class="token punctuation">(</span><span class="token number">0x80</span> <span class="token operator">&gt;&gt;</span> i<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token operator">?</span> SET <span class="token operator">:</span> RESET<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token function">delay_1us</span><span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token function">gpio_bit_reset</span><span class="token punctuation">(</span>NIX_SCK_PORT<span class="token punctuation">,</span> NIX_SCK_PIN<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token function">delay_1us</span><span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token function">gpio_bit_set</span><span class="token punctuation">(</span>NIX_SCK_PORT<span class="token punctuation">,</span> NIX_SCK_PIN<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token function">delay_1us</span><span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">rck_action</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token function">gpio_bit_reset</span><span class="token punctuation">(</span>NIX_RCK_PORT<span class="token punctuation">,</span> NIX_RCK_PIN<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">delay_1us</span><span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">gpio_bit_set</span><span class="token punctuation">(</span>NIX_RCK_PORT<span class="token punctuation">,</span> NIX_RCK_PIN<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">delay_1us</span><span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>这里宁愿多等一点，也不要让 SN74HC595N 无法准确移位、锁存数据。</p>
+]]></content>
+      <categories>
+        <category>GD32</category>
+        <category>踩坑记录</category>
+      </categories>
+      <tags>
+        <tag>GD32</tag>
+        <tag>时序要求</tag>
+        <tag>SN74HC595NSR</tag>
+        <tag>移位寄存器</tag>
       </tags>
   </entry>
 </search>
