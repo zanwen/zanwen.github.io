@@ -4,8 +4,14 @@
 
 <head>
     <meta charset="utf-8">
-    <meta name="keywords" content="Hello World, 安文的博客">
-    <meta name="description" content="Welcome to Hexo! This is your very first post. Check documentation for more info. If you get any problems when using Hex">
+    <meta name="keywords" content="ARM核（ARMv7-A/R）学习, 安文的博客">
+    <meta name="description" content="参考资料
+ARM Architecture Reference Manual ARMv7-A and ARMv7-R edition
+ARM核（ARMv7-A/R）工作模式
+
+
+
+从异常模式来看，只有 User 和 System 是非异常模">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <meta name="renderer" content="webkit|ie-stand|ie-comp">
@@ -17,7 +23,7 @@
     <!-- Global site tag (gtag.js) - Google Analytics -->
 
 
-    <title>Hello World | 安文的博客</title>
+    <title>ARM核（ARMv7-A/R）学习 | 安文的博客</title>
     <link rel="icon" type="image/png" href="/medias/logo.png">
     
 
@@ -337,12 +343,12 @@
 
 
 
-<div class="bg-cover pd-header post-cover" style="background-image: url('/medias/featureimages/12.jpg')">
+<div class="bg-cover pd-header post-cover" style="background-image: url('https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/IMG_20231108_120003.jpg')">
     <div class="container" style="right: 0px;left: 0px;">
         <div class="row">
             <div class="col s12 m12 l12">
                 <div class="brand">
-                    <h1 class="description center-align post-title">Hello World</h1>
+                    <h1 class="description center-align post-title">ARM核（ARMv7-A/R）学习</h1>
                 </div>
             </div>
         </div>
@@ -364,12 +370,29 @@
             <div class="row tag-cate">
                 <div class="col s7">
                     
-                          <div class="article-tag">
-                            <span class="chip bg-color">无标签</span>
-                          </div>
+                    <div class="article-tag">
+                        
+                            <a href="/tags/ARM/">
+                                <span class="chip bg-color">ARM</span>
+                            </a>
+                        
+                            <a href="/tags/ARMv7/">
+                                <span class="chip bg-color">ARMv7</span>
+                            </a>
+                        
+                    </div>
                     
                 </div>
                 <div class="col s5 right-align">
+                    
+                    <div class="post-cate">
+                        <i class="fas fa-bookmark fa-fw icon-category"></i>
+                        
+                            <a href="/categories/ARM/" class="post-category">
+                                ARM
+                            </a>
+                        
+                    </div>
                     
                 </div>
             </div>
@@ -378,28 +401,28 @@
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-minus fa-fw"></i>发布日期:&nbsp;&nbsp;
-                    2024-11-12
+                    2024-11-23
                 </div>
                 
 
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-check fa-fw"></i>更新日期:&nbsp;&nbsp;
-                    2024-11-12
+                    2024-11-24
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
-                    74
+                    2.4k
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-clock fa-fw"></i>阅读时长:&nbsp;&nbsp;
-                    1 分
+                    9 分
                 </div>
                 
 
@@ -422,20 +445,184 @@
 
         <div class="card-content article-card-content">
             <div id="articleContent">
-                <p>Welcome to <a target="_blank" rel="noopener" href="https://hexo.io/">Hexo</a>! This is your very first post. Check <a target="_blank" rel="noopener" href="https://hexo.io/docs/">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a target="_blank" rel="noopener" href="https://hexo.io/docs/troubleshooting.html">troubleshooting</a> or you can ask me on <a target="_blank" rel="noopener" href="https://github.com/hexojs/hexo/issues">GitHub</a>.</p>
-<h2 id="quick-start">Quick Start</h2>
-<h3 id="create-a-new-post">Create a new post</h3>
-<pre class="line-numbers language-bash" data-language="bash"><code class="language-bash">$ hexo new <span class="token string">"My New Post"</span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
-<p>More info: <a target="_blank" rel="noopener" href="https://hexo.io/docs/writing.html">Writing</a></p>
-<h3 id="run-server">Run server</h3>
-<pre class="line-numbers language-bash" data-language="bash"><code class="language-bash">$ hexo server<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
-<p>More info: <a target="_blank" rel="noopener" href="https://hexo.io/docs/server.html">Server</a></p>
-<h3 id="generate-static-files">Generate static files</h3>
-<pre class="line-numbers language-bash" data-language="bash"><code class="language-bash">$ hexo generate<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
-<p>More info: <a target="_blank" rel="noopener" href="https://hexo.io/docs/generating.html">Generating</a></p>
-<h3 id="deploy-to-remote-sites">Deploy to remote sites</h3>
-<pre class="line-numbers language-bash" data-language="bash"><code class="language-bash">$ hexo deploy<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
-<p>More info: <a target="_blank" rel="noopener" href="https://hexo.io/docs/one-command-deployment.html">Deployment</a></p>
+                <h1 id="can-kao-zi-liao">参考资料</h1>
+<p><a target="_blank" rel="noopener" href="https://developer.arm.com/documentation/ddi0406/latest/">ARM Architecture Reference Manual ARMv7-A and ARMv7-R edition</a></p>
+<h1 id="arm-he-ar-mv-7-a-r-gong-zuo-mo-shi">ARM核（ARMv7-A/R）工作模式</h1>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241123192806705.png" alt="Table B1-1 ARM processor modes  "></p>
+<ul>
+<li>
+<p>从异常模式来看，只有 User 和 System 是非异常模式；</p>
+</li>
+<li>
+<p>从特权级别来看，只有 User 是非特权级别；</p>
+</li>
+</ul>
+<h2 id="privilege-level">Privilege Level</h2>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241123192948933.png" alt="Privilege Level"></p>
+<h2 id="arm-processor-modes">ARM Processor Modes</h2>
+<h3 id="user-mode">User mode</h3>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241123193912894.png" alt="image-20241123193912894"></p>
+<ul>
+<li>操作系统通过在用户模式下运行引用程序来限制其对系统资源的访问，例如文件、进程等。</li>
+<li>用户模式下的任何应用程序不能切换模式，除非通过软中断或异常。</li>
+</ul>
+<h3 id="system-mode">System mode</h3>
+<blockquote>
+<p>Software executing in System mode executes at PL1. System mode has the same registers available</p>
+<p>as User mode, and is not entered by any exception</p>
+</blockquote>
+<p>在系统模式下运行的软件拥有PL1的特权，能够访问一些受控资源。系统模式和用户模式共用同一套可用的寄存器，并且无法通过任何异常来进入该模式。</p>
+<h3 id="supervisor-mode">Supervisor mode</h3>
+<blockquote>
+<p>Supervisor mode is the default mode to which a Supervisor Call exception is taken.<br>
+Executing a SVC (Supervisor Call) instruction generates an Supervisor Call exception, that is taken<br>
+to Supervisor mode.<br>
+A processor enters Supervisor mode on Reset.</p>
+</blockquote>
+<p>管理模式是CPU上电后默认的模式，因此在该模式下主要用来做系统的初始化，软中断处理也在该模式下。</p>
+<p>当用户模式下的用户程序请求使用硬件资源时，通过软件中断进入该模式。</p>
+<h3 id="abort-mode">Abort mode</h3>
+<blockquote>
+<p>Abort mode is the default mode to which a Data Abort exception or Prefetch Abort exception is<br>
+taken</p>
+</blockquote>
+<p>终止模式是数据终止异常或指令预取终止异常发生时默认进入的模式。</p>
+<p>数据终止异常：当用户程序访问非法地址、没有权限读取的地址时会发生该异常。例如linux下编程时经常遇到的<code>segment fault</code>：</p>
+<blockquote>
+<p><a target="_blank" rel="noopener" href="https://zh.wikipedia.org/wiki/%E8%A8%98%E6%86%B6%E9%AB%94%E5%8D%80%E6%AE%B5%E9%8C%AF%E8%AA%A4">以下是一些导致储存器段错误的一般编程错误</a>：</p>
+<ul>
+<li>引用空指针</li>
+<li>引用未初始化的野指针</li>
+<li>引用已经被调用free()函数释放了的悬空指针</li>
+<li>缓冲区溢出</li>
+<li>堆栈溢出</li>
+<li>运行未正确编译的程序（尽管存在编译时错误，某些编译器依然会输出可执行文件）</li>
+</ul>
+</blockquote>
+<p>预取指令异常：预取指令是指令流水线中的概念。该异常发生在预取指令时无法获取到正确的可执行指令，我们有时运行错误代码会出现程序跑飞了的情况就是因为预取不到正确的指令了，CPU无法继续正常执行。</p>
+<h3 id="undefined-mode">Undefined mode</h3>
+<blockquote>
+<p>Undefined mode is the default mode to which an instruction-related exception, including any<br>
+attempt to execute an UNDEFINED instruction, is taken</p>
+</blockquote>
+<p>当CPU遇到一个它无法识别的指令时发生该异常。例如在ARM架构的CPU上执行一条Intel指令。</p>
+<h3 id="fiq-mode">FIQ mode</h3>
+<blockquote>
+<p>FIQ mode is the default mode to which an FIQ interrupt is taken.</p>
+</blockquote>
+<p>FIQ是Fast Interrupt reQuetst，快速中断模式。快速是相当于一般中断模式（IRQ）而言的，用来处理对时间要求比较紧急的中断，主要用于高速数据传输及通道处理中。</p>
+<h3 id="irq-mode">IRQ mode</h3>
+<p>一般中断模式，也称普通中断模式，用于处理一般的中断请求。通常在硬件中断发生后自动进入该模式，该模式为特权模式，能够自由访问系统硬件资源。</p>
+<h1 id="arm-he-ji-cun-qi-zi-yuan">ARM核寄存器资源</h1>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241123201917744.png" alt="image-20241123201917744"></p>
+<h2 id="gai-lan">概览</h2>
+<h3 id="ji-cun-qi-gong-xiang">寄存器共享</h3>
+<p>R0~R7这几个寄存器是所有模式共享的，这意味着在模式发生切换时，为了不影响先前模式的寄存器数据，当前模式需要在使用这些寄存器之前先将它们压栈（内存区域中的栈）保存，并在模式退出时出栈以将寄存器恢复成原样。</p>
+<p>同样的R8~R12是除了FIQ的所有模式共享的。</p>
+<h3 id="ji-cun-qi-du-you">寄存器独有</h3>
+<p>对于R8~R12，FIQ由自己独有的寄存器，这是为了提高该模式的处理效率：在进入该模式后，访问这几个寄存器无需压栈保护和出栈复原。<mark>这也是FIQ比IRQ快的原因之一。</mark></p>
+<h3 id="yi-chang-mo-shi-ji-cun-qi">异常模式寄存器</h3>
+<p>可以发现，对于SP和LR寄存器，除了User和System两个非异常模式，其他模式都对应有自己独立的。它们与异常跳转有关。</p>
+<h3 id="pc-ji-cun-qi">PC寄存器</h3>
+<p>PC（Program Counter）程序计数器用来指向指令地址，在32位CPU顺序执行的过程中，每条指令相隔4个字节，地址相隔0x4，通过将PC的值依次递增0x4就能实现顺序执行的效果。</p>
+<p>但是发生模式切换时，需要修改PC的值以告诉CPU从哪里开始接着执行程序指令。</p>
+<h3 id="cpsr-spsr">CPSR/SPSR</h3>
+<p>Current Program Status Register，当前程序状态寄存器，其中包含了当前程序执行过程中产生的一些状态位，例如</p>
+<ul>
+<li>N：negtive，负数标志，例如比较指令 <code>cmp</code> 就是将一个数减去另一个数，如果结果为负，则将N位置1，后续指令可以通过增加条件后缀 <code>lt</code>、<code>le</code>（less than、less than or equals to）结合N标志位来实现类似 <code>if</code>条件的效果</li>
+<li>C：carry，进位标志</li>
+</ul>
+<p>可以理解这个寄存器保存了当前程序的上下文信息。</p>
+<p>Saved Program Status Register，暂存的程序状态寄存器。当发生模式切换时，应通过SPSR保存CPSR（之前的程序运行状态），并在返回时将SPSR会写到CPSR。</p>
+<h2 id="ji-cun-qi-yong-tu-fen-xi">寄存器用途分析</h2>
+<h3 id="tong-yong-ji-cun-qi-r-0-10">通用寄存器R0~10</h3>
+<p>用来存放用户的数据，例如函数入参、函数返回值等</p>
+<h3 id="zhan-xiang-guan-ji-cun-qi">栈相关寄存器</h3>
+<ul>
+<li>
+<p>R11（fp: frame pointer）：用来记录一个栈空间的开始地址</p>
+</li>
+<li>
+<p>R12（ip：The Intra-Procedure-call scratch register）用来临时存储sp</p>
+</li>
+<li>
+<p>R13（sp：stack pointer）：栈指针寄存器（指向栈顶），压栈时根据该寄存器中的地址存放数据并更新栈指针到下一个位置</p>
+</li>
+</ul>
+<p><mark>栈空间的计算：sp - fp</mark></p>
+<h3 id="tiao-zhuan-xiang-guan-branch-ji-cun-qi">跳转相关（branch）寄存器</h3>
+<ul>
+<li>R14（lr，link register）：在发生跳转（函数调用，中断处理）时，用来保存PC寄存器的值。后面通过将lr会写PC即可实现跳转后的返回。</li>
+</ul>
+<h3 id="pc-ji-cun-qi-1">PC寄存器</h3>
+<p>program counter：用来存放CPU需要执行的指令地址。</p>
+<p>之所以称之为counter计数器，是因为指令宽度是固定的（例如ARMv7中是32位字宽），通过在当前指令的地址上偏移固定的指令位宽（例如4个字节+0x4）就能取到顺序的下一条指令。</p>
+<h2 id="cpsr-cheng-xu-zhuang-tai-ji-cun-qi">CPSR（程序状态寄存器）</h2>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241124085427517.png" alt="image-20241124085427517"></p>
+<h3 id="tiao-jian-biao-zhi-wei-ke-bei-xu-duo-zhi-ling-she-zhi">条件标志位（可被许多指令设置）</h3>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241123230843319.png" alt="image-20241123230843319"></p>
+<h3 id="n-fu-hao-tiao-jian-biao-zhi-wei">N-负号条件标志位</h3>
+<blockquote>
+<p>Negative condition flag. Set to bit[31] of the result of the instruction. If the result is<br>
+regarded as a two’s complement signed integer, then the processor sets N to 1 if the result<br>
+is negative, and sets N to 0 if it is positive or zero.</p>
+</blockquote>
+<p>当指令的结果为有符号整数时，处理器会在该结果为负数时将N置1。例如我们有时需要根据条件来跳转：</p>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token keyword">if</span><span class="token punctuation">(</span>a <span class="token operator">&gt;=</span> b<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+	<span class="token function">foo</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
+	<span class="token function">fun</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>对应指令伪代码如下：</p>
+<pre class="line-numbers language-assembly" data-language="assembly"><code class="language-assembly">mov r0,a // 将a加载到r0寄存器
+mov r1,b // 将b加载到r1寄存器
+cmp r0,r1 // 通过r0-r1来比较两者的值，如果结果为负数则将N置1，否则置0
+bgt foo // b：branch分支跳转 gt：greater than，如果N=0（a&gt;=b），则跳转到foo函数入口地址
+ble fun // le：less than or equals to，如果N=1（a&lt;b），则跳转到fun函数入口地址<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<h3 id="z-ling-tiao-jian-biao-zhi-wei">Z-零条件标志位</h3>
+<blockquote>
+<p>Zero condition flag. Set to 1 if the result of the instruction is zero, and to 0 otherwise. A<br>
+result of zero often indicates an equal result from a comparison</p>
+</blockquote>
+<p>当指令结果为0时会将Z置1。Z位为1通常标示了一个结果为0的比较指令，例如：</p>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token keyword">if</span><span class="token punctuation">(</span>a <span class="token operator">==</span> b<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+	<span class="token function">foo</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+<p>对应指令 伪代码如下：</p>
+<pre class="line-numbers language-assembly" data-language="assembly"><code class="language-assembly">mov r0,a
+mov r1,b
+cmp r0,r1 // 通过r0-r1来比较两者的值，如果结果为0则将Z置1（当然也会将N置0）
+beq foo // b：branch分支跳转 eq：equals to，如果Z=1，则跳转foo函数入口地址<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
+<h3 id="c-jin-wei-tiao-jian-biao-zhi-wei">C-进位条件标志位</h3>
+<blockquote>
+<p>Carry condition flag. Set to 1 if the instruction results in a carry condition, for example an<br>
+unsigned overflow on an addition.</p>
+</blockquote>
+<p>如果指令的结果产生了进位，则C位会被置1。例如加法过程中的无符号溢出。以 <code>uint32_t</code>为例，最大为 <code>0xFFFFFFFF</code>，如果对其进行加法操作则会产生进位，例如</p>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token class-name">uint32_t</span> a <span class="token operator">=</span> <span class="token number">0xFFFFFFFF</span><span class="token punctuation">;</span>
+<span class="token class-name">uint32_t</span> b <span class="token operator">=</span> a <span class="token operator">+</span> <span class="token number">1</span><span class="token punctuation">;</span> <span class="token comment">// 产生进位，C被置1</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<h3 id="v-yi-chu-tiao-jian-biao-zhi-wei">V-溢出条件标志位</h3>
+<blockquote>
+<p>Overflow condition flag. Set to 1 if the instruction results in an overflow condition, for<br>
+example a signed overflow on an addition</p>
+</blockquote>
+<p>如果指令的结果产生了溢出（<mark>超过了数据类型的表示范围</mark>），例如加法中的有符号溢出，则会将该位置1。这里要和C位区分开来，C位是针对无符号的（运算不考虑符号位），V是针对有符号的。例如：</p>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token keyword">signed</span> <span class="token keyword">char</span> ch <span class="token operator">=</span> <span class="token number">127</span><span class="token punctuation">;</span>
+<span class="token keyword">signed</span> <span class="token keyword">char</span> tmp <span class="token operator">=</span> ch <span class="token operator">+</span> <span class="token number">1</span><span class="token punctuation">;</span> <span class="token comment">// 有符号char最大值为127，加1后为128超过了char的标示范围（-128~127）</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<h3 id="i-f-jin-yong-biao-zhi-wei">I/F-禁用标志位</h3>
+<p>I位置1标示禁用IRQ异常，F位置1标示禁用FIQ异常</p>
+<blockquote>
+<p>In an implementation that does not include the Security Extensions, setting a mask bit masks the<br>
+corresponding exception, meaning it cannot be taken</p>
+</blockquote>
+<h3 id="t-biao-zhi-wei">T标志位</h3>
+<p>标示了处理器指令集的状态：</p>
+<ul>
+<li>ARM状态：32位指令</li>
+<li>Thumb状态：16位指令（可以理解位ARM指令的压缩版）</li>
+</ul>
+<h3 id="m-biao-zhi-wei">M标志位</h3>
+<p>标示处理器当前的工作模式，参见本文 <mark>ARM&nbsp;Processor&nbsp;Modes</mark>对应的章节。</p>
 
                 
             </div>
@@ -462,7 +649,7 @@
                     </i>
                 </span>
                 <span class="reprint-info">
-                    <a href="https://zanwen.github.io/2024/11/12/16107.html">https://zanwen.github.io/2024/11/12/16107.html</a>
+                    <a href="https://zanwen.github.io/2024/11/23/1780.html">https://zanwen.github.io/2024/11/23/1780.html</a>
                 </span>
             </div>
             <div class="reprint__notice">
@@ -499,7 +686,15 @@
                 <div class="post-meta__tag-list" style="display: inline-block;">
                     
                         <div class="article-tag">
-                            <span class="chip bg-color">无标签</span>
+                            
+                                <a href="/tags/ARM/">
+                                    <span class="chip bg-color">ARM</span>
+                                </a>
+                            
+                                <a href="/tags/ARMv7/">
+                                    <span class="chip bg-color">ARMv7</span>
+                                </a>
+                            
                         </div>
                     
                 </div>
@@ -580,13 +775,12 @@
             <div class="article-badge left-badge text-color">
                 <i class="fas fa-chevron-left"></i>&nbsp;上一篇</div>
             <div class="card">
-                <a href="/2024/11/12/13750.html">
+                <a href="/2024/11/24/18972.html">
                     <div class="card-image">
                         
+                        <img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/pexels-vikashkr50-18646436.jpg" class="responsive-img" alt="ARM指令集（ARMv7-A-R）">
                         
-                        <img src="/medias/featureimages/4.jpg" class="responsive-img" alt="UART接收缓冲区溢出异常（HAL_UART_ERROR_ORE）问题记录">
-                        
-                        <span class="card-title">UART接收缓冲区溢出异常（HAL_UART_ERROR_ORE）问题记录</span>
+                        <span class="card-title">ARM指令集（ARMv7-A-R）</span>
                     </div>
                 </a>
                 <div class="card-content article-content">
@@ -597,18 +791,14 @@
                     </div>
                     <div class="publish-info">
                         <span class="publish-date">
-                            <i class="far fa-clock fa-fw icon-date"></i>2024-11-12
+                            <i class="far fa-clock fa-fw icon-date"></i>2024-11-24
                         </span>
                         <span class="publish-author">
                             
                             <i class="fas fa-bookmark fa-fw icon-category"></i>
                             
-                            <a href="/categories/STM32/" class="post-category">
-                                    STM32
-                                </a>
-                            
-                            <a href="/categories/STM32/%E8%B8%A9%E5%9D%91%E8%AE%B0%E5%BD%95/" class="post-category">
-                                    踩坑记录
+                            <a href="/categories/ARM/" class="post-category">
+                                    ARM
                                 </a>
                             
                             
@@ -618,24 +808,12 @@
                 
                 <div class="card-action article-tags">
                     
-                    <a href="/tags/Clion/">
-                        <span class="chip bg-color">Clion</span>
+                    <a href="/tags/ARM/">
+                        <span class="chip bg-color">ARM</span>
                     </a>
                     
-                    <a href="/tags/STM32/">
-                        <span class="chip bg-color">STM32</span>
-                    </a>
-                    
-                    <a href="/tags/GD32/">
-                        <span class="chip bg-color">GD32</span>
-                    </a>
-                    
-                    <a href="/tags/HAL/">
-                        <span class="chip bg-color">HAL</span>
-                    </a>
-                    
-                    <a href="/tags/UART/">
-                        <span class="chip bg-color">UART</span>
+                    <a href="/tags/ARMv7/">
+                        <span class="chip bg-color">ARMv7</span>
                     </a>
                     
                 </div>
@@ -646,16 +824,15 @@
         
         <div class="article col s12 m6" data-aos="fade-up">
             <div class="article-badge right-badge text-color">
-                本篇&nbsp;<i class="far fa-dot-circle"></i>
+                下一篇&nbsp;<i class="fas fa-chevron-right"></i>
             </div>
             <div class="card">
-                <a href="/2024/11/12/16107.html">
+                <a href="/2024/11/23/19447.html">
                     <div class="card-image">
                         
+                        <img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/pexels-vikashkr50-17863401.jpg" class="responsive-img" alt="STM32系统时钟初始化源码解析（SPL库，STM32F103ZE）">
                         
-                        <img src="/medias/featureimages/12.jpg" class="responsive-img" alt="Hello World">
-                        
-                        <span class="card-title">Hello World</span>
+                        <span class="card-title">STM32系统时钟初始化源码解析（SPL库，STM32F103ZE）</span>
                     </div>
                 </a>
                 <div class="card-content article-content">
@@ -666,17 +843,44 @@
                     </div>
                     <div class="publish-info">
                             <span class="publish-date">
-                                <i class="far fa-clock fa-fw icon-date"></i>2024-11-12
+                                <i class="far fa-clock fa-fw icon-date"></i>2024-11-23
                             </span>
                         <span class="publish-author">
                             
-                            <i class="fas fa-user fa-fw"></i>
-                            安文
+                            <i class="fas fa-bookmark fa-fw icon-category"></i>
+                            
+                            <a href="/categories/STM32/" class="post-category">
+                                    STM32
+                                </a>
+                            
+                            <a href="/categories/STM32/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/" class="post-category">
+                                    源码分析
+                                </a>
+                            
                             
                         </span>
                     </div>
                 </div>
-
+                
+                <div class="card-action article-tags">
+                    
+                    <a href="/tags/STM32/">
+                        <span class="chip bg-color">STM32</span>
+                    </a>
+                    
+                    <a href="/tags/SPL/">
+                        <span class="chip bg-color">SPL</span>
+                    </a>
+                    
+                    <a href="/tags/STM32F103ZE/">
+                        <span class="chip bg-color">STM32F103ZE</span>
+                    </a>
+                    
+                    <a href="/tags/%E6%97%B6%E9%92%9F/">
+                        <span class="chip bg-color">时钟</span>
+                    </a>
+                    
+                </div>
                 
             </div>
         </div>

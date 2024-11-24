@@ -6,7 +6,7 @@
   <link href="https://zanwen.github.io/atom.xml" rel="self"/>
   
   <link href="https://zanwen.github.io/"/>
-  <updated>2024-11-23T09:28:34.372Z</updated>
+  <updated>2024-11-24T01:44:07.646Z</updated>
   <id>https://zanwen.github.io/</id>
   
   <author>
@@ -17,11 +17,68 @@
   <generator uri="https://hexo.io/">Hexo</generator>
   
   <entry>
+    <title>ARM指令集（ARMv7-A-R）</title>
+    <link href="https://zanwen.github.io/2024/11/24/18972.html"/>
+    <id>https://zanwen.github.io/2024/11/24/18972.html</id>
+    <published>2024-11-24T01:08:14.000Z</published>
+    <updated>2024-11-24T01:44:07.646Z</updated>
+    
+    
+      
+      
+        
+        
+    <summary type="html">&lt;h1 id=&quot;mdk-huan-jing-da-jian&quot;&gt;MDK环境搭建&lt;/h1&gt;
+&lt;h2 id=&quot;xia-zai-legacy-support-zhi-chi-bao&quot;&gt;下载Legacy Support支持包&lt;/h2&gt;
+&lt;p&gt;&lt;a</summary>
+        
+      
+    
+    
+    
+    <category term="ARM" scheme="https://zanwen.github.io/categories/ARM/"/>
+    
+    
+    <category term="ARM" scheme="https://zanwen.github.io/tags/ARM/"/>
+    
+    <category term="ARMv7" scheme="https://zanwen.github.io/tags/ARMv7/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>ARM核（ARMv7-A/R）学习</title>
+    <link href="https://zanwen.github.io/2024/11/23/1780.html"/>
+    <id>https://zanwen.github.io/2024/11/23/1780.html</id>
+    <published>2024-11-23T11:16:50.000Z</published>
+    <updated>2024-11-24T01:08:38.779Z</updated>
+    
+    
+      
+      
+        
+        
+    <summary type="html">&lt;h1 id=&quot;can-kao-zi-liao&quot;&gt;参考资料&lt;/h1&gt;
+&lt;p&gt;&lt;a href=&quot;https://developer.arm.com/documentation/ddi0406/latest/&quot;&gt;ARM Architecture Reference Manual</summary>
+        
+      
+    
+    
+    
+    <category term="ARM" scheme="https://zanwen.github.io/categories/ARM/"/>
+    
+    
+    <category term="ARM" scheme="https://zanwen.github.io/tags/ARM/"/>
+    
+    <category term="ARMv7" scheme="https://zanwen.github.io/tags/ARMv7/"/>
+    
+  </entry>
+  
+  <entry>
     <title>STM32系统时钟初始化源码解析（SPL库，STM32F103ZE）</title>
     <link href="https://zanwen.github.io/2024/11/23/19447.html"/>
     <id>https://zanwen.github.io/2024/11/23/19447.html</id>
     <published>2024-11-23T07:48:46.000Z</published>
-    <updated>2024-11-23T09:28:34.372Z</updated>
+    <updated>2024-11-23T11:23:33.814Z</updated>
     
     
       
@@ -42,16 +99,14 @@
     
     <category term="STM32" scheme="https://zanwen.github.io/categories/STM32/"/>
     
-    <category term="嵌入式" scheme="https://zanwen.github.io/categories/STM32/%E5%B5%8C%E5%85%A5%E5%BC%8F/"/>
-    
-    <category term="源码分析" scheme="https://zanwen.github.io/categories/STM32/%E5%B5%8C%E5%85%A5%E5%BC%8F/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/"/>
+    <category term="源码分析" scheme="https://zanwen.github.io/categories/STM32/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/"/>
     
     
     <category term="STM32" scheme="https://zanwen.github.io/tags/STM32/"/>
     
-    <category term="HAL" scheme="https://zanwen.github.io/tags/HAL/"/>
+    <category term="SPL" scheme="https://zanwen.github.io/tags/SPL/"/>
     
-    <category term="STM32F103" scheme="https://zanwen.github.io/tags/STM32F103/"/>
+    <category term="STM32F103ZE" scheme="https://zanwen.github.io/tags/STM32F103ZE/"/>
     
     <category term="时钟" scheme="https://zanwen.github.io/tags/%E6%97%B6%E9%92%9F/"/>
     
@@ -62,7 +117,7 @@
     <link href="https://zanwen.github.io/2024/11/16/31289.html"/>
     <id>https://zanwen.github.io/2024/11/16/31289.html</id>
     <published>2024-11-16T11:36:55.000Z</published>
-    <updated>2024-11-23T04:59:29.897Z</updated>
+    <updated>2024-11-23T11:23:02.982Z</updated>
     
     
       
@@ -81,7 +136,7 @@
     
     
     
-    <category term="嵌入式" scheme="https://zanwen.github.io/categories/%E5%B5%8C%E5%85%A5%E5%BC%8F/"/>
+    <category term="协议" scheme="https://zanwen.github.io/categories/%E5%8D%8F%E8%AE%AE/"/>
     
     
     <category term="I2C" scheme="https://zanwen.github.io/tags/I2C/"/>
@@ -97,7 +152,7 @@
     <link href="https://zanwen.github.io/2024/11/15/31801.html"/>
     <id>https://zanwen.github.io/2024/11/15/31801.html</id>
     <published>2024-11-15T08:10:55.000Z</published>
-    <updated>2024-11-15T11:33:54.943Z</updated>
+    <updated>2024-11-23T11:22:14.866Z</updated>
     
     
       
@@ -113,18 +168,18 @@
     
     
     
-    <category term="嵌入式" scheme="https://zanwen.github.io/categories/%E5%B5%8C%E5%85%A5%E5%BC%8F/"/>
+    <category term="GD32" scheme="https://zanwen.github.io/categories/GD32/"/>
     
-    <category term="踩坑记录" scheme="https://zanwen.github.io/categories/%E5%B5%8C%E5%85%A5%E5%BC%8F/%E8%B8%A9%E5%9D%91%E8%AE%B0%E5%BD%95/"/>
+    <category term="踩坑记录" scheme="https://zanwen.github.io/categories/GD32/%E8%B8%A9%E5%9D%91%E8%AE%B0%E5%BD%95/"/>
     
+    
+    <category term="GD32" scheme="https://zanwen.github.io/tags/GD32/"/>
     
     <category term="时序要求" scheme="https://zanwen.github.io/tags/%E6%97%B6%E5%BA%8F%E8%A6%81%E6%B1%82/"/>
     
     <category term="SN74HC595NSR" scheme="https://zanwen.github.io/tags/SN74HC595NSR/"/>
     
     <category term="移位寄存器" scheme="https://zanwen.github.io/tags/%E7%A7%BB%E4%BD%8D%E5%AF%84%E5%AD%98%E5%99%A8/"/>
-    
-    <category term="数码管" scheme="https://zanwen.github.io/tags/%E6%95%B0%E7%A0%81%E7%AE%A1/"/>
     
   </entry>
   
@@ -133,7 +188,7 @@
     <link href="https://zanwen.github.io/2024/11/12/13750.html"/>
     <id>https://zanwen.github.io/2024/11/12/13750.html</id>
     <published>2024-11-12T12:40:06.000Z</published>
-    <updated>2024-11-15T11:33:43.559Z</updated>
+    <updated>2024-11-23T11:22:37.466Z</updated>
     
     
       
@@ -150,20 +205,18 @@
     
     
     
-    <category term="嵌入式" scheme="https://zanwen.github.io/categories/%E5%B5%8C%E5%85%A5%E5%BC%8F/"/>
+    <category term="STM32" scheme="https://zanwen.github.io/categories/STM32/"/>
     
-    <category term="踩坑记录" scheme="https://zanwen.github.io/categories/%E5%B5%8C%E5%85%A5%E5%BC%8F/%E8%B8%A9%E5%9D%91%E8%AE%B0%E5%BD%95/"/>
+    <category term="踩坑记录" scheme="https://zanwen.github.io/categories/STM32/%E8%B8%A9%E5%9D%91%E8%AE%B0%E5%BD%95/"/>
     
-    
-    <category term="STM32" scheme="https://zanwen.github.io/tags/STM32/"/>
-    
-    <category term="HAL" scheme="https://zanwen.github.io/tags/HAL/"/>
     
     <category term="Clion" scheme="https://zanwen.github.io/tags/Clion/"/>
     
-    <category term="ARM" scheme="https://zanwen.github.io/tags/ARM/"/>
+    <category term="STM32" scheme="https://zanwen.github.io/tags/STM32/"/>
     
     <category term="GD32" scheme="https://zanwen.github.io/tags/GD32/"/>
+    
+    <category term="HAL" scheme="https://zanwen.github.io/tags/HAL/"/>
     
     <category term="UART" scheme="https://zanwen.github.io/tags/UART/"/>
     

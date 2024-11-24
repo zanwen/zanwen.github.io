@@ -4,7 +4,7 @@
 
 <head>
     <meta charset="utf-8">
-    <meta name="keywords" content="分类: STM32, 安文的博客">
+    <meta name="keywords" content="分类: ARM, 安文的博客">
     <meta name="description" content="安文的博客 | 嵌入式 | 算法 | AI | 人工智能">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
@@ -17,7 +17,7 @@
     <!-- Global site tag (gtag.js) - Google Analytics -->
 
 
-    <title>分类: STM32 | 安文的博客</title>
+    <title>分类: ARM | 安文的博客</title>
     <link rel="icon" type="image/png" href="/medias/logo.png">
     
 
@@ -404,7 +404,7 @@
                 
                 <a href="/categories/ARM/" title="ARM: 2">
                     <span class="chip center-align waves-effect waves-light
-                             chip-default "
+                             chip-active "
                             style="background-color: #F9EBEA;">ARM
                         <span class="tag-length">2</span>
                     </span>
@@ -413,7 +413,7 @@
                 
                 <a href="/categories/STM32/" title="STM32: 2">
                     <span class="chip center-align waves-effect waves-light
-                             chip-active "
+                             chip-default "
                             style="background-color: #F5EEF8;">STM32
                         <span class="tag-length">2</span>
                     </span>
@@ -478,27 +478,78 @@
             
             <div class="article tag-post col s12 m6 l4" data-aos="zoom-in">
                 <div class="card">
-                    <a href="/2024/11/23/19447.html">
+                    <a href="/2024/11/24/18972.html">
                         <div class="card-image tag-image">
                             
-                            <img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/pexels-vikashkr50-17863401.jpg" class="responsive-img" alt="STM32系统时钟初始化源码解析（SPL库，STM32F103ZE）">
+                            <img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/pexels-vikashkr50-18646436.jpg" class="responsive-img" alt="ARM指令集（ARMv7-A-R）">
                             
-                            <span class="card-title">STM32系统时钟初始化源码解析（SPL库，STM32F103ZE）</span>
+                            <span class="card-title">ARM指令集（ARMv7-A-R）</span>
                         </div>
                     </a>
                     <div class="card-content article-content">
                         <div class="summary block-with-text">
                             
-                                一、背景
-开发环境
+                                MDK环境搭建
+下载Legacy Support支持包
+https://armkeil.blob.core.windows.net/legacy/MDK79525.EXE
+安装到MDK的安装目录下
+下载ARM GNU工具链
+https://
+                            
+                        </div>
+                        <div class="publish-info">
+                            <span class="publish-date">
+                                <i class="far fa-clock fa-fw icon-date"></i>2024-11-24
+                            </span>
+                            <span class="publish-author">
+                                
+                                <i class="fas fa-bookmark fa-fw icon-category"></i>
+                                
+                                <a href="/categories/ARM/" class="post-category">
+                                    ARM
+                                </a>
+                                
+                                
+                            </span>
+                        </div>
+                    </div>
 
-STM32F103ZET6
+                    
+                    <div class="card-action article-tags">
+                        
+                        <a href="/tags/ARM/">
+                            <span class="chip bg-color">ARM</span>
+                        </a>
+                        
+                        <a href="/tags/ARMv7/">
+                            <span class="chip bg-color">ARMv7</span>
+                        </a>
+                        
+                    </div>
+                    
+                </div>
+            </div>
+            
+            <div class="article tag-post col s12 m6 l4" data-aos="zoom-in">
+                <div class="card">
+                    <a href="/2024/11/23/1780.html">
+                        <div class="card-image tag-image">
+                            
+                            <img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/IMG_20231108_120003.jpg" class="responsive-img" alt="ARM核（ARMv7-A/R）学习">
+                            
+                            <span class="card-title">ARM核（ARMv7-A/R）学习</span>
+                        </div>
+                    </a>
+                    <div class="card-content article-content">
+                        <div class="summary block-with-text">
+                            
+                                参考资料
+ARM Architecture Reference Manual ARMv7-A and ARMv7-R edition
+ARM核（ARMv7-A/R）工作模式
 
-原理图
 
-HSE-高速外部晶振High Speed External oscillator
-通过23、24号引脚接入8M的高速外部晶振。
-HSI-低速外部晶振Low Speed Exter
+
+从异常模式来看，只有 User 和 System 是非异常模
                             
                         </div>
                         <div class="publish-info">
@@ -509,12 +560,8 @@ HSI-低速外部晶振Low Speed Exter
                                 
                                 <i class="fas fa-bookmark fa-fw icon-category"></i>
                                 
-                                <a href="/categories/STM32/" class="post-category">
-                                    STM32
-                                </a>
-                                
-                                <a href="/categories/STM32/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/" class="post-category">
-                                    源码分析
+                                <a href="/categories/ARM/" class="post-category">
+                                    ARM
                                 </a>
                                 
                                 
@@ -525,94 +572,12 @@ HSI-低速外部晶振Low Speed Exter
                     
                     <div class="card-action article-tags">
                         
-                        <a href="/tags/STM32/">
-                            <span class="chip bg-color">STM32</span>
+                        <a href="/tags/ARM/">
+                            <span class="chip bg-color">ARM</span>
                         </a>
                         
-                        <a href="/tags/SPL/">
-                            <span class="chip bg-color">SPL</span>
-                        </a>
-                        
-                        <a href="/tags/STM32F103ZE/">
-                            <span class="chip bg-color">STM32F103ZE</span>
-                        </a>
-                        
-                        <a href="/tags/%E6%97%B6%E9%92%9F/">
-                            <span class="chip bg-color">时钟</span>
-                        </a>
-                        
-                    </div>
-                    
-                </div>
-            </div>
-            
-            <div class="article tag-post col s12 m6 l4" data-aos="zoom-in">
-                <div class="card">
-                    <a href="/2024/11/12/13750.html">
-                        <div class="card-image tag-image">
-                            
-                            
-                            <img src="/medias/featureimages/4.jpg" class="responsive-img" alt="UART接收缓冲区溢出异常（HAL_UART_ERROR_ORE）问题记录">
-                            
-                            <span class="card-title">UART接收缓冲区溢出异常（HAL_UART_ERROR_ORE）问题记录</span>
-                        </div>
-                    </a>
-                    <div class="card-content article-content">
-                        <div class="summary block-with-text">
-                            
-                                问题背景
-开发环境
-
-硬件：GD32F407VET6开发版
-IDE：STM32CubeMX + Clion + ARM GNU
-烧录：OpenOCD
-
-实验目标
-使用Cube配置串口USART1及其中断，引脚复用PA9/PA10，通过使能接
-                            
-                        </div>
-                        <div class="publish-info">
-                            <span class="publish-date">
-                                <i class="far fa-clock fa-fw icon-date"></i>2024-11-12
-                            </span>
-                            <span class="publish-author">
-                                
-                                <i class="fas fa-bookmark fa-fw icon-category"></i>
-                                
-                                <a href="/categories/STM32/" class="post-category">
-                                    STM32
-                                </a>
-                                
-                                <a href="/categories/STM32/%E8%B8%A9%E5%9D%91%E8%AE%B0%E5%BD%95/" class="post-category">
-                                    踩坑记录
-                                </a>
-                                
-                                
-                            </span>
-                        </div>
-                    </div>
-
-                    
-                    <div class="card-action article-tags">
-                        
-                        <a href="/tags/Clion/">
-                            <span class="chip bg-color">Clion</span>
-                        </a>
-                        
-                        <a href="/tags/STM32/">
-                            <span class="chip bg-color">STM32</span>
-                        </a>
-                        
-                        <a href="/tags/GD32/">
-                            <span class="chip bg-color">GD32</span>
-                        </a>
-                        
-                        <a href="/tags/HAL/">
-                            <span class="chip bg-color">HAL</span>
-                        </a>
-                        
-                        <a href="/tags/UART/">
-                            <span class="chip bg-color">UART</span>
+                        <a href="/tags/ARMv7/">
+                            <span class="chip bg-color">ARMv7</span>
                         </a>
                         
                     </div>

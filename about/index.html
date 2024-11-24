@@ -404,21 +404,21 @@
                     <div class="post-statis col l4 hide-on-med-and-down" data-aos="zoom-in-right">
                         
 <div class="statis">
-    <span class="count"><a href="/">5</a></span>
+    <span class="count"><a href="/">7</a></span>
     <span class="name">文章</span>
 </div>
 
 
 
 <div class="statis">
-    <span class="count"><a href="/categories">5</a></span>
+    <span class="count"><a href="/categories">7</a></span>
     <span class="name">分类</span>
 </div>
 
 
 
 <div class="statis">
-    <span class="count"><a href="/tags">14</a></span>
+    <span class="count"><a href="/tags">15</a></span>
     <span class="name">标签</span>
 </div>
 
@@ -434,21 +434,21 @@
                                 <div class="post-statis hide-on-large-only" data-aos="zoom-in-right">
                                     
 <div class="statis">
-    <span class="count"><a href="/">5</a></span>
+    <span class="count"><a href="/">7</a></span>
     <span class="name">文章</span>
 </div>
 
 
 
 <div class="statis">
-    <span class="count"><a href="/categories">5</a></span>
+    <span class="count"><a href="/categories">7</a></span>
     <span class="name">分类</span>
 </div>
 
 
 
 <div class="statis">
-    <span class="count"><a href="/tags">14</a></span>
+    <span class="count"><a href="/tags">15</a></span>
     <span class="name">标签</span>
 </div>
 
@@ -592,7 +592,7 @@
                 name: '文章篇数',
                 type: 'line',
                 color: ['#6772e5'],
-                data: [0,0,0,0,0,0,0,0,0,0,0,0,5],
+                data: [0,0,0,0,0,0,0,0,0,0,0,0,7],
                 markPoint: {
                     symbolSize: 45,
                     color: ['#fa755a','#3ecf8e','#82d3f4'],
@@ -634,7 +634,7 @@
                 type: 'pie',
                 radius: '50%',
                 color: ['#6772e5', '#ff9e0f', '#fa755a', '#3ecf8e', '#82d3f4', '#ab47bc', '#525f7f', '#f51c47', '#26A69A'],
-                data: [{"name":"STM32","value":1},{"name":"嵌入式","value":3},{"name":"嵌入式","value":1},{"name":"踩坑记录","value":2},{"name":"源码分析","value":1}],
+                data: [{"name":"ARM","value":2},{"name":"STM32","value":2},{"name":"协议","value":1},{"name":"GD32","value":1},{"name":"踩坑记录","value":1},{"name":"源码分析","value":1},{"name":"踩坑记录","value":1}],
                 itemStyle: {
                     emphasis: {
                         shadowBlur: 10,
@@ -658,7 +658,7 @@
         xAxis: [
             {
                 type: 'category',
-                data: ["STM32","HAL","时序要求","STM32F103","时钟","Clion","ARM","GD32","UART","I2C"]
+                data: ["ARM","ARMv7","STM32","GD32","时序要求","Clion","HAL","UART","SPL","STM32F103ZE"]
             }
         ],
         yAxis: [
@@ -671,7 +671,7 @@
                 type: 'bar',
                 color: ['#82d3f4'],
                 barWidth : 18,
-                data: [2,2,2,1,1,1,1,1,1,1],
+                data: [2,2,2,2,2,1,1,1,1,1],
                 markPoint: {
                     symbolSize: 45,
                     data: [{
@@ -841,26 +841,14 @@
         <div class="tag-chips center-align">
             
             
-            <a href="/tags/STM32/">
-                <span class="chip center-align waves-effect waves-light chip-default">STM32</span>
+            <a href="/tags/ARM/">
+                <span class="chip center-align waves-effect waves-light chip-default">ARM</span>
             </a>
             
             
             
-            <a href="/tags/HAL/">
-                <span class="chip center-align waves-effect waves-light chip-default">HAL</span>
-            </a>
-            
-            
-            
-            <a href="/tags/STM32F103/">
-                <span class="chip center-align waves-effect waves-light chip-default">STM32F103</span>
-            </a>
-            
-            
-            
-            <a href="/tags/%E6%97%B6%E9%92%9F/">
-                <span class="chip center-align waves-effect waves-light chip-default">时钟</span>
+            <a href="/tags/ARMv7/">
+                <span class="chip center-align waves-effect waves-light chip-default">ARMv7</span>
             </a>
             
             
@@ -871,8 +859,8 @@
             
             
             
-            <a href="/tags/ARM/">
-                <span class="chip center-align waves-effect waves-light chip-default">ARM</span>
+            <a href="/tags/STM32/">
+                <span class="chip center-align waves-effect waves-light chip-default">STM32</span>
             </a>
             
             
@@ -883,8 +871,32 @@
             
             
             
+            <a href="/tags/HAL/">
+                <span class="chip center-align waves-effect waves-light chip-default">HAL</span>
+            </a>
+            
+            
+            
             <a href="/tags/UART/">
                 <span class="chip center-align waves-effect waves-light chip-default">UART</span>
+            </a>
+            
+            
+            
+            <a href="/tags/SPL/">
+                <span class="chip center-align waves-effect waves-light chip-default">SPL</span>
+            </a>
+            
+            
+            
+            <a href="/tags/STM32F103ZE/">
+                <span class="chip center-align waves-effect waves-light chip-default">STM32F103ZE</span>
+            </a>
+            
+            
+            
+            <a href="/tags/%E6%97%B6%E9%92%9F/">
+                <span class="chip center-align waves-effect waves-light chip-default">时钟</span>
             </a>
             
             
@@ -915,12 +927,6 @@
             
             <a href="/tags/%E7%A7%BB%E4%BD%8D%E5%AF%84%E5%AD%98%E5%99%A8/">
                 <span class="chip center-align waves-effect waves-light chip-default">移位寄存器</span>
-            </a>
-            
-            
-            
-            <a href="/tags/%E6%95%B0%E7%A0%81%E7%AE%A1/">
-                <span class="chip center-align waves-effect waves-light chip-default">数码管</span>
             </a>
             
             
@@ -1001,7 +1007,7 @@
             <br>
             
                 &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                        class="white-color">6.6k</span>
+                        class="white-color">9.2k</span>
             
             
             
