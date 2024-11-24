@@ -6,7 +6,7 @@
   <link href="https://zanwen.github.io/atom.xml" rel="self"/>
   
   <link href="https://zanwen.github.io/"/>
-  <updated>2024-11-24T01:44:07.646Z</updated>
+  <updated>2024-11-24T09:28:38.773Z</updated>
   <id>https://zanwen.github.io/</id>
   
   <author>
@@ -17,20 +17,19 @@
   <generator uri="https://hexo.io/">Hexo</generator>
   
   <entry>
-    <title>ARM指令集（ARMv7-A-R）</title>
+    <title>ARM核学习（二）指令集</title>
     <link href="https://zanwen.github.io/2024/11/24/18972.html"/>
     <id>https://zanwen.github.io/2024/11/24/18972.html</id>
     <published>2024-11-24T01:08:14.000Z</published>
-    <updated>2024-11-24T01:44:07.646Z</updated>
+    <updated>2024-11-24T09:28:38.773Z</updated>
     
     
       
       
         
         
-    <summary type="html">&lt;h1 id=&quot;mdk-huan-jing-da-jian&quot;&gt;MDK环境搭建&lt;/h1&gt;
-&lt;h2 id=&quot;xia-zai-legacy-support-zhi-chi-bao&quot;&gt;下载Legacy Support支持包&lt;/h2&gt;
-&lt;p&gt;&lt;a</summary>
+    <summary type="html">&lt;h1 id=&quot;can-kao-zi-liao&quot;&gt;参考资料&lt;/h1&gt;
+&lt;p&gt;&lt;a href=&quot;https://developer.arm.com/documentation/ddi0406/cd/?lang=en&quot;&gt;ARM Architecture Reference</summary>
         
       
     
@@ -46,11 +45,11 @@
   </entry>
   
   <entry>
-    <title>ARM核（ARMv7-A/R）学习</title>
+    <title>ARM核学习（一）及寄存器资源</title>
     <link href="https://zanwen.github.io/2024/11/23/1780.html"/>
     <id>https://zanwen.github.io/2024/11/23/1780.html</id>
     <published>2024-11-23T11:16:50.000Z</published>
-    <updated>2024-11-24T01:08:38.779Z</updated>
+    <updated>2024-11-24T02:12:02.195Z</updated>
     
     
       

@@ -1,58 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
-    <title>ARM指令集（ARMv7-A-R）</title>
-    <url>/2024/11/24/18972.html</url>
-    <content><![CDATA[<h1 id="mdk-huan-jing-da-jian">MDK环境搭建</h1>
-<h2 id="xia-zai-legacy-support-zhi-chi-bao">下载Legacy Support支持包</h2>
-<p><a href="https://armkeil.blob.core.windows.net/legacy/MDK79525.EXE">https://armkeil.blob.core.windows.net/legacy/MDK79525.EXE</a></p>
-<p>安装到MDK的安装目录下</p>
-<h2 id="xia-zai-arm-gnu-gong-ju-lian">下载ARM GNU工具链</h2>
-<p><a href="https://developer.arm.com/-/media/Files/downloads/gnu/13.3.rel1/binrel/arm-gnu-toolchain-13.3.rel1-mingw-w64-i686-arm-none-eabi.exe">https://developer.arm.com/-/media/Files/downloads/gnu/13.3.rel1/binrel/arm-gnu-toolchain-13.3.rel1-mingw-w64-i686-arm-none-eabi.exe</a></p>
-<blockquote>
-<p><a href="https://developer.arm.com/downloads/-/arm-gnu-toolchain-downloads">下载页面</a></p>
-</blockquote>
-<img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241124092507291.png" alt="image-20241124092507291" style="zoom:50%;">
-<h2 id="chuang-jian-xiang-mu">创建项目</h2>
-<p>安装Legacy Support之后，可以在Device中对其进行选择</p>
-<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241124091834836.png" alt="image-20241124091834836"></p>
-<p>然后选择ARM9E-S进行仿真</p>
-<img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241124092007126.png" alt="image-20241124092007126" style="zoom:50%;">
-<p>键入如下代码：</p>
-<pre class="line-numbers language-assembly" data-language="assembly"><code class="language-assembly">.global _start
-
-_start:
-	mov r0,#1
-	mov r1,#2
-	mov r2,#3
-	
-stop:
-	b stop<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241124093601960.png" alt="image-20241124093601960" style="zoom:50%;">
-<h2 id="pei-zhi-arm-gnu-gong-ju-lian">配置ARM GNU工具链</h2>
-<p>配置交叉编译工具链，即此前下载的ARM GNU</p>
-<img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241124093644442.png" alt="image-20241124093644442" style="zoom: 50%;">
-<h2 id="bian-yi-xiang-mu">编译项目</h2>
-<img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241124093742741.png" alt="image-20241124093742741" style="zoom:50%;">
-<h2 id="fang-zhen-diao-shi-pei-zhi">仿真/调试配置</h2>
-<img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241124093931756.png" alt="image-20241124093931756" style="zoom: 50%;">
-<img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241124094012862.png" alt="image-20241124094012862" style="zoom:50%;">
-<p><mark>注意</mark>：每次修改了编译配置选项后，最好重新编译一下以使其生效：</p>
-<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241124094203216.png" alt="image-20241124094203216"></p>
-<h2 id="kai-shi-diao-shi">开始调试</h2>
-<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241124094253900.png" alt="image-20241124094253900"></p>
-<p>如果点击调试按钮后出现如上界面，则仿真环境配置成功了。左侧是ARM核的寄存器（可参考另一篇文章）</p>
-]]></content>
-      <categories>
-        <category>ARM</category>
-      </categories>
-      <tags>
-        <tag>ARM</tag>
-        <tag>ARMv7</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>ARM核（ARMv7-A/R）学习</title>
+    <title>ARM核学习（一）及寄存器资源</title>
     <url>/2024/11/23/1780.html</url>
     <content><![CDATA[<h1 id="can-kao-zi-liao">参考资料</h1>
 <p><a href="https://developer.arm.com/documentation/ddi0406/latest/">ARM Architecture Reference Manual ARMv7-A and ARMv7-R edition</a></p>
@@ -232,6 +181,616 @@ corresponding exception, meaning it cannot be taken</p>
 </ul>
 <h3 id="m-biao-zhi-wei">M标志位</h3>
 <p>标示处理器当前的工作模式，参见本文 <mark>ARM&nbsp;Processor&nbsp;Modes</mark>对应的章节。</p>
+]]></content>
+      <categories>
+        <category>ARM</category>
+      </categories>
+      <tags>
+        <tag>ARM</tag>
+        <tag>ARMv7</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>ARM核学习（二）指令集</title>
+    <url>/2024/11/24/18972.html</url>
+    <content><![CDATA[<h1 id="can-kao-zi-liao">参考资料</h1>
+<p><a href="https://developer.arm.com/documentation/ddi0406/cd/?lang=en">ARM Architecture Reference Manual ARMv7-A and ARMv7-R edition</a></p>
+<h1 id="mdk-huan-jing-da-jian">MDK环境搭建</h1>
+<h2 id="xia-zai-legacy-support-zhi-chi-bao">下载Legacy Support支持包</h2>
+<p><a href="https://armkeil.blob.core.windows.net/legacy/MDK79525.EXE">https://armkeil.blob.core.windows.net/legacy/MDK79525.EXE</a></p>
+<p>安装到MDK的安装目录下</p>
+<h2 id="xia-zai-arm-gnu-gong-ju-lian">下载ARM GNU工具链</h2>
+<p><a href="https://developer.arm.com/-/media/Files/downloads/gnu/13.3.rel1/binrel/arm-gnu-toolchain-13.3.rel1-mingw-w64-i686-arm-none-eabi.exe">https://developer.arm.com/-/media/Files/downloads/gnu/13.3.rel1/binrel/arm-gnu-toolchain-13.3.rel1-mingw-w64-i686-arm-none-eabi.exe</a></p>
+<blockquote>
+<p><a href="https://developer.arm.com/downloads/-/arm-gnu-toolchain-downloads">下载页面</a></p>
+</blockquote>
+<img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241124092507291.png" alt="image-20241124092507291" style="zoom:50%;">
+<h2 id="chuang-jian-xiang-mu">创建项目</h2>
+<p>安装Legacy Support之后，可以在Device中对其进行选择</p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241124091834836.png" alt="image-20241124091834836"></p>
+<p>然后选择ARM9E-S（Little Endian）进行仿真</p>
+<img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241124092007126.png" alt="image-20241124092007126" style="zoom:50%;">
+<p>键入如下代码：</p>
+<pre class="line-numbers language-assembly" data-language="assembly"><code class="language-assembly">.global _start
+
+_start:
+	mov r0,#1
+	mov r1,#2
+	mov r2,#3
+	
+stop:
+	b stop<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241124093601960.png" alt="image-20241124093601960" style="zoom:50%;">
+<h2 id="pei-zhi-arm-gnu-gong-ju-lian">配置ARM GNU工具链</h2>
+<p>配置交叉编译工具链，即此前下载的ARM GNU的安装路径</p>
+<img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241124093644442.png" alt="image-20241124093644442" style="zoom: 50%;">
+<h2 id="bian-yi-xiang-mu">编译项目</h2>
+<img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241124093742741.png" alt="image-20241124093742741" style="zoom:50%;">
+<h2 id="fang-zhen-diao-shi-pei-zhi">仿真/调试配置</h2>
+<img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241124093931756.png" alt="image-20241124093931756" style="zoom: 50%;">
+<p>配置代码段开始地址：</p>
+<img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241124094012862.png" alt="image-20241124094012862" style="zoom:50%;">
+<p><mark>注意</mark>：每次修改了编译配置选项后，最好重新编译一下以使其生效：</p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241124094203216.png" alt="image-20241124094203216"></p>
+<h2 id="kai-shi-diao-shi">开始调试</h2>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241124094253900.png" alt="image-20241124094253900"></p>
+<p>如果点击调试按钮后出现如上界面，则仿真环境配置成功了。左侧是ARM核的寄存器（可参考另一篇文章《ARM核（ARMv7-A/R）学习》），右上方是对应的汇编指令。</p>
+<p>点击左上方的调试按钮，可以发现立即数1、2、3被依次加载到寄存器R0、R1、R2中了：</p>
+<img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241124094832406.png" alt="image-20241124094832406" style="zoom:50%;">
+<h1 id="zhi-ling-ge-shi">指令格式</h1>
+<img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241124101014161.png" alt="image-20241124101014161" style="zoom:50%;">
+<h2 id="he-fa-li-ji-shu">合法立即数</h2>
+<p>立即数使用 <code>#数字</code>来表示</p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241124102202527.png" alt="image-20241124102202527"></p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241124102256351.png" alt="image-20241124102256351"></p>
+<h2 id="ji-cun-qi-yi-wei">寄存器移位</h2>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241124102702102.png" alt="image-20241124102702102"></p>
+<h1 id="chang-yong-arm-he-zhi-ling">常用ARM核指令</h1>
+<p>参见手册中的 <mark>A8.8 Alphabetical list of instructions</mark>章节</p>
+<h2 id="shu-ju-chuan-song-zhi-ling">数据传送指令</h2>
+<h3 id="mov">MOV</h3>
+<img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241124103655266.png" alt="image-20241124103655266" style="zoom:50%;">
+<h3 id="mvn">MVN</h3>
+<img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241124103924679.png" alt="image-20241124103924679" style="zoom:50%;">
+<h3 id="ldr">LDR</h3>
+<img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241124104010947.png" alt="image-20241124104010947" style="zoom:50%;">
+<p><mark>注意：数字常量前需要加上“=”，这是常量/字面量表示的语法规则</mark></p>
+<p>当数据不是合法立即数时，作为MOV的替代指令。这是一条伪指令，底层是通过将数据（<code>=</code>号后面的数字）先存放到内存，再通过LDR(从内存加载到寄存器)指令来实现的。</p>
+<img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241124104851454.png" alt="image-20241124104851454" style="zoom: 33%;">
+<h2 id="shu-ju-ji-suan-zhi-ling">数据计算指令</h2>
+<h3 id="add-jia-fa">ADD加法</h3>
+<img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241124105251693.png" alt="image-20241124105251693" style="zoom:50%;">
+<h3 id="sub-jian-fa">SUB减法</h3>
+<img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241124105408936.png" alt="image-20241124105408936" style="zoom:50%;">
+<p>默认情况下SUB是不会影响CPSR的N标志位的，如果需要则要加上S后缀：</p>
+<img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241124105935847.png" alt="image-20241124105935847" style="zoom: 33%;">
+<img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241124110015698.png" alt="image-20241124110015698" style="zoom:33%;">
+<h3 id="mul-cheng-fa">MUL乘法</h3>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241124110117129.png" alt="image-20241124110117129"></p>
+<h3 id="lian-xi">练习</h3>
+<blockquote>
+<p>练习1：<br>
+(2&lt;&lt;2)-5+0x12345678, 计算的结果存放在r0</p>
+<p>练习2：<br>
+25-3*5+6 最终的计算结果存放在r0中</p>
+</blockquote>
+<pre class="line-numbers language-assembly" data-language="assembly"><code class="language-assembly">.global _start
+
+_start:
+	mov r0,#2
+	mov r1,r0,lsl #2
+	sub r1,r1,#5
+	ldr r0,=0x12345678
+	add r1,r1,r0
+	
+stop:
+	b stop
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-assembly" data-language="assembly"><code class="language-assembly">.global _start
+
+_start:
+	mov r0,#3
+	mov r1,#5
+	mul r2,r0,r1 @r0=3*5
+	mov r1,#25
+	sub r0,r1,r2 @r0=25-15
+	add r0,r0,#6 @r0=10+6
+	
+stop:
+	b stop
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<h2 id="wei-yun-suan-zhi-ling">位运算指令</h2>
+<h3 id="and">AND</h3>
+<img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241124112800154.png" alt="image-20241124112800154" style="zoom:50%;">
+<h3 id="orr-an-wei-huo">ORR-按位或</h3>
+<img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241124112835561.png" alt="image-20241124112835561" style="zoom:50%;">
+<h3 id="eor-an-wei-yi-huo-exclusive-or">EOR-按位异或（Exclusive OR）</h3>
+<img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241124113112400.png" alt="image-20241124113112400" style="zoom:50%;">
+<h3 id="bic-wei-qing-chu-zhi-ling">BIC-位清除指令</h3>
+<img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241124113149176.png" alt="image-20241124113149176" style="zoom:50%;">
+<h3 id="lian-xi-1">练习</h3>
+<img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241124113304642.png" alt="image-20241124113304642" style="zoom:50%;">
+<pre class="line-numbers language-assembly" data-language="assembly"><code class="language-assembly">.global _start
+
+_start:
+	ldr r0,=0x12345678
+	ldr r1,=0xFFFF0000
+	bic r1,r0,r1
+	mov r0,r0,lsr #16
+	add r0,r0,r1
+	
+stop:
+	b stop
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-assembly" data-language="assembly"><code class="language-assembly">.global _start
+
+_start:
+	ldr r0,=0xabcd
+	
+	mov r1,#0x7
+	bic r0,r1,lsl #1
+	
+	mov r1,#0x5
+	orr r0,r1,lsl #1
+	
+	mov r1,#0x1f
+	bic r0,r1,lsl #7
+	
+stop:
+	b stop
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<h2 id="bi-jiao-zhi-ling-cmp">比较指令CMP</h2>
+<img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241124114532330.png" alt="image-20241124114532330" style="zoom:50%;">
+<pre class="line-numbers language-assembly" data-language="assembly"><code class="language-assembly">.global _start
+
+_start:
+	mov r0,#5
+	mov r1,#6
+	mov r2,#10
+	
+	cmp r0,r1
+	addgt r1,r1,#1
+	
+	cmp r0,r2
+	addle r2,r2,#1
+	
+stop:
+	b stop
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241124114808027.png" alt="image-20241124114808027" style="zoom: 50%;">
+<h2 id="tiao-zhuan-zhi-ling">跳转指令</h2>
+<h3 id="b-bl">B/BL</h3>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241124125817106.png" alt="image-20241124125817106"></p>
+<blockquote>
+<p>Branch causes a branch to a target address.</p>
+</blockquote>
+<p>B指令用于跳转到一个目标地址（指令存放地址），该指令会修改PC的值，就像从处理器的顺序执行路径开了一个分岔一样，让处理器从既定的顺序指令序列跳到了另一个指令序列。常用于函数调用、中断处理。</p>
+<p>BL指令在B指令的基础之上增加了一个操作：将跳转前PC的值保存到LR寄存器中。这样如果想从分岔回到原来的路径继续执行，只需将LR会写PC即可。</p>
+<h4 id="si-xun-huan-de-shi-xian">死循环的实现</h4>
+<pre class="line-numbers language-assembly" data-language="assembly"><code class="language-assembly">.global _start
+
+_start:
+	mov r0,#1
+	mov r1,#2
+	b _start
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<h4 id="han-shu-diao-yong">函数调用</h4>
+<pre class="line-numbers language-assembly" data-language="assembly"><code class="language-assembly">.global _start
+
+_start:
+	mov r0,#1
+	mov r1,#2
+	bl add
+	
+	mov r3,r2
+	
+stop:
+	b _start
+	
+add:
+	add r2,r0,r1
+	mov pc,lr
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>通过单步调试观察PC的变化我们可以发现每条汇编指令的地址是按照编写顺序从上到下依次编址的，每条指令地址相隔4个字节，也即偏移量为0x4</p>
+<pre class="line-numbers language-assembly" data-language="assembly"><code class="language-assembly">.global _start
+
+_start:
+	mov r0,#1 @instruction address =&gt; 0x00000000
+	mov r1,#2 @instruction address =&gt; 0x00000004
+	bl add	  @instruction address =&gt; 0x00000008
+	
+	mov r3,r2 @instruction address =&gt; 0x0000000C
+	
+stop:
+	b _start  @instruction address =&gt; 0x00000010
+	
+add:
+	add r2,r0,r1 @instruction address =&gt; 0x00000014
+	mov pc,lr    @instruction address =&gt; 0x00000018<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<h3 id="gei-pc-fu-zhi">给PC赋值</h3>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241124125452912.png" alt="image-20241124125452912"></p>
+<p>B/BL指令有个限制：跳转的目标地址和当前PC中的指令地址之间的偏移量不能超过32M大小。如果超过了这个范围，我们可以直接赋值PC来实现跳转。</p>
+<pre class="line-numbers language-assembly" data-language="assembly"><code class="language-assembly">.global _start
+
+_start:
+	mov r0,#1 			
+	mov r1,#2
+	ldr pc,=add_label
+back_label:
+	mov r3,#10
+	
+stop:
+	b stop
+
+add_label:
+	add r2,r0,r1
+	ldr pc,=back_label
+	<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>其中标签名字面量（<code>add_label</code>、<code>back_label</code>、<code>stop</code>）本质上就是给标签名冒号后的指令地址取了个别名，其值就是冒号后第一条指令的地址；且标签声明不属于指令，也就不占用内存空间，因此 <code>ldr pc,=add_label</code>等价于 <code>ldr pc,=0x00000014</code>：</p>
+<pre class="line-numbers language-assembly" data-language="assembly"><code class="language-assembly">.global _start
+
+_start:
+	mov r0,#1 			@0x00000000
+	mov r1,#2			@0x00000004
+	ldr pc,=add_label	@0x00000008
+back_label:
+	mov r3,#10			@0x0000000C
+	
+stop:
+	b stop				@0x00000010
+
+add_label:
+	add r2,r0,r1 		@0x00000014
+	ldr pc,=back_label	@0x00000018
+	<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<h4 id="lian-xi-2">练习</h4>
+<img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241124131659348.png" alt="image-20241124131659348" style="zoom:50%;">
+<pre class="line-numbers language-assembly" data-language="assembly"><code class="language-assembly">.global _start
+
+_start:
+	mov r0,#0		@sum=0
+	mov r1,#1		@i=1
+loop:
+	cmp r1,#100
+	bgt stop		@stop loop if r1 &gt; 100
+	add r0,r0,r1	@sum+=i
+	add r1,r1,#1	@i++
+	b loop			@continue loop
+	
+stop:
+	b stop
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<h2 id="dan-ge-shu-ju-fang-wen-yi-ci-xing-fang-wen-yi-ge-zi-kuan-shu-ju">单个数据访问（一次性访问一个字宽数据）</h2>
+<img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241124132933599.png" alt="image-20241124132933599" style="zoom:50%;">
+<h3 id="ji-cun-qi-jian-jie-xun-zhi">寄存器间接寻址</h3>
+<p><mark>LDR &lt;目标寄存器&gt; [源寄存器]</mark>：从源寄存器指定的地址中加载数据到目标寄存器</p>
+<p><mark>LDR &lt;源寄存器&gt; [目标寄存器]</mark>：将源寄存器中的数据存储到目标寄存器指定的内存地址中</p>
+<p>如下代码将数据 <code>0x12345678</code> 写（存储）到内存地址 <code>0x40000000</code>中，并从改地址读（加载）数据到R2寄存器中</p>
+<pre class="line-numbers language-assembly" data-language="assembly"><code class="language-assembly">.global _start
+
+_start:
+	mov r0,#0x40000000
+	ldr r1,=0x12345678
+	
+	str r1,[r0]		@write 0x12345678 to memory address 0x40000000 =&gt; *r0 = r1
+	ldr r2,[r0]		@read 0x12345678 from memory address 0x40000000 =&gt; r2 = *r0
+	
+	b stop
+	
+stop:
+	b stop
+
+	<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>点击调试后，需要映射一下当前程序可访问的内存空间：</p>
+<img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241124143904811.png" alt="image-20241124143904811" style="zoom: 50%;">
+<img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241124143956075.png" alt="image-20241124143956075" style="zoom:50%;">
+<blockquote>
+<p>0x40000000,0x4000FFFF</p>
+</blockquote>
+<p>然后可以打开内存查看窗口：</p>
+<img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241124144137121.png" alt="image-20241124144137121" style="zoom: 50%;">
+<img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241124144919193.png" alt="image-20241124144919193" style="zoom: 33%;">
+<p>然后步进到 <code>str r1,[r0]</code>执行之后，会发现数据已被写入对应的内存。这里值得注意的是，存储方式是字节小端法。</p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241124145026768.png" alt="image-20241124145026768"></p>
+<p>再进一步，数据从内存加载到了R2寄存器中</p>
+<img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241124145228766.png" alt="image-20241124145228766" style="zoom:50%;">
+<h3 id="ji-di-zhi-bian-zhi-xun-zhi">基地址变址寻址</h3>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241124150404357.png" alt="参考手册 A8.5 Memory accesses"></p>
+<h4 id="pian-yi-liang-xun-zhi">偏移量寻址</h4>
+<blockquote>
+<p>Offset addressing<br>
+The offset value is applied to an address obtained from the base register. The result is used as the<br>
+address for the memory access. The value of the base register is unchanged.<br>
+The assembly language syntax for this mode is:<br>
+[<rn>, <offset>]</offset></rn></p>
+</blockquote>
+<p><mark>LDR/STR&nbsp;[<rn>, <offset>]</offset></rn></mark>：Rn为基地址，offset为偏移字节数</p>
+<p>类比理解：C语言中通过指针加偏移量来访问内存（<code>num = *(p+1)</code>），该操作不会改变指针的值。</p>
+<pre class="line-numbers language-assembly" data-language="assembly"><code class="language-assembly">.global _start
+
+_start:
+	mov r0,#0x40000000
+	ldr r1,=0x12345678
+	
+	str r1,[r0, #4]		@ *(r0+4)=r1
+	ldr r2,[r0, #4]		@ r2=*(r0+4)
+	
+	b stop
+	
+stop:
+	b stop
+	<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p><mark>注意：每次点击debug后做一下内存映射：</mark></p>
+<img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241124150820281.png" alt="image-20241124150820281" style="zoom: 50%;">
+<img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241124150924297.png" alt="image-20241124150924297" style="zoom:33%;">
+<h4 id="qian-suo-yin-xun-zhi">前索引寻址</h4>
+<blockquote>
+<p>Pre-indexed addressing<br>
+The offset value is applied to an address obtained from the base register. The result is used as the<br>
+address for the memory access, and written back into the base register.<br>
+The assembly language syntax for this mode is:<br>
+[<rn>, <offset>]!</offset></rn></p>
+</blockquote>
+<p><mark>LDR/STR [<rn>, <offset>]!</offset></rn></mark>：Rn为基地址，offset为偏移字节数。</p>
+<p>该指令在偏移量寻址的基础上加了个 <mark>!</mark>，标示在内存访问之后将访问的地址回写基地址Rn。</p>
+<p>类比理解：<code>num = *p++ =&gt; num = *p; p++;</code></p>
+<pre class="line-numbers language-assembly" data-language="assembly"><code class="language-assembly">.global _start
+
+_start:
+	mov r0,#0x40000000
+	ldr r1,=0x12345678
+	
+	str r1,[r0, #4]!		@ *(r0+4)=r1 r0+=4
+	ldr r2,[r0]		@ r2=*r0
+	
+	b stop
+	
+stop:
+	b stop
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241124152950125.png" alt="image-20241124152950125"></p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241124153051739.png" alt="image-20241124153051739"></p>
+<h4 id="hou-suo-yin-xun-zhi">后索引寻址</h4>
+<blockquote>
+<p>Post-indexed addressing<br>
+The address obtained from the base register is used, unchanged, as the address for the memory<br>
+access. The offset value is applied to the address, and written back into the base register<br>
+The assembly language syntax for this mode is:<br>
+[<rn>], <offset></offset></rn></p>
+</blockquote>
+<p><mark>LDR/STR [<rn>], <offset></offset></rn></mark>：Rn为基地址，offset为偏移字节数。</p>
+<p>该指令先从Rn访问内存，然后再将偏移量更新到Rn中。</p>
+<p>类比理解：<code>num = *p; p += offset</code></p>
+<pre class="line-numbers language-assembly" data-language="assembly"><code class="language-assembly">.global _start
+
+_start:
+	mov r0,#0x40000000
+	ldr r1,=0x12345678
+	
+	str r1,[r0],#4	@ *(r0)=r1 r0+=4
+	
+	sub r0,r0,#4	@ r0-=4
+	ldr r2,[r0]		@ r2=*r0
+	
+	b stop
+	
+stop:
+	b stop
+	<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241124153832192.png" alt="image-20241124153832192"></p>
+<h4 id="zong-jie">🌟总结</h4>
+<ul>
+<li>偏移量寻址：就是在给定地址上加减一个偏移量来访问内存（relative）</li>
+<li>前索引：先对给定地址增减偏移量进行更新，再访问更新后的地址</li>
+<li>后索引：先访问给定地址，再对给定地址加减偏移量并更新</li>
+</ul>
+<h4 id="lian-xi-3">练习</h4>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241124154157004.png" alt="image-20241124154157004"></p>
+<pre class="line-numbers language-assembly" data-language="assembly"><code class="language-assembly">.global _start
+
+_start:
+	mov r0,#1 				@i=1
+	mov r1,#0x40000000 		@p
+	
+	bl write_data
+	
+	mov r0,#1				@i=1
+	mov r1,#0x40000000 		@p=&gt;0x40000000
+	ldr r2,=0x40000100		@q=&gt;0x40000100
+	mov r3,#0				@num=0
+
+	bl read_data
+	
+stop:
+	b stop
+	
+write_data:
+	str r0,[r1],#4 			@*p++=i
+	add r0,r0,#1			@i++
+	cmp r0,#10
+	ble write_data 			@while(i&lt;=10)
+	
+	mov pc,lr				@return
+	
+read_data:
+	ldr r3,[r1],#4			@num=*p++
+	str r3,[r2],#4			@*q++=num
+	add r0,r0,#1			@i++
+	cmp r0,#10
+	ble read_data			@while(i&lt;=10)
+	
+	mov pc,lr				@return
+	<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241124160123984.png" alt="image-20241124160123984"></p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241124160205062.png" alt="image-20241124160205062"></p>
+<pre class="line-numbers language-assembly" data-language="assembly"><code class="language-assembly">.global _start
+
+_start:
+	ldr r0,=0x1234
+	ldr r1,=0x40000000 		@p=0x40000000
+	str r0,[r1],#4			@*p++=0x1234
+	
+	ldr r0,=0xabcd
+	str r0,[r1],#-4			@*p=0xabcd, p-=4
+	
+	ldr r2,[r1],#4			@num1=*p++
+	ldr r3,[r1]				@num2=*p
+	add r0,r2,r3			@sum=num1+num2
+	
+stop:
+	b stop
+	<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<h2 id="duo-ge-shu-ju-fang-wen">多个数据访问</h2>
+<img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241124162052165.png" alt="image-20241124162052165" style="zoom:50%;">
+<h3 id="zhi-ling-mo-shi">指令模式</h3>
+<img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241124162139880.png" alt="image-20241124162139880" style="zoom:50%;">
+<p>以STM（Store Multiple，写多个数据为例，LDM是类似的）：</p>
+<ul>
+<li>STMIA：Increase After，先向基地址写入数据，然后递增基地址</li>
+<li>STMIB：Increase Before，先递增基地址，再向基地址写入数据</li>
+<li>STMDA：Decrease After，先向基地址写入数据，然后递减基地址</li>
+<li>STMDB：Decrease Before，先递减基地址，再向基地址写入数据</li>
+</ul>
+<pre class="line-numbers language-assembly" data-language="assembly"><code class="language-assembly">.global _start
+
+_start:
+	mov r0,#0x40000000			@p=0x40000000
+	mov r1,#0x11				@buf[3] = {0x11,0x22,0x33}
+	mov r2,#0x22
+	mov r3,#0x33
+	
+	stmia r0!,{r1-r3} 			@*p++=buf[i]
+	
+stop:
+	b stop
+	
+	<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241124163643693.png" alt="image-20241124163643693"></p>
+<pre class="line-numbers language-assembly" data-language="assembly"><code class="language-assembly">.global _start
+
+_start:
+	mov r0,#0x40000000			@p=0x40000000
+	mov r1,#0x11				@buf[3] = {0x11,0x22,0x33}
+	mov r2,#0x22
+	mov r3,#0x33
+	
+	stmia r0!,{r1-r3} 			@*p++=buf[i++]
+	
+	ldmdb r0!,{r4-r6}			@buf2[i++]=*--p
+	
+stop:
+	b stop
+	
+	<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241124163945572.png" alt="image-20241124163945572"></p>
+<h2 id="zhan-cao-zuo-zhi-ling">栈操作指令</h2>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241124164247925.png" alt="image-20241124164247925"></p>
+<h3 id="zhan-zeng-chang-mo-shi">栈增长模式</h3>
+<p><mark>自底向上：栈顶指针随着入栈而递增（地址）；自顶向下：栈顶指针随着入栈而递减</mark></p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241124164335289.png" alt="image-20241124164335289"></p>
+<h3 id="kong-dui-zhan-he-man-dui-zhan">空堆栈和满堆栈</h3>
+<p><mark>其实就是栈顶指针指向栈顶元素（满堆栈）还是指向下一个入栈元素要存放的位置（空堆栈）</mark></p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241124164412290.png" alt="image-20241124164412290"></p>
+<h3 id="shi-li-ya-zhan-bao-cun-chu-zhan-hui-fu">示例：压栈保存，出栈恢复</h3>
+<blockquote>
+<p>在程序上下文发生切换时（例如函数调用、中断处理），我们通常需要先将先前程序执行状态相关的信息进行保存，然后在返回时进行恢复。</p>
+</blockquote>
+<p>如下程序以通用寄存器的暂存和恢复为例来模拟这一过程：</p>
+<pre class="line-numbers language-assembly" data-language="assembly"><code class="language-assembly">.global _start
+
+_start:
+	mov r1,#0x11				
+	mov r2,#0x22
+	mov r3,#0x33
+	
+	@first: set stack pointer(start address of stack, from high address to low)
+	ldr sp,=0x4000fff0		
+	@push to save general purpose registers and decrease stack pointer
+	stmfd sp!,{r1-r3}		
+	
+stop:
+	b stop
+	<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241124170153676.png" alt="image-20241124170153676"></p>
+<pre class="line-numbers language-assembly" data-language="assembly"><code class="language-assembly">.global _start
+
+_start:
+	mov r1,#0x11				
+	mov r2,#0x22
+	mov r3,#0x33
+	
+	@first: set stack pointer(start address of stack, from high address to low)
+	ldr sp,=0x4000fff0		
+	@push to save general purpose registers and decrease stack pointer
+	stmfd sp!,{r1-r3}		
+	
+	@do something with general purpose registers
+	mov r1,#0x00				
+	mov r2,#0x00
+	mov r3,#0x00
+	
+	@pop stack to recover general purpose registers
+	ldmfd sp!,{r1-r3}
+	
+stop:
+	b stop
+	<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241124170518808.png" alt="image-20241124170518808"></p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241124170639885.png" alt="image-20241124170639885"></p>
+<h2 id="cpsr-spsr-cao-zuo-zhi-ling">CPSR/SPSR操作指令</h2>
+<h3 id="mrs-move-to-register-from-special-register">MRS（Move to Register from Special register）</h3>
+<blockquote>
+<p>Move to Register from Special register moves the value from the CPSR or SPSR of the current mode into an ARM<br>
+core register.<br>
+An MRS that accesses the SPSR is UNPREDICTABLE if executed in User or System mode.<br>
+An MRS that is executed in User mode and accesses the CPSR returns an UNKNOWN value for the<br>
+CPSR.{E, A, I, F, M} fields.</p>
+</blockquote>
+<p><code>MRS{&lt;c&gt;}{&lt;q&gt;} &lt;Rd&gt;, &lt;spec_reg&gt;  </code></p>
+<h3 id="msr-move-register-immediate-to-special-register">MSR（Move register/immediate to Special Register）</h3>
+<blockquote>
+<p>Move to Special register from ARM core register moves the value of an ARM core register to the CPSR or the SPSR of the current mode.</p>
+</blockquote>
+<p><code>MSR&lt;c&gt; &lt;spec_reg&gt;, #&lt;const&gt;  </code></p>
+<p><code>MSR{&lt;c&gt;}{&lt;q&gt;} &lt;spec_reg&gt;, &lt;Rn&gt;  </code></p>
+<h3 id="zong-jie-1">🌟总结</h3>
+<p><mark>MRS、MSR分辨</mark>：</p>
+<ul>
+<li>R在前面，则操作数1为通用寄存器（要将CPSR读到Rd）；</li>
+<li>S在前面，操作数为特殊寄存器（要将通用寄存器写到CPSR）</li>
+</ul>
+<h3 id="lian-xi-4">练习</h3>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241124171837704.png" alt="image-20241124171837704"></p>
+<pre class="line-numbers language-assembly" data-language="assembly"><code class="language-assembly">.global _start
+
+_start:
+	mrs r0,cpsr 		@move to r0 from cpsr
+	mov r1,#1
+	bic r0,r1,lsl #7	@bit clear bit7 of cpsr
+	msr cpsr,r0			@write back to cpsr
+	
+	b stop
+stop:
+	b stop
+	<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241124172405608.png" alt="image-20241124172405608"></p>
+<pre class="line-numbers language-assembly" data-language="assembly"><code class="language-assembly">.global _start
+
+_start:
+	mrs r0,cpsr 		@move to r0 from cpsr
+	mov r1,#1
+	bic r0,r1,lsl #7	@bit clear bit7 of cpsr
+	msr cpsr,r0			@write back to cpsr
+	
+	mrs r0,cpsr
+	orr r0,r1, lsl #7	@set bit7 of cpsr
+	msr cpsr,r0			@write back to cpsr
+	
+	b stop
+stop:
+	b stop
+	<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<h1 id="end">END</h1>
 ]]></content>
       <categories>
         <category>ARM</category>
@@ -508,6 +1067,25 @@ huart<span class="token operator">-&gt;</span>RxState <span class="token operato
       </tags>
   </entry>
   <entry>
+    <title>Hello World</title>
+    <url>/2024/11/12/16107.html</url>
+    <content><![CDATA[<p>Welcome to <a href="https://hexo.io/">Hexo</a>! This is your very first post. Check <a href="https://hexo.io/docs/">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="https://hexo.io/docs/troubleshooting.html">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues">GitHub</a>.</p>
+<h2 id="quick-start">Quick Start</h2>
+<h3 id="create-a-new-post">Create a new post</h3>
+<pre class="line-numbers language-bash" data-language="bash"><code class="language-bash">$ hexo new <span class="token string">"My New Post"</span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<p>More info: <a href="https://hexo.io/docs/writing.html">Writing</a></p>
+<h3 id="run-server">Run server</h3>
+<pre class="line-numbers language-bash" data-language="bash"><code class="language-bash">$ hexo server<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<p>More info: <a href="https://hexo.io/docs/server.html">Server</a></p>
+<h3 id="generate-static-files">Generate static files</h3>
+<pre class="line-numbers language-bash" data-language="bash"><code class="language-bash">$ hexo generate<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<p>More info: <a href="https://hexo.io/docs/generating.html">Generating</a></p>
+<h3 id="deploy-to-remote-sites">Deploy to remote sites</h3>
+<pre class="line-numbers language-bash" data-language="bash"><code class="language-bash">$ hexo deploy<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<p>More info: <a href="https://hexo.io/docs/one-command-deployment.html">Deployment</a></p>
+]]></content>
+  </entry>
+  <entry>
     <title>STM32系统时钟初始化源码解析（SPL库，STM32F103ZE）</title>
     <url>/2024/11/23/19447.html</url>
     <content><![CDATA[<h1 id="yi-bei-jing">一、背景</h1>
@@ -652,25 +1230,6 @@ RCC<span class="token operator">-&gt;</span>CFGR <span class="token operator">|=
         <tag>STM32F103ZE</tag>
         <tag>时钟</tag>
       </tags>
-  </entry>
-  <entry>
-    <title>Hello World</title>
-    <url>/2024/11/12/16107.html</url>
-    <content><![CDATA[<p>Welcome to <a href="https://hexo.io/">Hexo</a>! This is your very first post. Check <a href="https://hexo.io/docs/">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="https://hexo.io/docs/troubleshooting.html">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues">GitHub</a>.</p>
-<h2 id="quick-start">Quick Start</h2>
-<h3 id="create-a-new-post">Create a new post</h3>
-<pre class="line-numbers language-bash" data-language="bash"><code class="language-bash">$ hexo new <span class="token string">"My New Post"</span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
-<p>More info: <a href="https://hexo.io/docs/writing.html">Writing</a></p>
-<h3 id="run-server">Run server</h3>
-<pre class="line-numbers language-bash" data-language="bash"><code class="language-bash">$ hexo server<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
-<p>More info: <a href="https://hexo.io/docs/server.html">Server</a></p>
-<h3 id="generate-static-files">Generate static files</h3>
-<pre class="line-numbers language-bash" data-language="bash"><code class="language-bash">$ hexo generate<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
-<p>More info: <a href="https://hexo.io/docs/generating.html">Generating</a></p>
-<h3 id="deploy-to-remote-sites">Deploy to remote sites</h3>
-<pre class="line-numbers language-bash" data-language="bash"><code class="language-bash">$ hexo deploy<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
-<p>More info: <a href="https://hexo.io/docs/one-command-deployment.html">Deployment</a></p>
-]]></content>
   </entry>
   <entry>
     <title>深入理解I2C时序（以I2C实时时钟PCF8563为案例）</title>
