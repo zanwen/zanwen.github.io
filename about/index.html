@@ -404,7 +404,7 @@
                     <div class="post-statis col l4 hide-on-med-and-down" data-aos="zoom-in-right">
                         
 <div class="statis">
-    <span class="count"><a href="/">8</a></span>
+    <span class="count"><a href="/">9</a></span>
     <span class="name">文章</span>
 </div>
 
@@ -418,7 +418,7 @@
 
 
 <div class="statis">
-    <span class="count"><a href="/tags">15</a></span>
+    <span class="count"><a href="/tags">18</a></span>
     <span class="name">标签</span>
 </div>
 
@@ -434,7 +434,7 @@
                                 <div class="post-statis hide-on-large-only" data-aos="zoom-in-right">
                                     
 <div class="statis">
-    <span class="count"><a href="/">8</a></span>
+    <span class="count"><a href="/">9</a></span>
     <span class="name">文章</span>
 </div>
 
@@ -448,7 +448,7 @@
 
 
 <div class="statis">
-    <span class="count"><a href="/tags">15</a></span>
+    <span class="count"><a href="/tags">18</a></span>
     <span class="name">标签</span>
 </div>
 
@@ -592,7 +592,7 @@
                 name: '文章篇数',
                 type: 'line',
                 color: ['#6772e5'],
-                data: [0,0,0,0,0,0,0,0,0,0,0,0,8],
+                data: [0,0,0,0,0,0,0,0,0,0,0,0,9],
                 markPoint: {
                     symbolSize: 45,
                     color: ['#fa755a','#3ecf8e','#82d3f4'],
@@ -634,7 +634,7 @@
                 type: 'pie',
                 radius: '50%',
                 color: ['#6772e5', '#ff9e0f', '#fa755a', '#3ecf8e', '#82d3f4', '#ab47bc', '#525f7f', '#f51c47', '#26A69A'],
-                data: [{"name":"ARM","value":3},{"name":"STM32","value":2},{"name":"协议","value":1},{"name":"踩坑记录","value":1},{"name":"源码分析","value":1},{"name":"GD32","value":1},{"name":"踩坑记录","value":1}],
+                data: [{"name":"ARM","value":4},{"name":"STM32","value":2},{"name":"GD32","value":1},{"name":"协议","value":1},{"name":"源码分析","value":1},{"name":"踩坑记录","value":1},{"name":"踩坑记录","value":1}],
                 itemStyle: {
                     emphasis: {
                         shadowBlur: 10,
@@ -658,7 +658,7 @@
         xAxis: [
             {
                 type: 'category',
-                data: ["ARM","ARMv7","STM32","GD32","时序要求","Clion","HAL","UART","SPL","STM32F103ZE"]
+                data: ["ARM","ARMv7","STM32","GD32","时序要求","指令流水线","ATPS","指令集","SPL","STM32F103ZE"]
             }
         ],
         yAxis: [
@@ -671,7 +671,7 @@
                 type: 'bar',
                 color: ['#82d3f4'],
                 barWidth : 18,
-                data: [3,3,2,2,2,1,1,1,1,1],
+                data: [4,4,2,2,2,1,1,1,1,1],
                 markPoint: {
                     symbolSize: 45,
                     data: [{
@@ -853,32 +853,26 @@
             
             
             
-            <a href="/tags/Clion/">
-                <span class="chip center-align waves-effect waves-light chip-default">Clion</span>
+            <a href="/tags/%E6%8C%87%E4%BB%A4%E6%B5%81%E6%B0%B4%E7%BA%BF/">
+                <span class="chip center-align waves-effect waves-light chip-default">指令流水线</span>
+            </a>
+            
+            
+            
+            <a href="/tags/ATPS/">
+                <span class="chip center-align waves-effect waves-light chip-default">ATPS</span>
+            </a>
+            
+            
+            
+            <a href="/tags/%E6%8C%87%E4%BB%A4%E9%9B%86/">
+                <span class="chip center-align waves-effect waves-light chip-default">指令集</span>
             </a>
             
             
             
             <a href="/tags/STM32/">
                 <span class="chip center-align waves-effect waves-light chip-default">STM32</span>
-            </a>
-            
-            
-            
-            <a href="/tags/GD32/">
-                <span class="chip center-align waves-effect waves-light chip-default">GD32</span>
-            </a>
-            
-            
-            
-            <a href="/tags/HAL/">
-                <span class="chip center-align waves-effect waves-light chip-default">HAL</span>
-            </a>
-            
-            
-            
-            <a href="/tags/UART/">
-                <span class="chip center-align waves-effect waves-light chip-default">UART</span>
             </a>
             
             
@@ -901,20 +895,26 @@
             
             
             
-            <a href="/tags/I2C/">
-                <span class="chip center-align waves-effect waves-light chip-default">I2C</span>
+            <a href="/tags/Clion/">
+                <span class="chip center-align waves-effect waves-light chip-default">Clion</span>
             </a>
             
             
             
-            <a href="/tags/%E6%97%B6%E5%BA%8F%E8%A6%81%E6%B1%82/">
-                <span class="chip center-align waves-effect waves-light chip-default">时序要求</span>
+            <a href="/tags/GD32/">
+                <span class="chip center-align waves-effect waves-light chip-default">GD32</span>
             </a>
             
             
             
-            <a href="/tags/PCF8563/">
-                <span class="chip center-align waves-effect waves-light chip-default">PCF8563</span>
+            <a href="/tags/HAL/">
+                <span class="chip center-align waves-effect waves-light chip-default">HAL</span>
+            </a>
+            
+            
+            
+            <a href="/tags/UART/">
+                <span class="chip center-align waves-effect waves-light chip-default">UART</span>
             </a>
             
             
@@ -925,8 +925,26 @@
             
             
             
+            <a href="/tags/%E6%97%B6%E5%BA%8F%E8%A6%81%E6%B1%82/">
+                <span class="chip center-align waves-effect waves-light chip-default">时序要求</span>
+            </a>
+            
+            
+            
             <a href="/tags/%E7%A7%BB%E4%BD%8D%E5%AF%84%E5%AD%98%E5%99%A8/">
                 <span class="chip center-align waves-effect waves-light chip-default">移位寄存器</span>
+            </a>
+            
+            
+            
+            <a href="/tags/I2C/">
+                <span class="chip center-align waves-effect waves-light chip-default">I2C</span>
+            </a>
+            
+            
+            
+            <a href="/tags/PCF8563/">
+                <span class="chip center-align waves-effect waves-light chip-default">PCF8563</span>
             </a>
             
             
