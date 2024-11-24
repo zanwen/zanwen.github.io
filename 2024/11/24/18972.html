@@ -413,14 +413,14 @@ https://armkeil.blob.core">
                 
                 <div class="info-break-policy">
                     <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
-                    2.9k
+                    3k
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-clock fa-fw"></i>阅读时长:&nbsp;&nbsp;
-                    13 分
+                    14 分
                 </div>
                 
 
@@ -752,9 +752,9 @@ stop:
 The offset value is applied to an address obtained from the base register. The result is used as the<br>
 address for the memory access. The value of the base register is unchanged.<br>
 The assembly language syntax for this mode is:<br>
-[<rn>, <offset>]</offset></rn></p>
+<code>[&lt;Rn&gt;, &lt;offset&gt;]</code></p>
 </blockquote>
-<p><mark>LDR/STR&nbsp;[<rn>, <offset>]</offset></rn></mark>：Rn为基地址，offset为偏移字节数</p>
+<p><code>LDR/STR [&lt;Rn&gt;, &lt;offset&gt;]</code>：Rn为基地址，offset为偏移字节数</p>
 <p>类比理解：C语言中通过指针加偏移量来访问内存（<code>num = *(p+1)</code>），该操作不会改变指针的值。</p>
 <pre class="line-numbers language-assembly" data-language="assembly"><code class="language-assembly">.global _start
 
@@ -779,9 +779,9 @@ stop:
 The offset value is applied to an address obtained from the base register. The result is used as the<br>
 address for the memory access, and written back into the base register.<br>
 The assembly language syntax for this mode is:<br>
-[<rn>, <offset>]!</offset></rn></p>
+<code>[&lt;Rn&gt;, &lt;offset&gt;]!</code></p>
 </blockquote>
-<p><mark>LDR/STR [<rn>, <offset>]!</offset></rn></mark>：Rn为基地址，offset为偏移字节数。</p>
+<p><code>LDR/STR [&lt;Rn&gt;, &lt;offset&gt;]!</code>：Rn为基地址，offset为偏移字节数。</p>
 <p>该指令在偏移量寻址的基础上加了个 <mark>!</mark>，标示在内存访问之后将访问的地址回写基地址Rn。</p>
 <p>类比理解：<code>num = *p++ =&gt; num = *p; p++;</code></p>
 <pre class="line-numbers language-assembly" data-language="assembly"><code class="language-assembly">.global _start
@@ -806,9 +806,9 @@ stop:
 The address obtained from the base register is used, unchanged, as the address for the memory<br>
 access. The offset value is applied to the address, and written back into the base register<br>
 The assembly language syntax for this mode is:<br>
-[<rn>], <offset></offset></rn></p>
+<code>[&lt;Rn&gt;], &lt;offset&gt;</code></p>
 </blockquote>
-<p><mark>LDR/STR [<rn>], <offset></offset></rn></mark>：Rn为基地址，offset为偏移字节数。</p>
+<p><code>LDR/STR [&lt;Rn&gt;], &lt;offset&gt;</code>：Rn为基地址，offset为偏移字节数。</p>
 <p>该指令先从Rn访问内存，然后再将偏移量更新到Rn中。</p>
 <p>类比理解：<code>num = *p; p += offset</code></p>
 <pre class="line-numbers language-assembly" data-language="assembly"><code class="language-assembly">.global _start
@@ -1429,7 +1429,7 @@ stop:
             <br>
             
                 &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                        class="white-color">11.9k</span>
+                        class="white-color">12k</span>
             
             
             
