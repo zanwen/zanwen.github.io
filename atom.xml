@@ -6,7 +6,7 @@
   <link href="https://zanwen.github.io/atom.xml" rel="self"/>
   
   <link href="https://zanwen.github.io/"/>
-  <updated>2024-11-25T10:43:42.176Z</updated>
+  <updated>2024-11-25T13:51:00.658Z</updated>
   <id>https://zanwen.github.io/</id>
   
   <author>
@@ -15,6 +15,38 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>ARM核学习（五）异常处理</title>
+    <link href="https://zanwen.github.io/2024/11/25/17360.html"/>
+    <id>https://zanwen.github.io/2024/11/25/17360.html</id>
+    <published>2024-11-25T13:30:22.000Z</published>
+    <updated>2024-11-25T13:51:00.658Z</updated>
+    
+    
+      
+      
+        
+        
+    <summary type="html">&lt;h1 id=&quot;can-kao-zi-liao&quot;&gt;参考资料&lt;/h1&gt;
+&lt;p&gt;&lt;a href=&quot;https://developer.arm.com/documentation/ddi0406/cd/?lang=en&quot;&gt;ARM Architecture Reference</summary>
+        
+      
+    
+    
+    
+    <category term="ARM" scheme="https://zanwen.github.io/categories/ARM/"/>
+    
+    
+    <category term="ARM" scheme="https://zanwen.github.io/tags/ARM/"/>
+    
+    <category term="ARMv7" scheme="https://zanwen.github.io/tags/ARMv7/"/>
+    
+    <category term="异常" scheme="https://zanwen.github.io/tags/%E5%BC%82%E5%B8%B8/"/>
+    
+    <category term="中断" scheme="https://zanwen.github.io/tags/%E4%B8%AD%E6%96%AD/"/>
+    
+  </entry>
   
   <entry>
     <title>ARM核学习（四）ATPS标准_汇编与C混合编程_volatile关键字</title>
@@ -107,11 +139,11 @@
   </entry>
   
   <entry>
-    <title>ARM核学习（一）及寄存器资源</title>
+    <title>ARM核学习（一）工作模式及寄存器资源</title>
     <link href="https://zanwen.github.io/2024/11/23/1780.html"/>
     <id>https://zanwen.github.io/2024/11/23/1780.html</id>
     <published>2024-11-23T11:16:50.000Z</published>
-    <updated>2024-11-24T02:12:02.195Z</updated>
+    <updated>2024-11-25T13:52:39.639Z</updated>
     
     
       
@@ -200,9 +232,9 @@
     <category term="协议" scheme="https://zanwen.github.io/categories/%E5%8D%8F%E8%AE%AE/"/>
     
     
-    <category term="时序要求" scheme="https://zanwen.github.io/tags/%E6%97%B6%E5%BA%8F%E8%A6%81%E6%B1%82/"/>
-    
     <category term="I2C" scheme="https://zanwen.github.io/tags/I2C/"/>
+    
+    <category term="时序要求" scheme="https://zanwen.github.io/tags/%E6%97%B6%E5%BA%8F%E8%A6%81%E6%B1%82/"/>
     
     <category term="PCF8563" scheme="https://zanwen.github.io/tags/PCF8563/"/>
     
@@ -236,9 +268,9 @@
     
     <category term="GD32" scheme="https://zanwen.github.io/tags/GD32/"/>
     
-    <category term="SN74HC595NSR" scheme="https://zanwen.github.io/tags/SN74HC595NSR/"/>
-    
     <category term="时序要求" scheme="https://zanwen.github.io/tags/%E6%97%B6%E5%BA%8F%E8%A6%81%E6%B1%82/"/>
+    
+    <category term="SN74HC595NSR" scheme="https://zanwen.github.io/tags/SN74HC595NSR/"/>
     
     <category term="移位寄存器" scheme="https://zanwen.github.io/tags/%E7%A7%BB%E4%BD%8D%E5%AF%84%E5%AD%98%E5%99%A8/"/>
     
@@ -271,9 +303,9 @@
     <category term="踩坑记录" scheme="https://zanwen.github.io/categories/STM32/%E8%B8%A9%E5%9D%91%E8%AE%B0%E5%BD%95/"/>
     
     
-    <category term="Clion" scheme="https://zanwen.github.io/tags/Clion/"/>
-    
     <category term="STM32" scheme="https://zanwen.github.io/tags/STM32/"/>
+    
+    <category term="Clion" scheme="https://zanwen.github.io/tags/Clion/"/>
     
     <category term="GD32" scheme="https://zanwen.github.io/tags/GD32/"/>
     
