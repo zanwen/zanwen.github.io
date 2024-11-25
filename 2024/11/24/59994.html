@@ -534,12 +534,12 @@ stop:
 <p>参照ATPCS标准，我们接着分析 <code>main_label</code>函数的执行。</p>
 <h3 id="jiang-sp-zan-cun-dao-ip">将SP暂存到IP</h3>
 <p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241125104614719.png" alt="image-20241125104614719"></p>
-<p>首先将<mark>R13(SP)<mark>送到了</mark>R12(IP)<mark>进行保存（这里可以看出</mark>IP</mark>的临时保存作用，将函数调用前的SP栈顶指针暂存起来以便后续恢复）：</p>
+<p>首先将<code>R13(SP)</code>送到了<code>R12(IP)</code>进行保存（这里可以看出<code>IP</code>的临时保存作用，将函数调用前的SP栈顶指针暂存起来以便后续恢复）：</p>
 <p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241125132222836.png" alt="image-20241125132222836"></p>
 <p>接着我们看下一条指令的执行：</p>
 <p>压栈PC,LR,IP,FP</p>
 <p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241125105604588.png" alt="image-20241125105604588"></p>
-<p>将==R11(FP)、R12(IP)、R14(LR)、PC(R15)==通过 <code>STMDB</code>指令进行压栈（参考另一篇文章《ARM核学习（二）指令集》），值得注意的是：</p>
+<p>将<code>R11(FP)、R12(IP)、R14(LR)、PC(R15)</code>通过 <code>STMDB</code>指令进行压栈（参考另一篇文章《ARM核学习（二）指令集》），值得注意的是：</p>
 <ul>
 <li>ATPCS标准规定使用<mark>满减栈模式</mark>（从高地址向低地址增长，栈顶指针SP指向最后一个入栈的数据地址）</li>
 <li><code>STM</code>：多数据传输指令，同时将多个数据进行压栈</li>
@@ -554,6 +554,9 @@ stop:
 <p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241125120006973.png" alt="image-20241125120006973"></p>
 <p>寄存器示意图:</p>
 <p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241125132458366.png" alt="image-20241125132458366"></p>
+<blockquote>
+<p>caller表示调用方，callee表示被调方</p>
+</blockquote>
 <h3 id="zeng-jia-sp-kuo-da-zhan-kong-jian">增加SP，扩大栈空间</h3>
 <p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241125121914111.png" alt="image-20241125121914111"></p>
 <p>接着通过 <code>SUB</code>指令，将SP(R13)减去 <code>0x00000010</code>（即16字节，4个字），相当于将SP下移了四个存储单元</p>
@@ -565,7 +568,7 @@ stop:
 <p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241125133004294.png" alt="image-20241125133004294"></p>
 <p>同样的，将R1写到FP向下偏移 <code>0x001C</code>（28个字节，7个字）的存储单元中：</p>
 <p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241125134213403.png" alt="image-20241125134213403"></p>
-<p>根据ATPCS标准的规范，<mark>r0</mark>通常用来传递第一个参数<mark>a1</mark>，<mark>r1</mark>通常用来传递第二个参数<mark>a2</mark>，因此上述操作起始就是将函数的两个入参 <code>main_label(int argc, const char *argv[])</code> 压栈</p>
+<p>根据ATPCS标准的规范，<code>r0</code>通常用来传递第一个参数<code>a1</code>，<code>r1</code>通常用来传递第二个参数<code>a2</code>，因此上述操作起始就是将函数的两个入参 <code>main_label(int argc, const char *argv[])</code> 压栈</p>
 <img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241125131207660.png" alt="image-20241125131207660" style="zoom:33%;">
 <h3 id="han-shu-ju-bu-bian-liang-ya-zhan">函数局部变量压栈</h3>
 <p>对应 <code>int i = 0</code></p>
@@ -593,7 +596,7 @@ i<span class="token operator">++</span><span class="token punctuation">;</span><
 <img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241125144454192.png" alt="image-20241125144454192" style="zoom:33%;">
 <p>接着通过 <code>SUB</code>，将R13(SP)指向R11(FP)向下偏移<code>0xC</code>的位置。如下图，SP指向这个位置后，相当于将函数参数和局部变量出栈释放了（对应图中灰色部分）</p>
 <p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241125144022274.png" alt="image-20241125144022274"></p>
-<p>接着通过 <code>LDMIA</code>将还保存在栈中的调用方的LR, SP, FP恢复到R14, R13, R11中</p>
+<p>接着通过 <code>LDMIA</code>将还保存在栈中的调用方的<code>LR, SP, FP</code>恢复到<code>R14, R13, R11</code>中</p>
 <p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241125145835783.png" alt="image-20241125145835783"></p>
 <p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241125145806719.png" alt="image-20241125145806719"></p>
 <p>接着通过 <code>BX</code>指令根据LR(R14)跳转回调用方：</p>
