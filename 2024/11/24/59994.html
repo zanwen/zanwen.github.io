@@ -4,7 +4,7 @@
 
 <head>
     <meta charset="utf-8">
-    <meta name="keywords" content="ARM核学习（四）ATPS标准及汇编与C混合编程, 安文的博客">
+    <meta name="keywords" content="ARM核学习（四）ATPS标准_汇编与C混合编程_volatile关键字, 安文的博客">
     <meta name="description" content="参考资料
 The ARM-THUMB Procedure Call Standard
 ATPCS标准
@@ -21,7 +21,7 @@ ATPCS是ARM-Thumb Procedure Call Standard的缩写，也就是ARM-Thumb的程序
     <!-- Global site tag (gtag.js) - Google Analytics -->
 
 
-    <title>ARM核学习（四）ATPS标准及汇编与C混合编程 | 安文的博客</title>
+    <title>ARM核学习（四）ATPS标准_汇编与C混合编程_volatile关键字 | 安文的博客</title>
     <link rel="icon" type="image/png" href="/medias/logo.png">
     
 
@@ -346,7 +346,7 @@ ATPCS是ARM-Thumb Procedure Call Standard的缩写，也就是ARM-Thumb的程序
         <div class="row">
             <div class="col s12 m12 l12">
                 <div class="brand">
-                    <h1 class="description center-align post-title">ARM核学习（四）ATPS标准及汇编与C混合编程</h1>
+                    <h1 class="description center-align post-title">ARM核学习（四）ATPS标准_汇编与C混合编程_volatile关键字</h1>
                 </div>
             </div>
         </div>
@@ -417,14 +417,14 @@ ATPCS是ARM-Thumb Procedure Call Standard的缩写，也就是ARM-Thumb的程序
                 
                 <div class="info-break-policy">
                     <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
-                    2.6k
+                    3k
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-clock fa-fw"></i>阅读时长:&nbsp;&nbsp;
-                    10 分
+                    12 分
                 </div>
                 
 
@@ -709,6 +709,50 @@ stop:
 <p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241125165906124.png" alt="image-20241125165906124"></p>
 <p>调试前别忘了映射下内存 <code>0x40000000,0x4000FFFF</code></p>
 <p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241125174751017.png" alt="image-20241125174751017"></p>
+<h1 id="volatile-guan-jian-zi">volatile关键字</h1>
+<h2 id="gcc-bian-yi-you-hua">gcc编译优化</h2>
+<h3 id="shi-li-cheng-xu">示例程序</h3>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241125181741845.png" alt="image-20241125181741845"></p>
+<pre class="line-numbers language-assembly" data-language="assembly"><code class="language-assembly">.global _start
+
+_start:
+    ldr sp,=0x4000FFF0
+	bl add	
+	
+stop:
+	b stop				
+	<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token keyword">int</span> global_a <span class="token operator">=</span> <span class="token number">0x3</span><span class="token punctuation">;</span>
+<span class="token keyword">int</span> global_b <span class="token operator">=</span> <span class="token number">0x4</span><span class="token punctuation">;</span>
+
+<span class="token keyword">int</span> <span class="token function">add</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">int</span> c <span class="token operator">=</span> global_a <span class="token operator">+</span> global_b<span class="token punctuation">;</span>
+    <span class="token keyword">if</span><span class="token punctuation">(</span>global_a <span class="token operator">&gt;</span> global_b<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        c<span class="token operator">++</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    <span class="token keyword">return</span> c<span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<h3 id="kai-qi-bian-yi-qi-you-hua">开启编译器优化</h3>
+<img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241125181830904.png" alt="image-20241125181830904" style="zoom: 50%;">
+<h3 id="you-hua-hou-de-hui-bian-zhi-ling-fen-xi">优化后的汇编指令分析</h3>
+<p>内存映射：<code>0x40000000,0x4000FFFF</code></p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241125181717824.png" alt="image-20241125181717824"></p>
+<p>可以发现在执行 <code>int c = global_a + global_b;</code>时从内存读取 <code>global_a</code>和 <code>global_b</code>的值到<code>R2, R3</code>中；但是执行 <code>if(global_a &gt; global_b)</code>，并没重新从内存读取 <code>global_a</code>和 <code>global_b</code>的值，而是使用了此前<code>R2, R3</code>的快照。</p>
+<h3 id="bian-yi-qi-you-hua-si-xiang-ji-bi-duan">编译器优化思想及弊端</h3>
+<blockquote>
+<p>[!NOTE]</p>
+<p>根据另一篇文章《ARM核学习（三）指令流水线分析及伪指令》的分析，这是因为内存访问操作较低，无法发挥指令流水线的最佳性能，因此编译器优化会使用寄存器快照代替内存访问</p>
+</blockquote>
+<p>那么在<mark>并发场景</mark>下，如果在执行 <code>if(global_a &gt; global_b)</code>时发生了上下文切换，并且全局变量 <code>global_a</code>和 <code>global_b</code>的值被修改，那么 <code>R2, R3</code>中的值就不是最新的，因而会产生并发问题。</p>
+<h2 id="volatile-guan-jian-zi-de-zuo-yong">volatile关键字的作用</h2>
+<blockquote>
+<p>[!TIP]</p>
+<p><code>volatile</code>关键字的语意是易变的，被该关键字修饰的变量在读写时能够禁止编译器优化，从而使得每次读 <code>volatile</code>变量强制从内存读取最新值（在CPU Cache模型中每次写 <code>volatile</code>变量 也会立即将寄存器中的值刷新到内存）</p>
+</blockquote>
+<p>下面我们给 <code>global_a</code>和 <code>global_b</code>加上 <code>volatile</code>修饰后再来调试下：</p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241125184042361.png" alt="image-20241125184042361"></p>
+<p>可以发现 <code>if(global_a &gt; global_b)</code>时，通过 <code>LDR</code>指令，强制从内存读值了。</p>
 <h1 id="the-end">The End</h1>
 
                 
@@ -870,9 +914,9 @@ stop:
                 <a href="/2024/11/24/59994.html">
                     <div class="card-image">
                         
-                        <img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/pexels-infinityadventure-10728303.jpg" class="responsive-img" alt="ARM核学习（四）ATPS标准及汇编与C混合编程">
+                        <img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/pexels-infinityadventure-10728303.jpg" class="responsive-img" alt="ARM核学习（四）ATPS标准_汇编与C混合编程_volatile关键字">
                         
-                        <span class="card-title">ARM核学习（四）ATPS标准及汇编与C混合编程</span>
+                        <span class="card-title">ARM核学习（四）ATPS标准_汇编与C混合编程_volatile关键字</span>
                     </div>
                 </a>
                 <div class="card-content article-content">
@@ -1110,7 +1154,7 @@ stop:
             <br>
             
                 &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                        class="white-color">16.4k</span>
+                        class="white-color">16.8k</span>
             
             
             
