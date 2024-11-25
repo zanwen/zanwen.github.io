@@ -931,6 +931,78 @@ addr:
       </tags>
   </entry>
   <entry>
+    <title>ARM核学习（五）异常处理</title>
+    <url>/2024/11/25/17360.html</url>
+    <content><![CDATA[<h1 id="can-kao-zi-liao">参考资料</h1>
+<p><a href="https://developer.arm.com/documentation/ddi0406/cd/?lang=en">ARM Architecture Reference Manual ARMv7-A and ARMv7-R edition</a></p>
+<ul>
+<li>B1.8 Exception handling</li>
+</ul>
+<p><a href="https://developer.arm.com/documentation/den0013/latest/">ARM® Cortex™-A Series Programmer’s Guide Version: 4.0</a></p>
+<h1 id="yi-chang-jie-shao">异常介绍</h1>
+<h2 id="shi-yao-shi-yi-chang">什么是异常</h2>
+<p>异常是处理器核在执行程序指令的过程中突然遇到了异常的事情，这些事件包括<strong>硬件中断、指令执行错误、用户程序请求服务、内存访问异常、取指令异常</strong>等，几乎每种处理器都支持特定的异常处理，<mark>中断也是异常的一种</mark>。</p>
+<h2 id="arm-de-yi-chang-yuan">ARM的异常源</h2>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241125214514494.png" alt="image-20241125214514494"></p>
+<h2 id="fiq-jiao-irq-kuai-de-yuan-yin">FIQ较IRQ快的原因</h2>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241125214951043.png" alt="image-20241125214951043"></p>
+<h1 id="arm-he-yi-chang-chu-li-guo-cheng">ARM核异常处理过程</h1>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241125215607973.png" alt="image-20241125215607973"></p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241125214441652.png" alt="处理器工作模式切换"></p>
+<h2 id="yi-chang-xiang-liang-biao">异常向量表</h2>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241125215846276.png" alt="image-20241125215846276"></p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241125215810206.png" alt="image-20241125215810206"></p>
+<blockquote>
+<p>[!NOTE]</p>
+<p>ARM核怎么知道异常向量表放在内存哪个地方呢？</p>
+<ol>
+<li>Cortex-A架构版本之前，是由协处理器（<a href="https://developer.arm.com/documentation/den0013/d/ARM-Processor-Modes-and-Registers/Registers/Coprocessor-15?lang=en">Coprocessor 15</a>） <code>CP15</code>的<code>C1</code>寄存器来决定的，且只能存放在 <code>0xFFFF0000</code>和<code>0x00000000</code>两者中的一个。</li>
+<li>从Cortex-A架构版本开始，由协处理器 <code>CP15</code>的<code>c12</code>寄存器来决定，且不限制起始地址</li>
+</ol>
+</blockquote>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241125221405786.png" alt="Table B1-3 The vector tables"></p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241125222433967.png" alt="image-20241125222433967"></p>
+<blockquote>
+<p><a href="https://developer.arm.com/documentation/den0013/d/Exception-Handling/Exception-priorities/Exception-mode-summary?lang=en">https://developer.arm.com/documentation/den0013/d/Exception-Handling/Exception-priorities/Exception-mode-summary?lang=en</a></p>
+</blockquote>
+<h2 id="cortex-a-chu-li-qi-yi-chang-xiang-liang-biao-ji-di-zhi-zhi-ding">Cortex-A处理器异常向量表基地址指定</h2>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241125223320833.png" alt="image-20241125223320833"></p>
+<blockquote>
+<p><a href="https://developer.arm.com/documentation/den0013/d/Exception-Handling/Exception-priorities?lang=en">https://developer.arm.com/documentation/den0013/d/Exception-Handling/Exception-priorities?lang=en</a></p>
+</blockquote>
+<blockquote>
+<p>The first column in <a href="https://developer.arm.com/documentation/den0013/d/Exception-Handling/Exception-priorities?lang=en#CEGHDCAE">Table 11.1</a> gives the vector offset within the vector table associated with the particular type of exception. This is a table of instructions that the ARM core jumps to when an exception is raised. These instructions are located in a specific place in memory. The default vector base address is <code>0x00000000</code>, but most ARM cores permit the vector base address to be moved to <code>0xFFFF0000</code> (or <code>HIVECS</code>). <strong>All Cortex-A series processors permit this, and it is the default address selected by the Linux kernel. Cores that implement the Security Extensions can additionally set the vector base address, separately for Secure and Non-secure states, using the CP15 Vector Base Address registers.</strong></p>
+<p><a href="https://developer.arm.com/documentation/den0013/d/Exception-Handling/Exception-priorities/The-Vector-table?lang=en">https://developer.arm.com/documentation/den0013/d/Exception-Handling/Exception-priorities/The-Vector-table?lang=en</a></p>
+</blockquote>
+<h3 id="cp-15-c-1">CP15 c1</h3>
+<blockquote>
+<p><a href="https://documentation-service.arm.com/static/602cf701083323480d479d18?token=">https://documentation-service.arm.com/static/602cf701083323480d479d18?token=</a></p>
+</blockquote>
+<img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241125225458216.png" alt="image-20241125225458216" style="zoom:50%;">
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241125225614769.png" alt="Table 4-52 SCTLR bit assignments (continued)  "></p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241125225701958.png" alt="image-20241125225701958"></p>
+<h3 id="cp-15-c-12">CP15 c12</h3>
+<blockquote>
+<p><a href="https://developer.arm.com/documentation/ddi0406/cd/?lang=en">ARM Architecture Reference Manual ARMv7-A and ARMv7-R edition</a></p>
+</blockquote>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241125230347930.png" alt="image-20241125230347930"></p>
+<blockquote>
+<p>[!NOTE]</p>
+<p>其中高位[31:5]是向量表的基地址，低位[4:0]是异常向量的偏移量（offset）</p>
+</blockquote>
+<h1 id="the-end">The End</h1>
+]]></content>
+      <categories>
+        <category>ARM</category>
+      </categories>
+      <tags>
+        <tag>ARM</tag>
+        <tag>ARMv7</tag>
+        <tag>异常</tag>
+        <tag>中断</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>ARM核学习（四）ATPS标准_汇编与C混合编程_volatile关键字</title>
     <url>/2024/11/24/59994.html</url>
     <content><![CDATA[<h1 id="can-kao-zi-liao">参考资料</h1>
@@ -1248,37 +1320,6 @@ stop:
         <tag>ARM</tag>
         <tag>ARMv7</tag>
         <tag>ATPS</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>ARM核学习（五）异常处理</title>
-    <url>/2024/11/25/17360.html</url>
-    <content><![CDATA[<h1 id="can-kao-zi-liao">参考资料</h1>
-<p><a href="https://developer.arm.com/documentation/ddi0406/cd/?lang=en">ARM Architecture Reference Manual ARMv7-A and ARMv7-R edition</a></p>
-<ul>
-<li>B1.8 Exception handling</li>
-</ul>
-<h1 id="yi-chang-jie-shao">异常介绍</h1>
-<h2 id="shi-yao-shi-yi-chang">什么是异常</h2>
-<p>异常是处理器核在执行程序指令的过程中突然遇到了异常的事情，这些事件包括<strong>硬件中断、指令执行错误、用户程序请求服务、内存访问异常、取指令异常</strong>等，几乎每种处理器都支持特定的异常处理，<mark>中断也是异常的一种</mark>。</p>
-<h2 id="arm-de-yi-chang-yuan">ARM的异常源</h2>
-<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241125214514494.png" alt="image-20241125214514494"></p>
-<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241125214405441.png" alt="Table B1-3 The vector tables"></p>
-<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241125214441652.png" alt="image-20241125214441652"></p>
-<h2 id="fiq-jiao-irq-kuai-de-yuan-yin">FIQ较IRQ快的原因</h2>
-<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241125214951043.png" alt="image-20241125214951043"></p>
-<h1 id="arm-he-yi-chang-chu-li-guo-cheng">ARM核异常处理过程</h1>
-<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241125215058104.png" alt="image-20241125215058104"></p>
-<h1 id="the-end">The End</h1>
-]]></content>
-      <categories>
-        <category>ARM</category>
-      </categories>
-      <tags>
-        <tag>ARM</tag>
-        <tag>ARMv7</tag>
-        <tag>异常</tag>
-        <tag>中断</tag>
       </tags>
   </entry>
   <entry>
@@ -1692,25 +1733,6 @@ huart<span class="token operator">-&gt;</span>RxState <span class="token operato
         <tag>HAL</tag>
         <tag>UART</tag>
       </tags>
-  </entry>
-  <entry>
-    <title>Hello World</title>
-    <url>/2024/11/12/16107.html</url>
-    <content><![CDATA[<p>Welcome to <a href="https://hexo.io/">Hexo</a>! This is your very first post. Check <a href="https://hexo.io/docs/">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="https://hexo.io/docs/troubleshooting.html">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues">GitHub</a>.</p>
-<h2 id="quick-start">Quick Start</h2>
-<h3 id="create-a-new-post">Create a new post</h3>
-<pre class="line-numbers language-bash" data-language="bash"><code class="language-bash">$ hexo new <span class="token string">"My New Post"</span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
-<p>More info: <a href="https://hexo.io/docs/writing.html">Writing</a></p>
-<h3 id="run-server">Run server</h3>
-<pre class="line-numbers language-bash" data-language="bash"><code class="language-bash">$ hexo server<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
-<p>More info: <a href="https://hexo.io/docs/server.html">Server</a></p>
-<h3 id="generate-static-files">Generate static files</h3>
-<pre class="line-numbers language-bash" data-language="bash"><code class="language-bash">$ hexo generate<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
-<p>More info: <a href="https://hexo.io/docs/generating.html">Generating</a></p>
-<h3 id="deploy-to-remote-sites">Deploy to remote sites</h3>
-<pre class="line-numbers language-bash" data-language="bash"><code class="language-bash">$ hexo deploy<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
-<p>More info: <a href="https://hexo.io/docs/one-command-deployment.html">Deployment</a></p>
-]]></content>
   </entry>
   <entry>
     <title>深入理解I2C时序（以I2C实时时钟PCF8563为案例）</title>
@@ -2177,6 +2199,25 @@ bool <span class="token function">hal_i2c_soft_read</span><span class="token pun
         <tag>时序要求</tag>
         <tag>PCF8563</tag>
       </tags>
+  </entry>
+  <entry>
+    <title>Hello World</title>
+    <url>/2024/11/12/16107.html</url>
+    <content><![CDATA[<p>Welcome to <a href="https://hexo.io/">Hexo</a>! This is your very first post. Check <a href="https://hexo.io/docs/">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="https://hexo.io/docs/troubleshooting.html">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues">GitHub</a>.</p>
+<h2 id="quick-start">Quick Start</h2>
+<h3 id="create-a-new-post">Create a new post</h3>
+<pre class="line-numbers language-bash" data-language="bash"><code class="language-bash">$ hexo new <span class="token string">"My New Post"</span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<p>More info: <a href="https://hexo.io/docs/writing.html">Writing</a></p>
+<h3 id="run-server">Run server</h3>
+<pre class="line-numbers language-bash" data-language="bash"><code class="language-bash">$ hexo server<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<p>More info: <a href="https://hexo.io/docs/server.html">Server</a></p>
+<h3 id="generate-static-files">Generate static files</h3>
+<pre class="line-numbers language-bash" data-language="bash"><code class="language-bash">$ hexo generate<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<p>More info: <a href="https://hexo.io/docs/generating.html">Generating</a></p>
+<h3 id="deploy-to-remote-sites">Deploy to remote sites</h3>
+<pre class="line-numbers language-bash" data-language="bash"><code class="language-bash">$ hexo deploy<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<p>More info: <a href="https://hexo.io/docs/one-command-deployment.html">Deployment</a></p>
+]]></content>
   </entry>
   <entry>
     <title>论时序要求的重要性（移位寄存器控制数码管）</title>
