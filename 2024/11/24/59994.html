@@ -417,14 +417,14 @@ ATPCS是ARM-Thumb Procedure Call Standard的缩写，也就是ARM-Thumb的程序
                 
                 <div class="info-break-policy">
                     <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
-                    1.8k
+                    2.6k
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-clock fa-fw"></i>阅读时长:&nbsp;&nbsp;
-                    7 分
+                    10 分
                 </div>
                 
 
@@ -605,6 +605,111 @@ i<span class="token operator">++</span><span class="token punctuation">;</span><
 <p>为什么通过LR可以跳转回去呢？</p>
 </blockquote>
 <p>这是因为我们是通过 <code>bl main_label</code>跳转的，<code>l</code>后缀会将当前PC暂存到LR中，因此可以通过 <code>BX R14</code>跳转回去。</p>
+<h1 id="hui-bian-yu-c-hun-he-bian-cheng">汇编与C混合编程</h1>
+<h2 id="hui-bian-yu-yan-diao-yong-c-yu-yan">汇编语言调用C语言</h2>
+<h3 id="zai-kan-c-yu-yan-cheng-xu-ru-kou">再看C语言程序入口</h3>
+<blockquote>
+<p>C语言程序的入口是main函数吗？</p>
+</blockquote>
+<p>经过上文的分析，我们知道C语言函数的执行过程是依赖栈的，在函数代码真正执行前需要将调用方程序状态相关的寄存器压栈保护（例如 <code>LR, SP, FP</code>）、函数参数压栈，如果有局部变量则也需要压栈，执行过程中的运算是基于栈和寄存器的配合来完成的。</p>
+<p>因此每个函数的在执行前都需要设置栈的起始地址（SP），<code>main</code>当然也不例外，而这需要借助汇编来完成。</p>
+<h3 id="mei-you-she-zhi-sp-han-shu-wu-fa-zheng-chang-zhi-xing">没有设置SP，函数无法正常执行</h3>
+<p>让我们来看下如下程序：</p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241125154604074.png" alt="image-20241125154604074"></p>
+<pre class="line-numbers language-assembly" data-language="assembly"><code class="language-assembly">.global _start
+
+_start:
+	mov r0,#0x2			
+	mov r1,#0x3
+	bl add	
+	
+stop:
+	b stop				
+	<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-assembly" data-language="assembly"><code class="language-assembly">int add(int a, int b) {
+    return a + b;
+}<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+<p>调试前需要先禁用编译器优化并重新编译：</p>
+<img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241125154632764.png" alt="image-20241125154632764" style="zoom:33%;">
+<p>调试时会发现，函数执行前的压栈导致SP变成了<code>0xFFFFFFF0</code>，并且接着步进，程序无法按照预期结束。</p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241125155225192.png" alt="image-20241125155225192"></p>
+<p>这是因为调用函数时没有设置SP，SP默认为零值：</p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241125155435833.png" alt="image-20241125155435833"></p>
+<h3 id="han-shu-diao-yong-qian-xu-yao-zheng-que-she-zhi-sp">函数调用前需要正确设置SP</h3>
+<p>于是我们在函数调用前，设置一下栈指针SP，并将相应的内存范围映射一下</p>
+<pre class="line-numbers language-assembly" data-language="assembly"><code class="language-assembly">.global _start
+
+_start:
+	mov r0,#0x2			
+	mov r1,#0x3
+    ldr sp,=0x4000FFF0
+	bl add	
+	
+stop:
+	b stop				
+	<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p><mark>注意，这里要将SP设置为4的整数倍</mark></p>
+<p><code>0x40000000,0x4000FFFF</code></p>
+<img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241125160139087.png" alt="image-20241125160139087" style="zoom: 50%;">
+<p>调整后发现可以正常执行到 <code>stop</code>，并且函数返回值 <code>2+3=5</code>也通过R0传递了过来</p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241125164223712.png" alt="image-20241125164223712"></p>
+<p>我们还可以打开函数调用栈窗口来更直观地观察入参压栈的过程：</p>
+<img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241125164542704.png" alt="image-20241125164542704" style="zoom: 50%;">
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241125165001604.png" alt="image-20241125165001604"></p>
+<h2 id="c-yu-yan-nei-qian-hui-bian">C语言内嵌汇编</h2>
+<h3 id="ge-shi">格式</h3>
+<img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241125165243027.png" alt="image-20241125165243027" style="zoom: 50%;">
+<h3 id="shi-li">示例</h3>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241125172126182.png" alt="image-20241125172126182"></p>
+<pre class="line-numbers language-assembly" data-language="assembly"><code class="language-assembly">.global _start
+
+_start:
+	mov r0,#0x2			
+	mov r1,#0x3
+    ldr sp,=0x4000FFF0
+	bl add	
+	
+stop:
+	b stop				
+	<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token keyword">int</span> <span class="token function">add</span><span class="token punctuation">(</span><span class="token keyword">int</span> a<span class="token punctuation">,</span> <span class="token keyword">int</span> b<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">int</span> c<span class="token punctuation">;</span>
+    
+    <span class="token keyword">asm</span><span class="token punctuation">(</span>
+        <span class="token string">"add r0,%1,%2\n"</span>
+        <span class="token string">"mov %0,r0\n"</span>
+        <span class="token operator">:</span><span class="token string">"=r"</span><span class="token punctuation">(</span>c<span class="token punctuation">)</span>
+        <span class="token operator">:</span><span class="token string">"r"</span><span class="token punctuation">(</span>a<span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token string">"r"</span><span class="token punctuation">(</span>b<span class="token punctuation">)</span>
+        <span class="token operator">:</span><span class="token string">"r0"</span>
+    <span class="token punctuation">)</span><span class="token punctuation">;</span>
+    
+    <span class="token keyword">return</span> c<span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<blockquote>
+<p>注意：可以通过%n引用输入列表、输出列表中的寄存器，从输出列表开始编号，输出列表的编号接着输入列表的最后一个</p>
+</blockquote>
+<ul>
+<li>
+<p>通过 <code>asm</code>关键字内嵌一段汇编代码</p>
+</li>
+<li>
+<p><code>:"r"(a), "r"(b)</code>：<mark>输入列表</mark>，声明将C程序中哪些变量输入到内嵌汇编的通用寄存器中（具体哪个寄存器是无法预知的，可以通过 <code>%</code>进行引用）。<mark>如果没有输入，则留一个空的冒号即可，但不能去掉该行。</mark></p>
+</li>
+<li>
+<p><code>"add r0,%1,%2\n"</code>：<mark>汇编指令</mark>，通过 <code>%1</code>、<code>%2</code>引用输入列表的中的变量 <code>a</code>、<code>b</code>对应的寄存器，并通过 <code>add</code>指令将这两个寄存器相加，结果存入 <code>r0</code>；<mark>注意，换行是不可省略的，标示这条指令结束</mark></p>
+</li>
+<li>
+<p><code>:"=r"(c)</code>：<mark>输出列表</mark>，声明将C程序的哪些变量的值由内嵌汇编输出。<code>=</code>标示了该汇编结束时需要将寄存器写入变量中。</p>
+</li>
+<li>
+<p><code>"mov %0,r0\n"</code>：<mark>汇编指令</mark>，将 <code>r0</code>中的值输入到 <code>%0</code>引用的寄存器中，由于引用编号是从输出列表开始的，因此引用的就是变量 <code>c</code>关联的寄存器</p>
+</li>
+</ul>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241125165906124.png" alt="image-20241125165906124"></p>
+<p>调试前别忘了映射下内存 <code>0x40000000,0x4000FFFF</code></p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241125174751017.png" alt="image-20241125174751017"></p>
+<h1 id="the-end">The End</h1>
 
                 
             </div>
@@ -1005,7 +1110,7 @@ i<span class="token operator">++</span><span class="token punctuation">;</span><
             <br>
             
                 &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                        class="white-color">15.6k</span>
+                        class="white-color">16.4k</span>
             
             
             
