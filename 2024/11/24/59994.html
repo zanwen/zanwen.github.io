@@ -5,7 +5,11 @@
 <head>
     <meta charset="utf-8">
     <meta name="keywords" content="ARM核学习（四）ATPS标准及汇编与C混合编程, 安文的博客">
-    <meta name="description" content="">
+    <meta name="description" content="参考资料
+The ARM-THUMB Procedure Call Standard
+ATPCS标准
+ATPCS标准介绍
+ATPCS是ARM-Thumb Procedure Call Standard的缩写，也就是ARM-Thumb的程序调">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <meta name="renderer" content="webkit|ie-stand|ie-comp">
@@ -406,21 +410,21 @@
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-check fa-fw"></i>更新日期:&nbsp;&nbsp;
-                    2024-11-24
+                    2024-11-25
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
-                    0
+                    1.8k
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-clock fa-fw"></i>阅读时长:&nbsp;&nbsp;
-                    1 分
+                    7 分
                 </div>
                 
 
@@ -443,7 +447,162 @@
 
         <div class="card-content article-card-content">
             <div id="articleContent">
-                
+                <h1 id="can-kao-zi-liao">参考资料</h1>
+<p><a target="_blank" rel="noopener" href="https://developer.arm.com/documentation/dui0041/latest/Thumb-Procedure-Call-Standard/About-the-Thumb-Procedure-Call-Standard">The ARM-THUMB Procedure Call Standard</a></p>
+<h1 id="atpcs-biao-zhun">ATPCS标准</h1>
+<h2 id="atpcs-biao-zhun-jie-shao">ATPCS标准介绍</h2>
+<p>ATPCS是<mark>ARM-Thumb Procedure Call Standard</mark>的缩写，也就是<mark>ARM-Thumb的程序调用标准</mark>。</p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241124210132131.png" alt="image-20241124210132131"></p>
+<h2 id="ji-cun-qi-jiao-se">寄存器角色</h2>
+<blockquote>
+<p>The first four registers r0-r3 are used to pass parameter values into a routine and result values out of a routine and to hold intermediate values within a routine (but, in general, only between subroutine calls). In ARM-state, register r12— also called IP— can also be used to hold intermediate values between subroutine calls.</p>
+</blockquote>
+<p><mark>r0-r3</mark>通常用来传递函数参数、返回函数结果和保存函数执行过程中产生的中间变量（例如 <code>sum=a+b</code>需要先将 <code>a+b</code>的计算结果存到寄存器中再写到 <code>sum</code>对应的内存）。</p>
+<p>在ARM状态下，<mark>r12，也称为IP</mark>寄存器也可以用来保存临时变量，尤其是当其他通用寄存器（r0-r11）已被使用时。</p>
+<blockquote>
+<p><code>r12</code> (IP) is a <strong>general-purpose register</strong>, not reserved for any specific use in standard ARM programming.</p>
+<p>The <strong>ARM Procedure Call Standard (AAPCS)</strong> defines it as a <strong>scratch register</strong>. This means:</p>
+<ul>
+<li>The <strong>caller</strong> can use it freely to store temporary values.</li>
+<li>The <strong>callee</strong> (the function being called) does not preserve its value. If <code>r12</code> is used by the caller before calling another function, its value will be lost unless explicitly saved.</li>
+</ul>
+</blockquote>
+<blockquote>
+<p>Typically, the registers from r4 to r11 are used to hold the values of a routine’s local variables. They are also labeled v1-v8. Only v1-v4 can be used uniformly by the whole Thumb instruction set (shown emboldened).</p>
+</blockquote>
+<p>一般地，<mark>r4-r11</mark>用来保存函数的局部变量，他们被标记为v1-v8。Thumb指令集只能使用v1-v4。</p>
+<blockquote>
+<p>In all variants of the procedure call standard, registers r12-r15 have special roles. In these roles they are labeled IP, SP, LR and PC (or ip, sp, lr, and pc, but this standard uses the upper case name for the special role)</p>
+</blockquote>
+<p><mark>r12-r15</mark>有着特殊的角色，例如IP（临时保存SP），SP（指向栈顶），LR（跳转时用来保存PC）、PC，并且使用大写来标示他们的特殊角色。</p>
+<blockquote>
+<p>In some variants of the procedure call standard, r9 and r10 also have a special role. In these roles, r9 is labeled SB and r10 is labeled SL (or sb and sl).<br>
+Only registers r0-r7, SP, LR and PC are ubiquitously available in Thumb state. Their synonyms and special names are shown emboldened. Few Thumb instructions can access the high registers, v5-v8, SB, SL and IP.<br>
+In Thumb-state, r7 is often used as a work register and is also labeled WR</p>
+</blockquote>
+<h2 id="can-shu-chuan-di">参数传递</h2>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241124212508273.png" alt="image-20241124212508273"></p>
+<p><mark>在定义函数时，参数数量尽量不要超过4个，这样效率较好</mark></p>
+<h2 id="han-shu-fan-hui-zhi">函数返回值</h2>
+<ul>
+<li>返回值为一个32位的整数时，可以通过寄存器0返回</li>
+<li>返回值为一个64位整数时，可以通过R0和R1返回，依此类推</li>
+</ul>
+<h2 id="zhan-zheng-fen-xi">栈帧分析</h2>
+<img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241124213834303.png" alt="image-20241124213834303" style="zoom:50%;">
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241124213931226.png" alt="image-20241124213931226"></p>
+<h1 id="fan-hui-bian-fen-xi-atpcs-biao-zhun">反汇编分析ATPCS标准</h1>
+<h2 id="zhun-bei-hui-bian-he-c-wen-jian">准备汇编和C文件</h2>
+<p>准备一个汇编启动文件和一个C文件：</p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241125151255393.png" alt="image-20241125151255393"></p>
+<p>在 <code>asm.s</code>中，在调用 <code>main_label</code>函数之前，我们操作了下R0-R2，并设置了SP，模拟在调用函数前做了一些操作</p>
+<pre class="line-numbers language-assembly" data-language="assembly"><code class="language-assembly">.global _start
+
+_start:
+	mov r0,#0x11			
+	mov r1,#0x22
+    mov r2,#0x33
+    mov sp,#0x00002000
+	bl main_label	
+	
+stop:
+	b stop				
+	<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token keyword">int</span> <span class="token function">add</span><span class="token punctuation">(</span><span class="token keyword">int</span> a<span class="token punctuation">,</span> <span class="token keyword">int</span> b<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">return</span> a <span class="token operator">+</span> b<span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">int</span> <span class="token function">main_label</span><span class="token punctuation">(</span><span class="token keyword">int</span> argc<span class="token punctuation">,</span> <span class="token keyword">const</span> <span class="token keyword">char</span> <span class="token operator">*</span>argv<span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+	<span class="token keyword">int</span> i <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
+	<span class="token keyword">int</span> b <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
+	b <span class="token operator">=</span> i<span class="token operator">++</span> <span class="token operator">+</span> <span class="token operator">++</span>i<span class="token punctuation">;</span>
+    <span class="token function">add</span><span class="token punctuation">(</span>i<span class="token punctuation">,</span> b<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">return</span> <span class="token number">0</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<h2 id="jin-yong-bian-yi-you-hua">禁用编译优化</h2>
+<img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241125151330962.png" alt="image-20241125151330962" style="zoom: 50%;">
+<h2 id="diao-shi-fen-xi-amp-nei-cun-ying-she">调试分析&amp;内存映射</h2>
+<p>在点击debug后，步进之前，我们先添加一下内存映射 <code>0x00001000,0x00002000</code>，因为在 <code>asm.s</code>中我们有设置过SP <code>mov sp,#0x00002000</code>（<mark>注意每次点击debug后都需要手动映射下</mark>）</p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241125102205035.png" alt="image-20241125102205035"></p>
+<p>接着我们步进，在调用 <code>main_label</code>函数之前，对R0-R2，SP(R13)有所使用（模拟函数调用前操作过相关的寄存器）：</p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241125104048265.png" alt="image-20241125104048265"></p>
+<p>寄存器状态示例：</p>
+<img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241125132148176.png" alt="image-20241125132148176" style="zoom:50%;">
+<h2 id="han-shu-diao-yong-fen-xi">函数调用分析</h2>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241125115716832.png" alt="image-20241125115716832"></p>
+<img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241124213834303.png" alt="image-20241124213834303" style="zoom:50%;">
+<p>参照ATPCS标准，我们接着分析 <code>main_label</code>函数的执行。</p>
+<h3 id="jiang-sp-zan-cun-dao-ip">将SP暂存到IP</h3>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241125104614719.png" alt="image-20241125104614719"></p>
+<p>首先将<mark>R13(SP)<mark>送到了</mark>R12(IP)<mark>进行保存（这里可以看出</mark>IP</mark>的临时保存作用，将函数调用前的SP栈顶指针暂存起来以便后续恢复）：</p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241125132222836.png" alt="image-20241125132222836"></p>
+<p>接着我们看下一条指令的执行：</p>
+<p>压栈PC,LR,IP,FP</p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241125105604588.png" alt="image-20241125105604588"></p>
+<p>将==R11(FP)、R12(IP)、R14(LR)、PC(R15)==通过 <code>STMDB</code>指令进行压栈（参考另一篇文章《ARM核学习（二）指令集》），值得注意的是：</p>
+<ul>
+<li>ATPCS标准规定使用<mark>满减栈模式</mark>（从高地址向低地址增长，栈顶指针SP指向最后一个入栈的数据地址）</li>
+<li><code>STM</code>：多数据传输指令，同时将多个数据进行压栈</li>
+<li><code>DB</code>： <mark>Decrease&nbsp;Before</mark>（先递减SP然后压栈数据），这里压栈4个寄存器（字宽4字节），所以SP会递减4*4=16</li>
+<li>同时压栈多个寄存器时，序号（Rn中的n）大的寄存器对应栈的高地址，序号小的则对应低地址</li>
+</ul>
+<p>寄存器状态示意图：</p>
+<img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241125132238290.png" alt="image-20241125132238290" style="zoom:50%;">
+<h3 id="she-zhi-zhan-ji-zhi-fp-zhan-di-shu-ju-de-di-zhi">设置栈基址FP（栈底数据的地址）</h3>
+<p>将R12(IP，之前保存了SP，即调用方caller的SP)，通过 <code>SUB</code>指令减4，赋值给R11（FP，栈基值，被调方callee即 <code>main_label</code>函数的栈的起始地址）</p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241125115123312.png" alt="image-20241125115123312"></p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241125120006973.png" alt="image-20241125120006973"></p>
+<p>寄存器示意图:</p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241125132458366.png" alt="image-20241125132458366"></p>
+<h3 id="zeng-jia-sp-kuo-da-zhan-kong-jian">增加SP，扩大栈空间</h3>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241125121914111.png" alt="image-20241125121914111"></p>
+<p>接着通过 <code>SUB</code>指令，将SP(R13)减去 <code>0x00000010</code>（即16字节，4个字），相当于将SP下移了四个存储单元</p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241125132531947.png" alt="image-20241125132531947"></p>
+<p>这样就相当于在栈中空出四个存储单元，为什么要这样做呢，我们接着往下看</p>
+<h3 id="han-shu-ru-can-ya-zhan">函数入参压栈</h3>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241125131249986.png" alt="image-20241125131249986"></p>
+<p>这里将R0写到R11（FP，栈基址）向下偏移 <code>0x0018</code>（即24字节，六个字）对应的存储单元中：</p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241125133004294.png" alt="image-20241125133004294"></p>
+<p>同样的，将R1写到FP向下偏移 <code>0x001C</code>（28个字节，7个字）的存储单元中：</p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241125134213403.png" alt="image-20241125134213403"></p>
+<p>根据ATPCS标准的规范，<mark>r0</mark>通常用来传递第一个参数<mark>a1</mark>，<mark>r1</mark>通常用来传递第二个参数<mark>a2</mark>，因此上述操作起始就是将函数的两个入参 <code>main_label(int argc, const char *argv[])</code> 压栈</p>
+<img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241125131207660.png" alt="image-20241125131207660" style="zoom:33%;">
+<h3 id="han-shu-ju-bu-bian-liang-ya-zhan">函数局部变量压栈</h3>
+<p>对应 <code>int i = 0</code></p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241125133712296.png" alt="image-20241125133712296"></p>
+<p>先将常量 <code>0</code>传输到寄存器R3中（这里R3作为通用寄存器存放临时的常量），再通过 <code>STR</code>指令压栈：</p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241125134430454.png" alt="image-20241125134430454"></p>
+<p>同样的，将局部变量 <code>b</code>压栈：</p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241125134728492.png" alt="image-20241125134728492"></p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241125134805022.png" alt="image-20241125134805022"></p>
+<h3 id="ji-yu-zhan-he-ji-cun-qi-zuo-yun-suan">基于栈和寄存器做运算</h3>
+<p>接着就到了 <code>b = i++ + ++i;</code>这一行代码的执行，它的过程是这样的：</p>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token operator">++</span>i<span class="token punctuation">;</span>
+b <span class="token operator">=</span> i <span class="token operator">+</span> i<span class="token punctuation">;</span>
+i<span class="token operator">++</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241125135029185.png" alt="image-20241125135029185"></p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241125135429854.png" alt="image-20241125135429854"></p>
+<p>接着分析，我们会发现处理器的行为与我们在C语言的预期步骤是有出入的，这可能是因为指令重排序的原因，<mark>但无论怎样重排序，其结果与C语言的预期步骤得出的结果要保持一致。</mark></p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241125141616740.png" alt="image-20241125141616740"></p>
+<h3 id="diao-yong-zi-han-shu-zi-guo-cheng-subroutine">调用子函数/子过程（subroutine）</h3>
+<p>这与我们从汇编开始调用 <code>main_label</code>的分析思路是一样的，这里不在赘述。</p>
+<h3 id="han-shu-fan-hui">函数返回</h3>
+<p>接下来我们看一看 <code>main_label</code>函数的最后一行 <code>return 0;</code>都做了什么：</p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241125144155014.png" alt="image-20241125144155014"></p>
+<p>首先将常量 <code>0</code>（返回值）传输到R3进行临时保存；然后根据ATPCS标准，应该将返回值通过R0来传递，因此又将R3传输到了R0</p>
+<img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241125144454192.png" alt="image-20241125144454192" style="zoom:33%;">
+<p>接着通过 <code>SUB</code>，将R13(SP)指向R11(FP)向下偏移<code>0xC</code>的位置。如下图，SP指向这个位置后，相当于将函数参数和局部变量出栈释放了（对应图中灰色部分）</p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241125144022274.png" alt="image-20241125144022274"></p>
+<p>接着通过 <code>LDMIA</code>将还保存在栈中的调用方的LR, SP, FP恢复到R14, R13, R11中</p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241125145835783.png" alt="image-20241125145835783"></p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241125145806719.png" alt="image-20241125145806719"></p>
+<p>接着通过 <code>BX</code>指令根据LR(R14)跳转回调用方：</p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241125150802906.png" alt="image-20241125150802906"></p>
+<blockquote>
+<p>为什么通过LR可以跳转回去呢？</p>
+</blockquote>
+<p>这是因为我们是通过 <code>bl main_label</code>跳转的，<code>l</code>后缀会将当前PC暂存到LR中，因此可以通过 <code>BX R14</code>跳转回去。</p>
+
                 
             </div>
             <hr/>
@@ -843,7 +1002,7 @@
             <br>
             
                 &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                        class="white-color">13.7k</span>
+                        class="white-color">15.6k</span>
             
             
             
