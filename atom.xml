@@ -6,7 +6,7 @@
   <link href="https://zanwen.github.io/atom.xml" rel="self"/>
   
   <link href="https://zanwen.github.io/"/>
-  <updated>2024-11-25T15:05:23.920Z</updated>
+  <updated>2024-11-26T01:49:18.779Z</updated>
   <id>https://zanwen.github.io/</id>
   
   <author>
@@ -15,6 +15,35 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>裸机多任务调度框架</title>
+    <link href="https://zanwen.github.io/2024/11/26/21297.html"/>
+    <id>https://zanwen.github.io/2024/11/26/21297.html</id>
+    <published>2024-11-26T01:29:21.000Z</published>
+    <updated>2024-11-26T01:49:18.779Z</updated>
+    
+    
+      
+      
+        
+        
+    <summary type="html">&lt;h1 id=&quot;kuang-jia-jian-mo&quot;&gt;框架建模&lt;/h1&gt;
+&lt;h2 id=&quot;kuang-jia-chou-xiang&quot;&gt;框架抽象&lt;/h2&gt;
+&lt;p&gt;&lt;img</summary>
+        
+      
+    
+    
+    
+    <category term="架构" scheme="https://zanwen.github.io/categories/%E6%9E%B6%E6%9E%84/"/>
+    
+    
+    <category term="多任务" scheme="https://zanwen.github.io/tags/%E5%A4%9A%E4%BB%BB%E5%8A%A1/"/>
+    
+    <category term="调度" scheme="https://zanwen.github.io/tags/%E8%B0%83%E5%BA%A6/"/>
+    
+  </entry>
   
   <entry>
     <title>ARM核学习（五）异常处理</title>
@@ -303,9 +332,9 @@
     <category term="踩坑记录" scheme="https://zanwen.github.io/categories/STM32/%E8%B8%A9%E5%9D%91%E8%AE%B0%E5%BD%95/"/>
     
     
-    <category term="STM32" scheme="https://zanwen.github.io/tags/STM32/"/>
-    
     <category term="Clion" scheme="https://zanwen.github.io/tags/Clion/"/>
+    
+    <category term="STM32" scheme="https://zanwen.github.io/tags/STM32/"/>
     
     <category term="GD32" scheme="https://zanwen.github.io/tags/GD32/"/>
     
