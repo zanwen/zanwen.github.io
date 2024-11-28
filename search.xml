@@ -1,135 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
-    <title>ARM核学习（三）指令流水线分析及伪指令</title>
-    <url>/2024/11/24/14899.html</url>
-    <content><![CDATA[<h1 id="zhi-ling-liu-shui-xian-fen-xi">指令流水线分析</h1>
-<h2 id="qian-yan">前言</h2>
-<p>在ARM核中，为增加处理器指令流的速度，ARM7系列使用3级流水线。允许多个操作同时处理，而非顺<br>
-序执行。<mark>不同的ARM核，流水线的级数是不一样的，ARM核版本越高，流水线级数越多。对于软件工</mark><br>
-<mark>程师编程而言，统一按照三级流水线来分析就可以了。</mark></p>
-<img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241124174742518.png" alt="image-20241124174742518" style="zoom: 33%;">
-<blockquote>
-<p>在MDK中断点调试时会发现PC指向的当前代码行，这是因为MDK调试屏蔽了底层流水线细节，以避免产生歧义。</p>
-</blockquote>
-<p>在ARM状态，指令位宽为32位4字节，因此当PC预取（例如）0x8地址的指令时，0x4地址的指令正在被解码、0x0地址的指令正在被执行。Thumb状态是压缩格式的指令集，指令位宽是16位2字节，因此偏差是2。</p>
-<h2 id="zui-jia-liu-shui-xian-fen-xi-jin-cao-zuo-ji-cun-qi">最佳流水线分析（仅操作寄存器）</h2>
-<img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241124175951254.png" alt="image-20241124175951254" style="zoom:50%;">
-<h2 id="nei-cun-fang-wen-zhi-ling-liu-shui-xian">内存访问指令流水线</h2>
-<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241124180204732.png" alt="image-20241124180204732"></p>
-<p>由于内存访问效率较低，因此在执行LDR指令时，无法在一个指令周期内完成（需要E、M、W三个周期）。这样，即使它前面的D跑得快，但解码的指令无法移交给E（它手上的活还没干完），只能干等，F也是一样。</p>
-<h2 id="fen-zhi-tiao-zhuan-liu-shui-xian-ju-li">分支（跳转）流水线举例</h2>
-<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241124181209542.png" alt="image-20241124181209542"></p>
-<p>在E执行跳转指令时，跑在它前面的F、D不得不丢弃已完成的工（解码 <code>0x3004 SUB</code>，预取 <code>0x3008 AND</code>）作，转而从目标地址重新开始F、D、E流程。</p>
-<p>图中E执行 <code>BL 0X8FEC</code>时，F正在预取 <code>0x3008</code>地址的指令，在该指令周期结束时，PC指向 <code>0x3008</code>，且由于是 <code>BL</code>跳转，因此该值会被保存到 <code>LR</code>寄存器中。</p>
-<p>当执行 <code>L</code>指令时，会将<code>LR</code>回写到 <code>PC</code>中，但是由于此前对于 <code>0X3004</code>的解码工作被丢弃了，因此处理器会自动执行一个 <code>A</code>指令，将 <code>PC</code>调整到 <code>0x3004</code>的位置接着执行。</p>
-<h2 id="zong-jie">总结</h2>
-<ul>
-<li>当只有寄存器操作（操作效率和CPU处于同一量级）时，指令流线效率是最高的：在每个指令周期，流水线上的三个工人F、D、E都在不停互相配合，高效完成指令执行所需的三个阶段的工作。</li>
-<li>当访问内存（外设）时，由于物理特性，处理器的工作效率远高于外设，因此工人E只能放慢节奏和外设协同把活干了，这期间即使F、D完成了手头上的活，由于不能向D、E移交，因此也只能干等着。导致了级联停顿（stall）的效应。</li>
-<li>当发生跳转时，工人F、D超前完成的工作只能被迫丢弃，转而从新的指令地址重新开始干活，且如果跳转回来，之前干完的活还得重新再干一次。</li>
-</ul>
-<h1 id="chang-yong-wei-zhi-ling-fen-xi">常用伪指令分析</h1>
-<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241124183925641.png" alt="image-20241124183925641"></p>
-<h2 id="ldr-r-0-0-x-12345678-fen-xi">LDR R0,=0x12345678 分析</h2>
-<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241124184043373.png" alt="image-20241124184043373"></p>
-<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241124184314696.png" alt="image-20241124184314696"></p>
-<p>编译器会将常量 <code>0x12345678</code>预先放到某个内存中（通常是所有代码指令之后），并将LDR翻译成一条读内存的指令。</p>
-<h2 id="ldr-r-0-label-fen-xi">LDR R0,=label 分析</h2>
-<p>标签本质上是一个常量，它的值就是标签后第一条指令的地址，可以理解为给这个地址取了个别名。</p>
-<h3 id="dai-ma-duan-qi-shi-di-zhi-wei-0-x-0">代码段起始地址为0x0</h3>
-<p>对于给定的代码段起始地址和指令位宽，每条指令的存放地址在编译阶段都可以确定，如下将代码段的起始地址配置为 <code>0x0</code>：</p>
-<img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241124185737443.png" alt="image-20241124185737443" style="zoom:33%;">
-<p>对于ARM状态下（指令位宽为4字节），如下代码的每条指令都可以顺序计算其存储地址</p>
-<pre class="line-numbers language-assembly" data-language="assembly"><code class="language-assembly">.global _start
-
-_start:
-	mov r1,#1			@0x00000000
-	mov r2,#2			@0x00000004
-	ldr r3,=addr		@0x00000008
-	ldr r4,[r3]			@0x0000000C
-	
-stop:
-	b stop				@0x00000010
-	
-addr:					@给0x00000014取了个别名叫addr
-	.word 0x12345678	@0x00000014 在这个地址存放一个字的数据
-		<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<p>需要注意的是：标签的声明并不属于指令，因此不占用地址空间。其中 <code>ldr r3,=addr</code>等价于 <code>ldr r3,=0x00000014</code>。</p>
-<p><code>ldr r3,=addr</code>（将addr表示的地址值加载到R3）分析如下：</p>
-<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241124190511217.png" alt="image-20241124190511217"></p>
-<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241124190550278.png" alt="image-20241124190550278"></p>
-<p><code>ldr r4,[r3]</code>：从R3对应的地址读取数据（该数据 <code>0x12345678</code> 在编译阶段通过 <code>.word</code>伪指令预先存储在了内存空间中）</p>
-<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241124190809542.png" alt="image-20241124190809542"></p>
-<h3 id="dai-ma-duan-qi-shi-di-zhi-wei-0-x-2000">代码段起始地址为0x2000</h3>
-<p>将代码段起始地址改为0x2000，计算规则是一样的，在编译阶段就能确定各个指令以及 <code>.word</code>数据存放的地址（注意修改后需要重新编译下）：</p>
-<img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241124200510540.png" alt="image-20241124200510540" style="zoom:33%;">
-<p>调试前需要修改下内存映射，默认是从0x0开始执行的，我们需要让0x0到0x2000及其后的一段内存都可执行：</p>
-<img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241124200751229.png" alt="image-20241124200751229" style="zoom:50%;">
-<p>然后在 <code>_start</code>的第一条指令打个断点，跳过从0x0到0x2000之间的无效指令：</p>
-<img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241124201005483.png" alt="image-20241124201005483" style="zoom: 33%;">
-<img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241124200325028.png" alt="image-20241124200325028" style="zoom:33%;">
-<h3 id="zong-jie-1">总结</h3>
-<img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241124195231017.png" alt="image-20241124195231017" style="zoom: 50%;">
-<h2 id="ldr-r-0-label-fen-xi-1">LDR R0,label 分析</h2>
-<pre class="line-numbers language-assembly" data-language="assembly"><code class="language-assembly">.global _start
-
-_start:
-	mov r1,#1			
-	mov r2,#2			
-	ldr r3,addr			
-	mov r4,r3			
-stop:
-	b stop				
-addr:	
-	.word 0x12345678	
-		<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<p><code>ldr r3,=addr</code>可以理解为将标签 <code>addr</code>的值当做常量加载到R3中，而 <code>ldr r3,addr</code>则是从 <code>addr</code>对应的地址加载数据到R3中，相当于 <code>R3=p</code>和 <code>R3=*p</code>的关系</p>
-<img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241124201244164.png" alt="image-20241124201244164" style="zoom: 33%;">
-<h2 id="adr-r-0-label-dong-tai-huo-qu-biao-qian-di-zhi">ADR R0,label 动态获取标签地址</h2>
-<blockquote>
-<p>This instruction adds an immediate value to the PC value to form a PC-relative address, and writes the result to the destination register.</p>
-</blockquote>
-<p>ADR 是 “Address” 的缩写，它是一条用于生成地址的伪指令。ADR 指令用于计算一个目标地址，并将其存储到指定的寄存器中。目标地址是基于当前 PC 加上一个偏移量计算得出的，因此它只能访问当前代码段附近的地址。</p>
-<h3 id="strong-zhi-ling-ge-shi-strong"><strong>指令格式</strong></h3>
-<pre class="line-numbers language-assembly" data-language="assembly"><code class="language-assembly">ADR &lt;Rd&gt;, &lt;label&gt;<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
-<ul>
-<li><code>&lt;Rd&gt;</code>：目标寄存器，用于存储计算出的地址。</li>
-<li><code>&lt;label&gt;</code>：目标地址标签，必须位于当前指令前后一定范围内。</li>
-</ul>
-<h3 id="shi-li">示例</h3>
-<pre class="line-numbers language-assembly" data-language="assembly"><code class="language-assembly">.global _start
-
-_start:
-	mov r1,#1			
-	mov r2,#2			
-	adr r3,addr			
-	ldr r4,[r3]		
-stop:
-	b stop				
-addr:	
-	.word 0x12345678	
-		<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241124202620567.png" alt="image-20241124202620567"></p>
-<h3 id="dui-bi-ldr-r-0-label">对比 LDR R0,=label</h3>
-<p>如下图，<code>LDR R0,=label</code>编译时，编译器会根据代码段起始地址和指令位宽计算出label对应的地址值（<code>0x00000014</code>），并单独开辟一个内存（<code>0x00000018</code>）存放这个<mark>写死</mark>的数据，在运行时通过LDR读取这个内存中写死的label地址值到R3中。</p>
-<p>如果起始地址为 <code>0x2000</code>，那么编译器就会在内存中存放一个写死的 <code>0x2014</code>，显然这是一种<mark>静态的做法</mark>（和编译时设置的代码段起始地址是<mark>强绑定的</mark>），如果程序换一个地址空间运行，这个写死的地址值就没有意义了。</p>
-<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241124203311920.png" alt="image-20241124203311920"></p>
-<p>而 <code>ADR R0,label</code>则是运行时动态获取标签对应的地址值，例如编译器知道执行当前指令时，通过在PC上偏移4个字节就能寻址到label对应的地址，那么通过 <code>ADD</code>指令就能在<mark>运行时动态获取</mark>该label对应的地址。这种做法是<mark>不依赖编译时设定的代码段起始地址的，无论使用什么起始地址，都能够得到一个正确的标签地址</mark>。</p>
-<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241124204230866.png" alt="image-20241124204230866"></p>
-<h2 id="ru-he-pan-bie-dai-ma-zai-shi-ji-nei-cun-zhong-yun-xing-de-di-zhi">🌟如何判别代码在实际内存中运行的地址？</h2>
-<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241124204803253.png" alt="image-20241124204803253"></p>
-]]></content>
-      <categories>
-        <category>ARM</category>
-      </categories>
-      <tags>
-        <tag>ARM</tag>
-        <tag>ARMv7</tag>
-        <tag>指令流水线</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>ARM核学习（一）工作模式及寄存器资源</title>
     <url>/2024/11/23/1780.html</url>
     <content><![CDATA[<h1 id="can-kao-zi-liao">参考资料</h1>
@@ -320,149 +191,349 @@ corresponding exception, meaning it cannot be taken</p>
       </tags>
   </entry>
   <entry>
-    <title>STM32系统时钟初始化源码解析（SPL库，STM32F103ZE）</title>
-    <url>/2024/11/23/19447.html</url>
-    <content><![CDATA[<h1 id="yi-bei-jing">一、背景</h1>
-<h2 id="kai-fa-huan-jing">开发环境</h2>
-<ul>
-<li>STM32F103ZET6</li>
-</ul>
-<h2 id="yuan-li-tu">原理图</h2>
-<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241123160212385.png" alt="image-20241123160212385"></p>
-<h3 id="hse-gao-su-wai-bu-jing-zhen-high-speed-external-oscillator">HSE-高速外部晶振High Speed External oscillator</h3>
-<p>通过23、24号引脚接入8M的高速外部晶振。</p>
-<h3 id="hsi-di-su-wai-bu-jing-zhen-low-speed-external-oscillator">HSI-低速外部晶振Low Speed External oscillator</h3>
-<p>通过GPIO引脚PC14和PC15的复用接入32.768kHz低速外部晶振。</p>
-<h2 id="yi-cube-de-tu-xing-hua-pei-zhi-wei-li-shuo-ming">以Cube的图形化配置为例说明</h2>
-<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241123160112667.png" alt="image-20241123160112667"></p>
-<p>MCU内置了两个RC震荡电路：</p>
-<ul>
-<li>HSI RC，High Speed Internal RC，8M高速内部RC震荡电路</li>
-<li>LSI RC，Low Speed Internal RC，40kHz低速内部RC震荡电路</li>
-</ul>
-<h3 id="wei-shi-yao-mcu-nei-zhi-liao-huan-xu-yao-wai-jie-jing-zhen">为什么MCU内置了，还需要外接晶振</h3>
-<ul>
-<li>
-<p>RC震荡电路容易受到其他电路干扰，导致信号不稳定，且精度远比晶振低。</p>
-</li>
-<li>
-<p>由于MCU的微小封装，无法内嵌较大的晶振</p>
-</li>
-<li>
-<p>将晶振的灵活选择权交给开发者</p>
-</li>
-</ul>
-<h3 id="cube-pei-zhi-jie-xi">Cube配置解析</h3>
-<p>外接晶振通过引脚接入MCU，但由于MCU的主频较高，一般将HSE通过PLL（锁相环，用来倍频）提高频率再作为系统时钟SYSCLK的来源。</p>
-<p>图中 <mark>Mux</mark>是多路选择器 <mark>Multiplex</mark>的缩写，可以看到我们的8M HSE经过了1分频（即不分频），连接到了PLL Source Mux，通过这个多路选择器，我们使用HSE而不是HSI作为PLL的时钟来源（HSE在精度和稳定性上要比HSI好很多）。</p>
-<p>接着经过了PLLMul，即锁相环倍频（PLL Multiply），将HSE的频率放大了9倍得到PLLCLK（8M * 9 = 72M），并连接到了System Clock Mux（即系统时钟多路选择器），这里我们当然选择稳定、高精度、高频的PLLCLK作为系统时钟。</p>
-<h1 id="er-shi-zhong-chu-shi-hua-guo-cheng-yuan-ma-fen-xi-spl-ku">二、时钟初始化过程源码分析（SPL库）</h1>
-<h2 id="shang-dian-fu-wei-hou-hui-fa-sheng-shi-yao">上电/复位后会发生什么？</h2>
-<p>MCU启动的汇编文件 <code>startup.s</code>会被执行：</p>
-<p><code>startup_stm32f10x_hd.s</code></p>
-<pre class="line-numbers language-asm" data-language="asm"><code class="language-asm">Reset_Handler   PROC
-                EXPORT  Reset_Handler             [WEAK]
-                IMPORT  __main
-                IMPORT  SystemInit
-                LDR     R0, =SystemInit
-                BLX     R0               
-                LDR     R0, =__main
-                BX      R0<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<p><mark>执行SystemInit函数</mark></p>
-<p>将 <code>SystemInit</code> 函数的入口地址加载到寄存器R0，通过 <code>BLX</code>跳转到其对应的代码段执行该函数，其中就包括了系统时钟的初始化过程。</p>
-<p><mark>执行main函数</mark></p>
-<p>将 <code>main</code> 函数的入口地址加载到寄存器R0，通过 <code>BX</code>跳转到其对应的代码段执行该函数，执行用户代码。</p>
+    <title>ARM核学习（三）指令流水线分析及伪指令</title>
+    <url>/2024/11/24/14899.html</url>
+    <content><![CDATA[<h1 id="zhi-ling-liu-shui-xian-fen-xi">指令流水线分析</h1>
+<h2 id="qian-yan">前言</h2>
+<p>在ARM核中，为增加处理器指令流的速度，ARM7系列使用3级流水线。允许多个操作同时处理，而非顺<br>
+序执行。<mark>不同的ARM核，流水线的级数是不一样的，ARM核版本越高，流水线级数越多。对于软件工</mark><br>
+<mark>程师编程而言，统一按照三级流水线来分析就可以了。</mark></p>
+<img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241124174742518.png" alt="image-20241124174742518" style="zoom: 33%;">
 <blockquote>
-<p>该初始化顺序遵循ARM的CMSIS（Cortex Microcontroller Software Interface Standard）标准</p>
+<p>在MDK中断点调试时会发现PC指向的当前代码行，这是因为MDK调试屏蔽了底层流水线细节，以避免产生歧义。</p>
 </blockquote>
-<h2 id="system-init">SystemInit</h2>
-<p><a href="https://www.st.com/resource/en/reference_manual/rm0008-stm32f101xx-stm32f102xx-stm32f103xx-stm32f105xx-and-stm32f107xx-advanced-armbased-32bit-mcus-stmicroelectronics.pdf">STM32F107参考手册</a></p>
-<h3 id="qi-yong-hsi-xian-rang-mcu-you-xin-tiao">启用HSI，先让MCU有心跳</h3>
-<p>在<code>system_stm32f10x.c</code>中找到 <code>SystemInit</code>函数，条件编译显示灰色的部分可以忽略</p>
-<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token comment">/* Set HSION bit */</span>
-RCC<span class="token operator">-&gt;</span>CR <span class="token operator">|=</span> <span class="token punctuation">(</span><span class="token class-name">uint32_t</span><span class="token punctuation">)</span><span class="token number">0x00000001</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
-<p>先开启HSI高速内部时钟（时钟相当于MCU心跳，先让MCU有心跳能够工作，后面再将时钟源通过多路选择器切换为我们配置的HSE），将寄存器的第0位设置为1：</p>
-<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241123165840693.png" alt="image-20241123165840693"></p>
-<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241123165911410.png" alt="image-20241123165911410"></p>
-<h3 id="fu-wei-shi-zhong-xiang-guan-ji-cun-qi-bi-te-wei">复位时钟相关寄存器比特位</h3>
-<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token comment">/* Reset SW, HPRE, PPRE1, PPRE2, ADCPRE and MCO bits */</span>
-RCC<span class="token operator">-&gt;</span>CFGR <span class="token operator">&amp;=</span> <span class="token punctuation">(</span><span class="token class-name">uint32_t</span><span class="token punctuation">)</span><span class="token number">0xF8FF0000</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
-<p>该操作会将CFGR（时钟配置）寄存器如下比特位清零：</p>
-<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241123170556835.png" alt="image-20241123170556835"></p>
-<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241123170704055.png" alt="image-20241123170704055"></p>
-<p>选择HSI（上一步已经开启了）作为系统时钟，其他的（HPRE, PPRE1, PPRE2, ADCPRE and MCO）分析过程类似。</p>
-<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token comment">/* Reset HSEON, CSSON and PLLON bits */</span>
-RCC<span class="token operator">-&gt;</span>CR <span class="token operator">&amp;=</span> <span class="token punctuation">(</span><span class="token class-name">uint32_t</span><span class="token punctuation">)</span><span class="token number">0xFEF6FFFF</span><span class="token punctuation">;</span>
-
-<span class="token comment">/* Reset HSEBYP bit */</span>
-RCC<span class="token operator">-&gt;</span>CR <span class="token operator">&amp;=</span> <span class="token punctuation">(</span><span class="token class-name">uint32_t</span><span class="token punctuation">)</span><span class="token number">0xFFFBFFFF</span><span class="token punctuation">;</span>
-
-<span class="token comment">/* Reset PLLSRC, PLLXTPRE, PLLMUL and USBPRE/OTGFSPRE bits */</span>
-RCC<span class="token operator">-&gt;</span>CFGR <span class="token operator">&amp;=</span> <span class="token punctuation">(</span><span class="token class-name">uint32_t</span><span class="token punctuation">)</span><span class="token number">0xFF80FFFF</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<p>同样的，也是将一些位清零，将系统时钟初始化为仅由HSI作为时钟源的初始状态</p>
-<h3 id="set-sys-clock-she-zhi-xi-tong-shi-zhong">SetSysClock设置系统时钟</h3>
-<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token comment">/* Enable HSE */</span>    
-RCC<span class="token operator">-&gt;</span>CR <span class="token operator">|=</span> <span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token class-name">uint32_t</span><span class="token punctuation">)</span>RCC_CR_HSEON<span class="token punctuation">)</span><span class="token punctuation">;</span>
- 
-<span class="token comment">/* Wait till HSE is ready and if Time out is reached exit */</span>
-<span class="token keyword">do</span>
-<span class="token punctuation">{</span>
-  HSEStatus <span class="token operator">=</span> RCC<span class="token operator">-&gt;</span>CR <span class="token operator">&amp;</span> RCC_CR_HSERDY<span class="token punctuation">;</span>
-  StartUpCounter<span class="token operator">++</span><span class="token punctuation">;</span>  
-<span class="token punctuation">}</span> <span class="token keyword">while</span><span class="token punctuation">(</span><span class="token punctuation">(</span>HSEStatus <span class="token operator">==</span> <span class="token number">0</span><span class="token punctuation">)</span> <span class="token operator">&amp;&amp;</span> <span class="token punctuation">(</span>StartUpCounter <span class="token operator">!=</span> HSE_STARTUP_TIMEOUT<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<p>这里开启了HSE外部高速时钟，并等待HSE的状态转变为READY（由硬件置位）。</p>
-<h3 id="xi-tong-shi-zhong-shu">系统时钟树</h3>
-<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token comment">/* HCLK = SYSCLK */</span>
-RCC<span class="token operator">-&gt;</span>CFGR <span class="token operator">|=</span> <span class="token punctuation">(</span><span class="token class-name">uint32_t</span><span class="token punctuation">)</span>RCC_CFGR_HPRE_DIV1<span class="token punctuation">;</span>
-  
-<span class="token comment">/* PCLK2 = HCLK */</span>
-RCC<span class="token operator">-&gt;</span>CFGR <span class="token operator">|=</span> <span class="token punctuation">(</span><span class="token class-name">uint32_t</span><span class="token punctuation">)</span>RCC_CFGR_PPRE2_DIV1<span class="token punctuation">;</span>
-
-<span class="token comment">/* PCLK1 = HCLK */</span>
-RCC<span class="token operator">-&gt;</span>CFGR <span class="token operator">|=</span> <span class="token punctuation">(</span><span class="token class-name">uint32_t</span><span class="token punctuation">)</span>RCC_CFGR_PPRE1_DIV2<span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<p>将系统时钟作为AHB和APB2的时钟源（对应HCLK和PCLK2），将系统时钟2分频，作为APB1的时钟源（对应PCLK2）。</p>
-<blockquote>
-<p>AHB挂载了Cortex核、DMA等主动单元</p>
-<p>APB2挂载了GPIO、USRAT1、ADC等需要高速率时钟的单元</p>
-<p>APB1则挂载了TIMER、I2C等不需要那么高频的单元</p>
-</blockquote>
-<img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241123172121666.png" alt="image-20241123172121666" style="zoom: 50%;">
-<h3 id="pll-bei-pin">PLL倍频</h3>
-<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token comment">/*  PLL configuration: PLLCLK = HSE * 9 = 72 MHz */</span>
-    RCC<span class="token operator">-&gt;</span>CFGR <span class="token operator">&amp;=</span> <span class="token punctuation">(</span><span class="token class-name">uint32_t</span><span class="token punctuation">)</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token class-name">uint32_t</span><span class="token punctuation">)</span><span class="token operator">~</span><span class="token punctuation">(</span>RCC_CFGR_PLLSRC <span class="token operator">|</span> RCC_CFGR_PLLXTPRE <span class="token operator">|</span>
-                                        RCC_CFGR_PLLMULL<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-    RCC<span class="token operator">-&gt;</span>CFGR <span class="token operator">|=</span> <span class="token punctuation">(</span><span class="token class-name">uint32_t</span><span class="token punctuation">)</span><span class="token punctuation">(</span>RCC_CFGR_PLLSRC_HSE <span class="token operator">|</span> RCC_CFGR_PLLMULL9<span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
+<p>在ARM状态，指令位宽为32位4字节，因此当PC预取（例如）0x8地址的指令时，0x4地址的指令正在被解码、0x0地址的指令正在被执行。Thumb状态是压缩格式的指令集，指令位宽是16位2字节，因此偏差是2。</p>
+<h2 id="zui-jia-liu-shui-xian-fen-xi-jin-cao-zuo-ji-cun-qi">最佳流水线分析（仅操作寄存器）</h2>
+<img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241124175951254.png" alt="image-20241124175951254" style="zoom:50%;">
+<h2 id="nei-cun-fang-wen-zhi-ling-liu-shui-xian">内存访问指令流水线</h2>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241124180204732.png" alt="image-20241124180204732"></p>
+<p>由于内存访问效率较低，因此在执行LDR指令时，无法在一个指令周期内完成（需要E、M、W三个周期）。这样，即使它前面的D跑得快，但解码的指令无法移交给E（它手上的活还没干完），只能干等，F也是一样。</p>
+<h2 id="fen-zhi-tiao-zhuan-liu-shui-xian-ju-li">分支（跳转）流水线举例</h2>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241124181209542.png" alt="image-20241124181209542"></p>
+<p>在E执行跳转指令时，跑在它前面的F、D不得不丢弃已完成的工（解码 <code>0x3004 SUB</code>，预取 <code>0x3008 AND</code>）作，转而从目标地址重新开始F、D、E流程。</p>
+<p>图中E执行 <code>BL 0X8FEC</code>时，F正在预取 <code>0x3008</code>地址的指令，在该指令周期结束时，PC指向 <code>0x3008</code>，且由于是 <code>BL</code>跳转，因此该值会被保存到 <code>LR</code>寄存器中。</p>
+<p>当执行 <code>L</code>指令时，会将<code>LR</code>回写到 <code>PC</code>中，但是由于此前对于 <code>0X3004</code>的解码工作被丢弃了，因此处理器会自动执行一个 <code>A</code>指令，将 <code>PC</code>调整到 <code>0x3004</code>的位置接着执行。</p>
+<h2 id="zong-jie">总结</h2>
 <ul>
-<li>将PLL时钟来源RCC_CFGR_PLLSRC、HSE进入PLL后的分频RCC_CFGR_PLLXTPRE、PLL倍频系数RCC_CFGR_PLLMULL清零；</li>
-<li>选择PLL时钟来源为HSE（RCC_CFGR_PLLSRC_HSE），倍频系数为9（RCC_CFGR_PLLMULL9）</li>
+<li>当只有寄存器操作（操作效率和CPU处于同一量级）时，指令流线效率是最高的：在每个指令周期，流水线上的三个工人F、D、E都在不停互相配合，高效完成指令执行所需的三个阶段的工作。</li>
+<li>当访问内存（外设）时，由于物理特性，处理器的工作效率远高于外设，因此工人E只能放慢节奏和外设协同把活干了，这期间即使F、D完成了手头上的活，由于不能向D、E移交，因此也只能干等着。导致了级联停顿（stall）的效应。</li>
+<li>当发生跳转时，工人F、D超前完成的工作只能被迫丢弃，转而从新的指令地址重新开始干活，且如果跳转回来，之前干完的活还得重新再干一次。</li>
 </ul>
-<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token comment">/* Enable PLL */</span>
-    RCC<span class="token operator">-&gt;</span>CR <span class="token operator">|=</span> RCC_CR_PLLON<span class="token punctuation">;</span>
+<h1 id="chang-yong-wei-zhi-ling-fen-xi">常用伪指令分析</h1>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241124183925641.png" alt="image-20241124183925641"></p>
+<h2 id="ldr-r-0-0-x-12345678-fen-xi">LDR R0,=0x12345678 分析</h2>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241124184043373.png" alt="image-20241124184043373"></p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241124184314696.png" alt="image-20241124184314696"></p>
+<p>编译器会将常量 <code>0x12345678</code>预先放到某个内存中（通常是所有代码指令之后），并将LDR翻译成一条读内存的指令。</p>
+<h2 id="ldr-r-0-label-fen-xi">LDR R0,=label 分析</h2>
+<p>标签本质上是一个常量，它的值就是标签后第一条指令的地址，可以理解为给这个地址取了个别名。</p>
+<h3 id="dai-ma-duan-qi-shi-di-zhi-wei-0-x-0">代码段起始地址为0x0</h3>
+<p>对于给定的代码段起始地址和指令位宽，每条指令的存放地址在编译阶段都可以确定，如下将代码段的起始地址配置为 <code>0x0</code>：</p>
+<img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241124185737443.png" alt="image-20241124185737443" style="zoom:33%;">
+<p>对于ARM状态下（指令位宽为4字节），如下代码的每条指令都可以顺序计算其存储地址</p>
+<pre class="line-numbers language-assembly" data-language="assembly"><code class="language-assembly">.global _start
 
-    <span class="token comment">/* Wait till PLL is ready */</span>
-    <span class="token keyword">while</span><span class="token punctuation">(</span><span class="token punctuation">(</span>RCC<span class="token operator">-&gt;</span>CR <span class="token operator">&amp;</span> RCC_CR_PLLRDY<span class="token punctuation">)</span> <span class="token operator">==</span> <span class="token number">0</span><span class="token punctuation">)</span>
-    <span class="token punctuation">{</span>
-    <span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<p>启动PLL锁相环，并等待它稳定。</p>
-<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token comment">/* Select PLL as system clock source */</span>
-   RCC<span class="token operator">-&gt;</span>CFGR <span class="token operator">&amp;=</span> <span class="token punctuation">(</span><span class="token class-name">uint32_t</span><span class="token punctuation">)</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token class-name">uint32_t</span><span class="token punctuation">)</span><span class="token operator">~</span><span class="token punctuation">(</span>RCC_CFGR_SW<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-   RCC<span class="token operator">-&gt;</span>CFGR <span class="token operator">|=</span> <span class="token punctuation">(</span><span class="token class-name">uint32_t</span><span class="token punctuation">)</span>RCC_CFGR_SW_PLL<span class="token punctuation">;</span>    
+_start:
+	mov r1,#1			@0x00000000
+	mov r2,#2			@0x00000004
+	ldr r3,=addr		@0x00000008
+	ldr r4,[r3]			@0x0000000C
+	
+stop:
+	b stop				@0x00000010
+	
+addr:					@给0x00000014取了个别名叫addr
+	.word 0x12345678	@0x00000014 在这个地址存放一个字的数据
+		<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>需要注意的是：标签的声明并不属于指令，因此不占用地址空间。其中 <code>ldr r3,=addr</code>等价于 <code>ldr r3,=0x00000014</code>。</p>
+<p><code>ldr r3,=addr</code>（将addr表示的地址值加载到R3）分析如下：</p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241124190511217.png" alt="image-20241124190511217"></p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241124190550278.png" alt="image-20241124190550278"></p>
+<p><code>ldr r4,[r3]</code>：从R3对应的地址读取数据（该数据 <code>0x12345678</code> 在编译阶段通过 <code>.word</code>伪指令预先存储在了内存空间中）</p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241124190809542.png" alt="image-20241124190809542"></p>
+<h3 id="dai-ma-duan-qi-shi-di-zhi-wei-0-x-2000">代码段起始地址为0x2000</h3>
+<p>将代码段起始地址改为0x2000，计算规则是一样的，在编译阶段就能确定各个指令以及 <code>.word</code>数据存放的地址（注意修改后需要重新编译下）：</p>
+<img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241124200510540.png" alt="image-20241124200510540" style="zoom:33%;">
+<p>调试前需要修改下内存映射，默认是从0x0开始执行的，我们需要让0x0到0x2000及其后的一段内存都可执行：</p>
+<img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241124200751229.png" alt="image-20241124200751229" style="zoom:50%;">
+<p>然后在 <code>_start</code>的第一条指令打个断点，跳过从0x0到0x2000之间的无效指令：</p>
+<img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241124201005483.png" alt="image-20241124201005483" style="zoom: 33%;">
+<img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241124200325028.png" alt="image-20241124200325028" style="zoom:33%;">
+<h3 id="zong-jie-1">总结</h3>
+<img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241124195231017.png" alt="image-20241124195231017" style="zoom: 50%;">
+<h2 id="ldr-r-0-label-fen-xi-1">LDR R0,label 分析</h2>
+<pre class="line-numbers language-assembly" data-language="assembly"><code class="language-assembly">.global _start
 
-   <span class="token comment">/* Wait till PLL is used as system clock source */</span>
-   <span class="token keyword">while</span> <span class="token punctuation">(</span><span class="token punctuation">(</span>RCC<span class="token operator">-&gt;</span>CFGR <span class="token operator">&amp;</span> <span class="token punctuation">(</span><span class="token class-name">uint32_t</span><span class="token punctuation">)</span>RCC_CFGR_SWS<span class="token punctuation">)</span> <span class="token operator">!=</span> <span class="token punctuation">(</span><span class="token class-name">uint32_t</span><span class="token punctuation">)</span><span class="token number">0x08</span><span class="token punctuation">)</span>
-   <span class="token punctuation">{</span>
-   <span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<p>通过系统时钟的多路选择器将PLL选择为系统时钟源，并等待此切换完成。</p>
+_start:
+	mov r1,#1			
+	mov r2,#2			
+	ldr r3,addr			
+	mov r4,r3			
+stop:
+	b stop				
+addr:	
+	.word 0x12345678	
+		<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p><code>ldr r3,=addr</code>可以理解为将标签 <code>addr</code>的值当做常量加载到R3中，而 <code>ldr r3,addr</code>则是从 <code>addr</code>对应的地址加载数据到R3中，相当于 <code>R3=p</code>和 <code>R3=*p</code>的关系</p>
+<img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241124201244164.png" alt="image-20241124201244164" style="zoom: 33%;">
+<h2 id="adr-r-0-label-dong-tai-huo-qu-biao-qian-di-zhi">ADR R0,label 动态获取标签地址</h2>
+<blockquote>
+<p>This instruction adds an immediate value to the PC value to form a PC-relative address, and writes the result to the destination register.</p>
+</blockquote>
+<p>ADR 是 “Address” 的缩写，它是一条用于生成地址的伪指令。ADR 指令用于计算一个目标地址，并将其存储到指定的寄存器中。目标地址是基于当前 PC 加上一个偏移量计算得出的，因此它只能访问当前代码段附近的地址。</p>
+<h3 id="strong-zhi-ling-ge-shi-strong"><strong>指令格式</strong></h3>
+<pre class="line-numbers language-assembly" data-language="assembly"><code class="language-assembly">ADR &lt;Rd&gt;, &lt;label&gt;<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<ul>
+<li><code>&lt;Rd&gt;</code>：目标寄存器，用于存储计算出的地址。</li>
+<li><code>&lt;label&gt;</code>：目标地址标签，必须位于当前指令前后一定范围内。</li>
+</ul>
+<h3 id="shi-li">示例</h3>
+<pre class="line-numbers language-assembly" data-language="assembly"><code class="language-assembly">.global _start
+
+_start:
+	mov r1,#1			
+	mov r2,#2			
+	adr r3,addr			
+	ldr r4,[r3]		
+stop:
+	b stop				
+addr:	
+	.word 0x12345678	
+		<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241124202620567.png" alt="image-20241124202620567"></p>
+<h3 id="dui-bi-ldr-r-0-label">对比 LDR R0,=label</h3>
+<p>如下图，<code>LDR R0,=label</code>编译时，编译器会根据代码段起始地址和指令位宽计算出label对应的地址值（<code>0x00000014</code>），并单独开辟一个内存（<code>0x00000018</code>）存放这个<mark>写死</mark>的数据，在运行时通过LDR读取这个内存中写死的label地址值到R3中。</p>
+<p>如果起始地址为 <code>0x2000</code>，那么编译器就会在内存中存放一个写死的 <code>0x2014</code>，显然这是一种<mark>静态的做法</mark>（和编译时设置的代码段起始地址是<mark>强绑定的</mark>），如果程序换一个地址空间运行，这个写死的地址值就没有意义了。</p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241124203311920.png" alt="image-20241124203311920"></p>
+<p>而 <code>ADR R0,label</code>则是运行时动态获取标签对应的地址值，例如编译器知道执行当前指令时，通过在PC上偏移4个字节就能寻址到label对应的地址，那么通过 <code>ADD</code>指令就能在<mark>运行时动态获取</mark>该label对应的地址。这种做法是<mark>不依赖编译时设定的代码段起始地址的，无论使用什么起始地址，都能够得到一个正确的标签地址</mark>。</p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241124204230866.png" alt="image-20241124204230866"></p>
+<h2 id="ru-he-pan-bie-dai-ma-zai-shi-ji-nei-cun-zhong-yun-xing-de-di-zhi">🌟如何判别代码在实际内存中运行的地址？</h2>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241124204803253.png" alt="image-20241124204803253"></p>
 ]]></content>
       <categories>
-        <category>STM32</category>
-        <category>源码分析</category>
+        <category>ARM</category>
       </categories>
       <tags>
-        <tag>STM32</tag>
-        <tag>SPL</tag>
-        <tag>STM32F103ZE</tag>
-        <tag>时钟</tag>
+        <tag>ARM</tag>
+        <tag>ARMv7</tag>
+        <tag>指令流水线</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>ARM核学习（五）异常处理</title>
+    <url>/2024/11/25/17360.html</url>
+    <content><![CDATA[<h1 id="can-kao-zi-liao">参考资料</h1>
+<p><a href="https://developer.arm.com/documentation/ddi0406/cd/?lang=en">ARM Architecture Reference Manual ARMv7-A and ARMv7-R edition</a></p>
+<ul>
+<li>B1.8 Exception handling</li>
+</ul>
+<p><a href="https://developer.arm.com/documentation/den0013/latest/">ARM® Cortex™-A Series Programmer’s Guide Version: 4.0</a></p>
+<h1 id="yi-chang-jie-shao">异常介绍</h1>
+<h2 id="shi-yao-shi-yi-chang">什么是异常</h2>
+<p>异常是处理器核在执行程序指令的过程中突然遇到了异常的事情，这些事件包括<strong>硬件中断、指令执行错误、用户程序请求服务、内存访问异常、取指令异常</strong>等，几乎每种处理器都支持特定的异常处理，<mark>中断也是异常的一种</mark>。</p>
+<h2 id="arm-de-yi-chang-yuan">ARM的异常源</h2>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241125214514494.png" alt="image-20241125214514494"></p>
+<h2 id="fiq-jiao-irq-kuai-de-yuan-yin">FIQ较IRQ快的原因</h2>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241125214951043.png" alt="image-20241125214951043"></p>
+<h1 id="arm-he-yi-chang-chu-li-guo-cheng">ARM核异常处理过程</h1>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241125215607973.png" alt="image-20241125215607973"></p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241125214441652.png" alt="处理器工作模式切换"></p>
+<h2 id="yi-chang-xiang-liang-biao">异常向量表</h2>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241125215846276.png" alt="image-20241125215846276"></p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241125215810206.png" alt="image-20241125215810206"></p>
+<blockquote>
+<p>[!NOTE]</p>
+<p>ARM核怎么知道异常向量表放在内存哪个地方呢？</p>
+<ol>
+<li>Cortex-A架构版本之前，是由协处理器（<a href="https://developer.arm.com/documentation/den0013/d/ARM-Processor-Modes-and-Registers/Registers/Coprocessor-15?lang=en">Coprocessor 15</a>） <code>CP15</code>的<code>C1</code>寄存器来决定的，且只能存放在 <code>0xFFFF0000</code>和<code>0x00000000</code>两者中的一个。</li>
+<li>从Cortex-A架构版本开始，由协处理器 <code>CP15</code>的<code>c12</code>寄存器来决定，且不限制起始地址</li>
+</ol>
+</blockquote>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241125221405786.png" alt="Table B1-3 The vector tables"></p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241125222433967.png" alt="image-20241125222433967"></p>
+<blockquote>
+<p><a href="https://developer.arm.com/documentation/den0013/d/Exception-Handling/Exception-priorities/Exception-mode-summary?lang=en">https://developer.arm.com/documentation/den0013/d/Exception-Handling/Exception-priorities/Exception-mode-summary?lang=en</a></p>
+</blockquote>
+<h2 id="cortex-a-chu-li-qi-yi-chang-xiang-liang-biao-ji-di-zhi-zhi-ding">Cortex-A处理器异常向量表基地址指定</h2>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241125223320833.png" alt="image-20241125223320833"></p>
+<blockquote>
+<p><a href="https://developer.arm.com/documentation/den0013/d/Exception-Handling/Exception-priorities?lang=en">https://developer.arm.com/documentation/den0013/d/Exception-Handling/Exception-priorities?lang=en</a></p>
+</blockquote>
+<blockquote>
+<p>The first column in <a href="https://developer.arm.com/documentation/den0013/d/Exception-Handling/Exception-priorities?lang=en#CEGHDCAE">Table 11.1</a> gives the vector offset within the vector table associated with the particular type of exception. This is a table of instructions that the ARM core jumps to when an exception is raised. These instructions are located in a specific place in memory. The default vector base address is <code>0x00000000</code>, but most ARM cores permit the vector base address to be moved to <code>0xFFFF0000</code> (or <code>HIVECS</code>). <strong>All Cortex-A series processors permit this, and it is the default address selected by the Linux kernel. Cores that implement the Security Extensions can additionally set the vector base address, separately for Secure and Non-secure states, using the CP15 Vector Base Address registers.</strong></p>
+<p><a href="https://developer.arm.com/documentation/den0013/d/Exception-Handling/Exception-priorities/The-Vector-table?lang=en">https://developer.arm.com/documentation/den0013/d/Exception-Handling/Exception-priorities/The-Vector-table?lang=en</a></p>
+</blockquote>
+<h3 id="cp-15-c-1">CP15 c1</h3>
+<blockquote>
+<p><a href="https://documentation-service.arm.com/static/602cf701083323480d479d18?token=">https://documentation-service.arm.com/static/602cf701083323480d479d18?token=</a></p>
+</blockquote>
+<img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241125225458216.png" alt="image-20241125225458216" style="zoom:50%;">
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241125225614769.png" alt="Table 4-52 SCTLR bit assignments (continued)  "></p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241125225701958.png" alt="image-20241125225701958"></p>
+<h3 id="cp-15-c-12">CP15 c12</h3>
+<blockquote>
+<p><a href="https://developer.arm.com/documentation/ddi0406/cd/?lang=en">ARM Architecture Reference Manual ARMv7-A and ARMv7-R edition</a></p>
+</blockquote>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241125230347930.png" alt="image-20241125230347930"></p>
+<blockquote>
+<p>[!NOTE]</p>
+<p>其中高位[31:5]是向量表的基地址，低位[4:0]是异常向量的偏移量（offset）</p>
+</blockquote>
+<h1 id="svc-swi-yi-chang-chu-li">SVC/SWI异常处理</h1>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241126170039244.png" alt="image-20241126170039244"></p>
+<h2 id="zai-cao-zuo-xi-tong-zhong-de-yun-yong">在操作系统中的运用</h2>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241126170125829.png" alt="image-20241126170125829"></p>
+<h2 id="an-li-dai-ma">案例代码</h2>
+<pre class="line-numbers language-assembly" data-language="assembly"><code class="language-assembly">.global _start
+
+_start:
+    b reset
+    b undefined_instruction
+    b software_interrupt
+    b prefetch_abort
+    b data_abort
+    b not_used
+    b irq_interrupt
+    b fiq_interrupt 
+    
+undefined_instruction:.word undefined_instruction
+prefetch_abort:.word prefetch_abort
+data_abort:.word data_abort
+not_used:.word not_used
+irq_interrupt:.word irq_interrupt
+fiq_interrupt:.word fiq_interrupt
+
+reset:
+    mov r0,#1
+    mov r1,#2
+    mov r2,#3
+    
+    swi #8      @will save CPSR to SPSR and set CPSR(T,M), save PC to LR
+    
+    mov r3,#4
+    mov r4,#5
+	
+software_interrupt:
+    ldr sp,=0x4000fff0
+    stmfd sp!,{r0-r12,lr}
+    
+    ldr r0,[lr,#-4]
+    mov r1,#0xff
+    bic r0,r0,r1,lsl #24
+    
+    ldmfd sp!,{r0-r12,pc}
+    
+stop:
+	b stop				
+	<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<h3 id="ding-yi-yi-chang-xiang-liang-biao">定义异常向量表</h3>
+<p>这里我们将异常向量表放在代码段起始地址：</p>
+<pre class="line-numbers language-assembly" data-language="assembly"><code class="language-assembly">_start:
+    b reset
+    b undefined_instruction
+    b software_interrupt
+    b prefetch_abort
+    b data_abort
+    b not_used
+    b irq_interrupt
+    b fiq_interrupt <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>异常向量表的指令顺序和地址偏移需要遵循规范，当发生异常跳转时处理器会按照规范从异常向量表找到对应的指令来执行</p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241126174514822.png" alt="image-20241126174514822"></p>
+<h3 id="cheng-xu-ru-kou-reset">程序入口reset</h3>
+<p>第一条指令跳转到 <code>reset</code></p>
+<pre class="line-numbers language-assembly" data-language="assembly"><code class="language-assembly">reset:
+    mov r0,#1
+    mov r1,#2
+    mov r2,#3
+    
+    swi #8      @will save CPSR to SPSR and set CPSR(T,M), save PC to LR
+    
+    mov r3,#4
+    mov r4,#5<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>其中我们在 <code>swi</code>软中断指令前后增加了一些寄存器操作来验证一些事情：</p>
+<ul>
+<li>中断返回后，中断前的寄存器应该保持原样</li>
+<li>中断返回后，应该接着下一条指令继续执行</li>
+</ul>
+<h3 id="zhong-duan-tiao-zhuan-arm-he-zi-dong-zuo-de-shi-qing">中断跳转——ARM核自动做的事情</h3>
+<img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241126175353623.png" alt="image-20241126175353623" style="zoom:50%;">
+<ul>
+<li>将当前CPSR保存到异常状态下的SPSR中</li>
+<li>对CPSR进行如下设置
+<ul>
+<li>进入ARM状态（对应CPSR的T位）</li>
+<li>设置工作模式为相应的异常模式（M位）</li>
+<li>禁止中断（设置I位和F位为1）</li>
+</ul>
+</li>
+<li>将当前PC的值保存到LR，以便异常处理完后能够跳转回中断发生的地方继续执行</li>
+<li>将当前PC设置到异常向量表的相应位置（由于我们执行的是 <code>swi</code>软中断，因此会根据异常向量表规范，将PC指向向量表的基地址偏移 <code>0x08</code>的位置）</li>
+</ul>
+<blockquote>
+<p>[!NOTE]</p>
+<p>由于使用的是ARM9E-S的核，因此没有手动指定向量表基地址时，默认为 <code>0x00000000</code>。</p>
+</blockquote>
+<h3 id="zhong-duan-tiao-zhuan-cong-xiang-liang-biao-dao-zhong-duan-fu-wu-cheng-xu">中断跳转——从向量表到中断服务程序</h3>
+<pre class="line-numbers language-assembly" data-language="assembly"><code class="language-assembly">_start:
+    b reset
+    b undefined_instruction
+    b software_interrupt
+    b prefetch_abort
+    b data_abort
+    b not_used
+    b irq_interrupt
+    b fiq_interrupt <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>根据向量表基地址及偏移量 <code>0x08</code>能够找到我们编写的 <code>b software_interrupt</code>，接着跳转到对应的中断服务程序：</p>
+<pre class="line-numbers language-assembly" data-language="assembly"><code class="language-assembly">software_interrupt:
+ldr sp,=0x4000fff0
+stmfd sp!,{r0-r12,lr}
+
+ldr r0,[lr,#-4]
+mov r1,#0xff
+bic r0,r0,r1,lsl #24
+
+ldmfd sp!,{r0-r12,pc}^<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li>
+<p>设置SP，将R0-12、LR压栈保护；</p>
+</li>
+<li>
+<p>将LR偏移 <code>-4</code>的地址中的内容给到R0，由于LR是由ARM核中断跳转时设置的，因此我们回头看看中断跳转的地方：</p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241126181400176.png" alt="image-20241126181400176"></p>
+</li>
+<li>
+<p>接着将 <code>0xff</code>送入R1，并将R1左移24位后作为掩码将R0中的高8位清零，得到中断号 <code>#8</code></p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241126181736106.png" alt="image-20241126181736106"></p>
+</li>
+<li>
+<p><code>ldmfd sp!,{r0-r12,pc}</code>，准备返回，出栈复原R0-R12，将LR（指向 <code>mov r3,#4</code>）送到PC，中断返回</p>
+</li>
+</ul>
+<blockquote>
+<p>[!IMPORTANT]</p>
+<p>这里需要注意的是，<code>ldmfd sp!,{r0-r12,pc}^</code>中的 <code>^</code>，会将SPSR暂存的值写回CPSR</p>
+</blockquote>
+<h1 id="zong-jie">总结</h1>
+<h2 id="yi-chang-chan-sheng-shi-arm-he-zi-dong-zuo-de-shi-qing">异常产生时，ARM核自动做的事情</h2>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241126190902985.png" alt="image-20241126190902985"></p>
+<h2 id="yi-chang-sheng-cheng-zhi-qian-wo-men-xu-yao-zuo-de-shi-qing">异常生成之前，我们需要做的事情</h2>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241126192006040.png" alt="image-20241126192006040"></p>
+<h2 id="yi-chang-fan-hui">异常返回</h2>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241126192130322.png" alt="image-20241126192130322"></p>
+<blockquote>
+<p>[!NOTE]</p>
+<p><code>S</code>后缀表明在原有指令基础上，同时将SPSR恢复到C</p>
+</blockquote>
+<h1 id="the-end">The End</h1>
+]]></content>
+      <categories>
+        <category>ARM</category>
+      </categories>
+      <tags>
+        <tag>ARM</tag>
+        <tag>ARMv7</tag>
+        <tag>异常</tag>
+        <tag>中断</tag>
       </tags>
   </entry>
   <entry>
@@ -1077,272 +1148,6 @@ stop:
       </tags>
   </entry>
   <entry>
-    <title>UART接收缓冲区溢出异常（HAL_UART_ERROR_ORE）问题记录</title>
-    <url>/2024/11/12/13750.html</url>
-    <content><![CDATA[<h1 id="wen-ti-bei-jing">问题背景</h1>
-<h2 id="kai-fa-huan-jing">开发环境</h2>
-<ul>
-<li>硬件：GD32F407VET6开发版</li>
-<li>IDE：STM32CubeMX + Clion + ARM GNU</li>
-<li>烧录：OpenOCD</li>
-</ul>
-<h2 id="shi-yan-mu-biao">实验目标</h2>
-<p>使用Cube配置串口USART1及其中断，引脚复用PA9/PA10，通过使能接收中断 <code>Receive_IT</code>，实现接收7字节时，在中断回调中处理该7个字节数据（简单回传，即echo），并再次开启接收中断，从而实现不断接收7字节、回传7字节的功能。</p>
-<h2 id="yu-dao-wen-ti">遇到问题</h2>
-<p>发送字节数为7时，能够正常echo；但是不为7时，本来期望是单次发送字节数：</p>
-<ul>
-<li>大于7字节时，应该也能每次触发中断，只是多余的字节数被丢弃了而已</li>
-<li>少于7字节时（例如5），则通过再次发送也能触发中断</li>
-</ul>
-<p>但实验过程中发现这两种情况下，会发送echo了一两次之后，后面无论发送多少数据都无法再echo的情况</p>
-<h1 id="qing-jing-zai-xian">情景再现</h1>
-<h2 id="cube-pei-zhi">Cube配置</h2>
-<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241112212649840.png" alt="image-20241112212649840"></p>
-<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241112212742297.png" alt="image-20241112212742297"></p>
-<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241112212813159.png" alt="image-20241112212813159"></p>
-<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241112212840656.png" alt="image-20241112212840656"></p>
-<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241112212935188.png" alt="image-20241112212935188"></p>
-<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241112212959621.png" alt="image-20241112212959621"></p>
-<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241112213059038.png" alt="image-20241112213059038"></p>
-<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241112213254243.png" alt="image-20241112213254243"></p>
-<h2 id="dao-ru-clion">导入Clion</h2>
-<h3 id="bian-yi-pei-zhi-jiao-cha-bian-yi">编译配置-交叉编译</h3>
-<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241112213601046.png" alt="image-20241112213601046"></p>
-<h3 id="cmake-pei-zhi">Cmake配置</h3>
-<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241112213656961.png" alt="image-20241112213656961"></p>
-<h3 id="open-ocd-shao-lu-pei-zhi">OpenOCD烧录配置</h3>
-<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241112213740944.png" alt="image-20241112213740944"></p>
-<p><code>daplink.cfg</code>：</p>
-<pre class="line-numbers language-none"><code class="language-none"># choose st-link/j-link/dap-link etc.
-adapter driver cmsis-dap
-transport select swd
-
-# 0x10000 = 64K Flash Size
-# set FLASH_SIZE 0x20000
-
-# 512KB Flash
-set FLASH_SIZE 0x80000
-
-source [find target/stm32f4x.cfg]
-
-# download speed = 10MHz
-# adapter speed 10000<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<h2 id="dai-ma-liu-cheng">代码流程</h2>
-<ul>
-<li>上电后启用接收中断</li>
-<li>在接收完毕回调中echo，并再次启用接收中断</li>
-</ul>
-<p><code>main.c</code></p>
-<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token comment">/* USER CODE BEGIN 0 */</span>
-<span class="token class-name">uint8_t</span> rxbuf<span class="token punctuation">[</span><span class="token number">7</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token punctuation">{</span><span class="token number">0</span><span class="token punctuation">}</span><span class="token punctuation">;</span>
-<span class="token keyword">void</span> <span class="token function">HAL_UART_RxCpltCallback</span><span class="token punctuation">(</span>UART_HandleTypeDef <span class="token operator">*</span>huart<span class="token punctuation">)</span> <span class="token punctuation">{</span>
-    <span class="token function">HAL_UART_Transmit</span><span class="token punctuation">(</span><span class="token operator">&amp;</span>huart1<span class="token punctuation">,</span> rxbuf<span class="token punctuation">,</span> <span class="token number">7</span><span class="token punctuation">,</span> <span class="token number">100</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-    <span class="token function">HAL_UART_Receive_IT</span><span class="token punctuation">(</span><span class="token operator">&amp;</span>huart1<span class="token punctuation">,</span> rxbuf<span class="token punctuation">,</span> <span class="token number">7</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-<span class="token punctuation">}</span>
-<span class="token comment">/* USER CODE END 0 */</span>
-
-<span class="token keyword">int</span> <span class="token function">main</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
-
-    <span class="token comment">/* USER CODE BEGIN 1 */</span>
-    <span class="token function">__HAL_RCC_HSI_ENABLE</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-    <span class="token function">__HAL_RCC_SYSCLK_CONFIG</span><span class="token punctuation">(</span>RCC_SYSCLKSOURCE_HSI<span class="token punctuation">)</span><span class="token punctuation">;</span>
-    <span class="token comment">/* USER CODE END 1 */</span>
-
-    <span class="token comment">/* MCU Configuration--------------------------------------------------------*/</span>
-
-    <span class="token comment">/* Reset of all peripherals, Initializes the Flash interface and the Systick. */</span>
-    <span class="token function">HAL_Init</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-
-    <span class="token comment">/* USER CODE BEGIN Init */</span>
-
-    <span class="token comment">/* USER CODE END Init */</span>
-
-    <span class="token comment">/* Configure the system clock */</span>
-    <span class="token function">SystemClock_Config</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-
-    <span class="token comment">/* USER CODE BEGIN SysInit */</span>
-
-    <span class="token comment">/* USER CODE END SysInit */</span>
-
-    <span class="token comment">/* Initialize all configured peripherals */</span>
-    <span class="token function">MX_GPIO_Init</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-    <span class="token function">MX_USART1_UART_Init</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-    <span class="token comment">/* USER CODE BEGIN 2 */</span>
-    <span class="token function">HAL_UART_Receive_IT</span><span class="token punctuation">(</span><span class="token operator">&amp;</span>huart1<span class="token punctuation">,</span> rxbuf<span class="token punctuation">,</span> <span class="token number">7</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-    <span class="token comment">/* USER CODE END 2 */</span>
-
-    <span class="token comment">/* Infinite loop */</span>
-    <span class="token comment">/* USER CODE BEGIN WHILE */</span>
-    <span class="token keyword">while</span> <span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
-        <span class="token comment">//        HAL_UART_Transmit_IT(&amp;huart1, (uint8_t *)"Hello, World!\r\n", 14);</span>
-        <span class="token comment">//        HAL_Delay(1000);</span>
-        <span class="token comment">/* USER CODE END WHILE */</span>
-
-        <span class="token comment">/* USER CODE BEGIN 3 */</span>
-    <span class="token punctuation">}</span>
-    <span class="token comment">/* USER CODE END 3 */</span>
-<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<h1 id="yuan-ma-fen-xi">源码分析</h1>
-<h2 id="qi-yong-jie-shou-zhong-duan-hal-uart-receive-it">启用接收中断HAL_UART_Receive_IT</h2>
-<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token class-name">uint8_t</span> rxbuf<span class="token punctuation">[</span><span class="token number">7</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token punctuation">{</span><span class="token number">0</span><span class="token punctuation">}</span><span class="token punctuation">;</span>
-
-<span class="token function">HAL_UART_Receive_IT</span><span class="token punctuation">(</span><span class="token operator">&amp;</span>huart1<span class="token punctuation">,</span> rxbuf<span class="token punctuation">,</span> <span class="token number">7</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
-<p><code>HAL_UART_Receive_IT -&gt; UART_Start_Receive_IT</code></p>
-<pre class="line-numbers language-c" data-language="c"><code class="language-c">huart<span class="token operator">-&gt;</span>pRxBuffPtr <span class="token operator">=</span> pData<span class="token punctuation">;</span>
-huart<span class="token operator">-&gt;</span>RxXferSize <span class="token operator">=</span> Size<span class="token punctuation">;</span>
-huart<span class="token operator">-&gt;</span>RxXferCount <span class="token operator">=</span> Size<span class="token punctuation">;</span>
-
-huart<span class="token operator">-&gt;</span>ErrorCode <span class="token operator">=</span> HAL_UART_ERROR_NONE<span class="token punctuation">;</span>
-huart<span class="token operator">-&gt;</span>RxState <span class="token operator">=</span> HAL_UART_STATE_BUSY_RX<span class="token punctuation">;</span>
-
-<span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
-    
-<span class="token comment">/* Enable the UART Error Interrupt: (Frame error, noise error, overrun error) */</span>
-<span class="token function">__HAL_UART_ENABLE_IT</span><span class="token punctuation">(</span>huart<span class="token punctuation">,</span> UART_IT_ERR<span class="token punctuation">)</span><span class="token punctuation">;</span>
-
-<span class="token comment">/* Enable the UART Data Register not empty Interrupt */</span>
-<span class="token function">__HAL_UART_ENABLE_IT</span><span class="token punctuation">(</span>huart<span class="token punctuation">,</span> UART_IT_RXNE<span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<ul>
-<li><code>pRxBuffPtr</code> ：<strong>保存我们传入的buf指针</strong></li>
-<li><code>RxXferSize</code> ：<strong>保存我们传入的buf大小</strong></li>
-<li><code>RxXferCount</code>： <strong>初始化待接收数据数量</strong></li>
-<li><code>ErrorCode</code>：初始化错误码为 no error</li>
-<li><code>RxState</code>：<strong>标识UART处于接收状态（Data Reception process is ongoing）</strong></li>
-<li>开启UART异常中断
-<ul>
-<li>帧异常（Frame error）</li>
-<li>噪声异常（noise error）</li>
-<li><em><strong>接收缓冲区溢出异常（overrun error）</strong></em></li>
-</ul>
-</li>
-<li>开启接收寄存器非空中断（Enable the UART Data Register not empty Interrupt）</li>
-</ul>
-<h2 id="uart-zhong-duan-xiang-liang-biao">UART中断向量表</h2>
-<p><em><strong>startup_stm32f407vetx.s</strong></em></p>
-<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token punctuation">.</span>word     USART1_IRQHandler                 <span class="token comment">/* USART1                       */</span>       <span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
-<p><em><strong>stm32f4xx_it.c</strong></em></p>
-<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token keyword">void</span> <span class="token function">USART1_IRQHandler</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span>
-<span class="token punctuation">{</span>
-  <span class="token comment">/* USER CODE BEGIN USART1_IRQn 0 */</span>
-
-  <span class="token comment">/* USER CODE END USART1_IRQn 0 */</span>
-  <span class="token function">HAL_UART_IRQHandler</span><span class="token punctuation">(</span><span class="token operator">&amp;</span>huart1<span class="token punctuation">)</span><span class="token punctuation">;</span>
-  <span class="token comment">/* USER CODE BEGIN USART1_IRQn 1 */</span>
-
-  <span class="token comment">/* USER CODE END USART1_IRQn 1 */</span>
-<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<h2 id="shu-ju-jie-shou-chu-li">数据接收处理</h2>
-<p><em><strong>stm32f4xx_it.c</strong></em></p>
-<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token keyword">void</span> <span class="token function">HAL_UART_IRQHandler</span><span class="token punctuation">(</span>UART_HandleTypeDef <span class="token operator">*</span>huart<span class="token punctuation">)</span> <span class="token punctuation">{</span>
-    <span class="token comment">/* If no error occurs */</span>
-    errorflags <span class="token operator">=</span> <span class="token punctuation">(</span>isrflags <span class="token operator">&amp;</span> <span class="token punctuation">(</span><span class="token class-name">uint32_t</span><span class="token punctuation">)</span> <span class="token punctuation">(</span>USART_SR_PE <span class="token operator">|</span> USART_SR_FE <span class="token operator">|</span> USART_SR_ORE <span class="token operator">|</span> USART_SR_NE<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-    <span class="token keyword">if</span> <span class="token punctuation">(</span>errorflags <span class="token operator">==</span> RESET<span class="token punctuation">)</span> <span class="token punctuation">{</span>
-        <span class="token comment">/* UART in mode Receiver -------------------------------------------------*/</span>
-        <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token punctuation">(</span>isrflags <span class="token operator">&amp;</span> USART_SR_RXNE<span class="token punctuation">)</span> <span class="token operator">!=</span> RESET<span class="token punctuation">)</span> <span class="token operator">&amp;&amp;</span> <span class="token punctuation">(</span><span class="token punctuation">(</span>cr1its <span class="token operator">&amp;</span> USART_CR1_RXNEIE<span class="token punctuation">)</span> <span class="token operator">!=</span> RESET<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
-            <span class="token function">UART_Receive_IT</span><span class="token punctuation">(</span>huart<span class="token punctuation">)</span><span class="token punctuation">;</span>
-            <span class="token keyword">return</span><span class="token punctuation">;</span>
-        <span class="token punctuation">}</span>
-    <span class="token punctuation">}</span>
-<span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<p>执行接收数据逻辑（UART_Receive_IT）的前置条件：</p>
-<ul>
-<li>没有UART相关的异常（errorflags）</li>
-<li>接收寄存器非空（USART_SR_RXNE）</li>
-<li>接收寄存器非空中断使能是开启的（USART_CR1_RXNEIE）</li>
-</ul>
-<h2 id="zhu-zi-jie-shou-shu-ju-data-register">逐字接收数据（Data Register）</h2>
-<p><em><strong>stm32f4xx_hal_uart.c/UART_Receive_IT</strong></em></p>
-<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token comment">/* Check that a Rx process is ongoing */</span>
-<span class="token keyword">if</span> <span class="token punctuation">(</span>huart<span class="token operator">-&gt;</span>RxState <span class="token operator">==</span> HAL_UART_STATE_BUSY_RX<span class="token punctuation">)</span> <span class="token punctuation">{</span>
-    <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
-    <span class="token operator">*</span>pdata8bits <span class="token operator">=</span> <span class="token punctuation">(</span><span class="token class-name">uint8_t</span><span class="token punctuation">)</span> <span class="token punctuation">(</span>huart<span class="token operator">-&gt;</span>Instance<span class="token operator">-&gt;</span>DR <span class="token operator">&amp;</span> <span class="token punctuation">(</span><span class="token class-name">uint8_t</span><span class="token punctuation">)</span> <span class="token number">0x00FF</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-	huart<span class="token operator">-&gt;</span>pRxBuffPtr <span class="token operator">+=</span> <span class="token number">1U</span><span class="token punctuation">;</span>
-    <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
-    <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">--</span>huart<span class="token operator">-&gt;</span>RxXferCount <span class="token operator">==</span> <span class="token number">0U</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
-        <span class="token comment">/*Call legacy weak Rx complete callback*/</span>
-		<span class="token function">HAL_UART_RxCpltCallback</span><span class="token punctuation">(</span>huart<span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<ul>
-<li>判断UART是不是处于接收进程中
-<ul>
-<li>我们之前调用过 <code>HAL_UART_Receive_IT</code>，里面会置位这个状态 <code>huart-&gt;RxState = HAL_UART_STATE_BUSY_RX</code></li>
-</ul>
-</li>
-<li>从DR（UART数据寄存器）中读取一个字节到用户自定义缓冲区中（我们调用 <code>HAL_UART_Receive_IT</code> 时传入过一个7字节的<code>buf</code>）</li>
-<li>递减剩余待接收数据数量 <code>huart-&gt;RxXferCount</code>（之前被初始化为7）
-<ul>
-<li>如果递减为0，则说明接收的字节数填满了用户指定缓冲区大小</li>
-<li>然后调用 <code>HAL_UART_RxCpltCallback</code>，这是一个 <code>weak</code>函数（默认是一个空实现），用户可以声明一个对应的非 <code>weak</code>版以实现回调处理。这个理念是经典的<strong>hook钩子函数</strong>。</li>
-</ul>
-</li>
-</ul>
-<h2 id="zhong-xie-huan-chong-qu-jie-shou-wan-bi-hui-diao">重写缓冲区接收完毕回调</h2>
-<p>原型：</p>
-<p><em><strong>stm32f4xx_hal_uart.c</strong></em></p>
-<pre class="line-numbers language-c" data-language="c"><code class="language-c">__weak <span class="token keyword">void</span> <span class="token function">HAL_UART_RxCpltCallback</span><span class="token punctuation">(</span>UART_HandleTypeDef <span class="token operator">*</span>huart<span class="token punctuation">)</span> <span class="token punctuation">{</span>
-    <span class="token comment">/* Prevent unused argument(s) compilation warning */</span>
-    <span class="token function">UNUSED</span><span class="token punctuation">(</span>huart<span class="token punctuation">)</span><span class="token punctuation">;</span>
-    <span class="token comment">/* NOTE: This function should not be modified, when the callback is needed,
-             the HAL_UART_RxCpltCallback could be implemented in the user file
-     */</span>
-<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<p>重写：</p>
-<p><em><strong>main.c</strong></em></p>
-<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token comment">/* USER CODE BEGIN 0 */</span>
-<span class="token class-name">uint8_t</span> rxbuf<span class="token punctuation">[</span><span class="token number">7</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token punctuation">{</span><span class="token number">0</span><span class="token punctuation">}</span><span class="token punctuation">;</span>
-<span class="token keyword">void</span> <span class="token function">HAL_UART_RxCpltCallback</span><span class="token punctuation">(</span>UART_HandleTypeDef <span class="token operator">*</span>huart<span class="token punctuation">)</span> <span class="token punctuation">{</span>
-    <span class="token function">HAL_UART_Transmit</span><span class="token punctuation">(</span><span class="token operator">&amp;</span>huart1<span class="token punctuation">,</span> rxbuf<span class="token punctuation">,</span> <span class="token number">7</span><span class="token punctuation">,</span> <span class="token number">100</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-    <span class="token function">HAL_UART_Receive_IT</span><span class="token punctuation">(</span><span class="token operator">&amp;</span>huart1<span class="token punctuation">,</span> rxbuf<span class="token punctuation">,</span> <span class="token number">7</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-<span class="token punctuation">}</span>
-<span class="token comment">/* USER CODE END 0 */</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<ul>
-<li>将缓冲区7字节数据通过UART TX发送，采用轮询方式（每发一个字节轮询发送状态），超时时间100ms</li>
-<li>重新开启接收中断，以实现下一次的echo</li>
-</ul>
-<h2 id="ding-chang-7-zi-jie-echo-ce-shi">定长7字节echo测试</h2>
-<p>至此，定长7字节数据echo功能就实现了</p>
-<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241113084959956.png" alt="image-20241113084959956"></p>
-<h2 id="chao-7-zi-jie-echo-ce-shi">超7字节echo测试</h2>
-<p><img src="C:/Users/86157/AppData/Roaming/Typora/typora-user-images/image-20241113085040298.png" alt="image-20241113085040298"></p>
-<p>为什么超过我们指定的缓冲区大小（<code>HAL_UART_Transmit</code>的入参 <code>Size</code>）后，功能就不整行了呢？</p>
-<h2 id="uart-zhong-duan-isr-yi-chang-liu-cheng">UART中断ISR-异常流程</h2>
-<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token keyword">void</span> <span class="token function">HAL_UART_IRQHandler</span><span class="token punctuation">(</span>UART_HandleTypeDef <span class="token operator">*</span>huart<span class="token punctuation">)</span> <span class="token punctuation">{</span>
-    <span class="token comment">/* If no error occurs */</span>
-    errorflags <span class="token operator">=</span> <span class="token punctuation">(</span>isrflags <span class="token operator">&amp;</span> <span class="token punctuation">(</span><span class="token class-name">uint32_t</span><span class="token punctuation">)</span> <span class="token punctuation">(</span>USART_SR_PE <span class="token operator">|</span> USART_SR_FE <span class="token operator">|</span> USART_SR_ORE <span class="token operator">|</span> USART_SR_NE<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-    <span class="token keyword">if</span> <span class="token punctuation">(</span>errorflags <span class="token operator">==</span> RESET<span class="token punctuation">)</span> <span class="token punctuation">{</span>
-        <span class="token function">UART_Receive_IT</span><span class="token punctuation">(</span>huart<span class="token punctuation">)</span><span class="token punctuation">;</span>
-     
-     <span class="token comment">/* If some errors occur */</span>
-    <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token punctuation">(</span>errorflags <span class="token operator">!=</span> RESET<span class="token punctuation">)</span> <span class="token operator">&amp;&amp;</span> <span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token punctuation">(</span>cr3its <span class="token operator">&amp;</span> USART_CR3_EIE<span class="token punctuation">)</span> <span class="token operator">!=</span> RESET<span class="token punctuation">)</span>
-                                  <span class="token operator">||</span> <span class="token punctuation">(</span><span class="token punctuation">(</span>cr1its <span class="token operator">&amp;</span> <span class="token punctuation">(</span>USART_CR1_RXNEIE <span class="token operator">|</span> USART_CR1_PEIE<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token operator">!=</span> RESET<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
-        <span class="token comment">/* UART Over-Run interrupt occurred
-         huart-&gt;ErrorCode |= HAL_UART_ERROR_ORE;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<ul>
-<li>没有异常时，会执行 <code>UART_Receive_IT</code>逐字接收数据并在填满缓冲区后触发接收完毕回调 <code>HAL_UART_RxCpltCallback</code></li>
-<li>但是当我们发送8字节时，会触发UART的接收溢出错误，继而转向异常处理流程</li>
-</ul>
-<pre class="line-numbers language-c" data-language="c"><code class="language-c"> <span class="token comment">/* Call UART Error Call back function if need be --------------------------*/</span>
-<span class="token keyword">if</span> <span class="token punctuation">(</span>huart<span class="token operator">-&gt;</span>ErrorCode <span class="token operator">!=</span> HAL_UART_ERROR_NONE<span class="token punctuation">)</span> <span class="token punctuation">{</span>
-     <span class="token comment">/*Call legacy weak error callback*/</span>
-    <span class="token function">HAL_UART_ErrorCallback</span><span class="token punctuation">(</span>huart<span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
-<p>因为异常处理流程不会执行我们自定义的 <code>HAL_UART_RxCpltCallback</code>，也就没有重新开启接收中断 <code>HAL_UART_RxCpltCallback</code>，所以就出现了发送8字节时，后续没有回传的现象：</p>
-<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241113085040298.png" alt="image-20241113085040298"></p>
-<h1 id="si-kao-yi-liu-wen-ti">思考/遗留问题</h1>
-<h2 id="usart-sr-ore-shi-ru-he-bei-she-zhi-de">USART_SR_ORE是如何被设置的</h2>
-<p>为什么发送8字节时会触发USART_SR_ORE错误？</p>
-]]></content>
-      <categories>
-        <category>STM32</category>
-        <category>踩坑记录</category>
-      </categories>
-      <tags>
-        <tag>STM32</tag>
-        <tag>Clion</tag>
-        <tag>GD32</tag>
-        <tag>HAL</tag>
-        <tag>UART</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>ARM核学习（四）ATPS标准_汇编与C混合编程_volatile关键字</title>
     <url>/2024/11/24/59994.html</url>
     <content><![CDATA[<h1 id="can-kao-zi-liao">参考资料</h1>
@@ -1663,220 +1468,415 @@ stop:
       </tags>
   </entry>
   <entry>
-    <title>ARM核学习（五）异常处理</title>
-    <url>/2024/11/25/17360.html</url>
-    <content><![CDATA[<h1 id="can-kao-zi-liao">参考资料</h1>
-<p><a href="https://developer.arm.com/documentation/ddi0406/cd/?lang=en">ARM Architecture Reference Manual ARMv7-A and ARMv7-R edition</a></p>
+    <title>STM32系统时钟初始化源码解析（SPL库，STM32F103ZE）</title>
+    <url>/2024/11/23/19447.html</url>
+    <content><![CDATA[<h1 id="yi-bei-jing">一、背景</h1>
+<h2 id="kai-fa-huan-jing">开发环境</h2>
 <ul>
-<li>B1.8 Exception handling</li>
+<li>STM32F103ZET6</li>
 </ul>
-<p><a href="https://developer.arm.com/documentation/den0013/latest/">ARM® Cortex™-A Series Programmer’s Guide Version: 4.0</a></p>
-<h1 id="yi-chang-jie-shao">异常介绍</h1>
-<h2 id="shi-yao-shi-yi-chang">什么是异常</h2>
-<p>异常是处理器核在执行程序指令的过程中突然遇到了异常的事情，这些事件包括<strong>硬件中断、指令执行错误、用户程序请求服务、内存访问异常、取指令异常</strong>等，几乎每种处理器都支持特定的异常处理，<mark>中断也是异常的一种</mark>。</p>
-<h2 id="arm-de-yi-chang-yuan">ARM的异常源</h2>
-<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241125214514494.png" alt="image-20241125214514494"></p>
-<h2 id="fiq-jiao-irq-kuai-de-yuan-yin">FIQ较IRQ快的原因</h2>
-<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241125214951043.png" alt="image-20241125214951043"></p>
-<h1 id="arm-he-yi-chang-chu-li-guo-cheng">ARM核异常处理过程</h1>
-<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241125215607973.png" alt="image-20241125215607973"></p>
-<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241125214441652.png" alt="处理器工作模式切换"></p>
-<h2 id="yi-chang-xiang-liang-biao">异常向量表</h2>
-<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241125215846276.png" alt="image-20241125215846276"></p>
-<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241125215810206.png" alt="image-20241125215810206"></p>
-<blockquote>
-<p>[!NOTE]</p>
-<p>ARM核怎么知道异常向量表放在内存哪个地方呢？</p>
-<ol>
-<li>Cortex-A架构版本之前，是由协处理器（<a href="https://developer.arm.com/documentation/den0013/d/ARM-Processor-Modes-and-Registers/Registers/Coprocessor-15?lang=en">Coprocessor 15</a>） <code>CP15</code>的<code>C1</code>寄存器来决定的，且只能存放在 <code>0xFFFF0000</code>和<code>0x00000000</code>两者中的一个。</li>
-<li>从Cortex-A架构版本开始，由协处理器 <code>CP15</code>的<code>c12</code>寄存器来决定，且不限制起始地址</li>
-</ol>
-</blockquote>
-<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241125221405786.png" alt="Table B1-3 The vector tables"></p>
-<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241125222433967.png" alt="image-20241125222433967"></p>
-<blockquote>
-<p><a href="https://developer.arm.com/documentation/den0013/d/Exception-Handling/Exception-priorities/Exception-mode-summary?lang=en">https://developer.arm.com/documentation/den0013/d/Exception-Handling/Exception-priorities/Exception-mode-summary?lang=en</a></p>
-</blockquote>
-<h2 id="cortex-a-chu-li-qi-yi-chang-xiang-liang-biao-ji-di-zhi-zhi-ding">Cortex-A处理器异常向量表基地址指定</h2>
-<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241125223320833.png" alt="image-20241125223320833"></p>
-<blockquote>
-<p><a href="https://developer.arm.com/documentation/den0013/d/Exception-Handling/Exception-priorities?lang=en">https://developer.arm.com/documentation/den0013/d/Exception-Handling/Exception-priorities?lang=en</a></p>
-</blockquote>
-<blockquote>
-<p>The first column in <a href="https://developer.arm.com/documentation/den0013/d/Exception-Handling/Exception-priorities?lang=en#CEGHDCAE">Table 11.1</a> gives the vector offset within the vector table associated with the particular type of exception. This is a table of instructions that the ARM core jumps to when an exception is raised. These instructions are located in a specific place in memory. The default vector base address is <code>0x00000000</code>, but most ARM cores permit the vector base address to be moved to <code>0xFFFF0000</code> (or <code>HIVECS</code>). <strong>All Cortex-A series processors permit this, and it is the default address selected by the Linux kernel. Cores that implement the Security Extensions can additionally set the vector base address, separately for Secure and Non-secure states, using the CP15 Vector Base Address registers.</strong></p>
-<p><a href="https://developer.arm.com/documentation/den0013/d/Exception-Handling/Exception-priorities/The-Vector-table?lang=en">https://developer.arm.com/documentation/den0013/d/Exception-Handling/Exception-priorities/The-Vector-table?lang=en</a></p>
-</blockquote>
-<h3 id="cp-15-c-1">CP15 c1</h3>
-<blockquote>
-<p><a href="https://documentation-service.arm.com/static/602cf701083323480d479d18?token=">https://documentation-service.arm.com/static/602cf701083323480d479d18?token=</a></p>
-</blockquote>
-<img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241125225458216.png" alt="image-20241125225458216" style="zoom:50%;">
-<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241125225614769.png" alt="Table 4-52 SCTLR bit assignments (continued)  "></p>
-<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241125225701958.png" alt="image-20241125225701958"></p>
-<h3 id="cp-15-c-12">CP15 c12</h3>
-<blockquote>
-<p><a href="https://developer.arm.com/documentation/ddi0406/cd/?lang=en">ARM Architecture Reference Manual ARMv7-A and ARMv7-R edition</a></p>
-</blockquote>
-<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241125230347930.png" alt="image-20241125230347930"></p>
-<blockquote>
-<p>[!NOTE]</p>
-<p>其中高位[31:5]是向量表的基地址，低位[4:0]是异常向量的偏移量（offset）</p>
-</blockquote>
-<h1 id="svc-swi-yi-chang-chu-li">SVC/SWI异常处理</h1>
-<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241126170039244.png" alt="image-20241126170039244"></p>
-<h2 id="zai-cao-zuo-xi-tong-zhong-de-yun-yong">在操作系统中的运用</h2>
-<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241126170125829.png" alt="image-20241126170125829"></p>
-<h2 id="an-li-dai-ma">案例代码</h2>
-<pre class="line-numbers language-assembly" data-language="assembly"><code class="language-assembly">.global _start
-
-_start:
-    b reset
-    b undefined_instruction
-    b software_interrupt
-    b prefetch_abort
-    b data_abort
-    b not_used
-    b irq_interrupt
-    b fiq_interrupt 
-    
-undefined_instruction:.word undefined_instruction
-prefetch_abort:.word prefetch_abort
-data_abort:.word data_abort
-not_used:.word not_used
-irq_interrupt:.word irq_interrupt
-fiq_interrupt:.word fiq_interrupt
-
-reset:
-    mov r0,#1
-    mov r1,#2
-    mov r2,#3
-    
-    swi #8      @will save CPSR to SPSR and set CPSR(T,M), save PC to LR
-    
-    mov r3,#4
-    mov r4,#5
-	
-software_interrupt:
-    ldr sp,=0x4000fff0
-    stmfd sp!,{r0-r12,lr}
-    
-    ldr r0,[lr,#-4]
-    mov r1,#0xff
-    bic r0,r0,r1,lsl #24
-    
-    ldmfd sp!,{r0-r12,pc}
-    
-stop:
-	b stop				
-	<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<h3 id="ding-yi-yi-chang-xiang-liang-biao">定义异常向量表</h3>
-<p>这里我们将异常向量表放在代码段起始地址：</p>
-<pre class="line-numbers language-assembly" data-language="assembly"><code class="language-assembly">_start:
-    b reset
-    b undefined_instruction
-    b software_interrupt
-    b prefetch_abort
-    b data_abort
-    b not_used
-    b irq_interrupt
-    b fiq_interrupt <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<p>异常向量表的指令顺序和地址偏移需要遵循规范，当发生异常跳转时处理器会按照规范从异常向量表找到对应的指令来执行</p>
-<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241126174514822.png" alt="image-20241126174514822"></p>
-<h3 id="cheng-xu-ru-kou-reset">程序入口reset</h3>
-<p>第一条指令跳转到 <code>reset</code></p>
-<pre class="line-numbers language-assembly" data-language="assembly"><code class="language-assembly">reset:
-    mov r0,#1
-    mov r1,#2
-    mov r2,#3
-    
-    swi #8      @will save CPSR to SPSR and set CPSR(T,M), save PC to LR
-    
-    mov r3,#4
-    mov r4,#5<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<p>其中我们在 <code>swi</code>软中断指令前后增加了一些寄存器操作来验证一些事情：</p>
+<h2 id="yuan-li-tu">原理图</h2>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241123160212385.png" alt="image-20241123160212385"></p>
+<h3 id="hse-gao-su-wai-bu-jing-zhen-high-speed-external-oscillator">HSE-高速外部晶振High Speed External oscillator</h3>
+<p>通过23、24号引脚接入8M的高速外部晶振。</p>
+<h3 id="hsi-di-su-wai-bu-jing-zhen-low-speed-external-oscillator">HSI-低速外部晶振Low Speed External oscillator</h3>
+<p>通过GPIO引脚PC14和PC15的复用接入32.768kHz低速外部晶振。</p>
+<h2 id="yi-cube-de-tu-xing-hua-pei-zhi-wei-li-shuo-ming">以Cube的图形化配置为例说明</h2>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241123160112667.png" alt="image-20241123160112667"></p>
+<p>MCU内置了两个RC震荡电路：</p>
 <ul>
-<li>中断返回后，中断前的寄存器应该保持原样</li>
-<li>中断返回后，应该接着下一条指令继续执行</li>
+<li>HSI RC，High Speed Internal RC，8M高速内部RC震荡电路</li>
+<li>LSI RC，Low Speed Internal RC，40kHz低速内部RC震荡电路</li>
 </ul>
-<h3 id="zhong-duan-tiao-zhuan-arm-he-zi-dong-zuo-de-shi-qing">中断跳转——ARM核自动做的事情</h3>
-<img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241126175353623.png" alt="image-20241126175353623" style="zoom:50%;">
-<ul>
-<li>将当前CPSR保存到异常状态下的SPSR中</li>
-<li>对CPSR进行如下设置
-<ul>
-<li>进入ARM状态（对应CPSR的T位）</li>
-<li>设置工作模式为相应的异常模式（M位）</li>
-<li>禁止中断（设置I位和F位为1）</li>
-</ul>
-</li>
-<li>将当前PC的值保存到LR，以便异常处理完后能够跳转回中断发生的地方继续执行</li>
-<li>将当前PC设置到异常向量表的相应位置（由于我们执行的是 <code>swi</code>软中断，因此会根据异常向量表规范，将PC指向向量表的基地址偏移 <code>0x08</code>的位置）</li>
-</ul>
-<blockquote>
-<p>[!NOTE]</p>
-<p>由于使用的是ARM9E-S的核，因此没有手动指定向量表基地址时，默认为 <code>0x00000000</code>。</p>
-</blockquote>
-<h3 id="zhong-duan-tiao-zhuan-cong-xiang-liang-biao-dao-zhong-duan-fu-wu-cheng-xu">中断跳转——从向量表到中断服务程序</h3>
-<pre class="line-numbers language-assembly" data-language="assembly"><code class="language-assembly">_start:
-    b reset
-    b undefined_instruction
-    b software_interrupt
-    b prefetch_abort
-    b data_abort
-    b not_used
-    b irq_interrupt
-    b fiq_interrupt <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<p>根据向量表基地址及偏移量 <code>0x08</code>能够找到我们编写的 <code>b software_interrupt</code>，接着跳转到对应的中断服务程序：</p>
-<pre class="line-numbers language-assembly" data-language="assembly"><code class="language-assembly">software_interrupt:
-ldr sp,=0x4000fff0
-stmfd sp!,{r0-r12,lr}
-
-ldr r0,[lr,#-4]
-mov r1,#0xff
-bic r0,r0,r1,lsl #24
-
-ldmfd sp!,{r0-r12,pc}^<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<h3 id="wei-shi-yao-mcu-nei-zhi-liao-huan-xu-yao-wai-jie-jing-zhen">为什么MCU内置了，还需要外接晶振</h3>
 <ul>
 <li>
-<p>设置SP，将R0-12、LR压栈保护；</p>
+<p>RC震荡电路容易受到其他电路干扰，导致信号不稳定，且精度远比晶振低。</p>
 </li>
 <li>
-<p>将LR偏移 <code>-4</code>的地址中的内容给到R0，由于LR是由ARM核中断跳转时设置的，因此我们回头看看中断跳转的地方：</p>
-<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241126181400176.png" alt="image-20241126181400176"></p>
+<p>由于MCU的微小封装，无法内嵌较大的晶振</p>
 </li>
 <li>
-<p>接着将 <code>0xff</code>送入R1，并将R1左移24位后作为掩码将R0中的高8位清零，得到中断号 <code>#8</code></p>
-<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241126181736106.png" alt="image-20241126181736106"></p>
-</li>
-<li>
-<p><code>ldmfd sp!,{r0-r12,pc}</code>，准备返回，出栈复原R0-R12，将LR（指向 <code>mov r3,#4</code>）送到PC，中断返回</p>
+<p>将晶振的灵活选择权交给开发者</p>
 </li>
 </ul>
+<h3 id="cube-pei-zhi-jie-xi">Cube配置解析</h3>
+<p>外接晶振通过引脚接入MCU，但由于MCU的主频较高，一般将HSE通过PLL（锁相环，用来倍频）提高频率再作为系统时钟SYSCLK的来源。</p>
+<p>图中 <mark>Mux</mark>是多路选择器 <mark>Multiplex</mark>的缩写，可以看到我们的8M HSE经过了1分频（即不分频），连接到了PLL Source Mux，通过这个多路选择器，我们使用HSE而不是HSI作为PLL的时钟来源（HSE在精度和稳定性上要比HSI好很多）。</p>
+<p>接着经过了PLLMul，即锁相环倍频（PLL Multiply），将HSE的频率放大了9倍得到PLLCLK（8M * 9 = 72M），并连接到了System Clock Mux（即系统时钟多路选择器），这里我们当然选择稳定、高精度、高频的PLLCLK作为系统时钟。</p>
+<h1 id="er-shi-zhong-chu-shi-hua-guo-cheng-yuan-ma-fen-xi-spl-ku">二、时钟初始化过程源码分析（SPL库）</h1>
+<h2 id="shang-dian-fu-wei-hou-hui-fa-sheng-shi-yao">上电/复位后会发生什么？</h2>
+<p>MCU启动的汇编文件 <code>startup.s</code>会被执行：</p>
+<p><code>startup_stm32f10x_hd.s</code></p>
+<pre class="line-numbers language-asm" data-language="asm"><code class="language-asm">Reset_Handler   PROC
+                EXPORT  Reset_Handler             [WEAK]
+                IMPORT  __main
+                IMPORT  SystemInit
+                LDR     R0, =SystemInit
+                BLX     R0               
+                LDR     R0, =__main
+                BX      R0<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p><mark>执行SystemInit函数</mark></p>
+<p>将 <code>SystemInit</code> 函数的入口地址加载到寄存器R0，通过 <code>BLX</code>跳转到其对应的代码段执行该函数，其中就包括了系统时钟的初始化过程。</p>
+<p><mark>执行main函数</mark></p>
+<p>将 <code>main</code> 函数的入口地址加载到寄存器R0，通过 <code>BX</code>跳转到其对应的代码段执行该函数，执行用户代码。</p>
 <blockquote>
-<p>[!IMPORTANT]</p>
-<p>这里需要注意的是，<code>ldmfd sp!,{r0-r12,pc}^</code>中的 <code>^</code>，会将SPSR暂存的值写回CPSR</p>
+<p>该初始化顺序遵循ARM的CMSIS（Cortex Microcontroller Software Interface Standard）标准</p>
 </blockquote>
-<h1 id="zong-jie">总结</h1>
-<h2 id="yi-chang-chan-sheng-shi-arm-he-zi-dong-zuo-de-shi-qing">异常产生时，ARM核自动做的事情</h2>
-<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241126190902985.png" alt="image-20241126190902985"></p>
-<h2 id="yi-chang-sheng-cheng-zhi-qian-wo-men-xu-yao-zuo-de-shi-qing">异常生成之前，我们需要做的事情</h2>
-<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241126192006040.png" alt="image-20241126192006040"></p>
-<h2 id="yi-chang-fan-hui">异常返回</h2>
-<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241126192130322.png" alt="image-20241126192130322"></p>
+<h2 id="system-init">SystemInit</h2>
+<p><a href="https://www.st.com/resource/en/reference_manual/rm0008-stm32f101xx-stm32f102xx-stm32f103xx-stm32f105xx-and-stm32f107xx-advanced-armbased-32bit-mcus-stmicroelectronics.pdf">STM32F107参考手册</a></p>
+<h3 id="qi-yong-hsi-xian-rang-mcu-you-xin-tiao">启用HSI，先让MCU有心跳</h3>
+<p>在<code>system_stm32f10x.c</code>中找到 <code>SystemInit</code>函数，条件编译显示灰色的部分可以忽略</p>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token comment">/* Set HSION bit */</span>
+RCC<span class="token operator">-&gt;</span>CR <span class="token operator">|=</span> <span class="token punctuation">(</span><span class="token class-name">uint32_t</span><span class="token punctuation">)</span><span class="token number">0x00000001</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<p>先开启HSI高速内部时钟（时钟相当于MCU心跳，先让MCU有心跳能够工作，后面再将时钟源通过多路选择器切换为我们配置的HSE），将寄存器的第0位设置为1：</p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241123165840693.png" alt="image-20241123165840693"></p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241123165911410.png" alt="image-20241123165911410"></p>
+<h3 id="fu-wei-shi-zhong-xiang-guan-ji-cun-qi-bi-te-wei">复位时钟相关寄存器比特位</h3>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token comment">/* Reset SW, HPRE, PPRE1, PPRE2, ADCPRE and MCO bits */</span>
+RCC<span class="token operator">-&gt;</span>CFGR <span class="token operator">&amp;=</span> <span class="token punctuation">(</span><span class="token class-name">uint32_t</span><span class="token punctuation">)</span><span class="token number">0xF8FF0000</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<p>该操作会将CFGR（时钟配置）寄存器如下比特位清零：</p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241123170556835.png" alt="image-20241123170556835"></p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241123170704055.png" alt="image-20241123170704055"></p>
+<p>选择HSI（上一步已经开启了）作为系统时钟，其他的（HPRE, PPRE1, PPRE2, ADCPRE and MCO）分析过程类似。</p>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token comment">/* Reset HSEON, CSSON and PLLON bits */</span>
+RCC<span class="token operator">-&gt;</span>CR <span class="token operator">&amp;=</span> <span class="token punctuation">(</span><span class="token class-name">uint32_t</span><span class="token punctuation">)</span><span class="token number">0xFEF6FFFF</span><span class="token punctuation">;</span>
+
+<span class="token comment">/* Reset HSEBYP bit */</span>
+RCC<span class="token operator">-&gt;</span>CR <span class="token operator">&amp;=</span> <span class="token punctuation">(</span><span class="token class-name">uint32_t</span><span class="token punctuation">)</span><span class="token number">0xFFFBFFFF</span><span class="token punctuation">;</span>
+
+<span class="token comment">/* Reset PLLSRC, PLLXTPRE, PLLMUL and USBPRE/OTGFSPRE bits */</span>
+RCC<span class="token operator">-&gt;</span>CFGR <span class="token operator">&amp;=</span> <span class="token punctuation">(</span><span class="token class-name">uint32_t</span><span class="token punctuation">)</span><span class="token number">0xFF80FFFF</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>同样的，也是将一些位清零，将系统时钟初始化为仅由HSI作为时钟源的初始状态</p>
+<h3 id="set-sys-clock-she-zhi-xi-tong-shi-zhong">SetSysClock设置系统时钟</h3>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token comment">/* Enable HSE */</span>    
+RCC<span class="token operator">-&gt;</span>CR <span class="token operator">|=</span> <span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token class-name">uint32_t</span><span class="token punctuation">)</span>RCC_CR_HSEON<span class="token punctuation">)</span><span class="token punctuation">;</span>
+ 
+<span class="token comment">/* Wait till HSE is ready and if Time out is reached exit */</span>
+<span class="token keyword">do</span>
+<span class="token punctuation">{</span>
+  HSEStatus <span class="token operator">=</span> RCC<span class="token operator">-&gt;</span>CR <span class="token operator">&amp;</span> RCC_CR_HSERDY<span class="token punctuation">;</span>
+  StartUpCounter<span class="token operator">++</span><span class="token punctuation">;</span>  
+<span class="token punctuation">}</span> <span class="token keyword">while</span><span class="token punctuation">(</span><span class="token punctuation">(</span>HSEStatus <span class="token operator">==</span> <span class="token number">0</span><span class="token punctuation">)</span> <span class="token operator">&amp;&amp;</span> <span class="token punctuation">(</span>StartUpCounter <span class="token operator">!=</span> HSE_STARTUP_TIMEOUT<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>这里开启了HSE外部高速时钟，并等待HSE的状态转变为READY（由硬件置位）。</p>
+<h3 id="xi-tong-shi-zhong-shu">系统时钟树</h3>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token comment">/* HCLK = SYSCLK */</span>
+RCC<span class="token operator">-&gt;</span>CFGR <span class="token operator">|=</span> <span class="token punctuation">(</span><span class="token class-name">uint32_t</span><span class="token punctuation">)</span>RCC_CFGR_HPRE_DIV1<span class="token punctuation">;</span>
+  
+<span class="token comment">/* PCLK2 = HCLK */</span>
+RCC<span class="token operator">-&gt;</span>CFGR <span class="token operator">|=</span> <span class="token punctuation">(</span><span class="token class-name">uint32_t</span><span class="token punctuation">)</span>RCC_CFGR_PPRE2_DIV1<span class="token punctuation">;</span>
+
+<span class="token comment">/* PCLK1 = HCLK */</span>
+RCC<span class="token operator">-&gt;</span>CFGR <span class="token operator">|=</span> <span class="token punctuation">(</span><span class="token class-name">uint32_t</span><span class="token punctuation">)</span>RCC_CFGR_PPRE1_DIV2<span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>将系统时钟作为AHB和APB2的时钟源（对应HCLK和PCLK2），将系统时钟2分频，作为APB1的时钟源（对应PCLK2）。</p>
 <blockquote>
-<p>[!NOTE]</p>
-<p><code>S</code>后缀表明在原有指令基础上，同时将SPSR恢复到C</p>
+<p>AHB挂载了Cortex核、DMA等主动单元</p>
+<p>APB2挂载了GPIO、USRAT1、ADC等需要高速率时钟的单元</p>
+<p>APB1则挂载了TIMER、I2C等不需要那么高频的单元</p>
 </blockquote>
-<h1 id="the-end">The End</h1>
+<img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241123172121666.png" alt="image-20241123172121666" style="zoom: 50%;">
+<h3 id="pll-bei-pin">PLL倍频</h3>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token comment">/*  PLL configuration: PLLCLK = HSE * 9 = 72 MHz */</span>
+    RCC<span class="token operator">-&gt;</span>CFGR <span class="token operator">&amp;=</span> <span class="token punctuation">(</span><span class="token class-name">uint32_t</span><span class="token punctuation">)</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token class-name">uint32_t</span><span class="token punctuation">)</span><span class="token operator">~</span><span class="token punctuation">(</span>RCC_CFGR_PLLSRC <span class="token operator">|</span> RCC_CFGR_PLLXTPRE <span class="token operator">|</span>
+                                        RCC_CFGR_PLLMULL<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    RCC<span class="token operator">-&gt;</span>CFGR <span class="token operator">|=</span> <span class="token punctuation">(</span><span class="token class-name">uint32_t</span><span class="token punctuation">)</span><span class="token punctuation">(</span>RCC_CFGR_PLLSRC_HSE <span class="token operator">|</span> RCC_CFGR_PLLMULL9<span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li>将PLL时钟来源RCC_CFGR_PLLSRC、HSE进入PLL后的分频RCC_CFGR_PLLXTPRE、PLL倍频系数RCC_CFGR_PLLMULL清零；</li>
+<li>选择PLL时钟来源为HSE（RCC_CFGR_PLLSRC_HSE），倍频系数为9（RCC_CFGR_PLLMULL9）</li>
+</ul>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token comment">/* Enable PLL */</span>
+    RCC<span class="token operator">-&gt;</span>CR <span class="token operator">|=</span> RCC_CR_PLLON<span class="token punctuation">;</span>
+
+    <span class="token comment">/* Wait till PLL is ready */</span>
+    <span class="token keyword">while</span><span class="token punctuation">(</span><span class="token punctuation">(</span>RCC<span class="token operator">-&gt;</span>CR <span class="token operator">&amp;</span> RCC_CR_PLLRDY<span class="token punctuation">)</span> <span class="token operator">==</span> <span class="token number">0</span><span class="token punctuation">)</span>
+    <span class="token punctuation">{</span>
+    <span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>启动PLL锁相环，并等待它稳定。</p>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token comment">/* Select PLL as system clock source */</span>
+   RCC<span class="token operator">-&gt;</span>CFGR <span class="token operator">&amp;=</span> <span class="token punctuation">(</span><span class="token class-name">uint32_t</span><span class="token punctuation">)</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token class-name">uint32_t</span><span class="token punctuation">)</span><span class="token operator">~</span><span class="token punctuation">(</span>RCC_CFGR_SW<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+   RCC<span class="token operator">-&gt;</span>CFGR <span class="token operator">|=</span> <span class="token punctuation">(</span><span class="token class-name">uint32_t</span><span class="token punctuation">)</span>RCC_CFGR_SW_PLL<span class="token punctuation">;</span>    
+
+   <span class="token comment">/* Wait till PLL is used as system clock source */</span>
+   <span class="token keyword">while</span> <span class="token punctuation">(</span><span class="token punctuation">(</span>RCC<span class="token operator">-&gt;</span>CFGR <span class="token operator">&amp;</span> <span class="token punctuation">(</span><span class="token class-name">uint32_t</span><span class="token punctuation">)</span>RCC_CFGR_SWS<span class="token punctuation">)</span> <span class="token operator">!=</span> <span class="token punctuation">(</span><span class="token class-name">uint32_t</span><span class="token punctuation">)</span><span class="token number">0x08</span><span class="token punctuation">)</span>
+   <span class="token punctuation">{</span>
+   <span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>通过系统时钟的多路选择器将PLL选择为系统时钟源，并等待此切换完成。</p>
 ]]></content>
       <categories>
-        <category>ARM</category>
+        <category>STM32</category>
+        <category>源码分析</category>
       </categories>
       <tags>
-        <tag>ARM</tag>
-        <tag>ARMv7</tag>
-        <tag>异常</tag>
-        <tag>中断</tag>
+        <tag>STM32</tag>
+        <tag>SPL</tag>
+        <tag>STM32F103ZE</tag>
+        <tag>时钟</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>UART接收缓冲区溢出异常（HAL_UART_ERROR_ORE）问题记录</title>
+    <url>/2024/11/12/13750.html</url>
+    <content><![CDATA[<h1 id="wen-ti-bei-jing">问题背景</h1>
+<h2 id="kai-fa-huan-jing">开发环境</h2>
+<ul>
+<li>硬件：GD32F407VET6开发版</li>
+<li>IDE：STM32CubeMX + Clion + ARM GNU</li>
+<li>烧录：OpenOCD</li>
+</ul>
+<h2 id="shi-yan-mu-biao">实验目标</h2>
+<p>使用Cube配置串口USART1及其中断，引脚复用PA9/PA10，通过使能接收中断 <code>Receive_IT</code>，实现接收7字节时，在中断回调中处理该7个字节数据（简单回传，即echo），并再次开启接收中断，从而实现不断接收7字节、回传7字节的功能。</p>
+<h2 id="yu-dao-wen-ti">遇到问题</h2>
+<p>发送字节数为7时，能够正常echo；但是不为7时，本来期望是单次发送字节数：</p>
+<ul>
+<li>大于7字节时，应该也能每次触发中断，只是多余的字节数被丢弃了而已</li>
+<li>少于7字节时（例如5），则通过再次发送也能触发中断</li>
+</ul>
+<p>但实验过程中发现这两种情况下，会发送echo了一两次之后，后面无论发送多少数据都无法再echo的情况</p>
+<h1 id="qing-jing-zai-xian">情景再现</h1>
+<h2 id="cube-pei-zhi">Cube配置</h2>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241112212649840.png" alt="image-20241112212649840"></p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241112212742297.png" alt="image-20241112212742297"></p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241112212813159.png" alt="image-20241112212813159"></p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241112212840656.png" alt="image-20241112212840656"></p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241112212935188.png" alt="image-20241112212935188"></p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241112212959621.png" alt="image-20241112212959621"></p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241112213059038.png" alt="image-20241112213059038"></p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241112213254243.png" alt="image-20241112213254243"></p>
+<h2 id="dao-ru-clion">导入Clion</h2>
+<h3 id="bian-yi-pei-zhi-jiao-cha-bian-yi">编译配置-交叉编译</h3>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241112213601046.png" alt="image-20241112213601046"></p>
+<h3 id="cmake-pei-zhi">Cmake配置</h3>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241112213656961.png" alt="image-20241112213656961"></p>
+<h3 id="open-ocd-shao-lu-pei-zhi">OpenOCD烧录配置</h3>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241112213740944.png" alt="image-20241112213740944"></p>
+<p><code>daplink.cfg</code>：</p>
+<pre class="line-numbers language-none"><code class="language-none"># choose st-link/j-link/dap-link etc.
+adapter driver cmsis-dap
+transport select swd
+
+# 0x10000 = 64K Flash Size
+# set FLASH_SIZE 0x20000
+
+# 512KB Flash
+set FLASH_SIZE 0x80000
+
+source [find target/stm32f4x.cfg]
+
+# download speed = 10MHz
+# adapter speed 10000<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<h2 id="dai-ma-liu-cheng">代码流程</h2>
+<ul>
+<li>上电后启用接收中断</li>
+<li>在接收完毕回调中echo，并再次启用接收中断</li>
+</ul>
+<p><code>main.c</code></p>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token comment">/* USER CODE BEGIN 0 */</span>
+<span class="token class-name">uint8_t</span> rxbuf<span class="token punctuation">[</span><span class="token number">7</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token punctuation">{</span><span class="token number">0</span><span class="token punctuation">}</span><span class="token punctuation">;</span>
+<span class="token keyword">void</span> <span class="token function">HAL_UART_RxCpltCallback</span><span class="token punctuation">(</span>UART_HandleTypeDef <span class="token operator">*</span>huart<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token function">HAL_UART_Transmit</span><span class="token punctuation">(</span><span class="token operator">&amp;</span>huart1<span class="token punctuation">,</span> rxbuf<span class="token punctuation">,</span> <span class="token number">7</span><span class="token punctuation">,</span> <span class="token number">100</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">HAL_UART_Receive_IT</span><span class="token punctuation">(</span><span class="token operator">&amp;</span>huart1<span class="token punctuation">,</span> rxbuf<span class="token punctuation">,</span> <span class="token number">7</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+<span class="token comment">/* USER CODE END 0 */</span>
+
+<span class="token keyword">int</span> <span class="token function">main</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+
+    <span class="token comment">/* USER CODE BEGIN 1 */</span>
+    <span class="token function">__HAL_RCC_HSI_ENABLE</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">__HAL_RCC_SYSCLK_CONFIG</span><span class="token punctuation">(</span>RCC_SYSCLKSOURCE_HSI<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token comment">/* USER CODE END 1 */</span>
+
+    <span class="token comment">/* MCU Configuration--------------------------------------------------------*/</span>
+
+    <span class="token comment">/* Reset of all peripherals, Initializes the Flash interface and the Systick. */</span>
+    <span class="token function">HAL_Init</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token comment">/* USER CODE BEGIN Init */</span>
+
+    <span class="token comment">/* USER CODE END Init */</span>
+
+    <span class="token comment">/* Configure the system clock */</span>
+    <span class="token function">SystemClock_Config</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token comment">/* USER CODE BEGIN SysInit */</span>
+
+    <span class="token comment">/* USER CODE END SysInit */</span>
+
+    <span class="token comment">/* Initialize all configured peripherals */</span>
+    <span class="token function">MX_GPIO_Init</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">MX_USART1_UART_Init</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token comment">/* USER CODE BEGIN 2 */</span>
+    <span class="token function">HAL_UART_Receive_IT</span><span class="token punctuation">(</span><span class="token operator">&amp;</span>huart1<span class="token punctuation">,</span> rxbuf<span class="token punctuation">,</span> <span class="token number">7</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token comment">/* USER CODE END 2 */</span>
+
+    <span class="token comment">/* Infinite loop */</span>
+    <span class="token comment">/* USER CODE BEGIN WHILE */</span>
+    <span class="token keyword">while</span> <span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token comment">//        HAL_UART_Transmit_IT(&amp;huart1, (uint8_t *)"Hello, World!\r\n", 14);</span>
+        <span class="token comment">//        HAL_Delay(1000);</span>
+        <span class="token comment">/* USER CODE END WHILE */</span>
+
+        <span class="token comment">/* USER CODE BEGIN 3 */</span>
+    <span class="token punctuation">}</span>
+    <span class="token comment">/* USER CODE END 3 */</span>
+<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<h1 id="yuan-ma-fen-xi">源码分析</h1>
+<h2 id="qi-yong-jie-shou-zhong-duan-hal-uart-receive-it">启用接收中断HAL_UART_Receive_IT</h2>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token class-name">uint8_t</span> rxbuf<span class="token punctuation">[</span><span class="token number">7</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token punctuation">{</span><span class="token number">0</span><span class="token punctuation">}</span><span class="token punctuation">;</span>
+
+<span class="token function">HAL_UART_Receive_IT</span><span class="token punctuation">(</span><span class="token operator">&amp;</span>huart1<span class="token punctuation">,</span> rxbuf<span class="token punctuation">,</span> <span class="token number">7</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+<p><code>HAL_UART_Receive_IT -&gt; UART_Start_Receive_IT</code></p>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c">huart<span class="token operator">-&gt;</span>pRxBuffPtr <span class="token operator">=</span> pData<span class="token punctuation">;</span>
+huart<span class="token operator">-&gt;</span>RxXferSize <span class="token operator">=</span> Size<span class="token punctuation">;</span>
+huart<span class="token operator">-&gt;</span>RxXferCount <span class="token operator">=</span> Size<span class="token punctuation">;</span>
+
+huart<span class="token operator">-&gt;</span>ErrorCode <span class="token operator">=</span> HAL_UART_ERROR_NONE<span class="token punctuation">;</span>
+huart<span class="token operator">-&gt;</span>RxState <span class="token operator">=</span> HAL_UART_STATE_BUSY_RX<span class="token punctuation">;</span>
+
+<span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+    
+<span class="token comment">/* Enable the UART Error Interrupt: (Frame error, noise error, overrun error) */</span>
+<span class="token function">__HAL_UART_ENABLE_IT</span><span class="token punctuation">(</span>huart<span class="token punctuation">,</span> UART_IT_ERR<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token comment">/* Enable the UART Data Register not empty Interrupt */</span>
+<span class="token function">__HAL_UART_ENABLE_IT</span><span class="token punctuation">(</span>huart<span class="token punctuation">,</span> UART_IT_RXNE<span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><code>pRxBuffPtr</code> ：<strong>保存我们传入的buf指针</strong></li>
+<li><code>RxXferSize</code> ：<strong>保存我们传入的buf大小</strong></li>
+<li><code>RxXferCount</code>： <strong>初始化待接收数据数量</strong></li>
+<li><code>ErrorCode</code>：初始化错误码为 no error</li>
+<li><code>RxState</code>：<strong>标识UART处于接收状态（Data Reception process is ongoing）</strong></li>
+<li>开启UART异常中断
+<ul>
+<li>帧异常（Frame error）</li>
+<li>噪声异常（noise error）</li>
+<li><em><strong>接收缓冲区溢出异常（overrun error）</strong></em></li>
+</ul>
+</li>
+<li>开启接收寄存器非空中断（Enable the UART Data Register not empty Interrupt）</li>
+</ul>
+<h2 id="uart-zhong-duan-xiang-liang-biao">UART中断向量表</h2>
+<p><em><strong>startup_stm32f407vetx.s</strong></em></p>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token punctuation">.</span>word     USART1_IRQHandler                 <span class="token comment">/* USART1                       */</span>       <span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<p><em><strong>stm32f4xx_it.c</strong></em></p>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token keyword">void</span> <span class="token function">USART1_IRQHandler</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+  <span class="token comment">/* USER CODE BEGIN USART1_IRQn 0 */</span>
+
+  <span class="token comment">/* USER CODE END USART1_IRQn 0 */</span>
+  <span class="token function">HAL_UART_IRQHandler</span><span class="token punctuation">(</span><span class="token operator">&amp;</span>huart1<span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token comment">/* USER CODE BEGIN USART1_IRQn 1 */</span>
+
+  <span class="token comment">/* USER CODE END USART1_IRQn 1 */</span>
+<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<h2 id="shu-ju-jie-shou-chu-li">数据接收处理</h2>
+<p><em><strong>stm32f4xx_it.c</strong></em></p>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token keyword">void</span> <span class="token function">HAL_UART_IRQHandler</span><span class="token punctuation">(</span>UART_HandleTypeDef <span class="token operator">*</span>huart<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token comment">/* If no error occurs */</span>
+    errorflags <span class="token operator">=</span> <span class="token punctuation">(</span>isrflags <span class="token operator">&amp;</span> <span class="token punctuation">(</span><span class="token class-name">uint32_t</span><span class="token punctuation">)</span> <span class="token punctuation">(</span>USART_SR_PE <span class="token operator">|</span> USART_SR_FE <span class="token operator">|</span> USART_SR_ORE <span class="token operator">|</span> USART_SR_NE<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>errorflags <span class="token operator">==</span> RESET<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token comment">/* UART in mode Receiver -------------------------------------------------*/</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token punctuation">(</span>isrflags <span class="token operator">&amp;</span> USART_SR_RXNE<span class="token punctuation">)</span> <span class="token operator">!=</span> RESET<span class="token punctuation">)</span> <span class="token operator">&amp;&amp;</span> <span class="token punctuation">(</span><span class="token punctuation">(</span>cr1its <span class="token operator">&amp;</span> USART_CR1_RXNEIE<span class="token punctuation">)</span> <span class="token operator">!=</span> RESET<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token function">UART_Receive_IT</span><span class="token punctuation">(</span>huart<span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token keyword">return</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>执行接收数据逻辑（UART_Receive_IT）的前置条件：</p>
+<ul>
+<li>没有UART相关的异常（errorflags）</li>
+<li>接收寄存器非空（USART_SR_RXNE）</li>
+<li>接收寄存器非空中断使能是开启的（USART_CR1_RXNEIE）</li>
+</ul>
+<h2 id="zhu-zi-jie-shou-shu-ju-data-register">逐字接收数据（Data Register）</h2>
+<p><em><strong>stm32f4xx_hal_uart.c/UART_Receive_IT</strong></em></p>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token comment">/* Check that a Rx process is ongoing */</span>
+<span class="token keyword">if</span> <span class="token punctuation">(</span>huart<span class="token operator">-&gt;</span>RxState <span class="token operator">==</span> HAL_UART_STATE_BUSY_RX<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+    <span class="token operator">*</span>pdata8bits <span class="token operator">=</span> <span class="token punctuation">(</span><span class="token class-name">uint8_t</span><span class="token punctuation">)</span> <span class="token punctuation">(</span>huart<span class="token operator">-&gt;</span>Instance<span class="token operator">-&gt;</span>DR <span class="token operator">&amp;</span> <span class="token punctuation">(</span><span class="token class-name">uint8_t</span><span class="token punctuation">)</span> <span class="token number">0x00FF</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+	huart<span class="token operator">-&gt;</span>pRxBuffPtr <span class="token operator">+=</span> <span class="token number">1U</span><span class="token punctuation">;</span>
+    <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">--</span>huart<span class="token operator">-&gt;</span>RxXferCount <span class="token operator">==</span> <span class="token number">0U</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token comment">/*Call legacy weak Rx complete callback*/</span>
+		<span class="token function">HAL_UART_RxCpltCallback</span><span class="token punctuation">(</span>huart<span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li>判断UART是不是处于接收进程中
+<ul>
+<li>我们之前调用过 <code>HAL_UART_Receive_IT</code>，里面会置位这个状态 <code>huart-&gt;RxState = HAL_UART_STATE_BUSY_RX</code></li>
+</ul>
+</li>
+<li>从DR（UART数据寄存器）中读取一个字节到用户自定义缓冲区中（我们调用 <code>HAL_UART_Receive_IT</code> 时传入过一个7字节的<code>buf</code>）</li>
+<li>递减剩余待接收数据数量 <code>huart-&gt;RxXferCount</code>（之前被初始化为7）
+<ul>
+<li>如果递减为0，则说明接收的字节数填满了用户指定缓冲区大小</li>
+<li>然后调用 <code>HAL_UART_RxCpltCallback</code>，这是一个 <code>weak</code>函数（默认是一个空实现），用户可以声明一个对应的非 <code>weak</code>版以实现回调处理。这个理念是经典的<strong>hook钩子函数</strong>。</li>
+</ul>
+</li>
+</ul>
+<h2 id="zhong-xie-huan-chong-qu-jie-shou-wan-bi-hui-diao">重写缓冲区接收完毕回调</h2>
+<p>原型：</p>
+<p><em><strong>stm32f4xx_hal_uart.c</strong></em></p>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c">__weak <span class="token keyword">void</span> <span class="token function">HAL_UART_RxCpltCallback</span><span class="token punctuation">(</span>UART_HandleTypeDef <span class="token operator">*</span>huart<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token comment">/* Prevent unused argument(s) compilation warning */</span>
+    <span class="token function">UNUSED</span><span class="token punctuation">(</span>huart<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token comment">/* NOTE: This function should not be modified, when the callback is needed,
+             the HAL_UART_RxCpltCallback could be implemented in the user file
+     */</span>
+<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>重写：</p>
+<p><em><strong>main.c</strong></em></p>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token comment">/* USER CODE BEGIN 0 */</span>
+<span class="token class-name">uint8_t</span> rxbuf<span class="token punctuation">[</span><span class="token number">7</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token punctuation">{</span><span class="token number">0</span><span class="token punctuation">}</span><span class="token punctuation">;</span>
+<span class="token keyword">void</span> <span class="token function">HAL_UART_RxCpltCallback</span><span class="token punctuation">(</span>UART_HandleTypeDef <span class="token operator">*</span>huart<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token function">HAL_UART_Transmit</span><span class="token punctuation">(</span><span class="token operator">&amp;</span>huart1<span class="token punctuation">,</span> rxbuf<span class="token punctuation">,</span> <span class="token number">7</span><span class="token punctuation">,</span> <span class="token number">100</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">HAL_UART_Receive_IT</span><span class="token punctuation">(</span><span class="token operator">&amp;</span>huart1<span class="token punctuation">,</span> rxbuf<span class="token punctuation">,</span> <span class="token number">7</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+<span class="token comment">/* USER CODE END 0 */</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li>将缓冲区7字节数据通过UART TX发送，采用轮询方式（每发一个字节轮询发送状态），超时时间100ms</li>
+<li>重新开启接收中断，以实现下一次的echo</li>
+</ul>
+<h2 id="ding-chang-7-zi-jie-echo-ce-shi">定长7字节echo测试</h2>
+<p>至此，定长7字节数据echo功能就实现了</p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241113084959956.png" alt="image-20241113084959956"></p>
+<h2 id="chao-7-zi-jie-echo-ce-shi">超7字节echo测试</h2>
+<p><img src="C:/Users/86157/AppData/Roaming/Typora/typora-user-images/image-20241113085040298.png" alt="image-20241113085040298"></p>
+<p>为什么超过我们指定的缓冲区大小（<code>HAL_UART_Transmit</code>的入参 <code>Size</code>）后，功能就不整行了呢？</p>
+<h2 id="uart-zhong-duan-isr-yi-chang-liu-cheng">UART中断ISR-异常流程</h2>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token keyword">void</span> <span class="token function">HAL_UART_IRQHandler</span><span class="token punctuation">(</span>UART_HandleTypeDef <span class="token operator">*</span>huart<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token comment">/* If no error occurs */</span>
+    errorflags <span class="token operator">=</span> <span class="token punctuation">(</span>isrflags <span class="token operator">&amp;</span> <span class="token punctuation">(</span><span class="token class-name">uint32_t</span><span class="token punctuation">)</span> <span class="token punctuation">(</span>USART_SR_PE <span class="token operator">|</span> USART_SR_FE <span class="token operator">|</span> USART_SR_ORE <span class="token operator">|</span> USART_SR_NE<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>errorflags <span class="token operator">==</span> RESET<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token function">UART_Receive_IT</span><span class="token punctuation">(</span>huart<span class="token punctuation">)</span><span class="token punctuation">;</span>
+     
+     <span class="token comment">/* If some errors occur */</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token punctuation">(</span>errorflags <span class="token operator">!=</span> RESET<span class="token punctuation">)</span> <span class="token operator">&amp;&amp;</span> <span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token punctuation">(</span>cr3its <span class="token operator">&amp;</span> USART_CR3_EIE<span class="token punctuation">)</span> <span class="token operator">!=</span> RESET<span class="token punctuation">)</span>
+                                  <span class="token operator">||</span> <span class="token punctuation">(</span><span class="token punctuation">(</span>cr1its <span class="token operator">&amp;</span> <span class="token punctuation">(</span>USART_CR1_RXNEIE <span class="token operator">|</span> USART_CR1_PEIE<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token operator">!=</span> RESET<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token comment">/* UART Over-Run interrupt occurred
+         huart-&gt;ErrorCode |= HAL_UART_ERROR_ORE;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li>没有异常时，会执行 <code>UART_Receive_IT</code>逐字接收数据并在填满缓冲区后触发接收完毕回调 <code>HAL_UART_RxCpltCallback</code></li>
+<li>但是当我们发送8字节时，会触发UART的接收溢出错误，继而转向异常处理流程</li>
+</ul>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"> <span class="token comment">/* Call UART Error Call back function if need be --------------------------*/</span>
+<span class="token keyword">if</span> <span class="token punctuation">(</span>huart<span class="token operator">-&gt;</span>ErrorCode <span class="token operator">!=</span> HAL_UART_ERROR_NONE<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+     <span class="token comment">/*Call legacy weak error callback*/</span>
+    <span class="token function">HAL_UART_ErrorCallback</span><span class="token punctuation">(</span>huart<span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
+<p>因为异常处理流程不会执行我们自定义的 <code>HAL_UART_RxCpltCallback</code>，也就没有重新开启接收中断 <code>HAL_UART_RxCpltCallback</code>，所以就出现了发送8字节时，后续没有回传的现象：</p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241113085040298.png" alt="image-20241113085040298"></p>
+<h1 id="si-kao-yi-liu-wen-ti">思考/遗留问题</h1>
+<h2 id="usart-sr-ore-shi-ru-he-bei-she-zhi-de">USART_SR_ORE是如何被设置的</h2>
+<p>为什么发送8字节时会触发USART_SR_ORE错误？</p>
+]]></content>
+      <categories>
+        <category>STM32</category>
+        <category>踩坑记录</category>
+      </categories>
+      <tags>
+        <tag>STM32</tag>
+        <tag>Clion</tag>
+        <tag>GD32</tag>
+        <tag>HAL</tag>
+        <tag>UART</tag>
       </tags>
   </entry>
   <entry>
@@ -1897,6 +1897,208 @@ ldmfd sp!,{r0-r12,pc}^<span aria-hidden="true" class="line-numbers-rows"><span><
 <pre class="line-numbers language-bash" data-language="bash"><code class="language-bash">$ hexo deploy<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
 <p>More info: <a href="https://hexo.io/docs/one-command-deployment.html">Deployment</a></p>
 ]]></content>
+  </entry>
+  <entry>
+    <title>从按键控制LED开始深入理解外部中断（基于STM32F103ZE）</title>
+    <url>/2024/11/27/59863.html</url>
+    <content><![CDATA[<h1 id="qian-yan">前言</h1>
+<h2 id="can-kao-shou-ce">参考手册</h2>
+<p><a href="https://www.st.com.cn/resource/en/reference_manual/rm0008-stm32f101xx-stm32f102xx-stm32f103xx-stm32f105xx-and-stm32f107xx-advanced-armbased-32bit-mcus-stmicroelectronics.pdf">STM32F101xx, STM32F102xx, STM32F103xx, STM32F105xx and STM32F107xx advanced Arm®-based 32-bit MCUs</a></p>
+<p><a href="https://www.st.com/resource/en/programming_manual/pm0056-stm32f10xxx20xxx21xxxl1xxxx-cortexm3-programming-manual-stmicroelectronics.pdf">STM32F10xxx/20xxx/21xxx/L1xxxx Cortex®-M3 programming manual</a></p>
+<h2 id="wei-shi-yao-xu-yao-wai-bu-zhong-duan">为什么需要外部中断</h2>
+<blockquote>
+<p>[!NOTE]</p>
+<p>按键扫描也可以实现按键控制LED亮灭，为什么需要外部中断呢？</p>
+</blockquote>
+<p>当我们使用按键扫描的方案时，CPU需要主动的不断轮询查看按键的状态，发现其被按下时就将LED状态反转一下。</p>
+<p>如果把我们自己比作CPU，这就相当于我们网购之后，不断去快递点询问快递有没有到，如果没有就一直干等在那里，直到取到快递。在此期间，我们没有办法去做其他事情，时间都被浪费掉了。</p>
+<h2 id="hao-lai-wu-yuan-ze-kong-zhi-fan-zhuan">好莱坞原则/控制反转</h2>
+<p>还有一个著名的好莱坞原则：当演员去试镜后，剧组会告知演员不要打电话给我们，有结果了我们会通知你。</p>
+<p>好莱坞原则是面向对象编程中的一个设计理念，常用来指导模块之间的交互方式。其核心思想是：</p>
+<blockquote>
+<p>“Don’t call us, we’ll call you.”<br>
+“别调用我们，我们会调用你。”</p>
+</blockquote>
+<p>这意味着，在系统的架构设计中，下层模块不主动调用上层模块，而是通过某种机制（例如回调函数、事件驱动或依赖注入）让上层模块在合适的时候去调用下层模块。</p>
+<p>这一原则强调 控制反转（IOC，Inversion of Control），目的是解耦模块，增强代码的可维护性和可扩展性。</p>
+<h1 id="yi-chang-xiang-liang-biao">异常向量表</h1>
+<h2 id="arm-he-yi-chang-xiang-liang-biao">ARM核异常向量表</h2>
+<p>类似的，在按键控制LED案例中，我们无法预知用户会在何时按下按键，因此通过CPU主动地不断轮询这一事件是不明智的。我们应该将控制权交还给用户，希望用户在按下按键时，CPU能够被动地感知到，并执行我们预先编写好的按键事件处理逻辑。</p>
+<p>ARM核是支持中断这一机制的，当中断发生时，ARM能够停下手头上的事情、保存工作现场，转而执行对应的中断处理服务程序，完成后再跳转会中断前的地方，恢复工作现场并继续执行既定程序。</p>
+<img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241127224011740.png" alt="image-20241127224011740" style="zoom: 50%;">
+<blockquote>
+<p><a href="https://www.st.com/resource/en/programming_manual/pm0056-stm32f10xxx20xxx21xxxl1xxxx-cortexm3-programming-manual-stmicroelectronics.pdf">STM32F10xxx/20xxx/21xxx/L1xxxx Cortex®-M3 programming manual</a> P156</p>
+<p>The vector table contains the reset value of the stack pointer, and the start addresses, alsocalled exception vectors, for all exception handlers</p>
+</blockquote>
+<p>上述是ARM核对应异常（中断是异常的一种）向量表的规范：上电后应该初始化SP栈指针，接着执行<code>Reset</code>异常处理函数。我们可以对应STM32提供的标准外设库中的启动汇编程序 <code>startup.s</code>来看下：</p>
+<pre class="line-numbers language-assembly" data-language="assembly"><code class="language-assembly">__Vectors       DCD     __initial_sp               ; Top of Stack
+                DCD     Reset_Handler              ; Reset Handler
+                ...
+                
+; Reset handler
+Reset_Handler   PROC
+                EXPORT  Reset_Handler             [WEAK]
+                IMPORT  __main
+                IMPORT  SystemInit
+                LDR     R0, =SystemInit
+                BLX     R0               
+                LDR     R0, =__main
+                BX      R0
+                ENDP<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>可以发现<code>Reset</code>异常的执行做了两件事情：</p>
+<ol>
+<li>执行 <code>SystemInit</code>函数：可以在<code>system_stm32f1xx.c</code>找到定义，其中做了系统时钟的初始化</li>
+<li>执行 <code>main</code>函数</li>
+</ol>
+<h2 id="yi-chang-fen-lei">异常分类</h2>
+<p>ARM核规范中提供了84个中断（见上表），但STM32F103只实现了70个：</p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241127230557526.png" alt="image-20241127230557526"></p>
+<blockquote>
+<p><a href="https://www.st.com.cn/resource/en/reference_manual/rm0008-stm32f101xx-stm32f102xx-stm32f103xx-stm32f105xx-and-stm32f107xx-advanced-armbased-32bit-mcus-stmicroelectronics.pdf">STM32F101xx, STM32F102xx, STM32F103xx, STM32F105xx and STM32F107xx advanced Arm®-based 32-bit MCUs</a> P1136</p>
+</blockquote>
+<p>这些异常大致可以分为三类：</p>
+<ul>
+<li>ARM核异常：例如复位异常，用于上电后执行用户程序</li>
+<li>外设中断异常：由STM32根据ARM异常规范及SOC（片上外设）实现，例如USART中断、DMA中断、定时器中断等</li>
+<li>外部异常：通过服用GPIO引脚输入功能来实现，可以通过片外硬件触发（例如按键）</li>
+</ul>
+<h2 id="yi-chang-tiao-zhuan">异常跳转</h2>
+<p>当具体的异常发生时，ARM核会根据该异常在向量表中的偏移地址找到对应的异常处理指令来执行，例如外部中断10就会找到 <code>startup_stm32f103xe.s</code>中的 <code>DCD     EXTI15_10_IRQHandler</code>。通过<code>DCD</code>指令存放了 <code>EXTI15_10_IRQHandler</code>函数的入口地址（如果我们定义了该函数，则在链接时就能够找到对应的入口地址）</p>
+<h1 id="stm-32-wai-bu-zhong-duan-shi-jian">STM32外部中断实践</h1>
+<blockquote>
+<p>[!NOTE]</p>
+<p>这里以STM32F103ZE为例</p>
+</blockquote>
+<h2 id="stm-32-zhong-duan-ti-xi-jia-gou">STM32中断体系架构</h2>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241128082243029.png" alt="image-20241128082243029"></p>
+<h2 id="gpio-shu-ru-fu-yong-exti">GPIO输入复用EXTI</h2>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241128084910018.png" alt="image-20241128084910018"></p>
+<p>可以发现，输入不仅会传输到输入数据寄存器IDR，也会接入到复用功能输入（AF Input）；</p>
+<p>如下，EXTI的左边是多个GPIO连接到多路选择器，右边连到中断线，这样就能通过一根中断线处理A-G 7个IO口的引脚。具体中断和其中哪个引脚短接，可以通过设置EXTI中的寄存器（多路选择寄存器）来选择具体的引脚。</p>
+<img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241128084718261.png" alt="image-20241128084718261" style="zoom:50%;">
+<h2 id="wai-bu-zhong-duan-kong-zhi-qi-kuang-tu">外部中断控制器框图</h2>
+<img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241128082339103.png" alt="image-20241128082339103" style="zoom:50%;">
+<ul>
+<li>（falling/rising trigger selection register）边沿触发选择寄存器：可配置触发方式为上升沿、下降沿、还是两者均可</li>
+<li>（software interrupt event register）软件中断事件寄存器：和外部中断通过 <mark>或门</mark>相接，我们可以通过在程序中设置该寄存器从而实现软件触发中断的效果，而不是外部硬件设备（例如按键按下）触发</li>
+<li>（interrupt mask register）中断屏蔽（<mark>mask</mark>）寄存器：该寄存器与外部中断通过 <mark>与门</mark>相接，当该寄存器设置为1时，表明不要屏蔽该外部中断，当其发生时将其递交给 <mark>NVIC</mark></li>
+<li>（pending request register）中断待处理（pending）请求寄存器：如果该外部中断经过了前述寄存器的层层考验，那么该寄存器会被设置（硬件设置）；该寄存器与 <mark>NVIC</mark>对接，<mark>NVIC</mark>检测到该寄存器被设置，那么就会收到中断待处理请求。（相当于EXTI通知NVIC有外部中断了）</li>
+</ul>
+<h2 id="zhong-duan-you-xian-ji-ceng-ji-hua-fen">中断优先级层级划分</h2>
+<p>由于这一部分隶属于ARM核，因此需要查看ARM核相关的参考手册</p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241128090342846.png" alt="image-20241128090342846"></p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241128090422528.png" alt="image-20241128090422528"></p>
+<blockquote>
+<p><a href="https://www.st.com/resource/en/programming_manual/pm0056-stm32f10xxx20xxx21xxxl1xxxx-cortexm3-programming-manual-stmicroelectronics.pdf">STM32F10xxx/20xxx/21xxx/L1xxxx Cortex®-M3 programming manual</a></p>
+</blockquote>
+<p>如果将这三个比特位配置为 <code>011</code>，那么就不划分出子优先级，而只使用抢占优先级</p>
+<h2 id="zhong-duan-you-xian-ji-she-zhi">中断优先级设置</h2>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241128091551647.png" alt="image-20241128091551647"></p>
+<img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241128091800612.png" alt="image-20241128091800612" style="zoom:50%;">
+<blockquote>
+<p>[!NOTE]</p>
+<p>其中八位的高四位（[7:4]）用来表示优先级的值，offset则对应中断号</p>
+</blockquote>
+<h1 id="dai-ma-shi-xian-ji-cun-qi-ban-ben">代码实现（寄存器版本）</h1>
+<h2 id="kai-qi-shi-zhong">开启时钟</h2>
+<p>找到GPIO和AFIO外设挂载的总线：</p>
+<img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241128100638280.png" alt="image-20241128100638280" style="zoom:50%;">
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241128100807316.png" alt="image-20241128100807316"></p>
+<p>增加芯片型号的定义 <code>#define STM32F10X_HD</code>以开启宏定义<code>RCC_APB2ENR_IOPFEN</code></p>
+<pre class="line-numbers language-C" data-language="C"><code class="language-C">#if !defined (STM32F10X_LD) &amp;&amp; !defined (STM32F10X_LD_VL) &amp;&amp; !defined (STM32F10X_MD) &amp;&amp; !defined (STM32F10X_MD_VL) &amp;&amp; !defined (STM32F10X_HD) &amp;&amp; !defined (STM32F10X_HD_VL) &amp;&amp; !defined (STM32F10X_XL) &amp;&amp; !defined (STM32F10X_CL) 
+  /* #define STM32F10X_LD */     /*!&lt; STM32F10X_LD: STM32 Low density devices */
+  /* #define STM32F10X_LD_VL */  /*!&lt; STM32F10X_LD_VL: STM32 Low density Value Line devices */
+  /* #define STM32F10X_MD */     /*!&lt; STM32F10X_MD: STM32 Medium density devices */
+  /* #define STM32F10X_MD_VL */  /*!&lt; STM32F10X_MD_VL: STM32 Medium density Value Line devices */
+  #define STM32F10X_HD     /*!&lt; STM32F10X_HD: STM32 High density devices */
+  /* #define STM32F10X_HD_VL */  /*!&lt; STM32F10X_HD_VL: STM32 High density value line devices */
+  /* #define STM32F10X_XL */     /*!&lt; STM32F10X_XL: STM32 XL-density devices */
+  /* #define STM32F10X_CL */     /*!&lt; STM32F10X_CL: STM32 Connectivity line devices */
+#endif<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>使能时钟：</p>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token comment">// gpio clock</span>
+RCC<span class="token operator">-&gt;</span>APB2ENR <span class="token operator">|=</span> RCC_APB2ENR_IOPFEN<span class="token punctuation">;</span>
+<span class="token comment">// afio clock</span>
+RCC<span class="token operator">-&gt;</span>APB2ENR <span class="token operator">|=</span> RCC_APB2ENR_AFIOEN<span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
+<h2 id="gpio-pei-zhi">GPIO配置</h2>
+<p>由于一端接3V3，因此GPIO可以配置成输入下拉，这样按下时能够产生一个上升沿：</p>
+<img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241128092332887.png" alt="image-20241128092332887" style="zoom: 33%;">
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241128092630183.png" alt="image-20241128092630183"></p>
+<p>并通过ODR将上下拉选择为下拉</p>
+<img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241128093513456.png" alt="image-20241128093513456" style="zoom:50%;">
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241128093142134.png" alt="image-20241128093142134"></p>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token comment">// gpio config for PF10</span>
+   GPIOF<span class="token operator">-&gt;</span>CRH <span class="token operator">&amp;=</span> <span class="token operator">~</span>GPIO_CRH_MODE10<span class="token punctuation">;</span>   <span class="token comment">// input mode</span>
+   GPIOF<span class="token operator">-&gt;</span>CRH <span class="token operator">|=</span> GPIO_CRH_CNF10_1<span class="token punctuation">;</span>   <span class="token comment">// input with pull-up/down</span>
+   GPIOF<span class="token operator">-&gt;</span>CRH <span class="token operator">&amp;=</span> <span class="token operator">~</span>GPIO_CRH_CNF10_0<span class="token punctuation">;</span>
+   GPIOF<span class="token operator">-&gt;</span>ODR <span class="token operator">&amp;=</span> <span class="token operator">~</span>GPIO_ODR_ODR10<span class="token punctuation">;</span>   <span class="token comment">// pull-down</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<h2 id="afio-fu-yong-shu-ru-wei-wai-bu-zhong-duan">AFIO复用输入为外部中断</h2>
+<p>接着我们需要打通GPIO输入到EXTI的通路</p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241128092916951.png" alt="image-20241128092916951"></p>
+<p>将外部中断线10（EXTI10）选择为PF10：</p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241128093641646.png" alt="image-20241128093641646"></p>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token comment">// afio config</span>
+    AFIO<span class="token operator">-&gt;</span>EXTICR<span class="token punctuation">[</span><span class="token number">2</span><span class="token punctuation">]</span> <span class="token operator">&amp;=</span> <span class="token operator">~</span>AFIO_EXTICR3_EXTI10<span class="token punctuation">;</span>
+    AFIO<span class="token operator">-&gt;</span>EXTICR<span class="token punctuation">[</span><span class="token number">2</span><span class="token punctuation">]</span> <span class="token operator">|=</span> AFIO_EXTICR3_EXTI10_PF<span class="token punctuation">;</span>   <span class="token comment">// select PF as exti10</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+<h2 id="exti-pei-zhi">EXTI配置</h2>
+<p>对照其内部框图，看下哪些寄存器需要配置</p>
+<img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241128094127920.png" alt="image-20241128094127920" style="zoom:50%;">
+<h3 id="jie-chu-zhong-duan-ping-bi">解除中断屏蔽</h3>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241128094000914.png" alt="image-20241128094000914"></p>
+<h3 id="qi-yong-shang-sheng-yan-hong-fa">启用上升沿触发</h3>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241128094036359.png" alt="image-20241128094036359"></p>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token comment">// exti config</span>
+    EXTI<span class="token operator">-&gt;</span>IMR <span class="token operator">|=</span> EXTI_IMR_MR10<span class="token punctuation">;</span>   <span class="token comment">// unmask interrupt</span>
+    EXTI<span class="token operator">-&gt;</span>RTSR <span class="token operator">|=</span> EXTI_RTSR_TR10<span class="token punctuation">;</span>   <span class="token comment">// rising edge trigger</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+<h2 id="nvic-pei-zhi">NVIC配置</h2>
+<h3 id="you-xian-ji-ceng-ji-she-zhi">优先级层级设置</h3>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241128094413013.png" alt="image-20241128094413013"></p>
+<h3 id="wei-wai-bu-zhong-duan-hao-zhi-ding-you-xian-ji">为外部中断号指定优先级</h3>
+<img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241128094538150.png" alt="image-20241128094538150" style="zoom:50%;">
+<blockquote>
+<p>[!NOTE]</p>
+<p>这里每8个bit对应一个中断号的优先级，因此使用了21个32bit的IPR寄存器来存储84个中断号对应的优先级</p>
+</blockquote>
+<h3 id="shi-neng-wai-bu-zhong-duan">使能外部中断</h3>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241128094859410.png" alt="image-20241128094859410"></p>
+<blockquote>
+<p>[!IMPORTANT]</p>
+<p>注意EXTI有中断屏蔽开关，NVIC也有中断使能开关；</p>
+</blockquote>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241128095539003.png" alt="image-20241128095539003"></p>
+<blockquote>
+<p>[!NOTE]</p>
+<p>一个bit存储一个中断对应的使能开关，使用了3个32bit的ISER寄存器来存储中断号<mark>0~67</mark>的使能开关</p>
+</blockquote>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token comment">// nvic config</span>
+    <span class="token function">NVIC_SetPriorityGrouping</span><span class="token punctuation">(</span><span class="token number">3</span><span class="token punctuation">)</span><span class="token punctuation">;</span>   <span class="token comment">// only pre-priority</span>
+    <span class="token function">NVIC_SetPriority</span><span class="token punctuation">(</span>EXTI15_10_IRQn<span class="token punctuation">,</span> <span class="token number">3</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">NVIC_EnableIRQ</span><span class="token punctuation">(</span>EXTI15_10_IRQn<span class="token punctuation">)</span><span class="token punctuation">;</span>   <span class="token comment">// response interrupt</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
+<h2 id="ding-yi-zhong-duan-chu-li-han-shu">定义中断处理函数</h2>
+<p>在 <code>startup.s</code>中找到 EXTI10对应的中断函数名称的声明 <code>EXTI15_10_IRQHandler</code></p>
+<pre class="line-numbers language-assembly" data-language="assembly"><code class="language-assembly">__Vectors       DCD     __initial_sp               ; Top of Stack
+                DCD     Reset_Handler              ; Reset Handler
+                DCD     NMI_Handler                ; NMI Handler
+                ...
+                DCD     EXTI15_10_IRQHandler       ; EXTI Line 15..10<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>经过按键抖动判断后反转LED状态：</p>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token keyword">void</span> <span class="token function">EXTI15_10_IRQHandler</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    EXTI<span class="token operator">-&gt;</span>PR <span class="token operator">|=</span> EXTI_PR_PR10<span class="token punctuation">;</span>   <span class="token comment">// clear pending flag</span>
+    <span class="token function">delay_ms</span><span class="token punctuation">(</span><span class="token number">10</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>GPIOF<span class="token operator">-&gt;</span>IDR <span class="token operator">&amp;</span> GPIO_IDR_IDR10<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token function">LED_Toggle</span><span class="token punctuation">(</span>LED1<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<h1 id="the-end">THE END</h1>
+]]></content>
+      <categories>
+        <category>STM32</category>
+      </categories>
+      <tags>
+        <tag>STM32</tag>
+        <tag>外部中断</tag>
+        <tag>EXTI</tag>
+      </tags>
   </entry>
   <entry>
     <title>深入理解I2C时序（以I2C实时时钟PCF8563为案例）</title>
@@ -2511,208 +2713,6 @@ bool <span class="token function">hal_i2c_soft_read</span><span class="token pun
       <tags>
         <tag>多任务</tag>
         <tag>调度</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>从按键控制LED开始深入理解外部中断（基于STM32F103ZE）</title>
-    <url>/2024/11/27/59863.html</url>
-    <content><![CDATA[<h1 id="qian-yan">前言</h1>
-<h2 id="can-kao-shou-ce">参考手册</h2>
-<p><a href="https://www.st.com.cn/resource/en/reference_manual/rm0008-stm32f101xx-stm32f102xx-stm32f103xx-stm32f105xx-and-stm32f107xx-advanced-armbased-32bit-mcus-stmicroelectronics.pdf">STM32F101xx, STM32F102xx, STM32F103xx, STM32F105xx and STM32F107xx advanced Arm®-based 32-bit MCUs</a></p>
-<p><a href="https://www.st.com/resource/en/programming_manual/pm0056-stm32f10xxx20xxx21xxxl1xxxx-cortexm3-programming-manual-stmicroelectronics.pdf">STM32F10xxx/20xxx/21xxx/L1xxxx Cortex®-M3 programming manual</a></p>
-<h2 id="wei-shi-yao-xu-yao-wai-bu-zhong-duan">为什么需要外部中断</h2>
-<blockquote>
-<p>[!NOTE]</p>
-<p>按键扫描也可以实现按键控制LED亮灭，为什么需要外部中断呢？</p>
-</blockquote>
-<p>当我们使用按键扫描的方案时，CPU需要主动的不断轮询查看按键的状态，发现其被按下时就将LED状态反转一下。</p>
-<p>如果把我们自己比作CPU，这就相当于我们网购之后，不断去快递点询问快递有没有到，如果没有就一直干等在那里，直到取到快递。在此期间，我们没有办法去做其他事情，时间都被浪费掉了。</p>
-<h2 id="hao-lai-wu-yuan-ze-kong-zhi-fan-zhuan">好莱坞原则/控制反转</h2>
-<p>还有一个著名的好莱坞原则：当演员去试镜后，剧组会告知演员不要打电话给我们，有结果了我们会通知你。</p>
-<p>好莱坞原则是面向对象编程中的一个设计理念，常用来指导模块之间的交互方式。其核心思想是：</p>
-<blockquote>
-<p>“Don’t call us, we’ll call you.”<br>
-“别调用我们，我们会调用你。”</p>
-</blockquote>
-<p>这意味着，在系统的架构设计中，下层模块不主动调用上层模块，而是通过某种机制（例如回调函数、事件驱动或依赖注入）让上层模块在合适的时候去调用下层模块。</p>
-<p>这一原则强调 控制反转（IOC，Inversion of Control），目的是解耦模块，增强代码的可维护性和可扩展性。</p>
-<h1 id="yi-chang-xiang-liang-biao">异常向量表</h1>
-<h2 id="arm-he-yi-chang-xiang-liang-biao">ARM核异常向量表</h2>
-<p>类似的，在按键控制LED案例中，我们无法预知用户会在何时按下按键，因此通过CPU主动地不断轮询这一事件是不明智的。我们应该将控制权交还给用户，希望用户在按下按键时，CPU能够被动地感知到，并执行我们预先编写好的按键事件处理逻辑。</p>
-<p>ARM核是支持中断这一机制的，当中断发生时，ARM能够停下手头上的事情、保存工作现场，转而执行对应的中断处理服务程序，完成后再跳转会中断前的地方，恢复工作现场并继续执行既定程序。</p>
-<img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241127224011740.png" alt="image-20241127224011740" style="zoom: 50%;">
-<blockquote>
-<p><a href="https://www.st.com/resource/en/programming_manual/pm0056-stm32f10xxx20xxx21xxxl1xxxx-cortexm3-programming-manual-stmicroelectronics.pdf">STM32F10xxx/20xxx/21xxx/L1xxxx Cortex®-M3 programming manual</a> P156</p>
-<p>The vector table contains the reset value of the stack pointer, and the start addresses, alsocalled exception vectors, for all exception handlers</p>
-</blockquote>
-<p>上述是ARM核对应异常（中断是异常的一种）向量表的规范：上电后应该初始化SP栈指针，接着执行<code>Reset</code>异常处理函数。我们可以对应STM32提供的标准外设库中的启动汇编程序 <code>startup.s</code>来看下：</p>
-<pre class="line-numbers language-assembly" data-language="assembly"><code class="language-assembly">__Vectors       DCD     __initial_sp               ; Top of Stack
-                DCD     Reset_Handler              ; Reset Handler
-                ...
-                
-; Reset handler
-Reset_Handler   PROC
-                EXPORT  Reset_Handler             [WEAK]
-                IMPORT  __main
-                IMPORT  SystemInit
-                LDR     R0, =SystemInit
-                BLX     R0               
-                LDR     R0, =__main
-                BX      R0
-                ENDP<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<p>可以发现<code>Reset</code>异常的执行做了两件事情：</p>
-<ol>
-<li>执行 <code>SystemInit</code>函数：可以在<code>system_stm32f1xx.c</code>找到定义，其中做了系统时钟的初始化</li>
-<li>执行 <code>main</code>函数</li>
-</ol>
-<h2 id="yi-chang-fen-lei">异常分类</h2>
-<p>ARM核规范中提供了84个中断（见上表），但STM32F103只实现了70个：</p>
-<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241127230557526.png" alt="image-20241127230557526"></p>
-<blockquote>
-<p><a href="https://www.st.com.cn/resource/en/reference_manual/rm0008-stm32f101xx-stm32f102xx-stm32f103xx-stm32f105xx-and-stm32f107xx-advanced-armbased-32bit-mcus-stmicroelectronics.pdf">STM32F101xx, STM32F102xx, STM32F103xx, STM32F105xx and STM32F107xx advanced Arm®-based 32-bit MCUs</a> P1136</p>
-</blockquote>
-<p>这些异常大致可以分为三类：</p>
-<ul>
-<li>ARM核异常：例如复位异常，用于上电后执行用户程序</li>
-<li>外设中断异常：由STM32根据ARM异常规范及SOC（片上外设）实现，例如USART中断、DMA中断、定时器中断等</li>
-<li>外部异常：通过服用GPIO引脚输入功能来实现，可以通过片外硬件触发（例如按键）</li>
-</ul>
-<h2 id="yi-chang-tiao-zhuan">异常跳转</h2>
-<p>当具体的异常发生时，ARM核会根据该异常在向量表中的偏移地址找到对应的异常处理指令来执行，例如外部中断10就会找到 <code>startup_stm32f103xe.s</code>中的 <code>DCD     EXTI15_10_IRQHandler</code>。通过<code>DCD</code>指令存放了 <code>EXTI15_10_IRQHandler</code>函数的入口地址（如果我们定义了该函数，则在链接时就能够找到对应的入口地址）</p>
-<h1 id="stm-32-wai-bu-zhong-duan-shi-jian">STM32外部中断实践</h1>
-<blockquote>
-<p>[!NOTE]</p>
-<p>这里以STM32F103ZE为例</p>
-</blockquote>
-<h2 id="stm-32-zhong-duan-ti-xi-jia-gou">STM32中断体系架构</h2>
-<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241128082243029.png" alt="image-20241128082243029"></p>
-<h2 id="gpio-shu-ru-fu-yong-exti">GPIO输入复用EXTI</h2>
-<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241128084910018.png" alt="image-20241128084910018"></p>
-<p>可以发现，输入不仅会传输到输入数据寄存器IDR，也会接入到复用功能输入（AF Input）；</p>
-<p>如下，EXTI的左边是多个GPIO连接到多路选择器，右边连到中断线，这样就能通过一根中断线处理A-G 7个IO口的引脚。具体中断和其中哪个引脚短接，可以通过设置EXTI中的寄存器（多路选择寄存器）来选择具体的引脚。</p>
-<img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241128084718261.png" alt="image-20241128084718261" style="zoom:50%;">
-<h2 id="wai-bu-zhong-duan-kong-zhi-qi-kuang-tu">外部中断控制器框图</h2>
-<img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241128082339103.png" alt="image-20241128082339103" style="zoom:50%;">
-<ul>
-<li>（falling/rising trigger selection register）边沿触发选择寄存器：可配置触发方式为上升沿、下降沿、还是两者均可</li>
-<li>（software interrupt event register）软件中断事件寄存器：和外部中断通过 <mark>或门</mark>相接，我们可以通过在程序中设置该寄存器从而实现软件触发中断的效果，而不是外部硬件设备（例如按键按下）触发</li>
-<li>（interrupt mask register）中断屏蔽（<mark>mask</mark>）寄存器：该寄存器与外部中断通过 <mark>与门</mark>相接，当该寄存器设置为1时，表明不要屏蔽该外部中断，当其发生时将其递交给 <mark>NVIC</mark></li>
-<li>（pending request register）中断待处理（pending）请求寄存器：如果该外部中断经过了前述寄存器的层层考验，那么该寄存器会被设置（硬件设置）；该寄存器与 <mark>NVIC</mark>对接，<mark>NVIC</mark>检测到该寄存器被设置，那么就会收到中断待处理请求。（相当于EXTI通知NVIC有外部中断了）</li>
-</ul>
-<h2 id="zhong-duan-you-xian-ji-ceng-ji-hua-fen">中断优先级层级划分</h2>
-<p>由于这一部分隶属于ARM核，因此需要查看ARM核相关的参考手册</p>
-<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241128090342846.png" alt="image-20241128090342846"></p>
-<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241128090422528.png" alt="image-20241128090422528"></p>
-<blockquote>
-<p><a href="https://www.st.com/resource/en/programming_manual/pm0056-stm32f10xxx20xxx21xxxl1xxxx-cortexm3-programming-manual-stmicroelectronics.pdf">STM32F10xxx/20xxx/21xxx/L1xxxx Cortex®-M3 programming manual</a></p>
-</blockquote>
-<p>如果将这三个比特位配置为 <code>011</code>，那么就不划分出子优先级，而只使用抢占优先级</p>
-<h2 id="zhong-duan-you-xian-ji-she-zhi">中断优先级设置</h2>
-<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241128091551647.png" alt="image-20241128091551647"></p>
-<img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241128091800612.png" alt="image-20241128091800612" style="zoom:50%;">
-<blockquote>
-<p>[!NOTE]</p>
-<p>其中八位的高四位（[7:4]）用来表示优先级的值，offset则对应中断号</p>
-</blockquote>
-<h1 id="dai-ma-shi-xian-ji-cun-qi-ban-ben">代码实现（寄存器版本）</h1>
-<h2 id="kai-qi-shi-zhong">开启时钟</h2>
-<p>找到GPIO和AFIO外设挂载的总线：</p>
-<img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241128100638280.png" alt="image-20241128100638280" style="zoom:50%;">
-<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241128100807316.png" alt="image-20241128100807316"></p>
-<p>增加芯片型号的定义 <code>#define STM32F10X_HD</code>以开启宏定义<code>RCC_APB2ENR_IOPFEN</code></p>
-<pre class="line-numbers language-C" data-language="C"><code class="language-C">#if !defined (STM32F10X_LD) &amp;&amp; !defined (STM32F10X_LD_VL) &amp;&amp; !defined (STM32F10X_MD) &amp;&amp; !defined (STM32F10X_MD_VL) &amp;&amp; !defined (STM32F10X_HD) &amp;&amp; !defined (STM32F10X_HD_VL) &amp;&amp; !defined (STM32F10X_XL) &amp;&amp; !defined (STM32F10X_CL) 
-  /* #define STM32F10X_LD */     /*!&lt; STM32F10X_LD: STM32 Low density devices */
-  /* #define STM32F10X_LD_VL */  /*!&lt; STM32F10X_LD_VL: STM32 Low density Value Line devices */
-  /* #define STM32F10X_MD */     /*!&lt; STM32F10X_MD: STM32 Medium density devices */
-  /* #define STM32F10X_MD_VL */  /*!&lt; STM32F10X_MD_VL: STM32 Medium density Value Line devices */
-  #define STM32F10X_HD     /*!&lt; STM32F10X_HD: STM32 High density devices */
-  /* #define STM32F10X_HD_VL */  /*!&lt; STM32F10X_HD_VL: STM32 High density value line devices */
-  /* #define STM32F10X_XL */     /*!&lt; STM32F10X_XL: STM32 XL-density devices */
-  /* #define STM32F10X_CL */     /*!&lt; STM32F10X_CL: STM32 Connectivity line devices */
-#endif<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<p>使能时钟：</p>
-<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token comment">// gpio clock</span>
-RCC<span class="token operator">-&gt;</span>APB2ENR <span class="token operator">|=</span> RCC_APB2ENR_IOPFEN<span class="token punctuation">;</span>
-<span class="token comment">// afio clock</span>
-RCC<span class="token operator">-&gt;</span>APB2ENR <span class="token operator">|=</span> RCC_APB2ENR_AFIOEN<span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
-<h2 id="gpio-pei-zhi">GPIO配置</h2>
-<p>由于一端接3V3，因此GPIO可以配置成输入下拉，这样按下时能够产生一个上升沿：</p>
-<img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241128092332887.png" alt="image-20241128092332887" style="zoom: 33%;">
-<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241128092630183.png" alt="image-20241128092630183"></p>
-<p>并通过ODR将上下拉选择为下拉</p>
-<img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241128093513456.png" alt="image-20241128093513456" style="zoom:50%;">
-<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241128093142134.png" alt="image-20241128093142134"></p>
-<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token comment">// gpio config for PF10</span>
-   GPIOF<span class="token operator">-&gt;</span>CRH <span class="token operator">&amp;=</span> <span class="token operator">~</span>GPIO_CRH_MODE10<span class="token punctuation">;</span>   <span class="token comment">// input mode</span>
-   GPIOF<span class="token operator">-&gt;</span>CRH <span class="token operator">|=</span> GPIO_CRH_CNF10_1<span class="token punctuation">;</span>   <span class="token comment">// input with pull-up/down</span>
-   GPIOF<span class="token operator">-&gt;</span>CRH <span class="token operator">&amp;=</span> <span class="token operator">~</span>GPIO_CRH_CNF10_0<span class="token punctuation">;</span>
-   GPIOF<span class="token operator">-&gt;</span>ODR <span class="token operator">&amp;=</span> <span class="token operator">~</span>GPIO_ODR_ODR10<span class="token punctuation">;</span>   <span class="token comment">// pull-down</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<h2 id="afio-fu-yong-shu-ru-wei-wai-bu-zhong-duan">AFIO复用输入为外部中断</h2>
-<p>接着我们需要打通GPIO输入到EXTI的通路</p>
-<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241128092916951.png" alt="image-20241128092916951"></p>
-<p>将外部中断线10（EXTI10）选择为PF10：</p>
-<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241128093641646.png" alt="image-20241128093641646"></p>
-<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token comment">// afio config</span>
-    AFIO<span class="token operator">-&gt;</span>EXTICR<span class="token punctuation">[</span><span class="token number">2</span><span class="token punctuation">]</span> <span class="token operator">&amp;=</span> <span class="token operator">~</span>AFIO_EXTICR3_EXTI10<span class="token punctuation">;</span>
-    AFIO<span class="token operator">-&gt;</span>EXTICR<span class="token punctuation">[</span><span class="token number">2</span><span class="token punctuation">]</span> <span class="token operator">|=</span> AFIO_EXTICR3_EXTI10_PF<span class="token punctuation">;</span>   <span class="token comment">// select PF as exti10</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
-<h2 id="exti-pei-zhi">EXTI配置</h2>
-<p>对照其内部框图，看下哪些寄存器需要配置</p>
-<img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241128094127920.png" alt="image-20241128094127920" style="zoom:50%;">
-<h3 id="jie-chu-zhong-duan-ping-bi">解除中断屏蔽</h3>
-<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241128094000914.png" alt="image-20241128094000914"></p>
-<h3 id="qi-yong-shang-sheng-yan-hong-fa">启用上升沿触发</h3>
-<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241128094036359.png" alt="image-20241128094036359"></p>
-<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token comment">// exti config</span>
-    EXTI<span class="token operator">-&gt;</span>IMR <span class="token operator">|=</span> EXTI_IMR_MR10<span class="token punctuation">;</span>   <span class="token comment">// unmask interrupt</span>
-    EXTI<span class="token operator">-&gt;</span>RTSR <span class="token operator">|=</span> EXTI_RTSR_TR10<span class="token punctuation">;</span>   <span class="token comment">// rising edge trigger</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
-<h2 id="nvic-pei-zhi">NVIC配置</h2>
-<h3 id="you-xian-ji-ceng-ji-she-zhi">优先级层级设置</h3>
-<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241128094413013.png" alt="image-20241128094413013"></p>
-<h3 id="wei-wai-bu-zhong-duan-hao-zhi-ding-you-xian-ji">为外部中断号指定优先级</h3>
-<img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241128094538150.png" alt="image-20241128094538150" style="zoom:50%;">
-<blockquote>
-<p>[!NOTE]</p>
-<p>这里每8个bit对应一个中断号的优先级，因此使用了21个32bit的IPR寄存器来存储84个中断号对应的优先级</p>
-</blockquote>
-<h3 id="shi-neng-wai-bu-zhong-duan">使能外部中断</h3>
-<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241128094859410.png" alt="image-20241128094859410"></p>
-<blockquote>
-<p>[!IMPORTANT]</p>
-<p>注意EXTI有中断屏蔽开关，NVIC也有中断使能开关；</p>
-</blockquote>
-<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241128095539003.png" alt="image-20241128095539003"></p>
-<blockquote>
-<p>[!NOTE]</p>
-<p>一个bit存储一个中断对应的使能开关，使用了3个32bit的ISER寄存器来存储中断号<mark>0~67</mark>的使能开关</p>
-</blockquote>
-<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token comment">// nvic config</span>
-    <span class="token function">NVIC_SetPriorityGrouping</span><span class="token punctuation">(</span><span class="token number">3</span><span class="token punctuation">)</span><span class="token punctuation">;</span>   <span class="token comment">// only pre-priority</span>
-    <span class="token function">NVIC_SetPriority</span><span class="token punctuation">(</span>EXTI15_10_IRQn<span class="token punctuation">,</span> <span class="token number">3</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-    <span class="token function">NVIC_EnableIRQ</span><span class="token punctuation">(</span>EXTI15_10_IRQn<span class="token punctuation">)</span><span class="token punctuation">;</span>   <span class="token comment">// response interrupt</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
-<h2 id="ding-yi-zhong-duan-chu-li-han-shu">定义中断处理函数</h2>
-<p>在 <code>startup.s</code>中找到 EXTI10对应的中断函数名称的声明 <code>EXTI15_10_IRQHandler</code></p>
-<pre class="line-numbers language-assembly" data-language="assembly"><code class="language-assembly">__Vectors       DCD     __initial_sp               ; Top of Stack
-                DCD     Reset_Handler              ; Reset Handler
-                DCD     NMI_Handler                ; NMI Handler
-                ...
-                DCD     EXTI15_10_IRQHandler       ; EXTI Line 15..10<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<p>经过按键抖动判断后反转LED状态：</p>
-<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token keyword">void</span> <span class="token function">EXTI15_10_IRQHandler</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
-    EXTI<span class="token operator">-&gt;</span>PR <span class="token operator">|=</span> EXTI_PR_PR10<span class="token punctuation">;</span>   <span class="token comment">// clear pending flag</span>
-    <span class="token function">delay_ms</span><span class="token punctuation">(</span><span class="token number">10</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-    <span class="token keyword">if</span> <span class="token punctuation">(</span>GPIOF<span class="token operator">-&gt;</span>IDR <span class="token operator">&amp;</span> GPIO_IDR_IDR10<span class="token punctuation">)</span> <span class="token punctuation">{</span>
-        <span class="token function">LED_Toggle</span><span class="token punctuation">(</span>LED1<span class="token punctuation">)</span><span class="token punctuation">;</span>
-    <span class="token punctuation">}</span>
-<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<h1 id="the-end">THE END</h1>
-]]></content>
-      <categories>
-        <category>STM32</category>
-      </categories>
-      <tags>
-        <tag>STM32</tag>
-        <tag>外部中断</tag>
-        <tag>EXTI</tag>
       </tags>
   </entry>
   <entry>
