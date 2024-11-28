@@ -415,21 +415,21 @@ ARM® Cortex™-A Series Progr">
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-check fa-fw"></i>更新日期:&nbsp;&nbsp;
-                    2024-11-25
+                    2024-11-26
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
-                    471
+                    1.3k
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-clock fa-fw"></i>阅读时长:&nbsp;&nbsp;
-                    2 分
+                    5 分
                 </div>
                 
 
@@ -508,6 +508,151 @@ ARM® Cortex™-A Series Progr">
 <blockquote>
 <p>[!NOTE]</p>
 <p>其中高位[31:5]是向量表的基地址，低位[4:0]是异常向量的偏移量（offset）</p>
+</blockquote>
+<h1 id="svc-swi-yi-chang-chu-li">SVC/SWI异常处理</h1>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241126170039244.png" alt="image-20241126170039244"></p>
+<h2 id="zai-cao-zuo-xi-tong-zhong-de-yun-yong">在操作系统中的运用</h2>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241126170125829.png" alt="image-20241126170125829"></p>
+<h2 id="an-li-dai-ma">案例代码</h2>
+<pre class="line-numbers language-assembly" data-language="assembly"><code class="language-assembly">.global _start
+
+_start:
+    b reset
+    b undefined_instruction
+    b software_interrupt
+    b prefetch_abort
+    b data_abort
+    b not_used
+    b irq_interrupt
+    b fiq_interrupt 
+    
+undefined_instruction:.word undefined_instruction
+prefetch_abort:.word prefetch_abort
+data_abort:.word data_abort
+not_used:.word not_used
+irq_interrupt:.word irq_interrupt
+fiq_interrupt:.word fiq_interrupt
+
+reset:
+    mov r0,#1
+    mov r1,#2
+    mov r2,#3
+    
+    swi #8      @will save CPSR to SPSR and set CPSR(T,M), save PC to LR
+    
+    mov r3,#4
+    mov r4,#5
+	
+software_interrupt:
+    ldr sp,=0x4000fff0
+    stmfd sp!,{r0-r12,lr}
+    
+    ldr r0,[lr,#-4]
+    mov r1,#0xff
+    bic r0,r0,r1,lsl #24
+    
+    ldmfd sp!,{r0-r12,pc}
+    
+stop:
+	b stop				
+	<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<h3 id="ding-yi-yi-chang-xiang-liang-biao">定义异常向量表</h3>
+<p>这里我们将异常向量表放在代码段起始地址：</p>
+<pre class="line-numbers language-assembly" data-language="assembly"><code class="language-assembly">_start:
+    b reset
+    b undefined_instruction
+    b software_interrupt
+    b prefetch_abort
+    b data_abort
+    b not_used
+    b irq_interrupt
+    b fiq_interrupt <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>异常向量表的指令顺序和地址偏移需要遵循规范，当发生异常跳转时处理器会按照规范从异常向量表找到对应的指令来执行</p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241126174514822.png" alt="image-20241126174514822"></p>
+<h3 id="cheng-xu-ru-kou-reset">程序入口reset</h3>
+<p>第一条指令跳转到 <code>reset</code></p>
+<pre class="line-numbers language-assembly" data-language="assembly"><code class="language-assembly">reset:
+    mov r0,#1
+    mov r1,#2
+    mov r2,#3
+    
+    swi #8      @will save CPSR to SPSR and set CPSR(T,M), save PC to LR
+    
+    mov r3,#4
+    mov r4,#5<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>其中我们在 <code>swi</code>软中断指令前后增加了一些寄存器操作来验证一些事情：</p>
+<ul>
+<li>中断返回后，中断前的寄存器应该保持原样</li>
+<li>中断返回后，应该接着下一条指令继续执行</li>
+</ul>
+<h3 id="zhong-duan-tiao-zhuan-arm-he-zi-dong-zuo-de-shi-qing">中断跳转——ARM核自动做的事情</h3>
+<img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241126175353623.png" alt="image-20241126175353623" style="zoom:50%;">
+<ul>
+<li>将当前CPSR保存到异常状态下的SPSR中</li>
+<li>对CPSR进行如下设置
+<ul>
+<li>进入ARM状态（对应CPSR的T位）</li>
+<li>设置工作模式为相应的异常模式（M位）</li>
+<li>禁止中断（设置I位和F位为1）</li>
+</ul>
+</li>
+<li>将当前PC的值保存到LR，以便异常处理完后能够跳转回中断发生的地方继续执行</li>
+<li>将当前PC设置到异常向量表的相应位置（由于我们执行的是 <code>swi</code>软中断，因此会根据异常向量表规范，将PC指向向量表的基地址偏移 <code>0x08</code>的位置）</li>
+</ul>
+<blockquote>
+<p>[!NOTE]</p>
+<p>由于使用的是ARM9E-S的核，因此没有手动指定向量表基地址时，默认为 <code>0x00000000</code>。</p>
+</blockquote>
+<h3 id="zhong-duan-tiao-zhuan-cong-xiang-liang-biao-dao-zhong-duan-fu-wu-cheng-xu">中断跳转——从向量表到中断服务程序</h3>
+<pre class="line-numbers language-assembly" data-language="assembly"><code class="language-assembly">_start:
+    b reset
+    b undefined_instruction
+    b software_interrupt
+    b prefetch_abort
+    b data_abort
+    b not_used
+    b irq_interrupt
+    b fiq_interrupt <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>根据向量表基地址及偏移量 <code>0x08</code>能够找到我们编写的 <code>b software_interrupt</code>，接着跳转到对应的中断服务程序：</p>
+<pre class="line-numbers language-assembly" data-language="assembly"><code class="language-assembly">software_interrupt:
+ldr sp,=0x4000fff0
+stmfd sp!,{r0-r12,lr}
+
+ldr r0,[lr,#-4]
+mov r1,#0xff
+bic r0,r0,r1,lsl #24
+
+ldmfd sp!,{r0-r12,pc}^<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li>
+<p>设置SP，将R0-12、LR压栈保护；</p>
+</li>
+<li>
+<p>将LR偏移 <code>-4</code>的地址中的内容给到R0，由于LR是由ARM核中断跳转时设置的，因此我们回头看看中断跳转的地方：</p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241126181400176.png" alt="image-20241126181400176"></p>
+</li>
+<li>
+<p>接着将 <code>0xff</code>送入R1，并将R1左移24位后作为掩码将R0中的高8位清零，得到中断号 <code>#8</code></p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241126181736106.png" alt="image-20241126181736106"></p>
+</li>
+<li>
+<p><code>ldmfd sp!,{r0-r12,pc}</code>，准备返回，出栈复原R0-R12，将LR（指向 <code>mov r3,#4</code>）送到PC，中断返回</p>
+</li>
+</ul>
+<blockquote>
+<p>[!IMPORTANT]</p>
+<p>这里需要注意的是，<code>ldmfd sp!,{r0-r12,pc}^</code>中的 <code>^</code>，会将SPSR暂存的值写回CPSR</p>
+</blockquote>
+<h1 id="zong-jie">总结</h1>
+<h2 id="yi-chang-chan-sheng-shi-arm-he-zi-dong-zuo-de-shi-qing">异常产生时，ARM核自动做的事情</h2>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241126190902985.png" alt="image-20241126190902985"></p>
+<h2 id="yi-chang-sheng-cheng-zhi-qian-wo-men-xu-yao-zuo-de-shi-qing">异常生成之前，我们需要做的事情</h2>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241126192006040.png" alt="image-20241126192006040"></p>
+<h2 id="yi-chang-fan-hui">异常返回</h2>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241126192130322.png" alt="image-20241126192130322"></p>
+<blockquote>
+<p>[!NOTE]</p>
+<p><code>S</code>后缀表明在原有指令基础上，同时将SPSR恢复到C</p>
 </blockquote>
 <h1 id="the-end">The End</h1>
 
@@ -673,9 +818,9 @@ ARM® Cortex™-A Series Progr">
                 <a href="/2024/11/26/21297.html">
                     <div class="card-image">
                         
-                        <img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/pexels-lu-li-63700378-10521177.jpg" class="responsive-img" alt="裸机多任务调度框架">
+                        <img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/pexels-lu-li-63700378-10521177.jpg" class="responsive-img" alt="简易版裸机多任务调度框架">
                         
-                        <span class="card-title">裸机多任务调度框架</span>
+                        <span class="card-title">简易版裸机多任务调度框架</span>
                     </div>
                 </a>
                 <div class="card-content article-content">
@@ -908,7 +1053,7 @@ ARM® Cortex™-A Series Progr">
             <br>
             
                 &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                        class="white-color">17.6k</span>
+                        class="white-color">21.2k</span>
             
             
             

@@ -6,7 +6,7 @@
   <link href="https://zanwen.github.io/atom.xml" rel="self"/>
   
   <link href="https://zanwen.github.io/"/>
-  <updated>2024-11-26T01:49:18.779Z</updated>
+  <updated>2024-11-28T02:11:01.619Z</updated>
   <id>https://zanwen.github.io/</id>
   
   <author>
@@ -17,11 +17,73 @@
   <generator uri="https://hexo.io/">Hexo</generator>
   
   <entry>
-    <title>裸机多任务调度框架</title>
+    <title>从按键控制LED开始深入理解外部中断（基于STM32F103ZE）</title>
+    <link href="https://zanwen.github.io/2024/11/27/59863.html"/>
+    <id>https://zanwen.github.io/2024/11/27/59863.html</id>
+    <published>2024-11-27T13:49:26.000Z</published>
+    <updated>2024-11-28T02:11:01.619Z</updated>
+    
+    
+      
+      
+        
+        
+    <summary type="html">&lt;h1 id=&quot;qian-yan&quot;&gt;前言&lt;/h1&gt;
+&lt;h2 id=&quot;can-kao-shou-ce&quot;&gt;参考手册&lt;/h2&gt;
+&lt;p&gt;&lt;a</summary>
+        
+      
+    
+    
+    
+    <category term="STM32" scheme="https://zanwen.github.io/categories/STM32/"/>
+    
+    
+    <category term="STM32" scheme="https://zanwen.github.io/tags/STM32/"/>
+    
+    <category term="外部中断" scheme="https://zanwen.github.io/tags/%E5%A4%96%E9%83%A8%E4%B8%AD%E6%96%AD/"/>
+    
+    <category term="EXTI" scheme="https://zanwen.github.io/tags/EXTI/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>算法之美</title>
+    <link href="https://zanwen.github.io/2024/11/26/23674.html"/>
+    <id>https://zanwen.github.io/2024/11/26/23674.html</id>
+    <published>2024-11-26T06:15:30.000Z</published>
+    <updated>2024-11-26T08:57:23.110Z</updated>
+    
+    
+      
+      
+        
+        
+    <summary type="html">&lt;h1 id=&quot;chun-bian-cheng-ti&quot;&gt;纯编程题&lt;/h1&gt;
+&lt;h1 id=&quot;zhao-gui-lu-ti&quot;&gt;找规律题&lt;/h1&gt;
+&lt;h1 id=&quot;lian-biao&quot;&gt;链表&lt;/h1&gt;
+&lt;h1 id=&quot;zhan-he-dui-lie&quot;&gt;栈和队列&lt;/h1&gt;
+&lt;h1</summary>
+        
+      
+    
+    
+    
+    <category term="算法" scheme="https://zanwen.github.io/categories/%E7%AE%97%E6%B3%95/"/>
+    
+    
+    <category term="算法" scheme="https://zanwen.github.io/tags/%E7%AE%97%E6%B3%95/"/>
+    
+    <category term="LeetCode" scheme="https://zanwen.github.io/tags/LeetCode/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>简易版裸机多任务调度框架</title>
     <link href="https://zanwen.github.io/2024/11/26/21297.html"/>
     <id>https://zanwen.github.io/2024/11/26/21297.html</id>
     <published>2024-11-26T01:29:21.000Z</published>
-    <updated>2024-11-26T01:49:18.779Z</updated>
+    <updated>2024-11-26T08:58:35.005Z</updated>
     
     
       
@@ -50,7 +112,7 @@
     <link href="https://zanwen.github.io/2024/11/25/17360.html"/>
     <id>https://zanwen.github.io/2024/11/25/17360.html</id>
     <published>2024-11-25T13:30:22.000Z</published>
-    <updated>2024-11-25T15:05:23.920Z</updated>
+    <updated>2024-11-26T11:22:05.765Z</updated>
     
     
       
@@ -332,9 +394,9 @@
     <category term="踩坑记录" scheme="https://zanwen.github.io/categories/STM32/%E8%B8%A9%E5%9D%91%E8%AE%B0%E5%BD%95/"/>
     
     
-    <category term="Clion" scheme="https://zanwen.github.io/tags/Clion/"/>
-    
     <category term="STM32" scheme="https://zanwen.github.io/tags/STM32/"/>
+    
+    <category term="Clion" scheme="https://zanwen.github.io/tags/Clion/"/>
     
     <category term="GD32" scheme="https://zanwen.github.io/tags/GD32/"/>
     
