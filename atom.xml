@@ -6,7 +6,7 @@
   <link href="https://zanwen.github.io/atom.xml" rel="self"/>
   
   <link href="https://zanwen.github.io/"/>
-  <updated>2024-11-28T02:14:30.047Z</updated>
+  <updated>2024-11-29T05:13:26.399Z</updated>
   <id>https://zanwen.github.io/</id>
   
   <author>
@@ -15,6 +15,36 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>深入理解UART串口通信（基于STM32F103）</title>
+    <link href="https://zanwen.github.io/2024/11/28/38060.html"/>
+    <id>https://zanwen.github.io/2024/11/28/38060.html</id>
+    <published>2024-11-28T11:16:13.000Z</published>
+    <updated>2024-11-29T05:13:26.399Z</updated>
+    
+    
+      
+      
+        
+        
+    <summary type="html">&lt;h1 id=&quot;can-kao-shou-ce&quot;&gt;参考手册&lt;/h1&gt;
+&lt;p&gt;&lt;a</summary>
+        
+      
+    
+    
+    
+    <category term="STM32" scheme="https://zanwen.github.io/categories/STM32/"/>
+    
+    
+    <category term="STM32" scheme="https://zanwen.github.io/tags/STM32/"/>
+    
+    <category term="UART" scheme="https://zanwen.github.io/tags/UART/"/>
+    
+    <category term="串口" scheme="https://zanwen.github.io/tags/%E4%B8%B2%E5%8F%A3/"/>
+    
+  </entry>
   
   <entry>
     <title>从按键控制LED开始深入理解外部中断（基于STM32F103ZE）</title>
@@ -52,7 +82,7 @@
     <link href="https://zanwen.github.io/2024/11/26/23674.html"/>
     <id>https://zanwen.github.io/2024/11/26/23674.html</id>
     <published>2024-11-26T06:15:30.000Z</published>
-    <updated>2024-11-28T02:12:11.883Z</updated>
+    <updated>2024-11-29T09:28:58.682Z</updated>
     
     
       
