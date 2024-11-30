@@ -4,12 +4,10 @@
 
 <head>
     <meta charset="utf-8">
-    <meta name="keywords" content="ARM核学习（三）指令流水线分析及伪指令, 安文的博客">
-    <meta name="description" content="指令流水线分析
-前言
-在ARM核中，为增加处理器指令流的速度，ARM7系列使用3级流水线。允许多个操作同时处理，而非顺
-序执行。不同的ARM核，流水线的级数是不一样的，ARM核版本越高，流水线级数越多。对于软件工
-程师编程而言，统一按照三级">
+    <meta name="keywords" content="MDK调试之可视化外设&amp;内核寄存器, 安文的博客">
+    <meta name="description" content="前言
+我们经常遇到一个困惑：明明感觉代码没有问题，但是运行时就是无法按照预期执行。并且把别人的示例拿过来跑是可以跑通的，确认了硬件没问题，比对代码也找不出差异。
+这通常是因为一些细节问题导致的，这类问题在逐检查时常常因为当局者迷难以发现，最">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <meta name="renderer" content="webkit|ie-stand|ie-comp">
@@ -21,7 +19,7 @@
     <!-- Global site tag (gtag.js) - Google Analytics -->
 
 
-    <title>ARM核学习（三）指令流水线分析及伪指令 | 安文的博客</title>
+    <title>MDK调试之可视化外设&amp;内核寄存器 | 安文的博客</title>
     <link rel="icon" type="image/png" href="/medias/logo.png">
     
 
@@ -341,12 +339,12 @@
 
 
 
-<div class="bg-cover pd-header post-cover" style="background-image: url('https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/pexels-navraj-pradhan-511329-1242987.jpg')">
+<div class="bg-cover pd-header post-cover" style="background-image: url('https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/pexels-mei-lin-1483020-6666098.jpg')">
     <div class="container" style="right: 0px;left: 0px;">
         <div class="row">
             <div class="col s12 m12 l12">
                 <div class="brand">
-                    <h1 class="description center-align post-title">ARM核学习（三）指令流水线分析及伪指令</h1>
+                    <h1 class="description center-align post-title">MDK调试之可视化外设&amp;内核寄存器</h1>
                 </div>
             </div>
         </div>
@@ -370,16 +368,16 @@
                     
                     <div class="article-tag">
                         
-                            <a href="/tags/ARM/">
-                                <span class="chip bg-color">ARM</span>
+                            <a href="/tags/MDK/">
+                                <span class="chip bg-color">MDK</span>
                             </a>
                         
-                            <a href="/tags/ARMv7/">
-                                <span class="chip bg-color">ARMv7</span>
+                            <a href="/tags/Debug/">
+                                <span class="chip bg-color">Debug</span>
                             </a>
                         
-                            <a href="/tags/%E6%8C%87%E4%BB%A4%E6%B5%81%E6%B0%B4%E7%BA%BF/">
-                                <span class="chip bg-color">指令流水线</span>
+                            <a href="/tags/%E5%AF%84%E5%AD%98%E5%99%A8%E5%8F%AF%E8%A7%86%E5%8C%96/">
+                                <span class="chip bg-color">寄存器可视化</span>
                             </a>
                         
                     </div>
@@ -390,8 +388,8 @@
                     <div class="post-cate">
                         <i class="fas fa-bookmark fa-fw icon-category"></i>
                         
-                            <a href="/categories/ARM/" class="post-category">
-                                ARM
+                            <a href="/categories/MDK/" class="post-category">
+                                MDK
                             </a>
                         
                     </div>
@@ -403,28 +401,28 @@
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-minus fa-fw"></i>发布日期:&nbsp;&nbsp;
-                    2024-11-24
+                    2024-11-30
                 </div>
                 
 
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-check fa-fw"></i>更新日期:&nbsp;&nbsp;
-                    2024-11-24
+                    2024-11-30
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
-                    1.8k
+                    548
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-clock fa-fw"></i>阅读时长:&nbsp;&nbsp;
-                    6 分
+                    1 分
                 </div>
                 
 
@@ -447,122 +445,49 @@
 
         <div class="card-content article-card-content">
             <div id="articleContent">
-                <h1 id="zhi-ling-liu-shui-xian-fen-xi">指令流水线分析</h1>
-<h2 id="qian-yan">前言</h2>
-<p>在ARM核中，为增加处理器指令流的速度，ARM7系列使用3级流水线。允许多个操作同时处理，而非顺<br>
-序执行。<mark>不同的ARM核，流水线的级数是不一样的，ARM核版本越高，流水线级数越多。对于软件工</mark><br>
-<mark>程师编程而言，统一按照三级流水线来分析就可以了。</mark></p>
-<img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241124174742518.png" alt="image-20241124174742518" style="zoom: 33%;">
-<blockquote>
-<p>在MDK中断点调试时会发现PC指向的当前代码行，这是因为MDK调试屏蔽了底层流水线细节，以避免产生歧义。</p>
-</blockquote>
-<p>在ARM状态，指令位宽为32位4字节，因此当PC预取（例如）0x8地址的指令时，0x4地址的指令正在被解码、0x0地址的指令正在被执行。Thumb状态是压缩格式的指令集，指令位宽是16位2字节，因此偏差是2。</p>
-<h2 id="zui-jia-liu-shui-xian-fen-xi-jin-cao-zuo-ji-cun-qi">最佳流水线分析（仅操作寄存器）</h2>
-<img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241124175951254.png" alt="image-20241124175951254" style="zoom:50%;">
-<h2 id="nei-cun-fang-wen-zhi-ling-liu-shui-xian">内存访问指令流水线</h2>
-<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241124180204732.png" alt="image-20241124180204732"></p>
-<p>由于内存访问效率较低，因此在执行LDR指令时，无法在一个指令周期内完成（需要E、M、W三个周期）。这样，即使它前面的D跑得快，但解码的指令无法移交给E（它手上的活还没干完），只能干等，F也是一样。</p>
-<h2 id="fen-zhi-tiao-zhuan-liu-shui-xian-ju-li">分支（跳转）流水线举例</h2>
-<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241124181209542.png" alt="image-20241124181209542"></p>
-<p>在E执行跳转指令时，跑在它前面的F、D不得不丢弃已完成的工（解码 <code>0x3004 SUB</code>，预取 <code>0x3008 AND</code>）作，转而从目标地址重新开始F、D、E流程。</p>
-<p>图中E执行 <code>BL 0X8FEC</code>时，F正在预取 <code>0x3008</code>地址的指令，在该指令周期结束时，PC指向 <code>0x3008</code>，且由于是 <code>BL</code>跳转，因此该值会被保存到 <code>LR</code>寄存器中。</p>
-<p>当执行 <code>L</code>指令时，会将<code>LR</code>回写到 <code>PC</code>中，但是由于此前对于 <code>0X3004</code>的解码工作被丢弃了，因此处理器会自动执行一个 <code>A</code>指令，将 <code>PC</code>调整到 <code>0x3004</code>的位置接着执行。</p>
-<h2 id="zong-jie">总结</h2>
+                <h1 id="qian-yan">前言</h1>
+<p>我们经常遇到一个困惑：明明感觉代码没有问题，但是运行时就是无法按照预期执行。并且把别人的示例拿过来跑是可以跑通的，确认了硬件没问题，比对代码也找不出差异。</p>
+<p>这通常是因为一些细节问题导致的，这类问题在逐检查时常常因为当局者迷难以发现，最常见的就是位运算相关的细节错误例如：</p>
 <ul>
-<li>当只有寄存器操作（操作效率和CPU处于同一量级）时，指令流线效率是最高的：在每个指令周期，流水线上的三个工人F、D、E都在不停互相配合，高效完成指令执行所需的三个阶段的工作。</li>
-<li>当访问内存（外设）时，由于物理特性，处理器的工作效率远高于外设，因此工人E只能放慢节奏和外设协同把活干了，这期间即使F、D完成了手头上的活，由于不能向D、E移交，因此也只能干等着。导致了级联停顿（stall）的效应。</li>
-<li>当发生跳转时，工人F、D超前完成的工作只能被迫丢弃，转而从新的指令地址重新开始干活，且如果跳转回来，之前干完的活还得重新再干一次。</li>
+<li>
+<p>清零错误：</p>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c">GPIOA<span class="token operator">-&gt;</span>CRH <span class="token operator">&amp;=</span> GPIO_CRH_MODE10<span class="token punctuation">;</span> <span class="token comment">//期望将GPIOA的CRH寄存器中的PA10工作模式清零</span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<p>上述代码少了 <code>~</code>，正确操作如下：</p>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c">GPIOA<span class="token operator">-&gt;</span>CRH <span class="token operator">&amp;=</span> <span class="token operator">~</span>GPIO_CRH_MODE10<span class="token punctuation">;</span> <span class="token comment">//期望将GPIOA的CRH寄存器中的PA10工作模式清零</span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+</li>
+<li>
+<p>判断某一位是否为1：</p>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token keyword">if</span><span class="token punctuation">(</span>USART1<span class="token operator">-&gt;</span>SR <span class="token operator">&amp;</span> USART_SR_RXNE <span class="token operator">==</span> <span class="token number">1</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    buffer<span class="token punctuation">[</span>size<span class="token operator">++</span><span class="token punctuation">]</span> <span class="token operator">=</span> USART1<span class="token operator">-&gt;</span>DR<span class="token punctuation">;</span>
+<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+<p>通过按位与来判断某一位是否为1应该操作如下：</p>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token keyword">if</span><span class="token punctuation">(</span>USART1<span class="token operator">-&gt;</span>SR <span class="token operator">&amp;</span> USART_SR_RXNE<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    buffer<span class="token punctuation">[</span>size<span class="token operator">++</span><span class="token punctuation">]</span> <span class="token operator">=</span> USART1<span class="token operator">-&gt;</span>DR<span class="token punctuation">;</span>
+<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+</li>
 </ul>
-<h1 id="chang-yong-wei-zhi-ling-fen-xi">常用伪指令分析</h1>
-<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241124183925641.png" alt="image-20241124183925641"></p>
-<h2 id="ldr-r-0-0-x-12345678-fen-xi">LDR R0,=0x12345678 分析</h2>
-<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241124184043373.png" alt="image-20241124184043373"></p>
-<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241124184314696.png" alt="image-20241124184314696"></p>
-<p>编译器会将常量 <code>0x12345678</code>预先放到某个内存中（通常是所有代码指令之后），并将LDR翻译成一条读内存的指令。</p>
-<h2 id="ldr-r-0-label-fen-xi">LDR R0,=label 分析</h2>
-<p>标签本质上是一个常量，它的值就是标签后第一条指令的地址，可以理解为给这个地址取了个别名。</p>
-<h3 id="dai-ma-duan-qi-shi-di-zhi-wei-0-x-0">代码段起始地址为0x0</h3>
-<p>对于给定的代码段起始地址和指令位宽，每条指令的存放地址在编译阶段都可以确定，如下将代码段的起始地址配置为 <code>0x0</code>：</p>
-<img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241124185737443.png" alt="image-20241124185737443" style="zoom:33%;">
-<p>对于ARM状态下（指令位宽为4字节），如下代码的每条指令都可以顺序计算其存储地址</p>
-<pre class="line-numbers language-assembly" data-language="assembly"><code class="language-assembly">.global _start
-
-_start:
-	mov r1,#1			@0x00000000
-	mov r2,#2			@0x00000004
-	ldr r3,=addr		@0x00000008
-	ldr r4,[r3]			@0x0000000C
-	
-stop:
-	b stop				@0x00000010
-	
-addr:					@给0x00000014取了个别名叫addr
-	.word 0x12345678	@0x00000014 在这个地址存放一个字的数据
-		<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<p>需要注意的是：标签的声明并不属于指令，因此不占用地址空间。其中 <code>ldr r3,=addr</code>等价于 <code>ldr r3,=0x00000014</code>。</p>
-<p><code>ldr r3,=addr</code>（将addr表示的地址值加载到R3）分析如下：</p>
-<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241124190511217.png" alt="image-20241124190511217"></p>
-<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241124190550278.png" alt="image-20241124190550278"></p>
-<p><code>ldr r4,[r3]</code>：从R3对应的地址读取数据（该数据 <code>0x12345678</code> 在编译阶段通过 <code>.word</code>伪指令预先存储在了内存空间中）</p>
-<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241124190809542.png" alt="image-20241124190809542"></p>
-<h3 id="dai-ma-duan-qi-shi-di-zhi-wei-0-x-2000">代码段起始地址为0x2000</h3>
-<p>将代码段起始地址改为0x2000，计算规则是一样的，在编译阶段就能确定各个指令以及 <code>.word</code>数据存放的地址（注意修改后需要重新编译下）：</p>
-<img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241124200510540.png" alt="image-20241124200510540" style="zoom:33%;">
-<p>调试前需要修改下内存映射，默认是从0x0开始执行的，我们需要让0x0到0x2000及其后的一段内存都可执行：</p>
-<img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241124200751229.png" alt="image-20241124200751229" style="zoom:50%;">
-<p>然后在 <code>_start</code>的第一条指令打个断点，跳过从0x0到0x2000之间的无效指令：</p>
-<img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241124201005483.png" alt="image-20241124201005483" style="zoom: 33%;">
-<img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241124200325028.png" alt="image-20241124200325028" style="zoom:33%;">
-<h3 id="zong-jie-1">总结</h3>
-<img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241124195231017.png" alt="image-20241124195231017" style="zoom: 50%;">
-<h2 id="ldr-r-0-label-fen-xi-1">LDR R0,label 分析</h2>
-<pre class="line-numbers language-assembly" data-language="assembly"><code class="language-assembly">.global _start
-
-_start:
-	mov r1,#1			
-	mov r2,#2			
-	ldr r3,addr			
-	mov r4,r3			
-stop:
-	b stop				
-addr:	
-	.word 0x12345678	
-		<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<p><code>ldr r3,=addr</code>可以理解为将标签 <code>addr</code>的值当做常量加载到R3中，而 <code>ldr r3,addr</code>则是从 <code>addr</code>对应的地址加载数据到R3中，相当于 <code>R3=p</code>和 <code>R3=*p</code>的关系</p>
-<img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241124201244164.png" alt="image-20241124201244164" style="zoom: 33%;">
-<h2 id="adr-r-0-label-dong-tai-huo-qu-biao-qian-di-zhi">ADR R0,label 动态获取标签地址</h2>
-<blockquote>
-<p>This instruction adds an immediate value to the PC value to form a PC-relative address, and writes the result to the destination register.</p>
-</blockquote>
-<p>ADR 是 “Address” 的缩写，它是一条用于生成地址的伪指令。ADR 指令用于计算一个目标地址，并将其存储到指定的寄存器中。目标地址是基于当前 PC 加上一个偏移量计算得出的，因此它只能访问当前代码段附近的地址。</p>
-<h3 id="strong-zhi-ling-ge-shi-strong"><strong>指令格式</strong></h3>
-<pre class="line-numbers language-assembly" data-language="assembly"><code class="language-assembly">ADR &lt;Rd&gt;, &lt;label&gt;<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
-<ul>
-<li><code>&lt;Rd&gt;</code>：目标寄存器，用于存储计算出的地址。</li>
-<li><code>&lt;label&gt;</code>：目标地址标签，必须位于当前指令前后一定范围内。</li>
-</ul>
-<h3 id="shi-li">示例</h3>
-<pre class="line-numbers language-assembly" data-language="assembly"><code class="language-assembly">.global _start
-
-_start:
-	mov r1,#1			
-	mov r2,#2			
-	adr r3,addr			
-	ldr r4,[r3]		
-stop:
-	b stop				
-addr:	
-	.word 0x12345678	
-		<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241124202620567.png" alt="image-20241124202620567"></p>
-<h3 id="dui-bi-ldr-r-0-label">对比 LDR R0,=label</h3>
-<p>如下图，<code>LDR R0,=label</code>编译时，编译器会根据代码段起始地址和指令位宽计算出label对应的地址值（<code>0x00000014</code>），并单独开辟一个内存（<code>0x00000018</code>）存放这个<mark>写死</mark>的数据，在运行时通过LDR读取这个内存中写死的label地址值到R3中。</p>
-<p>如果起始地址为 <code>0x2000</code>，那么编译器就会在内存中存放一个写死的 <code>0x2014</code>，显然这是一种<mark>静态的做法</mark>（和编译时设置的代码段起始地址是<mark>强绑定的</mark>），如果程序换一个地址空间运行，这个写死的地址值就没有意义了。</p>
-<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241124203311920.png" alt="image-20241124203311920"></p>
-<p>而 <code>ADR R0,label</code>则是运行时动态获取标签对应的地址值，例如编译器知道执行当前指令时，通过在PC上偏移4个字节就能寻址到label对应的地址，那么通过 <code>ADD</code>指令就能在<mark>运行时动态获取</mark>该label对应的地址。这种做法是<mark>不依赖编译时设定的代码段起始地址的，无论使用什么起始地址，都能够得到一个正确的标签地址</mark>。</p>
-<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241124204230866.png" alt="image-20241124204230866"></p>
-<h2 id="ru-he-pan-bie-dai-ma-zai-shi-ji-nei-cun-zhong-yun-xing-de-di-zhi">🌟如何判别代码在实际内存中运行的地址？</h2>
-<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241124204803253.png" alt="image-20241124204803253"></p>
+<h1 id="mdk-wai-she-ji-cun-qi-shi-tu">MDK外设寄存器视图</h1>
+<p>通过MDK的Debug功能，我们实时查看代码执行到断电时，对应的外设寄存器中的值，从而可视化地分析响应的寄存器是否真的按照预期被设置了，从而避免检查代码时无法察觉细节错误的情况。</p>
+<p>以 <code>GPIOA-&gt;CRH &amp;= GPIO_CRH_MODE10</code>为例，我们期望通过这一行代码将 <code>CRH</code>寄存器的第8、9个bit清零</p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241130112416568.png" alt="image-20241130112416568"></p>
+<h2 id="she-zhi-duan-dian">设置断点</h2>
+<p>可以在该行代码的左侧点击打上断点：</p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241130112531806.png" alt="image-20241130112531806"></p>
+<h2 id="fang-xing-cheng-xu-dao-duan-dian-chu-zan-ting">放行程序到断点处暂停</h2>
+<p>然后进入Debug模式并通过Run使程序停在断点处：</p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241130112707073.png" alt="image-20241130112707073"></p>
+<h2 id="da-kai-wai-she-xi-tong-shi-tu">打开外设系统视图</h2>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241130112746427.png" alt="image-20241130112746427"></p>
+<h2 id="zhao-dao-dui-ying-ji-cun-qi">找到对应寄存器</h2>
+<img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241130112926649.png" alt="image-20241130112926649" style="zoom:50%;">
+<h2 id="bu-jin-bing-cha-kan-dui-ying-ji-cun-qi-shi-fou-an-zhao-yu-qi-bei-she-zhi">步进并查看对应寄存器是否按照预期被设置</h2>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241130113658038.png" alt="image-20241130113658038"></p>
+<p>步进后发现本来预期只设置MODE10，结果发现其他的bit位也被影响了（高亮部分），说明我们的代码有问题</p>
+<h1 id="zhi-jie-xiu-gai-ji-cun-qi-bing-sheng-xiao">直接修改寄存器并生效</h1>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241130115225062.png" alt="image-20241130115225062"></p>
+<p>如上，我们可以通过勾选/取消勾选（相当于ODR置1/0），并实时观察LED的变化。其他寄存器中可编辑的地方应该也都是可以实时手动修改的。</p>
+<h1 id="arm-he-xiang-guan-ji-cun-qi">ARM核相关寄存器</h1>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241130115446304.png" alt="image-20241130115446304"></p>
 
                 
             </div>
@@ -589,7 +514,7 @@ addr:
                     </i>
                 </span>
                 <span class="reprint-info">
-                    <a href="https://zanwen.github.io/2024/11/24/14899.html">https://zanwen.github.io/2024/11/24/14899.html</a>
+                    <a href="https://zanwen.github.io/2024/11/30/5535.html">https://zanwen.github.io/2024/11/30/5535.html</a>
                 </span>
             </div>
             <div class="reprint__notice">
@@ -627,16 +552,16 @@ addr:
                     
                         <div class="article-tag">
                             
-                                <a href="/tags/ARM/">
-                                    <span class="chip bg-color">ARM</span>
+                                <a href="/tags/MDK/">
+                                    <span class="chip bg-color">MDK</span>
                                 </a>
                             
-                                <a href="/tags/ARMv7/">
-                                    <span class="chip bg-color">ARMv7</span>
+                                <a href="/tags/Debug/">
+                                    <span class="chip bg-color">Debug</span>
                                 </a>
                             
-                                <a href="/tags/%E6%8C%87%E4%BB%A4%E6%B5%81%E6%B0%B4%E7%BA%BF/">
-                                    <span class="chip bg-color">指令流水线</span>
+                                <a href="/tags/%E5%AF%84%E5%AD%98%E5%99%A8%E5%8F%AF%E8%A7%86%E5%8C%96/">
+                                    <span class="chip bg-color">寄存器可视化</span>
                                 </a>
                             
                         </div>
@@ -715,16 +640,17 @@ addr:
 <article id="prenext-posts" class="prev-next articles">
     <div class="row article-row">
         
-        <div class="article col s12 m6" data-aos="fade-up">
+        <div class="article col s12 m6" data-aos="fade-up" data-aos="fade-up">
             <div class="article-badge left-badge text-color">
-                <i class="fas fa-chevron-left"></i>&nbsp;上一篇</div>
+                <i class="far fa-dot-circle"></i>&nbsp;本篇
+            </div>
             <div class="card">
-                <a href="/2024/11/24/59994.html">
+                <a href="/2024/11/30/5535.html">
                     <div class="card-image">
                         
-                        <img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/pexels-infinityadventure-10728303.jpg" class="responsive-img" alt="ARM核学习（四）ATPS标准_汇编与C混合编程_volatile关键字">
+                        <img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/pexels-mei-lin-1483020-6666098.jpg" class="responsive-img" alt="MDK调试之可视化外设&amp;内核寄存器">
                         
-                        <span class="card-title">ARM核学习（四）ATPS标准_汇编与C混合编程_volatile关键字</span>
+                        <span class="card-title">MDK调试之可视化外设&amp;内核寄存器</span>
                     </div>
                 </a>
                 <div class="card-content article-content">
@@ -734,34 +660,35 @@ addr:
                         
                     </div>
                     <div class="publish-info">
-                        <span class="publish-date">
-                            <i class="far fa-clock fa-fw icon-date"></i>2024-11-24
-                        </span>
+                            <span class="publish-date">
+                                <i class="far fa-clock fa-fw icon-date"></i>2024-11-30
+                            </span>
                         <span class="publish-author">
                             
                             <i class="fas fa-bookmark fa-fw icon-category"></i>
                             
-                            <a href="/categories/ARM/" class="post-category">
-                                    ARM
+                            <a href="/categories/MDK/" class="post-category">
+                                    MDK
                                 </a>
                             
                             
                         </span>
                     </div>
                 </div>
+
                 
                 <div class="card-action article-tags">
                     
-                    <a href="/tags/ARM/">
-                        <span class="chip bg-color">ARM</span>
+                    <a href="/tags/MDK/">
+                        <span class="chip bg-color">MDK</span>
                     </a>
                     
-                    <a href="/tags/ARMv7/">
-                        <span class="chip bg-color">ARMv7</span>
+                    <a href="/tags/Debug/">
+                        <span class="chip bg-color">Debug</span>
                     </a>
                     
-                    <a href="/tags/ATPS/">
-                        <span class="chip bg-color">ATPS</span>
+                    <a href="/tags/%E5%AF%84%E5%AD%98%E5%99%A8%E5%8F%AF%E8%A7%86%E5%8C%96/">
+                        <span class="chip bg-color">寄存器可视化</span>
                     </a>
                     
                 </div>
@@ -775,12 +702,12 @@ addr:
                 下一篇&nbsp;<i class="fas fa-chevron-right"></i>
             </div>
             <div class="card">
-                <a href="/2024/11/24/18972.html">
+                <a href="/2024/11/28/38060.html">
                     <div class="card-image">
                         
-                        <img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/pexels-vikashkr50-18646436.jpg" class="responsive-img" alt="ARM核学习（二）指令集">
+                        <img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/pexels-lu-li-63700378-10520915.jpg" class="responsive-img" alt="深入理解UART串口通信（基于STM32F103）">
                         
-                        <span class="card-title">ARM核学习（二）指令集</span>
+                        <span class="card-title">深入理解UART串口通信（基于STM32F103）</span>
                     </div>
                 </a>
                 <div class="card-content article-content">
@@ -791,14 +718,14 @@ addr:
                     </div>
                     <div class="publish-info">
                             <span class="publish-date">
-                                <i class="far fa-clock fa-fw icon-date"></i>2024-11-24
+                                <i class="far fa-clock fa-fw icon-date"></i>2024-11-28
                             </span>
                         <span class="publish-author">
                             
                             <i class="fas fa-bookmark fa-fw icon-category"></i>
                             
-                            <a href="/categories/ARM/" class="post-category">
-                                    ARM
+                            <a href="/categories/STM32/" class="post-category">
+                                    STM32
                                 </a>
                             
                             
@@ -808,16 +735,16 @@ addr:
                 
                 <div class="card-action article-tags">
                     
-                    <a href="/tags/ARM/">
-                        <span class="chip bg-color">ARM</span>
+                    <a href="/tags/STM32/">
+                        <span class="chip bg-color">STM32</span>
                     </a>
                     
-                    <a href="/tags/ARMv7/">
-                        <span class="chip bg-color">ARMv7</span>
+                    <a href="/tags/UART/">
+                        <span class="chip bg-color">UART</span>
                     </a>
                     
-                    <a href="/tags/%E6%8C%87%E4%BB%A4%E9%9B%86/">
-                        <span class="chip bg-color">指令集</span>
+                    <a href="/tags/%E4%B8%B2%E5%8F%A3/">
+                        <span class="chip bg-color">串口</span>
                     </a>
                     
                 </div>

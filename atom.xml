@@ -6,7 +6,7 @@
   <link href="https://zanwen.github.io/atom.xml" rel="self"/>
   
   <link href="https://zanwen.github.io/"/>
-  <updated>2024-11-29T09:49:18.849Z</updated>
+  <updated>2024-11-30T03:54:48.403Z</updated>
   <id>https://zanwen.github.io/</id>
   
   <author>
@@ -17,11 +17,40 @@
   <generator uri="https://hexo.io/">Hexo</generator>
   
   <entry>
+    <title>MDK调试之可视化外设&amp;内核寄存器</title>
+    <link href="https://zanwen.github.io/2024/11/30/5535.html"/>
+    <id>https://zanwen.github.io/2024/11/30/5535.html</id>
+    <published>2024-11-30T03:04:15.000Z</published>
+    <updated>2024-11-30T03:54:48.403Z</updated>
+    
+    
+      
+      
+        
+        
+    <summary type="html">&lt;h1</summary>
+        
+      
+    
+    
+    
+    <category term="MDK" scheme="https://zanwen.github.io/categories/MDK/"/>
+    
+    
+    <category term="MDK" scheme="https://zanwen.github.io/tags/MDK/"/>
+    
+    <category term="Debug" scheme="https://zanwen.github.io/tags/Debug/"/>
+    
+    <category term="寄存器可视化" scheme="https://zanwen.github.io/tags/%E5%AF%84%E5%AD%98%E5%99%A8%E5%8F%AF%E8%A7%86%E5%8C%96/"/>
+    
+  </entry>
+  
+  <entry>
     <title>深入理解UART串口通信（基于STM32F103）</title>
     <link href="https://zanwen.github.io/2024/11/28/38060.html"/>
     <id>https://zanwen.github.io/2024/11/28/38060.html</id>
     <published>2024-11-28T11:16:13.000Z</published>
-    <updated>2024-11-29T09:49:18.849Z</updated>
+    <updated>2024-11-30T02:56:57.257Z</updated>
     
     
       
@@ -29,7 +58,8 @@
         
         
     <summary type="html">&lt;h1 id=&quot;can-kao-shou-ce&quot;&gt;参考手册&lt;/h1&gt;
-&lt;p&gt;&lt;a</summary>
+&lt;ul&gt;
+&lt;li&gt;&lt;a</summary>
         
       
     

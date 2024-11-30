@@ -320,223 +320,6 @@ addr:
       </tags>
   </entry>
   <entry>
-    <title>ARM核学习（五）异常处理</title>
-    <url>/2024/11/25/17360.html</url>
-    <content><![CDATA[<h1 id="can-kao-zi-liao">参考资料</h1>
-<p><a href="https://developer.arm.com/documentation/ddi0406/cd/?lang=en">ARM Architecture Reference Manual ARMv7-A and ARMv7-R edition</a></p>
-<ul>
-<li>B1.8 Exception handling</li>
-</ul>
-<p><a href="https://developer.arm.com/documentation/den0013/latest/">ARM® Cortex™-A Series Programmer’s Guide Version: 4.0</a></p>
-<h1 id="yi-chang-jie-shao">异常介绍</h1>
-<h2 id="shi-yao-shi-yi-chang">什么是异常</h2>
-<p>异常是处理器核在执行程序指令的过程中突然遇到了异常的事情，这些事件包括<strong>硬件中断、指令执行错误、用户程序请求服务、内存访问异常、取指令异常</strong>等，几乎每种处理器都支持特定的异常处理，<mark>中断也是异常的一种</mark>。</p>
-<h2 id="arm-de-yi-chang-yuan">ARM的异常源</h2>
-<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241125214514494.png" alt="image-20241125214514494"></p>
-<h2 id="fiq-jiao-irq-kuai-de-yuan-yin">FIQ较IRQ快的原因</h2>
-<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241125214951043.png" alt="image-20241125214951043"></p>
-<h1 id="arm-he-yi-chang-chu-li-guo-cheng">ARM核异常处理过程</h1>
-<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241125215607973.png" alt="image-20241125215607973"></p>
-<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241125214441652.png" alt="处理器工作模式切换"></p>
-<h2 id="yi-chang-xiang-liang-biao">异常向量表</h2>
-<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241125215846276.png" alt="image-20241125215846276"></p>
-<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241125215810206.png" alt="image-20241125215810206"></p>
-<blockquote>
-<p>[!NOTE]</p>
-<p>ARM核怎么知道异常向量表放在内存哪个地方呢？</p>
-<ol>
-<li>Cortex-A架构版本之前，是由协处理器（<a href="https://developer.arm.com/documentation/den0013/d/ARM-Processor-Modes-and-Registers/Registers/Coprocessor-15?lang=en">Coprocessor 15</a>） <code>CP15</code>的<code>C1</code>寄存器来决定的，且只能存放在 <code>0xFFFF0000</code>和<code>0x00000000</code>两者中的一个。</li>
-<li>从Cortex-A架构版本开始，由协处理器 <code>CP15</code>的<code>c12</code>寄存器来决定，且不限制起始地址</li>
-</ol>
-</blockquote>
-<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241125221405786.png" alt="Table B1-3 The vector tables"></p>
-<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241125222433967.png" alt="image-20241125222433967"></p>
-<blockquote>
-<p><a href="https://developer.arm.com/documentation/den0013/d/Exception-Handling/Exception-priorities/Exception-mode-summary?lang=en">https://developer.arm.com/documentation/den0013/d/Exception-Handling/Exception-priorities/Exception-mode-summary?lang=en</a></p>
-</blockquote>
-<h2 id="cortex-a-chu-li-qi-yi-chang-xiang-liang-biao-ji-di-zhi-zhi-ding">Cortex-A处理器异常向量表基地址指定</h2>
-<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241125223320833.png" alt="image-20241125223320833"></p>
-<blockquote>
-<p><a href="https://developer.arm.com/documentation/den0013/d/Exception-Handling/Exception-priorities?lang=en">https://developer.arm.com/documentation/den0013/d/Exception-Handling/Exception-priorities?lang=en</a></p>
-</blockquote>
-<blockquote>
-<p>The first column in <a href="https://developer.arm.com/documentation/den0013/d/Exception-Handling/Exception-priorities?lang=en#CEGHDCAE">Table 11.1</a> gives the vector offset within the vector table associated with the particular type of exception. This is a table of instructions that the ARM core jumps to when an exception is raised. These instructions are located in a specific place in memory. The default vector base address is <code>0x00000000</code>, but most ARM cores permit the vector base address to be moved to <code>0xFFFF0000</code> (or <code>HIVECS</code>). <strong>All Cortex-A series processors permit this, and it is the default address selected by the Linux kernel. Cores that implement the Security Extensions can additionally set the vector base address, separately for Secure and Non-secure states, using the CP15 Vector Base Address registers.</strong></p>
-<p><a href="https://developer.arm.com/documentation/den0013/d/Exception-Handling/Exception-priorities/The-Vector-table?lang=en">https://developer.arm.com/documentation/den0013/d/Exception-Handling/Exception-priorities/The-Vector-table?lang=en</a></p>
-</blockquote>
-<h3 id="cp-15-c-1">CP15 c1</h3>
-<blockquote>
-<p><a href="https://documentation-service.arm.com/static/602cf701083323480d479d18?token=">https://documentation-service.arm.com/static/602cf701083323480d479d18?token=</a></p>
-</blockquote>
-<img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241125225458216.png" alt="image-20241125225458216" style="zoom:50%;">
-<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241125225614769.png" alt="Table 4-52 SCTLR bit assignments (continued)  "></p>
-<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241125225701958.png" alt="image-20241125225701958"></p>
-<h3 id="cp-15-c-12">CP15 c12</h3>
-<blockquote>
-<p><a href="https://developer.arm.com/documentation/ddi0406/cd/?lang=en">ARM Architecture Reference Manual ARMv7-A and ARMv7-R edition</a></p>
-</blockquote>
-<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241125230347930.png" alt="image-20241125230347930"></p>
-<blockquote>
-<p>[!NOTE]</p>
-<p>其中高位[31:5]是向量表的基地址，低位[4:0]是异常向量的偏移量（offset）</p>
-</blockquote>
-<h1 id="svc-swi-yi-chang-chu-li">SVC/SWI异常处理</h1>
-<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241126170039244.png" alt="image-20241126170039244"></p>
-<h2 id="zai-cao-zuo-xi-tong-zhong-de-yun-yong">在操作系统中的运用</h2>
-<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241126170125829.png" alt="image-20241126170125829"></p>
-<h2 id="an-li-dai-ma">案例代码</h2>
-<pre class="line-numbers language-assembly" data-language="assembly"><code class="language-assembly">.global _start
-
-_start:
-    b reset
-    b undefined_instruction
-    b software_interrupt
-    b prefetch_abort
-    b data_abort
-    b not_used
-    b irq_interrupt
-    b fiq_interrupt 
-    
-undefined_instruction:.word undefined_instruction
-prefetch_abort:.word prefetch_abort
-data_abort:.word data_abort
-not_used:.word not_used
-irq_interrupt:.word irq_interrupt
-fiq_interrupt:.word fiq_interrupt
-
-reset:
-    mov r0,#1
-    mov r1,#2
-    mov r2,#3
-    
-    swi #8      @will save CPSR to SPSR and set CPSR(T,M), save PC to LR
-    
-    mov r3,#4
-    mov r4,#5
-	
-software_interrupt:
-    ldr sp,=0x4000fff0
-    stmfd sp!,{r0-r12,lr}
-    
-    ldr r0,[lr,#-4]
-    mov r1,#0xff
-    bic r0,r0,r1,lsl #24
-    
-    ldmfd sp!,{r0-r12,pc}
-    
-stop:
-	b stop				
-	<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<h3 id="ding-yi-yi-chang-xiang-liang-biao">定义异常向量表</h3>
-<p>这里我们将异常向量表放在代码段起始地址：</p>
-<pre class="line-numbers language-assembly" data-language="assembly"><code class="language-assembly">_start:
-    b reset
-    b undefined_instruction
-    b software_interrupt
-    b prefetch_abort
-    b data_abort
-    b not_used
-    b irq_interrupt
-    b fiq_interrupt <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<p>异常向量表的指令顺序和地址偏移需要遵循规范，当发生异常跳转时处理器会按照规范从异常向量表找到对应的指令来执行</p>
-<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241126174514822.png" alt="image-20241126174514822"></p>
-<h3 id="cheng-xu-ru-kou-reset">程序入口reset</h3>
-<p>第一条指令跳转到 <code>reset</code></p>
-<pre class="line-numbers language-assembly" data-language="assembly"><code class="language-assembly">reset:
-    mov r0,#1
-    mov r1,#2
-    mov r2,#3
-    
-    swi #8      @will save CPSR to SPSR and set CPSR(T,M), save PC to LR
-    
-    mov r3,#4
-    mov r4,#5<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<p>其中我们在 <code>swi</code>软中断指令前后增加了一些寄存器操作来验证一些事情：</p>
-<ul>
-<li>中断返回后，中断前的寄存器应该保持原样</li>
-<li>中断返回后，应该接着下一条指令继续执行</li>
-</ul>
-<h3 id="zhong-duan-tiao-zhuan-arm-he-zi-dong-zuo-de-shi-qing">中断跳转——ARM核自动做的事情</h3>
-<img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241126175353623.png" alt="image-20241126175353623" style="zoom:50%;">
-<ul>
-<li>将当前CPSR保存到异常状态下的SPSR中</li>
-<li>对CPSR进行如下设置
-<ul>
-<li>进入ARM状态（对应CPSR的T位）</li>
-<li>设置工作模式为相应的异常模式（M位）</li>
-<li>禁止中断（设置I位和F位为1）</li>
-</ul>
-</li>
-<li>将当前PC的值保存到LR，以便异常处理完后能够跳转回中断发生的地方继续执行</li>
-<li>将当前PC设置到异常向量表的相应位置（由于我们执行的是 <code>swi</code>软中断，因此会根据异常向量表规范，将PC指向向量表的基地址偏移 <code>0x08</code>的位置）</li>
-</ul>
-<blockquote>
-<p>[!NOTE]</p>
-<p>由于使用的是ARM9E-S的核，因此没有手动指定向量表基地址时，默认为 <code>0x00000000</code>。</p>
-</blockquote>
-<h3 id="zhong-duan-tiao-zhuan-cong-xiang-liang-biao-dao-zhong-duan-fu-wu-cheng-xu">中断跳转——从向量表到中断服务程序</h3>
-<pre class="line-numbers language-assembly" data-language="assembly"><code class="language-assembly">_start:
-    b reset
-    b undefined_instruction
-    b software_interrupt
-    b prefetch_abort
-    b data_abort
-    b not_used
-    b irq_interrupt
-    b fiq_interrupt <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<p>根据向量表基地址及偏移量 <code>0x08</code>能够找到我们编写的 <code>b software_interrupt</code>，接着跳转到对应的中断服务程序：</p>
-<pre class="line-numbers language-assembly" data-language="assembly"><code class="language-assembly">software_interrupt:
-ldr sp,=0x4000fff0
-stmfd sp!,{r0-r12,lr}
-
-ldr r0,[lr,#-4]
-mov r1,#0xff
-bic r0,r0,r1,lsl #24
-
-ldmfd sp!,{r0-r12,pc}^<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<ul>
-<li>
-<p>设置SP，将R0-12、LR压栈保护；</p>
-</li>
-<li>
-<p>将LR偏移 <code>-4</code>的地址中的内容给到R0，由于LR是由ARM核中断跳转时设置的，因此我们回头看看中断跳转的地方：</p>
-<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241126181400176.png" alt="image-20241126181400176"></p>
-</li>
-<li>
-<p>接着将 <code>0xff</code>送入R1，并将R1左移24位后作为掩码将R0中的高8位清零，得到中断号 <code>#8</code></p>
-<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241126181736106.png" alt="image-20241126181736106"></p>
-</li>
-<li>
-<p><code>ldmfd sp!,{r0-r12,pc}</code>，准备返回，出栈复原R0-R12，将LR（指向 <code>mov r3,#4</code>）送到PC，中断返回</p>
-</li>
-</ul>
-<blockquote>
-<p>[!IMPORTANT]</p>
-<p>这里需要注意的是，<code>ldmfd sp!,{r0-r12,pc}^</code>中的 <code>^</code>，会将SPSR暂存的值写回CPSR</p>
-</blockquote>
-<h1 id="zong-jie">总结</h1>
-<h2 id="yi-chang-chan-sheng-shi-arm-he-zi-dong-zuo-de-shi-qing">异常产生时，ARM核自动做的事情</h2>
-<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241126190902985.png" alt="image-20241126190902985"></p>
-<h2 id="yi-chang-sheng-cheng-zhi-qian-wo-men-xu-yao-zuo-de-shi-qing">异常生成之前，我们需要做的事情</h2>
-<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241126192006040.png" alt="image-20241126192006040"></p>
-<h2 id="yi-chang-fan-hui">异常返回</h2>
-<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241126192130322.png" alt="image-20241126192130322"></p>
-<blockquote>
-<p>[!NOTE]</p>
-<p><code>S</code>后缀表明在原有指令基础上，同时将SPSR恢复到C</p>
-</blockquote>
-<h1 id="the-end">The End</h1>
-]]></content>
-      <categories>
-        <category>ARM</category>
-      </categories>
-      <tags>
-        <tag>ARM</tag>
-        <tag>ARMv7</tag>
-        <tag>异常</tag>
-        <tag>中断</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>ARM核学习（二）指令集</title>
     <url>/2024/11/24/18972.html</url>
     <content><![CDATA[<h1 id="can-kao-zi-liao">参考资料</h1>
@@ -1148,6 +931,223 @@ stop:
       </tags>
   </entry>
   <entry>
+    <title>ARM核学习（五）异常处理</title>
+    <url>/2024/11/25/17360.html</url>
+    <content><![CDATA[<h1 id="can-kao-zi-liao">参考资料</h1>
+<p><a href="https://developer.arm.com/documentation/ddi0406/cd/?lang=en">ARM Architecture Reference Manual ARMv7-A and ARMv7-R edition</a></p>
+<ul>
+<li>B1.8 Exception handling</li>
+</ul>
+<p><a href="https://developer.arm.com/documentation/den0013/latest/">ARM® Cortex™-A Series Programmer’s Guide Version: 4.0</a></p>
+<h1 id="yi-chang-jie-shao">异常介绍</h1>
+<h2 id="shi-yao-shi-yi-chang">什么是异常</h2>
+<p>异常是处理器核在执行程序指令的过程中突然遇到了异常的事情，这些事件包括<strong>硬件中断、指令执行错误、用户程序请求服务、内存访问异常、取指令异常</strong>等，几乎每种处理器都支持特定的异常处理，<mark>中断也是异常的一种</mark>。</p>
+<h2 id="arm-de-yi-chang-yuan">ARM的异常源</h2>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241125214514494.png" alt="image-20241125214514494"></p>
+<h2 id="fiq-jiao-irq-kuai-de-yuan-yin">FIQ较IRQ快的原因</h2>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241125214951043.png" alt="image-20241125214951043"></p>
+<h1 id="arm-he-yi-chang-chu-li-guo-cheng">ARM核异常处理过程</h1>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241125215607973.png" alt="image-20241125215607973"></p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241125214441652.png" alt="处理器工作模式切换"></p>
+<h2 id="yi-chang-xiang-liang-biao">异常向量表</h2>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241125215846276.png" alt="image-20241125215846276"></p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241125215810206.png" alt="image-20241125215810206"></p>
+<blockquote>
+<p>[!NOTE]</p>
+<p>ARM核怎么知道异常向量表放在内存哪个地方呢？</p>
+<ol>
+<li>Cortex-A架构版本之前，是由协处理器（<a href="https://developer.arm.com/documentation/den0013/d/ARM-Processor-Modes-and-Registers/Registers/Coprocessor-15?lang=en">Coprocessor 15</a>） <code>CP15</code>的<code>C1</code>寄存器来决定的，且只能存放在 <code>0xFFFF0000</code>和<code>0x00000000</code>两者中的一个。</li>
+<li>从Cortex-A架构版本开始，由协处理器 <code>CP15</code>的<code>c12</code>寄存器来决定，且不限制起始地址</li>
+</ol>
+</blockquote>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241125221405786.png" alt="Table B1-3 The vector tables"></p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241125222433967.png" alt="image-20241125222433967"></p>
+<blockquote>
+<p><a href="https://developer.arm.com/documentation/den0013/d/Exception-Handling/Exception-priorities/Exception-mode-summary?lang=en">https://developer.arm.com/documentation/den0013/d/Exception-Handling/Exception-priorities/Exception-mode-summary?lang=en</a></p>
+</blockquote>
+<h2 id="cortex-a-chu-li-qi-yi-chang-xiang-liang-biao-ji-di-zhi-zhi-ding">Cortex-A处理器异常向量表基地址指定</h2>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241125223320833.png" alt="image-20241125223320833"></p>
+<blockquote>
+<p><a href="https://developer.arm.com/documentation/den0013/d/Exception-Handling/Exception-priorities?lang=en">https://developer.arm.com/documentation/den0013/d/Exception-Handling/Exception-priorities?lang=en</a></p>
+</blockquote>
+<blockquote>
+<p>The first column in <a href="https://developer.arm.com/documentation/den0013/d/Exception-Handling/Exception-priorities?lang=en#CEGHDCAE">Table 11.1</a> gives the vector offset within the vector table associated with the particular type of exception. This is a table of instructions that the ARM core jumps to when an exception is raised. These instructions are located in a specific place in memory. The default vector base address is <code>0x00000000</code>, but most ARM cores permit the vector base address to be moved to <code>0xFFFF0000</code> (or <code>HIVECS</code>). <strong>All Cortex-A series processors permit this, and it is the default address selected by the Linux kernel. Cores that implement the Security Extensions can additionally set the vector base address, separately for Secure and Non-secure states, using the CP15 Vector Base Address registers.</strong></p>
+<p><a href="https://developer.arm.com/documentation/den0013/d/Exception-Handling/Exception-priorities/The-Vector-table?lang=en">https://developer.arm.com/documentation/den0013/d/Exception-Handling/Exception-priorities/The-Vector-table?lang=en</a></p>
+</blockquote>
+<h3 id="cp-15-c-1">CP15 c1</h3>
+<blockquote>
+<p><a href="https://documentation-service.arm.com/static/602cf701083323480d479d18?token=">https://documentation-service.arm.com/static/602cf701083323480d479d18?token=</a></p>
+</blockquote>
+<img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241125225458216.png" alt="image-20241125225458216" style="zoom:50%;">
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241125225614769.png" alt="Table 4-52 SCTLR bit assignments (continued)  "></p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241125225701958.png" alt="image-20241125225701958"></p>
+<h3 id="cp-15-c-12">CP15 c12</h3>
+<blockquote>
+<p><a href="https://developer.arm.com/documentation/ddi0406/cd/?lang=en">ARM Architecture Reference Manual ARMv7-A and ARMv7-R edition</a></p>
+</blockquote>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241125230347930.png" alt="image-20241125230347930"></p>
+<blockquote>
+<p>[!NOTE]</p>
+<p>其中高位[31:5]是向量表的基地址，低位[4:0]是异常向量的偏移量（offset）</p>
+</blockquote>
+<h1 id="svc-swi-yi-chang-chu-li">SVC/SWI异常处理</h1>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241126170039244.png" alt="image-20241126170039244"></p>
+<h2 id="zai-cao-zuo-xi-tong-zhong-de-yun-yong">在操作系统中的运用</h2>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241126170125829.png" alt="image-20241126170125829"></p>
+<h2 id="an-li-dai-ma">案例代码</h2>
+<pre class="line-numbers language-assembly" data-language="assembly"><code class="language-assembly">.global _start
+
+_start:
+    b reset
+    b undefined_instruction
+    b software_interrupt
+    b prefetch_abort
+    b data_abort
+    b not_used
+    b irq_interrupt
+    b fiq_interrupt 
+    
+undefined_instruction:.word undefined_instruction
+prefetch_abort:.word prefetch_abort
+data_abort:.word data_abort
+not_used:.word not_used
+irq_interrupt:.word irq_interrupt
+fiq_interrupt:.word fiq_interrupt
+
+reset:
+    mov r0,#1
+    mov r1,#2
+    mov r2,#3
+    
+    swi #8      @will save CPSR to SPSR and set CPSR(T,M), save PC to LR
+    
+    mov r3,#4
+    mov r4,#5
+	
+software_interrupt:
+    ldr sp,=0x4000fff0
+    stmfd sp!,{r0-r12,lr}
+    
+    ldr r0,[lr,#-4]
+    mov r1,#0xff
+    bic r0,r0,r1,lsl #24
+    
+    ldmfd sp!,{r0-r12,pc}
+    
+stop:
+	b stop				
+	<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<h3 id="ding-yi-yi-chang-xiang-liang-biao">定义异常向量表</h3>
+<p>这里我们将异常向量表放在代码段起始地址：</p>
+<pre class="line-numbers language-assembly" data-language="assembly"><code class="language-assembly">_start:
+    b reset
+    b undefined_instruction
+    b software_interrupt
+    b prefetch_abort
+    b data_abort
+    b not_used
+    b irq_interrupt
+    b fiq_interrupt <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>异常向量表的指令顺序和地址偏移需要遵循规范，当发生异常跳转时处理器会按照规范从异常向量表找到对应的指令来执行</p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241126174514822.png" alt="image-20241126174514822"></p>
+<h3 id="cheng-xu-ru-kou-reset">程序入口reset</h3>
+<p>第一条指令跳转到 <code>reset</code></p>
+<pre class="line-numbers language-assembly" data-language="assembly"><code class="language-assembly">reset:
+    mov r0,#1
+    mov r1,#2
+    mov r2,#3
+    
+    swi #8      @will save CPSR to SPSR and set CPSR(T,M), save PC to LR
+    
+    mov r3,#4
+    mov r4,#5<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>其中我们在 <code>swi</code>软中断指令前后增加了一些寄存器操作来验证一些事情：</p>
+<ul>
+<li>中断返回后，中断前的寄存器应该保持原样</li>
+<li>中断返回后，应该接着下一条指令继续执行</li>
+</ul>
+<h3 id="zhong-duan-tiao-zhuan-arm-he-zi-dong-zuo-de-shi-qing">中断跳转——ARM核自动做的事情</h3>
+<img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241126175353623.png" alt="image-20241126175353623" style="zoom:50%;">
+<ul>
+<li>将当前CPSR保存到异常状态下的SPSR中</li>
+<li>对CPSR进行如下设置
+<ul>
+<li>进入ARM状态（对应CPSR的T位）</li>
+<li>设置工作模式为相应的异常模式（M位）</li>
+<li>禁止中断（设置I位和F位为1）</li>
+</ul>
+</li>
+<li>将当前PC的值保存到LR，以便异常处理完后能够跳转回中断发生的地方继续执行</li>
+<li>将当前PC设置到异常向量表的相应位置（由于我们执行的是 <code>swi</code>软中断，因此会根据异常向量表规范，将PC指向向量表的基地址偏移 <code>0x08</code>的位置）</li>
+</ul>
+<blockquote>
+<p>[!NOTE]</p>
+<p>由于使用的是ARM9E-S的核，因此没有手动指定向量表基地址时，默认为 <code>0x00000000</code>。</p>
+</blockquote>
+<h3 id="zhong-duan-tiao-zhuan-cong-xiang-liang-biao-dao-zhong-duan-fu-wu-cheng-xu">中断跳转——从向量表到中断服务程序</h3>
+<pre class="line-numbers language-assembly" data-language="assembly"><code class="language-assembly">_start:
+    b reset
+    b undefined_instruction
+    b software_interrupt
+    b prefetch_abort
+    b data_abort
+    b not_used
+    b irq_interrupt
+    b fiq_interrupt <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>根据向量表基地址及偏移量 <code>0x08</code>能够找到我们编写的 <code>b software_interrupt</code>，接着跳转到对应的中断服务程序：</p>
+<pre class="line-numbers language-assembly" data-language="assembly"><code class="language-assembly">software_interrupt:
+ldr sp,=0x4000fff0
+stmfd sp!,{r0-r12,lr}
+
+ldr r0,[lr,#-4]
+mov r1,#0xff
+bic r0,r0,r1,lsl #24
+
+ldmfd sp!,{r0-r12,pc}^<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li>
+<p>设置SP，将R0-12、LR压栈保护；</p>
+</li>
+<li>
+<p>将LR偏移 <code>-4</code>的地址中的内容给到R0，由于LR是由ARM核中断跳转时设置的，因此我们回头看看中断跳转的地方：</p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241126181400176.png" alt="image-20241126181400176"></p>
+</li>
+<li>
+<p>接着将 <code>0xff</code>送入R1，并将R1左移24位后作为掩码将R0中的高8位清零，得到中断号 <code>#8</code></p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241126181736106.png" alt="image-20241126181736106"></p>
+</li>
+<li>
+<p><code>ldmfd sp!,{r0-r12,pc}</code>，准备返回，出栈复原R0-R12，将LR（指向 <code>mov r3,#4</code>）送到PC，中断返回</p>
+</li>
+</ul>
+<blockquote>
+<p>[!IMPORTANT]</p>
+<p>这里需要注意的是，<code>ldmfd sp!,{r0-r12,pc}^</code>中的 <code>^</code>，会将SPSR暂存的值写回CPSR</p>
+</blockquote>
+<h1 id="zong-jie">总结</h1>
+<h2 id="yi-chang-chan-sheng-shi-arm-he-zi-dong-zuo-de-shi-qing">异常产生时，ARM核自动做的事情</h2>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241126190902985.png" alt="image-20241126190902985"></p>
+<h2 id="yi-chang-sheng-cheng-zhi-qian-wo-men-xu-yao-zuo-de-shi-qing">异常生成之前，我们需要做的事情</h2>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241126192006040.png" alt="image-20241126192006040"></p>
+<h2 id="yi-chang-fan-hui">异常返回</h2>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241126192130322.png" alt="image-20241126192130322"></p>
+<blockquote>
+<p>[!NOTE]</p>
+<p><code>S</code>后缀表明在原有指令基础上，同时将SPSR恢复到C</p>
+</blockquote>
+<h1 id="the-end">The End</h1>
+]]></content>
+      <categories>
+        <category>ARM</category>
+      </categories>
+      <tags>
+        <tag>ARM</tag>
+        <tag>ARMv7</tag>
+        <tag>异常</tag>
+        <tag>中断</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>ARM核学习（四）ATPS标准_汇编与C混合编程_volatile关键字</title>
     <url>/2024/11/24/59994.html</url>
     <content><![CDATA[<h1 id="can-kao-zi-liao">参考资料</h1>
@@ -1611,6 +1611,62 @@ RCC<span class="token operator">-&gt;</span>CFGR <span class="token operator">|=
         <tag>SPL</tag>
         <tag>STM32F103ZE</tag>
         <tag>时钟</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>MDK调试之可视化外设&amp;内核寄存器</title>
+    <url>/2024/11/30/5535.html</url>
+    <content><![CDATA[<h1 id="qian-yan">前言</h1>
+<p>我们经常遇到一个困惑：明明感觉代码没有问题，但是运行时就是无法按照预期执行。并且把别人的示例拿过来跑是可以跑通的，确认了硬件没问题，比对代码也找不出差异。</p>
+<p>这通常是因为一些细节问题导致的，这类问题在逐检查时常常因为当局者迷难以发现，最常见的就是位运算相关的细节错误例如：</p>
+<ul>
+<li>
+<p>清零错误：</p>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c">GPIOA<span class="token operator">-&gt;</span>CRH <span class="token operator">&amp;=</span> GPIO_CRH_MODE10<span class="token punctuation">;</span> <span class="token comment">//期望将GPIOA的CRH寄存器中的PA10工作模式清零</span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<p>上述代码少了 <code>~</code>，正确操作如下：</p>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c">GPIOA<span class="token operator">-&gt;</span>CRH <span class="token operator">&amp;=</span> <span class="token operator">~</span>GPIO_CRH_MODE10<span class="token punctuation">;</span> <span class="token comment">//期望将GPIOA的CRH寄存器中的PA10工作模式清零</span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+</li>
+<li>
+<p>判断某一位是否为1：</p>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token keyword">if</span><span class="token punctuation">(</span>USART1<span class="token operator">-&gt;</span>SR <span class="token operator">&amp;</span> USART_SR_RXNE <span class="token operator">==</span> <span class="token number">1</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    buffer<span class="token punctuation">[</span>size<span class="token operator">++</span><span class="token punctuation">]</span> <span class="token operator">=</span> USART1<span class="token operator">-&gt;</span>DR<span class="token punctuation">;</span>
+<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+<p>通过按位与来判断某一位是否为1应该操作如下：</p>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token keyword">if</span><span class="token punctuation">(</span>USART1<span class="token operator">-&gt;</span>SR <span class="token operator">&amp;</span> USART_SR_RXNE<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    buffer<span class="token punctuation">[</span>size<span class="token operator">++</span><span class="token punctuation">]</span> <span class="token operator">=</span> USART1<span class="token operator">-&gt;</span>DR<span class="token punctuation">;</span>
+<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+</li>
+</ul>
+<h1 id="mdk-wai-she-ji-cun-qi-shi-tu">MDK外设寄存器视图</h1>
+<p>通过MDK的Debug功能，我们实时查看代码执行到断电时，对应的外设寄存器中的值，从而可视化地分析响应的寄存器是否真的按照预期被设置了，从而避免检查代码时无法察觉细节错误的情况。</p>
+<p>以 <code>GPIOA-&gt;CRH &amp;= GPIO_CRH_MODE10</code>为例，我们期望通过这一行代码将 <code>CRH</code>寄存器的第8、9个bit清零</p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241130112416568.png" alt="image-20241130112416568"></p>
+<h2 id="she-zhi-duan-dian">设置断点</h2>
+<p>可以在该行代码的左侧点击打上断点：</p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241130112531806.png" alt="image-20241130112531806"></p>
+<h2 id="fang-xing-cheng-xu-dao-duan-dian-chu-zan-ting">放行程序到断点处暂停</h2>
+<p>然后进入Debug模式并通过Run使程序停在断点处：</p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241130112707073.png" alt="image-20241130112707073"></p>
+<h2 id="da-kai-wai-she-xi-tong-shi-tu">打开外设系统视图</h2>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241130112746427.png" alt="image-20241130112746427"></p>
+<h2 id="zhao-dao-dui-ying-ji-cun-qi">找到对应寄存器</h2>
+<img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241130112926649.png" alt="image-20241130112926649" style="zoom:50%;">
+<h2 id="bu-jin-bing-cha-kan-dui-ying-ji-cun-qi-shi-fou-an-zhao-yu-qi-bei-she-zhi">步进并查看对应寄存器是否按照预期被设置</h2>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241130113658038.png" alt="image-20241130113658038"></p>
+<p>步进后发现本来预期只设置MODE10，结果发现其他的bit位也被影响了（高亮部分），说明我们的代码有问题</p>
+<h1 id="zhi-jie-xiu-gai-ji-cun-qi-bing-sheng-xiao">直接修改寄存器并生效</h1>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241130115225062.png" alt="image-20241130115225062"></p>
+<p>如上，我们可以通过勾选/取消勾选（相当于ODR置1/0），并实时观察LED的变化。其他寄存器中可编辑的地方应该也都是可以实时手动修改的。</p>
+<h1 id="arm-he-xiang-guan-ji-cun-qi">ARM核相关寄存器</h1>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241130115446304.png" alt="image-20241130115446304"></p>
+]]></content>
+      <categories>
+        <category>MDK</category>
+      </categories>
+      <tags>
+        <tag>MDK</tag>
+        <tag>Debug</tag>
+        <tag>寄存器可视化</tag>
       </tags>
   </entry>
   <entry>
@@ -2567,10 +2623,162 @@ bool <span class="token function">hal_i2c_soft_read</span><span class="token pun
       </tags>
   </entry>
   <entry>
+    <title>简易版裸机多任务调度框架</title>
+    <url>/2024/11/26/21297.html</url>
+    <content><![CDATA[<h1 id="kuang-jia-jian-mo">框架建模</h1>
+<h2 id="kuang-jia-chou-xiang">框架抽象</h2>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241126093047180.png" alt="image-20241126093047180"></p>
+<h2 id="mo-kuai-hua-fen">模块划分</h2>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241126094329449.png" alt="image-20241126094329449"></p>
+<h1 id="scheduler">Scheduler</h1>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token comment">//</span>
+<span class="token comment">// Created by 86157 on 2024/11/25.</span>
+<span class="token comment">//</span>
+
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">ifndef</span> <span class="token expression">__SCHEDULER_H</span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name">__SCHEDULER_H</span></span>
+
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">"gd32f4xx.h"</span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">"stdbool.h"</span></span>
+
+<span class="token keyword">typedef</span> <span class="token keyword">void</span> <span class="token punctuation">(</span><span class="token operator">*</span><span class="token class-name">task_function_t</span><span class="token punctuation">)</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token keyword">typedef</span> <span class="token keyword">enum</span> <span class="token punctuation">{</span>
+    TASK_READY<span class="token punctuation">,</span>
+    TASK_RUNNING<span class="token punctuation">,</span>
+    TASK_WAITING
+<span class="token punctuation">}</span> <span class="token class-name">task_state_t</span><span class="token punctuation">;</span>
+
+<span class="token keyword">typedef</span> <span class="token keyword">struct</span> <span class="token punctuation">{</span>
+    <span class="token class-name">task_state_t</span>  task_state<span class="token punctuation">;</span>
+    <span class="token class-name">uint16_t</span> task_interval_ms<span class="token punctuation">;</span>
+    <span class="token class-name">uint16_t</span> task_time_waiting_ms<span class="token punctuation">;</span>
+    <span class="token class-name">task_function_t</span> task_function<span class="token punctuation">;</span>
+<span class="token punctuation">}</span> <span class="token class-name">task_t</span><span class="token punctuation">;</span>
+
+<span class="token keyword">void</span> <span class="token function">task_update</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">void</span> <span class="token function">task_execute</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">endif</span><span class="token comment">//__SCHEDULER_H</span></span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token comment">//</span>
+<span class="token comment">// Created by 86157 on 2024/11/25.</span>
+<span class="token comment">//</span>
+
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">"scheduler.h"</span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">"app.h"</span></span>
+
+<span class="token keyword">static</span> <span class="token class-name">task_t</span> tasks<span class="token punctuation">[</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token punctuation">{</span>
+        TASK_READY<span class="token punctuation">,</span> <span class="token number">400</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> app_ui_led_flow<span class="token punctuation">,</span>
+        TASK_READY<span class="token punctuation">,</span> <span class="token number">20</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> app_debug_key_scan<span class="token punctuation">}</span><span class="token punctuation">;</span>
+
+<span class="token keyword">static</span> <span class="token keyword">const</span> <span class="token class-name">uint8_t</span> TASK_SIZE <span class="token operator">=</span> <span class="token keyword">sizeof</span><span class="token punctuation">(</span>tasks<span class="token punctuation">)</span> <span class="token operator">/</span> <span class="token keyword">sizeof</span><span class="token punctuation">(</span>tasks<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token keyword">void</span> <span class="token function">task_update</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">for</span> <span class="token punctuation">(</span><span class="token class-name">uint16_t</span> i <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span> i <span class="token operator">&lt;</span> TASK_SIZE<span class="token punctuation">;</span> <span class="token operator">++</span>i<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        tasks<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">.</span>task_time_waiting_ms<span class="token operator">++</span><span class="token punctuation">;</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>tasks<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">.</span>task_time_waiting_ms <span class="token operator">&gt;=</span> tasks<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">.</span>task_interval_ms<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            tasks<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">.</span>task_state <span class="token operator">=</span> TASK_READY<span class="token punctuation">;</span>
+            tasks<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">.</span>task_time_waiting_ms <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">void</span> <span class="token function">task_execute</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">for</span> <span class="token punctuation">(</span><span class="token class-name">uint16_t</span> i <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span> i <span class="token operator">&lt;</span> TASK_SIZE<span class="token punctuation">;</span> <span class="token operator">++</span>i<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>tasks<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">.</span>task_state <span class="token operator">==</span> TASK_READY<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            tasks<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">.</span>task_state <span class="token operator">=</span> TASK_RUNNING<span class="token punctuation">;</span>
+            tasks<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">.</span><span class="token function">task_function</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            tasks<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">.</span>task_state <span class="token operator">=</span> TASK_WAITING<span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<h1 id="app">App</h1>
+<h2 id="ren-wu-jie-kou-guan-li">任务接口管理</h2>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token comment">//</span>
+<span class="token comment">// Created by 86157 on 2024/11/25.</span>
+<span class="token comment">//</span>
+
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">ifndef</span> <span class="token expression">APP_H</span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name">APP_H</span></span>
+
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">"logger.h"</span></span>
+
+<span class="token keyword">void</span> <span class="token function">app_init</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">void</span> <span class="token function">app_ui_led_flow</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">void</span> <span class="token function">app_debug_key_scan</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">endif</span><span class="token comment">//APP_H</span></span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<h2 id="ying-yong-chu-shi-hua">应用初始化</h2>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token comment">//</span>
+<span class="token comment">// Created by 86157 on 2024/11/25.</span>
+<span class="token comment">//</span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">"app.h"</span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">"int_led.h"</span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">"int_key.h"</span></span>
+
+<span class="token keyword">void</span> <span class="token function">app_init</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token function">int_led_init</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">int_key_init</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">LOG_DEBUG</span><span class="token punctuation">(</span><span class="token string">"app_init done"</span><span class="token punctuation">)</span>
+<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<h2 id="liu-shui-deng-ren-wu-shi-xian">流水灯任务实现</h2>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token comment">//</span>
+<span class="token comment">// Created by 86157 on 2024/11/25.</span>
+<span class="token comment">//</span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">"app.h"</span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">"int_led.h"</span></span>
+
+<span class="token keyword">void</span> <span class="token function">app_ui_led_flow</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+<span class="token comment">//    LOG_DEBUG("app_ui_led_flow invoke")</span>
+    <span class="token keyword">static</span> <span class="token class-name">uint8_t</span> led_index <span class="token operator">=</span> LED1<span class="token punctuation">;</span>
+    <span class="token function">int_led_on</span><span class="token punctuation">(</span>led_index<span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    led_index<span class="token operator">++</span><span class="token punctuation">;</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>led_index <span class="token operator">==</span> LED_SIZE<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token function">int_led_off_all</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        led_index <span class="token operator">=</span> LED1<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<h2 id="an-jian-sao-miao-ren-wu-shi-xian">按键扫描任务实现</h2>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token comment">//</span>
+<span class="token comment">// Created by 86157 on 2024/11/25.</span>
+<span class="token comment">//</span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">"app.h"</span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">"int_key.h"</span></span>
+
+<span class="token keyword">void</span> <span class="token function">app_debug_key_scan</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token function">int_key_scan</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">void</span> <span class="token function">key_up_callback</span><span class="token punctuation">(</span>KEY_NO key_no<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token function">LOG_DEBUG</span><span class="token punctuation">(</span><span class="token string">"key up"</span><span class="token punctuation">)</span>
+<span class="token punctuation">}</span>
+<span class="token keyword">void</span> <span class="token function">key_down_callback</span><span class="token punctuation">(</span>KEY_NO key_no<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token function">LOG_DEBUG</span><span class="token punctuation">(</span><span class="token string">"key down"</span><span class="token punctuation">)</span>
+<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<h1 id="ding-shi-qi-geng-xin-ren-wu-zhuang-tai">定时器更新任务状态</h1>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token keyword">void</span> <span class="token function">hal_timer5_update_callback</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token function">task_update</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+]]></content>
+      <categories>
+        <category>架构</category>
+      </categories>
+      <tags>
+        <tag>多任务</tag>
+        <tag>调度</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>深入理解UART串口通信（基于STM32F103）</title>
     <url>/2024/11/28/38060.html</url>
     <content><![CDATA[<h1 id="can-kao-shou-ce">参考手册</h1>
-<p><a href="https://www.st.com.cn/resource/en/reference_manual/rm0008-stm32f101xx-stm32f102xx-stm32f103xx-stm32f105xx-and-stm32f107xx-advanced-armbased-32bit-mcus-stmicroelectronics.pdf">STM32F101xx, STM32F102xx, STM32F103xx, STM32F105xx and STM32F107xx advanced Arm®-based 32-bit MCUs</a></p>
+<ul>
+<li><a href="https://www.st.com.cn/resource/en/reference_manual/rm0008-stm32f101xx-stm32f102xx-stm32f103xx-stm32f105xx-and-stm32f107xx-advanced-armbased-32bit-mcus-stmicroelectronics.pdf">STM32F101xx, STM32F102xx, STM32F103xx, STM32F105xx and STM32F107xx advanced Arm®-based 32-bit MCUs</a></li>
+<li><a href="https://www.zanwen.icu/2024/11/27/59863.html">从按键控制LED开始深入理解外部中断（基于STM32F103ZE）</a></li>
+</ul>
 <h1 id="usart-kuang-tu-fen-xi">USART框图分析</h1>
 <p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241128192635013.png" alt="image-20241128192635013"></p>
 <blockquote>
@@ -2814,7 +3022,7 @@ USART_DR register. The RXNE flag can also be cleared by writing a zero to it. Th
 RXNE bit must be cleared before the end of the reception of the next character to avoid<br>
 an overrun error.</p>
 </blockquote>
-<p>当一个数据帧接收完成后：</p>
+<p>当收到了一个数据帧后：</p>
 <ul>
 <li>RXNE会被置位：有数据被传输到了RDR中，可以通过DR来读取它</li>
 <li>产生RXNEIE中断（如果使能了该中断）</li>
@@ -2832,7 +3040,27 @@ an overrun error.</p>
 <blockquote>
 <p>When an idle frame is detected, there is the same procedure as a data received character plus an interrupt if the IDLEIE bit is set.</p>
 </blockquote>
-<p>当检测到一个空闲帧时，处理过程和接收一个普通数据帧的过程是一样的（参考上一节），但在此基础上增加了一个IDLEIE中断（如果使能了该中断）</p>
+<p>当检测到空闲帧（<mark>注意这里是指跟在数据帧后的第一个空闲帧</mark>）时，硬件会执行与接收到一个数据帧类似的流程（参考上一节）：</p>
+<ol>
+<li>设置USART_SR 寄存器的 <strong>IDLE（空闲帧检测）</strong> 标志位（接收到数据帧则是设置RXNE标志位）。</li>
+<li>如果 <strong>IDLEIE 位=1</strong>（空闲帧中断使能），会触发中断。</li>
+</ol>
+<p>但是，<strong>空闲帧</strong>不会影响接收数据缓冲区的内容，因此不会产生 RXNE 标志，也不会修改接收数据寄存器（RDR）。</p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241129193651750.png" alt="image-20241129193651750"></p>
+<blockquote>
+<p>It is cleared by a software sequence (an read to the USART_SR register followed by a read to the USART_DR register).</p>
+</blockquote>
+<p>这里值得注意的是，IDLE标志位可以通过如下软件操作序列来清除：</p>
+<ol>
+<li>读USART_SR寄存器（例如轮询IDLE标志位）</li>
+<li>读USART_DR（例如轮询到IDLE被置后，执行一个USART_DR读到的空操作）</li>
+</ol>
+<blockquote>
+<p>[!NOTE]</p>
+<p>Note: The IDLE bit will not be set again until the RXNE bit has been set itself (i.e. a new idle<br>
+line occurs).</p>
+<p>这里需要注意的是，在RXNE被置位后（接收到了数据）如果检测到了空闲帧才会将IDLE置位，并且如果有多个空闲帧不会多次将IDLE置位，即每次接收数据后的第一个空闲帧（指示一次不定长数据传输已经完成）才会置位IDLE</p>
+</blockquote>
 <h1 id="bo-te-lu-she-zhi">波特率设置</h1>
 <p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241129105108831.png" alt="image-20241129105108831"></p>
 <p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241129102353746.png" alt="image-20241129102353746"></p>
@@ -2847,7 +3075,7 @@ an overrun error.</p>
 </blockquote>
 <p>可以通过如下寄存器配置是否开启校验位，以及选择奇偶校验模式</p>
 <p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241128210525491.png" alt="image-20241128210525491"></p>
-<h1 id="lun-xun-fang-shi-shou-fa-shi-jian">轮询方式收发实践</h1>
+<h1 id="lun-xun-fang-shi-shou-fa-dan-zi-jie-shi-jian">轮询方式收发单字节实践</h1>
 <h2 id="yuan-li-tu">原理图</h2>
 <p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241129103540732.png" alt="image-20241129103540732"></p>
 <h2 id="shi-neng-shi-zhong">使能时钟</h2>
@@ -2977,6 +3205,704 @@ USART1<span class="token operator">-&gt;</span>CR1 <span class="token operator">
     <span class="token keyword">while</span> <span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span> <span class="token punctuation">{</span><span class="token punctuation">}</span>
 <span class="token punctuation">}</span>
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<h1 id="lun-xun-fang-shi-shou-fa-duo-zi-jie-shi-jian">轮询方式收发多字节实践</h1>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token keyword">void</span> <span class="token function">uart_send_bytes</span><span class="token punctuation">(</span><span class="token class-name">uint8_t</span><span class="token operator">*</span> bytes<span class="token punctuation">,</span> u16 size<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">for</span> <span class="token punctuation">(</span>u16 i <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span> i <span class="token operator">&lt;</span> size<span class="token punctuation">;</span> i<span class="token operator">++</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token function">uart_send_byte</span><span class="token punctuation">(</span>bytes<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">void</span> <span class="token function">uart_receive_bytes</span><span class="token punctuation">(</span><span class="token class-name">uint8_t</span><span class="token operator">*</span> bytes_buf<span class="token punctuation">,</span> <span class="token class-name">uint16_t</span><span class="token operator">*</span> sizebuf<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token class-name">uint16_t</span> i <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
+    <span class="token keyword">while</span> <span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">while</span> <span class="token punctuation">(</span><span class="token punctuation">(</span>USART1<span class="token operator">-&gt;</span>SR <span class="token operator">&amp;</span> USART_SR_RXNE<span class="token punctuation">)</span> <span class="token operator">==</span> <span class="token number">0</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token keyword">if</span> <span class="token punctuation">(</span>USART1<span class="token operator">-&gt;</span>SR <span class="token operator">&amp;</span> USART_SR_IDLE<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                USART1<span class="token operator">-&gt;</span>DR<span class="token punctuation">;</span>
+                <span class="token operator">*</span>sizebuf <span class="token operator">=</span> i<span class="token punctuation">;</span>
+                <span class="token keyword">return</span><span class="token punctuation">;</span>
+            <span class="token punctuation">}</span>
+        <span class="token punctuation">}</span>
+        bytes_buf<span class="token punctuation">[</span>i<span class="token operator">++</span><span class="token punctuation">]</span> <span class="token operator">=</span> USART1<span class="token operator">-&gt;</span>DR<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>这里既要通过轮询来检测RXNE从而实现多字节的读取，又要轮询IDLE来实现在检测到空闲帧后（发送方发送完了最后一个字节）终止轮询读取的逻辑。</p>
+<blockquote>
+<p>[!NOTE]</p>
+<p>这里在检测到IDLE标志位（通过读USART1-&gt;SR）后，追加了一个USART1-&gt;DR读操作，这是为了遵循手册对于IDLE标志位描述中的规范：</p>
+<p>It is cleared by a software sequence (an read to theUSART_SR register followed by a read to the USART_DR register).</p>
+</blockquote>
+<p>值得注意的是，<mark>轮询RXNE和IDLE应该配合使用</mark>，如下代码试图通过在每次从DR读取到一个字节后检测一次IDLE，如果IDLE刚好在这个 <code>if (USART1-&gt;SR &amp; USART_SR_IDLE) </code>执行后被置位，那么程序就会卡在第4行</p>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token keyword">void</span> <span class="token function">uart_receive_bytes</span><span class="token punctuation">(</span><span class="token class-name">uint8_t</span><span class="token operator">*</span> bytes_buf<span class="token punctuation">,</span> <span class="token class-name">uint16_t</span><span class="token operator">*</span> sizebuf<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token class-name">uint16_t</span> i <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
+    <span class="token keyword">while</span> <span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">while</span> <span class="token punctuation">(</span><span class="token punctuation">(</span>USART1<span class="token operator">-&gt;</span>SR <span class="token operator">&amp;</span> USART_SR_RXNE<span class="token punctuation">)</span> <span class="token operator">==</span> <span class="token number">0</span><span class="token punctuation">)</span> <span class="token punctuation">{</span><span class="token punctuation">}</span>
+        bytes_buf<span class="token punctuation">[</span>i<span class="token operator">++</span><span class="token punctuation">]</span> <span class="token operator">=</span> USART1<span class="token operator">-&gt;</span>DR<span class="token punctuation">;</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>USART1<span class="token operator">-&gt;</span>SR <span class="token operator">&amp;</span> USART_SR_IDLE<span class="token punctuation">)</span> <span class="token punctuation">{</span> 
+            USART1<span class="token operator">-&gt;</span>DR<span class="token punctuation">;</span>
+            <span class="token operator">*</span>sizebuf <span class="token operator">=</span> i<span class="token punctuation">;</span>
+            <span class="token keyword">return</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<blockquote>
+<p>[!WARNING]</p>
+<p>可以发现，对于硬件置位的标志位（例如RXNE、IDLE），应该不断轮询去检测，而不要期望在某个时机检测仅仅一次。</p>
+<p>例如上述程序期望在收到最后一个字节后通过一次 <code>if</code>判断来检测IDLE，虽然对于接收最后一个字节而言，IDLE置位确实发生在 <code>bytes_buf[i++] = USART1-&gt;DR</code>之后，但是程序的执行速度是很快的，而空闲帧的检测需要硬件检测到一个帧长的所有bit全为1时才会将IDLE置1。因此上述程序中的 <code>if (USART1-&gt;SR &amp; USART_SR_IDLE)</code> 并不能在接收完最后一个字节后如期检测到IDLE被置位，接着又回到了 <code>while ((USART1-&gt;SR &amp; USART_SR_RXNE) == 0)</code>空转无法跳出。</p>
+</blockquote>
+<p>因此如下代码将RXNE和IDLE的轮询结合到了一起，在RXNE被置位时执行数据的读取 <code>bytes_buf[i++] = USART1-&gt;DR</code>，在IDLE被置位时执行函数的返回</p>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token keyword">void</span> <span class="token function">uart_receive_bytes</span><span class="token punctuation">(</span><span class="token class-name">uint8_t</span><span class="token operator">*</span> bytes_buf<span class="token punctuation">,</span> <span class="token class-name">uint16_t</span><span class="token operator">*</span> sizebuf<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token class-name">uint16_t</span> i <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
+    <span class="token keyword">while</span> <span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">while</span> <span class="token punctuation">(</span><span class="token punctuation">(</span>USART1<span class="token operator">-&gt;</span>SR <span class="token operator">&amp;</span> USART_SR_RXNE<span class="token punctuation">)</span> <span class="token operator">==</span> <span class="token number">0</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token keyword">if</span> <span class="token punctuation">(</span>USART1<span class="token operator">-&gt;</span>SR <span class="token operator">&amp;</span> USART_SR_IDLE<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                USART1<span class="token operator">-&gt;</span>DR<span class="token punctuation">;</span>
+                <span class="token operator">*</span>sizebuf <span class="token operator">=</span> i<span class="token punctuation">;</span>
+                <span class="token keyword">return</span><span class="token punctuation">;</span>
+            <span class="token punctuation">}</span>
+        <span class="token punctuation">}</span>
+        bytes_buf<span class="token punctuation">[</span>i<span class="token operator">++</span><span class="token punctuation">]</span> <span class="token operator">=</span> USART1<span class="token operator">-&gt;</span>DR<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<h2 id="you-hua">优化</h2>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token class-name">uint8_t</span> <span class="token function">uart_receive_byte</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token comment">// waits until receive buffer is not empty</span>
+    <span class="token keyword">while</span> <span class="token punctuation">(</span><span class="token punctuation">(</span>USART1<span class="token operator">-&gt;</span>SR <span class="token operator">&amp;</span> USART_SR_RXNE<span class="token punctuation">)</span> <span class="token operator">==</span> <span class="token number">0</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>USART1<span class="token operator">-&gt;</span>SR <span class="token operator">&amp;</span> USART_SR_IDLE<span class="token punctuation">)</span> <span class="token punctuation">{</span>   <span class="token comment">// 如果检测到了空闲帧则停止接收数据</span>
+            <span class="token keyword">return</span> <span class="token number">0</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+    <span class="token keyword">return</span> USART1<span class="token operator">-&gt;</span>DR<span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">void</span> <span class="token function">uart_receive_bytes</span><span class="token punctuation">(</span><span class="token class-name">uint8_t</span><span class="token operator">*</span> bytes_buf<span class="token punctuation">,</span> <span class="token class-name">uint16_t</span><span class="token operator">*</span> sizebuf<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token comment">/*     uint16_t i = 0;
+    while (1) {
+        while ((USART1-&gt;SR &amp; USART_SR_RXNE) == 0) {
+            if (USART1-&gt;SR &amp; USART_SR_IDLE) {
+                USART1-&gt;DR;
+                *sizebuf = i;
+                return;
+            }
+        }
+        bytes_buf[i++] = USART1-&gt;DR;
+    } */</span>
+    <span class="token class-name">uint16_t</span> i <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
+    <span class="token keyword">while</span> <span class="token punctuation">(</span><span class="token punctuation">(</span>USART1<span class="token operator">-&gt;</span>SR <span class="token operator">&amp;</span> USART_SR_IDLE<span class="token punctuation">)</span> <span class="token operator">==</span> <span class="token number">0</span><span class="token punctuation">)</span> <span class="token punctuation">{</span> <span class="token comment">// 如果没有检测到空闲帧，则轮询接收数据</span>
+        bytes_buf<span class="token punctuation">[</span>i<span class="token operator">++</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token function">uart_receive_byte</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    USART1<span class="token operator">-&gt;</span>DR<span class="token punctuation">;</span> <span class="token comment">// 通过USART_SR读操作之后跟随一个USART_DR读来清除IDLE标志</span>
+    <span class="token operator">*</span>sizebuf <span class="token operator">=</span> <span class="token operator">--</span>i<span class="token punctuation">;</span> <span class="token comment">// uart_receive_byte返回的最后一个字节是因为空闲帧返回的无效数据</span>
+<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<h2 id="zai-kan-txe-tc-rxne-idel-qing-chu-luo-ji">再看TXE/TC、RXNE、IDEL清除逻辑</h2>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241129220628220.png" alt="image-20241129220628220"></p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241129220926870.png" alt="image-20241129220926870"></p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241129221419149.png" alt="image-20241129221419149"></p>
+<blockquote>
+<p>[!NOTE]</p>
+<p>这里需要注意的是，在RXNE被置位后（接收到了数据）如果检测到了空闲帧才会将IDLE置位，并且如果有多个空闲帧不会多次将IDLE置位，即每次接收数据后的第一个空闲帧（指示一次不定长数据传输已经完成）才会置位IDLE</p>
+</blockquote>
+<h2 id="wan-zheng-dai-ma-1">完整代码</h2>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">"uart.h"</span></span>
+
+<span class="token keyword">void</span> <span class="token function">uart_init</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token comment">// enable clock</span>
+    RCC<span class="token operator">-&gt;</span>APB2ENR <span class="token operator">|=</span> RCC_APB2ENR_IOPAEN<span class="token punctuation">;</span>
+    RCC<span class="token operator">-&gt;</span>APB2ENR <span class="token operator">|=</span> RCC_APB2ENR_AFIOEN<span class="token punctuation">;</span>
+    RCC<span class="token operator">-&gt;</span>APB2ENR <span class="token operator">|=</span> RCC_APB2ENR_USART1EN<span class="token punctuation">;</span>
+
+    <span class="token comment">// GPIO CONFIG</span>
+    <span class="token comment">// PA9 TX  alternate pp output</span>
+    GPIOA<span class="token operator">-&gt;</span>CRH <span class="token operator">|=</span> GPIO_CRH_MODE9<span class="token punctuation">;</span>   <span class="token comment">// output</span>
+    GPIOA<span class="token operator">-&gt;</span>CRH <span class="token operator">|=</span> GPIO_CRH_CNF9_1<span class="token punctuation">;</span>   <span class="token comment">// alternate pp</span>
+    GPIOA<span class="token operator">-&gt;</span>CRH <span class="token operator">&amp;=</span> <span class="token operator">~</span>GPIO_CRH_CNF9_0<span class="token punctuation">;</span>
+    <span class="token comment">// PA10 RX alternate float input</span>
+    GPIOA<span class="token operator">-&gt;</span>CRH <span class="token operator">&amp;=</span> <span class="token operator">~</span>GPIO_CRH_MODE10<span class="token punctuation">;</span>   <span class="token comment">// input mode</span>
+    GPIOA<span class="token operator">-&gt;</span>CRH <span class="token operator">&amp;=</span> <span class="token operator">~</span>GPIO_CRH_CNF10_1<span class="token punctuation">;</span>
+    GPIOA<span class="token operator">-&gt;</span>CRH <span class="token operator">|=</span> GPIO_CRH_CNF10_0<span class="token punctuation">;</span>   <span class="token comment">// float input</span>
+
+    <span class="token comment">// AFIO CONFIG</span>
+    AFIO<span class="token operator">-&gt;</span>MAPR <span class="token operator">&amp;=</span> <span class="token operator">~</span>AFIO_MAPR_USART1_REMAP<span class="token punctuation">;</span>
+
+    <span class="token comment">// USART CONFIG</span>
+    <span class="token comment">// baud rate</span>
+    USART1<span class="token operator">-&gt;</span>BRR <span class="token operator">&amp;=</span> <span class="token operator">~</span>USART_BRR_DIV_Mantissa<span class="token punctuation">;</span>
+    USART1<span class="token operator">-&gt;</span>BRR <span class="token operator">&amp;=</span> <span class="token operator">~</span>USART_BRR_DIV_Fraction<span class="token punctuation">;</span>
+    USART1<span class="token operator">-&gt;</span>BRR <span class="token operator">|=</span> <span class="token punctuation">(</span><span class="token number">0x27</span> <span class="token operator">&lt;&lt;</span> <span class="token number">4</span> <span class="token operator">|</span> <span class="token number">0x01</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token comment">//USART1-&gt;BRR = 0x271;</span>
+    <span class="token comment">// data frame</span>
+    USART1<span class="token operator">-&gt;</span>CR1 <span class="token operator">&amp;=</span> <span class="token operator">~</span>USART_CR1_M<span class="token punctuation">;</span>   <span class="token comment">// 8 bit word length</span>
+    USART1<span class="token operator">-&gt;</span>CR1 <span class="token operator">&amp;=</span> <span class="token operator">~</span>USART_CR1_PCE<span class="token punctuation">;</span>   <span class="token comment">// diable parity</span>
+    USART1<span class="token operator">-&gt;</span>CR2 <span class="token operator">&amp;=</span> <span class="token operator">~</span>USART_CR2_STOP<span class="token punctuation">;</span>   <span class="token comment">// 1 stop bit</span>
+    <span class="token comment">// enable</span>
+    USART1<span class="token operator">-&gt;</span>CR1 <span class="token operator">|=</span> <span class="token punctuation">(</span>USART_CR1_UE <span class="token operator">|</span> USART_CR1_RE <span class="token operator">|</span> USART_CR1_TE<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">void</span> <span class="token function">uart_send_byte</span><span class="token punctuation">(</span><span class="token class-name">uint8_t</span> byte<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token comment">// waits until transmit buffer is empty</span>
+    <span class="token keyword">while</span> <span class="token punctuation">(</span><span class="token punctuation">(</span>USART1<span class="token operator">-&gt;</span>SR <span class="token operator">&amp;</span> USART_SR_TXE<span class="token punctuation">)</span> <span class="token operator">==</span> <span class="token number">0</span><span class="token punctuation">)</span> <span class="token punctuation">{</span><span class="token punctuation">}</span>
+    USART1<span class="token operator">-&gt;</span>DR <span class="token operator">=</span> byte<span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token class-name">uint8_t</span> <span class="token function">uart_receive_byte</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token comment">// waits until receive buffer is not empty</span>
+    <span class="token keyword">while</span> <span class="token punctuation">(</span><span class="token punctuation">(</span>USART1<span class="token operator">-&gt;</span>SR <span class="token operator">&amp;</span> USART_SR_RXNE<span class="token punctuation">)</span> <span class="token operator">==</span> <span class="token number">0</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>USART1<span class="token operator">-&gt;</span>SR <span class="token operator">&amp;</span> USART_SR_IDLE<span class="token punctuation">)</span> <span class="token punctuation">{</span>   <span class="token comment">// 如果检测到了空闲帧则停止接收数据</span>
+            <span class="token keyword">return</span> <span class="token number">0</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+    <span class="token keyword">return</span> USART1<span class="token operator">-&gt;</span>DR<span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">void</span> <span class="token function">uart_send_bytes</span><span class="token punctuation">(</span><span class="token class-name">uint8_t</span><span class="token operator">*</span> bytes<span class="token punctuation">,</span> u16 size<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">for</span> <span class="token punctuation">(</span>u16 i <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span> i <span class="token operator">&lt;</span> size<span class="token punctuation">;</span> i<span class="token operator">++</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token function">uart_send_byte</span><span class="token punctuation">(</span>bytes<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">void</span> <span class="token function">uart_receive_bytes</span><span class="token punctuation">(</span><span class="token class-name">uint8_t</span><span class="token operator">*</span> bytes_buf<span class="token punctuation">,</span> <span class="token class-name">uint16_t</span><span class="token operator">*</span> sizebuf<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token comment">/*     uint16_t i = 0;
+    while (1) {
+        while ((USART1-&gt;SR &amp; USART_SR_RXNE) == 0) {
+            if (USART1-&gt;SR &amp; USART_SR_IDLE) {
+                USART1-&gt;DR;
+                *sizebuf = i;
+                return;
+            }
+        }
+        bytes_buf[i++] = USART1-&gt;DR;
+    } */</span>
+    <span class="token class-name">uint16_t</span> i <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
+    <span class="token keyword">while</span> <span class="token punctuation">(</span><span class="token punctuation">(</span>USART1<span class="token operator">-&gt;</span>SR <span class="token operator">&amp;</span> USART_SR_IDLE<span class="token punctuation">)</span> <span class="token operator">==</span> <span class="token number">0</span><span class="token punctuation">)</span> <span class="token punctuation">{</span> <span class="token comment">// 如果没有检测到空闲帧，则轮询接收数据</span>
+        bytes_buf<span class="token punctuation">[</span>i<span class="token operator">++</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token function">uart_receive_byte</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    USART1<span class="token operator">-&gt;</span>DR<span class="token punctuation">;</span> <span class="token comment">// 通过USART_SR读操作之后跟随一个USART_DR读来清除IDLE标志</span>
+    <span class="token operator">*</span>sizebuf <span class="token operator">=</span> <span class="token operator">--</span>i<span class="token punctuation">;</span> <span class="token comment">// uart_receive_byte返回的最后一个字节是因为空闲帧返回的无效数据</span>
+<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<h1 id="zhong-duan-fang-shi-jie-shou-dan-zi-jie-he-bian-chang-shu-ju">中断方式接收单字节和变长数据</h1>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241129223248999.png" alt="image-20241129223248999"></p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241129223318399.png" alt="image-20241129223318399"></p>
+<h2 id="shi-neng-zhong-duan">使能中断</h2>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241129223405148.png" alt="image-20241129223405148"></p>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token comment">// interrupt config</span>
+   USART1<span class="token operator">-&gt;</span>CR1 <span class="token operator">|=</span> USART_CR1_RXNEIE<span class="token punctuation">;</span>
+   USART1<span class="token operator">-&gt;</span>CR1 <span class="token operator">|=</span> USART_CR1_IDLEIE<span class="token punctuation">;</span>
+   <span class="token function">NVIC_SetPriorityGrouping</span><span class="token punctuation">(</span><span class="token number">3</span><span class="token punctuation">)</span><span class="token punctuation">;</span>   <span class="token comment">// only group priority</span>
+   <span class="token function">NVIC_SetPriority</span><span class="token punctuation">(</span>USART1_IRQn<span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+   <span class="token function">NVIC_EnableIRQ</span><span class="token punctuation">(</span>USART1_IRQn<span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<h2 id="ding-yi-zhong-duan-chu-li-han-shu">定义中断处理函数</h2>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token class-name">uint8_t</span> buffer<span class="token punctuation">[</span><span class="token number">100</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token punctuation">{</span><span class="token number">0</span><span class="token punctuation">}</span><span class="token punctuation">;</span>
+<span class="token class-name">uint8_t</span> size <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
+
+__weak <span class="token keyword">void</span> <span class="token function">uart1_received_callback</span><span class="token punctuation">(</span><span class="token class-name">uint8_t</span> buf<span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">,</span> <span class="token class-name">uint8_t</span> size<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    
+<span class="token punctuation">}</span>
+
+<span class="token keyword">void</span> <span class="token function">USART1_IRQHandler</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">if</span><span class="token punctuation">(</span>USART1<span class="token operator">-&gt;</span>SR <span class="token operator">&amp;</span> USART_SR_RXNE<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        buffer<span class="token punctuation">[</span>size<span class="token operator">++</span><span class="token punctuation">]</span> <span class="token operator">=</span> USART1<span class="token operator">-&gt;</span>DR<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    <span class="token keyword">if</span><span class="token punctuation">(</span>USART1<span class="token operator">-&gt;</span>SR <span class="token operator">&amp;</span> USART_SR_IDLE<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        USART1<span class="token operator">-&gt;</span>DR<span class="token punctuation">;</span> <span class="token comment">// dummy read for clearing IDLE flag</span>
+        <span class="token function">uart1_received_callback</span><span class="token punctuation">(</span>buffer<span class="token punctuation">,</span> size<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        size <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<h2 id="shi-yong-fang-zhong-xie-hui-diao-han-shu">使用方重写回调函数</h2>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token keyword">void</span> <span class="token function">uart1_received_callback</span><span class="token punctuation">(</span><span class="token class-name">uint8_t</span> buf<span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">,</span> <span class="token class-name">uint8_t</span> size<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token function">uart_send_bytes</span><span class="token punctuation">(</span>buf<span class="token punctuation">,</span> size<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">int</span> <span class="token function">main</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token function">uart_init</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token comment">//uart_send_byte('a');</span>
+    <span class="token class-name">uint8_t</span><span class="token operator">*</span> str <span class="token operator">=</span> <span class="token string">"hello world!\n"</span><span class="token punctuation">;</span>
+    <span class="token function">uart_send_bytes</span><span class="token punctuation">(</span>str<span class="token punctuation">,</span> <span class="token function">strlen</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token keyword">char</span><span class="token operator">*</span><span class="token punctuation">)</span>str<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">while</span> <span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span> <span class="token punctuation">{</span><span class="token punctuation">}</span>
+<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<h2 id="wan-zheng-dai-ma-2">完整代码</h2>
+<p><code>uart.h</code></p>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">ifndef</span> <span class="token expression">__UART_H__</span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name">__UART_H__</span></span>
+
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">"stm32f10x.h"</span></span>
+
+<span class="token keyword">void</span> <span class="token function">uart_init</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token keyword">void</span> <span class="token function">uart_send_byte</span><span class="token punctuation">(</span><span class="token class-name">uint8_t</span> byte<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token keyword">void</span> <span class="token function">uart_send_bytes</span><span class="token punctuation">(</span><span class="token class-name">uint8_t</span> <span class="token operator">*</span>bytes<span class="token punctuation">,</span> u16 size<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token keyword">void</span> <span class="token function">uart1_received_callback</span><span class="token punctuation">(</span><span class="token class-name">uint8_t</span> <span class="token operator">*</span>buf<span class="token punctuation">,</span> <span class="token class-name">uint8_t</span> size<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">endif</span> <span class="token comment">/* __UART_H__ */</span></span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p><code>uart.c</code></p>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">"uart.h"</span></span>
+
+<span class="token keyword">void</span> <span class="token function">uart_init</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token comment">// enable clock</span>
+    RCC<span class="token operator">-&gt;</span>APB2ENR <span class="token operator">|=</span> RCC_APB2ENR_IOPAEN<span class="token punctuation">;</span>
+    RCC<span class="token operator">-&gt;</span>APB2ENR <span class="token operator">|=</span> RCC_APB2ENR_AFIOEN<span class="token punctuation">;</span>
+    RCC<span class="token operator">-&gt;</span>APB2ENR <span class="token operator">|=</span> RCC_APB2ENR_USART1EN<span class="token punctuation">;</span>
+
+    <span class="token comment">// GPIO CONFIG</span>
+    <span class="token comment">// PA9 TX  alternate pp output</span>
+    GPIOA<span class="token operator">-&gt;</span>CRH <span class="token operator">|=</span> GPIO_CRH_MODE9<span class="token punctuation">;</span>   <span class="token comment">// output</span>
+    GPIOA<span class="token operator">-&gt;</span>CRH <span class="token operator">|=</span> GPIO_CRH_CNF9_1<span class="token punctuation">;</span>   <span class="token comment">// alternate pp</span>
+    GPIOA<span class="token operator">-&gt;</span>CRH <span class="token operator">&amp;=</span> <span class="token operator">~</span>GPIO_CRH_CNF9_0<span class="token punctuation">;</span>
+    <span class="token comment">// PA10 RX alternate float input</span>
+    GPIOA<span class="token operator">-&gt;</span>CRH <span class="token operator">&amp;=</span> <span class="token operator">~</span>GPIO_CRH_MODE10<span class="token punctuation">;</span>   <span class="token comment">// input mode</span>
+    GPIOA<span class="token operator">-&gt;</span>CRH <span class="token operator">&amp;=</span> <span class="token operator">~</span>GPIO_CRH_CNF10_1<span class="token punctuation">;</span>
+    GPIOA<span class="token operator">-&gt;</span>CRH <span class="token operator">|=</span> GPIO_CRH_CNF10_0<span class="token punctuation">;</span>   <span class="token comment">// float input</span>
+
+    <span class="token comment">// AFIO CONFIG</span>
+    AFIO<span class="token operator">-&gt;</span>MAPR <span class="token operator">&amp;=</span> <span class="token operator">~</span>AFIO_MAPR_USART1_REMAP<span class="token punctuation">;</span>
+
+    <span class="token comment">// USART CONFIG</span>
+    <span class="token comment">// baud rate</span>
+    USART1<span class="token operator">-&gt;</span>BRR <span class="token operator">&amp;=</span> <span class="token operator">~</span>USART_BRR_DIV_Mantissa<span class="token punctuation">;</span>
+    USART1<span class="token operator">-&gt;</span>BRR <span class="token operator">&amp;=</span> <span class="token operator">~</span>USART_BRR_DIV_Fraction<span class="token punctuation">;</span>
+    USART1<span class="token operator">-&gt;</span>BRR <span class="token operator">|=</span> <span class="token punctuation">(</span><span class="token number">0x27</span> <span class="token operator">&lt;&lt;</span> <span class="token number">4</span> <span class="token operator">|</span> <span class="token number">0x01</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token comment">//USART1-&gt;BRR = 0x271;</span>
+    <span class="token comment">// data frame</span>
+    USART1<span class="token operator">-&gt;</span>CR1 <span class="token operator">&amp;=</span> <span class="token operator">~</span>USART_CR1_M<span class="token punctuation">;</span>   <span class="token comment">// 8 bit word length</span>
+    USART1<span class="token operator">-&gt;</span>CR1 <span class="token operator">&amp;=</span> <span class="token operator">~</span>USART_CR1_PCE<span class="token punctuation">;</span>   <span class="token comment">// diable parity</span>
+    USART1<span class="token operator">-&gt;</span>CR2 <span class="token operator">&amp;=</span> <span class="token operator">~</span>USART_CR2_STOP<span class="token punctuation">;</span>   <span class="token comment">// 1 stop bit</span>
+    <span class="token comment">// enable</span>
+    USART1<span class="token operator">-&gt;</span>CR1 <span class="token operator">|=</span> <span class="token punctuation">(</span>USART_CR1_UE <span class="token operator">|</span> USART_CR1_RE <span class="token operator">|</span> USART_CR1_TE<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token comment">// interrupt config</span>
+    USART1<span class="token operator">-&gt;</span>CR1 <span class="token operator">|=</span> USART_CR1_RXNEIE<span class="token punctuation">;</span>
+    USART1<span class="token operator">-&gt;</span>CR1 <span class="token operator">|=</span> USART_CR1_IDLEIE<span class="token punctuation">;</span>
+    <span class="token function">NVIC_SetPriorityGrouping</span><span class="token punctuation">(</span><span class="token number">3</span><span class="token punctuation">)</span><span class="token punctuation">;</span>   <span class="token comment">// only group priority</span>
+    <span class="token function">NVIC_SetPriority</span><span class="token punctuation">(</span>USART1_IRQn<span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">NVIC_EnableIRQ</span><span class="token punctuation">(</span>USART1_IRQn<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token class-name">uint8_t</span> buffer<span class="token punctuation">[</span><span class="token number">100</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token punctuation">{</span><span class="token number">0</span><span class="token punctuation">}</span><span class="token punctuation">;</span>
+<span class="token class-name">uint8_t</span> size <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
+<span class="token keyword">void</span> <span class="token function">USART1_IRQHandler</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">if</span><span class="token punctuation">(</span>USART1<span class="token operator">-&gt;</span>SR <span class="token operator">&amp;</span> USART_SR_RXNE<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        buffer<span class="token punctuation">[</span>size<span class="token operator">++</span><span class="token punctuation">]</span> <span class="token operator">=</span> USART1<span class="token operator">-&gt;</span>DR<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    <span class="token keyword">if</span><span class="token punctuation">(</span>USART1<span class="token operator">-&gt;</span>SR <span class="token operator">&amp;</span> USART_SR_IDLE<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        USART1<span class="token operator">-&gt;</span>DR<span class="token punctuation">;</span> <span class="token comment">// dummy read for clearing IDLE flag</span>
+        <span class="token function">uart1_received_callback</span><span class="token punctuation">(</span>buffer<span class="token punctuation">,</span> size<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        size <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+
+__weak <span class="token keyword">void</span> <span class="token function">uart1_received_callback</span><span class="token punctuation">(</span><span class="token class-name">uint8_t</span> <span class="token operator">*</span>buf<span class="token punctuation">,</span> <span class="token class-name">uint8_t</span> size<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    
+<span class="token punctuation">}</span>
+
+<span class="token keyword">void</span> <span class="token function">uart_send_byte</span><span class="token punctuation">(</span><span class="token class-name">uint8_t</span> byte<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token comment">// waits until transmit buffer is empty</span>
+    <span class="token keyword">while</span> <span class="token punctuation">(</span><span class="token punctuation">(</span>USART1<span class="token operator">-&gt;</span>SR <span class="token operator">&amp;</span> USART_SR_TXE<span class="token punctuation">)</span> <span class="token operator">==</span> <span class="token number">0</span><span class="token punctuation">)</span> <span class="token punctuation">{</span><span class="token punctuation">}</span>
+    USART1<span class="token operator">-&gt;</span>DR <span class="token operator">=</span> byte<span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">void</span> <span class="token function">uart_send_bytes</span><span class="token punctuation">(</span><span class="token class-name">uint8_t</span><span class="token operator">*</span> bytes<span class="token punctuation">,</span> u16 size<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">for</span> <span class="token punctuation">(</span>u16 i <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span> i <span class="token operator">&lt;</span> size<span class="token punctuation">;</span> i<span class="token operator">++</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token function">uart_send_byte</span><span class="token punctuation">(</span>bytes<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p><code>main.c</code></p>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token keyword">void</span> <span class="token function">uart1_received_callback</span><span class="token punctuation">(</span><span class="token class-name">uint8_t</span> buf<span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">,</span> <span class="token class-name">uint8_t</span> size<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token function">uart_send_bytes</span><span class="token punctuation">(</span>buf<span class="token punctuation">,</span> size<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">int</span> <span class="token function">main</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token function">uart_init</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token comment">//uart_send_byte('a');</span>
+    <span class="token class-name">uint8_t</span><span class="token operator">*</span> str <span class="token operator">=</span> <span class="token string">"hello world!\n"</span><span class="token punctuation">;</span>
+    <span class="token function">uart_send_bytes</span><span class="token punctuation">(</span>str<span class="token punctuation">,</span> <span class="token function">strlen</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token keyword">char</span><span class="token operator">*</span><span class="token punctuation">)</span>str<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">while</span> <span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span> <span class="token punctuation">{</span><span class="token punctuation">}</span>
+<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<h1 id="stm-32-cube-mx-hal-ku-shi-jian">STM32CubeMX/HAL库实践</h1>
+<h2 id="lun-xun-fang-shi-shou-fa-ding-chang-shu-ju">轮询方式收发定长数据</h2>
+<h3 id="cube-pei-zhi-qi-yong-usart-xiang-guan-de-gpio-hui-bei-zi-dong-pei-zhi">Cube配置启用USART，相关的GPIO会被自动配置</h3>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241130085637544.png" alt="image-20241130085637544"></p>
+<h3 id="afio-zhong-ying-she-wen-ti">AFIO重映射问题</h3>
+<p>需要注意的是，如果希望PB6/7作为TX/RX，可以直接点击图中的可视化引脚视图中的PB6选择USART1_TX，那么PA9/10就会被切换为PB6/7，并且自动在生成的代码中做好AFIO的remap配置</p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241130085714543.png" alt="image-20241130085714543"></p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241130090020406.png" alt="image-20241130090020406"></p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241130090037660.png" alt="image-20241130090037660"></p>
+<p>同样的，再次点击PA9引脚选择USART1_TX则可以切换回PA9/10</p>
+<h3 id="lun-xun-shou-fa-ding-chang-han-shu-diao-yong">轮询收发定长函数调用</h3>
+<p><code>stm32f1xx_hal_uart.c</code></p>
+<pre class="line-numbers language-none"><code class="language-none">*** Polling mode IO operation ***
+=================================
+[..]
+  (+) Send an amount of data in blocking mode using HAL_UART_Transmit()
+  (+) Receive an amount of data in blocking mode using HAL_UART_Receive()<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li><code>HAL_UART_Transmit</code>：轮询发送指定数量数据，需要指定超时时间（ms）</li>
+<li><code>HAL_UART_Receive</code>：轮询接收指定数量的数据，需要指定超时时间（ms）</li>
+<li><code>HAL_StatusTypeDef</code>：上述两个函数的返回值，如果成功则返回 <code>HAL_OK</code>，如果超时则返回 <code>HAL_TIMEOUT</code></li>
+</ul>
+<p>如下示例实现了不断接收8个数据并原样发送8个数据</p>
+<pre class="line-numbers language-C" data-language="C"><code class="language-C">int main(void) {
+    ...
+
+    /* Initialize all configured peripherals */
+    MX_GPIO_Init();
+    MX_USART1_UART_Init();
+    /* USER CODE BEGIN 2 */
+    uint8_t* str = "hello world\n";
+    HAL_UART_Transmit(&amp;huart1, str, strlen((char*)str), 10);
+
+    uint8_t buffer[100] = { 0 };
+    /* USER CODE END 2 */
+
+    /* Infinite loop */
+    /* USER CODE BEGIN WHILE */
+    while (1) {
+        if (HAL_UART_Receive(&amp;huart1, buffer, 8, 10) == HAL_OK) {
+            HAL_UART_Transmit(&amp;huart1, buffer, 8, 10);
+            /* code */
+        }
+        /* USER CODE END WHILE */
+        
+        if (HAL_UART_Receive(&amp;huart1, buffer, 8, 10) == HAL_OK) {
+            HAL_UART_Transmit(&amp;huart1, buffer, 8, 10);
+            /* code */
+        }
+
+        /* USER CODE BEGIN 3 */
+    }
+    /* USER CODE END 3 */
+}<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<h2 id="lun-xun-fang-shi-jie-shou-bian-chang-shu-ju">轮询方式接收变长数据</h2>
+<p><code>stm32f1xx_hal_uart.c</code></p>
+<pre class="line-numbers language-none"><code class="language-none">(+) Blocking mode: The reception is performed in polling mode, until either expected number of data is received,
+   or till IDLE event occurs. Reception is handled only during function execution.
+   When function exits, no data reception could occur. HAL status and number of actually received data elements,
+   are returned by function after finishing transfer.
+   
+(#) Blocking mode API:
+    (+) HAL_UARTEx_ReceiveToIdle()<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p><code>HAL_UARTEx_ReceiveToIdle</code>：轮询接收数据直到检测到空闲帧</p>
+<ul>
+<li><code>uint8_t *pData</code>：指定缓冲区的地址</li>
+<li><code>uint16_t Size</code>：指定需要接收多少数量数据到缓冲区，通常可以设置为缓冲区的大小</li>
+<li><code>uint16_t *RxLen</code>：检测到空闲帧时实际接收到的数据数量，调用方需要准备一个 <code>uint16_t</code>变量并将其地址通过该参数传入，函数会根据实际情况来设置该变量的值</li>
+</ul>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token class-name">uint8_t</span> buffer<span class="token punctuation">[</span><span class="token number">100</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token punctuation">{</span> <span class="token number">0</span> <span class="token punctuation">}</span><span class="token punctuation">;</span>
+<span class="token class-name">uint16_t</span> received_size <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
+<span class="token comment">/* USER CODE END 2 */</span>
+
+<span class="token comment">/* Infinite loop */</span>
+<span class="token comment">/* USER CODE BEGIN WHILE */</span>
+<span class="token keyword">while</span> <span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token function">HAL_UARTEx_ReceiveToIdle</span><span class="token punctuation">(</span><span class="token operator">&amp;</span>huart1<span class="token punctuation">,</span> buffer<span class="token punctuation">,</span> <span class="token number">100</span><span class="token punctuation">,</span> <span class="token operator">&amp;</span>received_size<span class="token punctuation">,</span> <span class="token number">10</span><span class="token punctuation">)</span> <span class="token operator">==</span> HAL_OK<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token function">HAL_UART_Transmit</span><span class="token punctuation">(</span><span class="token operator">&amp;</span>huart1<span class="token punctuation">,</span> buffer<span class="token punctuation">,</span> received_size<span class="token punctuation">,</span> <span class="token number">10</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token comment">/* code */</span>
+    <span class="token punctuation">}</span>
+    <span class="token comment">/* USER CODE END WHILE */</span>
+
+    <span class="token comment">/* USER CODE BEGIN 3 */</span>
+<span class="token punctuation">}</span>
+<span class="token comment">/* USER CODE END 3 */</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<h2 id="zhong-duan-fang-shi-jie-shou-ding-chang-shu-ju">中断方式接收定长数据</h2>
+<p><code>stm32f1xx_hal_uart.c</code></p>
+<pre class="line-numbers language-none"><code class="language-none">*** Interrupt mode IO operation ***
+    ===================================
+    [..]
+      (+) Send an amount of data in non blocking mode using HAL_UART_Transmit_IT()
+      (+) At transmission end of transfer HAL_UART_TxCpltCallback is executed and user can
+           add his own code by customization of function pointer HAL_UART_TxCpltCallback
+      (+) Receive an amount of data in non blocking mode using HAL_UART_Receive_IT()
+      (+) At reception end of transfer HAL_UART_RxCpltCallback is executed and user can
+           add his own code by customization of function pointer HAL_UART_RxCpltCallback
+      (+) In case of transfer Error, HAL_UART_ErrorCallback() function is executed and user can
+           add his own code by customization of function pointer HAL_UART_ErrorCallback<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li>
+<p><code>HAL_UART_Receive_IT</code>：以中断方式接收指定数量的数据到接收缓冲区中（由用户定义），调用该函数不会阻塞当前程序</p>
+</li>
+<li>
+<p><code>HAL_UART_RxCpltCallback</code>：接收完成回调，在接收了指定数量（底层通过RXNE中断逐个接收）数据并放到接收缓冲区中（由用户定义）后，该函数会被调用，我们可以通过重写改函数来处理接收到的数据</p>
+</li>
+</ul>
+<blockquote>
+<p>[!TIP]</p>
+<p><code>stm32f1xx_hal_uart.c</code>提供了 <code>HAL_UART_RxCpltCallback</code>函数的弱定义形式（相当于提供了一个接口），用户可以重写该函数（去掉 <code>__weak</code>关键字）以实现自定义逻辑。</p>
+<p>该设计和钩子函数是一脉相承的。</p>
+</blockquote>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token comment">/**
+  * @brief  Rx Transfer completed callbacks.
+  * @param  huart  Pointer to a UART_HandleTypeDef structure that contains
+  *                the configuration information for the specified UART module.
+  * @retval None
+  */</span>
+__weak <span class="token keyword">void</span> <span class="token function">HAL_UART_RxCpltCallback</span><span class="token punctuation">(</span>UART_HandleTypeDef <span class="token operator">*</span>huart<span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+  <span class="token comment">/* Prevent unused argument(s) compilation warning */</span>
+  <span class="token function">UNUSED</span><span class="token punctuation">(</span>huart<span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token comment">/* NOTE: This function should not be modified, when the callback is needed,
+           the HAL_UART_RxCpltCallback could be implemented in the user file
+   */</span>
+<span class="token punctuation">}</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>示例代码：</p>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token comment">/* USER CODE BEGIN 0 */</span>
+<span class="token class-name">uint8_t</span> buffer<span class="token punctuation">[</span><span class="token number">100</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token punctuation">{</span><span class="token number">0</span><span class="token punctuation">}</span><span class="token punctuation">;</span>
+<span class="token class-name">uint16_t</span> fixed_data_size <span class="token operator">=</span> <span class="token number">5</span><span class="token punctuation">;</span>
+<span class="token class-name">uint8_t</span> is_over <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
+<span class="token keyword">void</span> <span class="token function">HAL_UART_RxCpltCallback</span><span class="token punctuation">(</span>UART_HandleTypeDef <span class="token operator">*</span>huart<span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+  <span class="token keyword">if</span> <span class="token punctuation">(</span>huart <span class="token operator">==</span> <span class="token operator">&amp;</span>huart1<span class="token punctuation">)</span>
+  <span class="token punctuation">{</span>
+    is_over <span class="token operator">=</span> <span class="token number">1</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+<span class="token comment">/* USER CODE END 0 */</span>
+
+<span class="token comment">/**
+ * @brief  The application entry point.
+ * @retval int
+ */</span>
+<span class="token keyword">int</span> <span class="token function">main</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+
+  <span class="token comment">/* USER CODE BEGIN 1 */</span>
+
+  <span class="token comment">/* USER CODE END 1 */</span>
+
+  <span class="token comment">/* MCU Configuration--------------------------------------------------------*/</span>
+
+  <span class="token comment">/* Reset of all peripherals, Initializes the Flash interface and the Systick. */</span>
+  <span class="token function">HAL_Init</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+  <span class="token comment">/* USER CODE BEGIN Init */</span>
+
+  <span class="token comment">/* USER CODE END Init */</span>
+
+  <span class="token comment">/* Configure the system clock */</span>
+  <span class="token function">SystemClock_Config</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+  <span class="token comment">/* USER CODE BEGIN SysInit */</span>
+
+  <span class="token comment">/* USER CODE END SysInit */</span>
+
+  <span class="token comment">/* Initialize all configured peripherals */</span>
+  <span class="token function">MX_GPIO_Init</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token function">MX_USART1_UART_Init</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token comment">/* USER CODE BEGIN 2 */</span>
+
+  <span class="token comment">/* USER CODE END 2 */</span>
+
+  <span class="token comment">/* Infinite loop */</span>
+  <span class="token comment">/* USER CODE BEGIN WHILE */</span>
+  <span class="token keyword">while</span> <span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span>
+  <span class="token punctuation">{</span>
+    <span class="token function">HAL_UART_Receive_IT</span><span class="token punctuation">(</span><span class="token operator">&amp;</span>huart1<span class="token punctuation">,</span> buffer<span class="token punctuation">,</span> fixed_data_size<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>is_over<span class="token punctuation">)</span>
+    <span class="token punctuation">{</span>
+      <span class="token function">HAL_UART_Transmit</span><span class="token punctuation">(</span><span class="token operator">&amp;</span>huart1<span class="token punctuation">,</span> buffer<span class="token punctuation">,</span> fixed_data_size<span class="token punctuation">,</span> <span class="token number">10</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+      is_over <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token comment">/* USER CODE END WHILE */</span>
+
+    <span class="token comment">/* USER CODE BEGIN 3 */</span>
+  <span class="token punctuation">}</span>
+  <span class="token comment">/* USER CODE END 3 */</span>
+<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<blockquote>
+<p>[!NOTE]</p>
+<p>由于是接收定长数据，如果发送方发送的数据不等于既定的<code>fixed_data_size</code>，那么该程序的echo回传逻辑会有问题</p>
+</blockquote>
+<h2 id="zhong-duan-fang-shi-jie-shou-bian-chang-shu-ju">中断方式接收变长数据</h2>
+<p><code>stm32f1xx_hal_uart.c</code></p>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token punctuation">(</span><span class="token operator">+</span><span class="token punctuation">)</span> Non<span class="token operator">-</span>Blocking mode<span class="token operator">:</span> The reception is performed using Interrupts or DMA<span class="token punctuation">.</span>
+       These API's <span class="token keyword">return</span> the HAL status<span class="token punctuation">.</span>
+       The end of the data processing will be indicated through the
+       dedicated UART IRQ when using Interrupt mode or the DMA IRQ when using DMA mode<span class="token punctuation">.</span>
+       The <span class="token function">HAL_UARTEx_RxEventCallback</span><span class="token punctuation">(</span><span class="token punctuation">)</span> user callback will be executed during Receive process
+       The <span class="token function">HAL_UART_ErrorCallback</span><span class="token punctuation">(</span><span class="token punctuation">)</span>user callback will be executed when a reception error is detected<span class="token punctuation">.</span>
+
+<span class="token punctuation">(</span>#<span class="token punctuation">)</span> Non<span class="token operator">-</span>Blocking mode API with Interrupt<span class="token operator">:</span>
+    <span class="token punctuation">(</span><span class="token operator">+</span><span class="token punctuation">)</span> <span class="token function">HAL_UARTEx_ReceiveToIdle_IT</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p><code>HAL_UARTEx_ReceiveToIdle_IT</code>：以中断方式接收变长数据，接收数据到缓冲区（由用户定义）直到检测到空闲帧，，该函数不会阻塞当前程序</p>
+<ul>
+<li><code>uint8_t *pData</code>：接收缓冲区</li>
+<li><code>uint16_t Size</code>：需要接收的字结束，通常可以给定为缓冲区的大小</li>
+</ul>
+<p><code>HAL_UARTEx_RxEventCallback</code>：接收变长数据完成回调，可以通过入参 <code>Size</code>获取实际接收到的数据数量</p>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token comment">/**
+  * @brief  Reception Event Callback (Rx event notification called after use of advanced reception service).
+  * @param  huart UART handle
+  * @param  Size  Number of data available in application reception buffer (indicates a position in
+  *               reception buffer until which, data are available)
+  * @retval None
+  */</span>
+__weak <span class="token keyword">void</span> <span class="token function">HAL_UARTEx_RxEventCallback</span><span class="token punctuation">(</span>UART_HandleTypeDef <span class="token operator">*</span>huart<span class="token punctuation">,</span> <span class="token class-name">uint16_t</span> Size<span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+  <span class="token comment">/* Prevent unused argument(s) compilation warning */</span>
+  <span class="token function">UNUSED</span><span class="token punctuation">(</span>huart<span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token function">UNUSED</span><span class="token punctuation">(</span>Size<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+  <span class="token comment">/* NOTE : This function should not be modified, when the callback is needed,
+            the HAL_UARTEx_RxEventCallback can be implemented in the user file.
+   */</span>
+<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>示例代码：</p>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token comment">/* USER CODE BEGIN 0 */</span>
+<span class="token class-name">uint8_t</span> buffer<span class="token punctuation">[</span><span class="token number">100</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token punctuation">{</span><span class="token number">0</span><span class="token punctuation">}</span><span class="token punctuation">;</span>
+<span class="token class-name">uint8_t</span> is_over <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
+<span class="token class-name">uint8_t</span> received_size <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
+<span class="token keyword">void</span> <span class="token function">HAL_UARTEx_RxEventCallback</span><span class="token punctuation">(</span>UART_HandleTypeDef <span class="token operator">*</span>huart<span class="token punctuation">,</span> <span class="token class-name">uint16_t</span> Size<span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+  <span class="token keyword">if</span> <span class="token punctuation">(</span>huart <span class="token operator">==</span> <span class="token operator">&amp;</span>huart1<span class="token punctuation">)</span>
+  <span class="token punctuation">{</span>
+    is_over <span class="token operator">=</span> <span class="token number">1</span><span class="token punctuation">;</span>
+    received_size <span class="token operator">=</span> Size<span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+<span class="token comment">/* USER CODE END 0 */</span>
+
+<span class="token comment">/**
+ * @brief  The application entry point.
+ * @retval int
+ */</span>
+<span class="token keyword">int</span> <span class="token function">main</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+
+  <span class="token comment">/* USER CODE BEGIN 1 */</span>
+
+  <span class="token comment">/* USER CODE END 1 */</span>
+
+  <span class="token comment">/* MCU Configuration--------------------------------------------------------*/</span>
+
+  <span class="token comment">/* Reset of all peripherals, Initializes the Flash interface and the Systick. */</span>
+  <span class="token function">HAL_Init</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+  <span class="token comment">/* USER CODE BEGIN Init */</span>
+
+  <span class="token comment">/* USER CODE END Init */</span>
+
+  <span class="token comment">/* Configure the system clock */</span>
+  <span class="token function">SystemClock_Config</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+  <span class="token comment">/* USER CODE BEGIN SysInit */</span>
+
+  <span class="token comment">/* USER CODE END SysInit */</span>
+
+  <span class="token comment">/* Initialize all configured peripherals */</span>
+  <span class="token function">MX_GPIO_Init</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token function">MX_USART1_UART_Init</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token comment">/* USER CODE BEGIN 2 */</span>
+
+  <span class="token comment">/* USER CODE END 2 */</span>
+
+  <span class="token comment">/* Infinite loop */</span>
+  <span class="token comment">/* USER CODE BEGIN WHILE */</span>
+  <span class="token keyword">while</span> <span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span>
+  <span class="token punctuation">{</span>
+    <span class="token function">HAL_UARTEx_ReceiveToIdle_IT</span><span class="token punctuation">(</span><span class="token operator">&amp;</span>huart1<span class="token punctuation">,</span> buffer<span class="token punctuation">,</span> <span class="token number">100</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>is_over<span class="token punctuation">)</span>
+    <span class="token punctuation">{</span>
+      <span class="token function">HAL_UART_Transmit</span><span class="token punctuation">(</span><span class="token operator">&amp;</span>huart1<span class="token punctuation">,</span> buffer<span class="token punctuation">,</span> received_size<span class="token punctuation">,</span> <span class="token number">10</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+      is_over <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token comment">/* USER CODE END WHILE */</span>
+
+    <span class="token comment">/* USER CODE BEGIN 3 */</span>
+  <span class="token punctuation">}</span>
+  <span class="token comment">/* USER CODE END 3 */</span>
+<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<h2 id="cube-sheng-cheng-dai-ma-zi-dong-pei-zhi-fen-xi">Cube生成代码自动配置分析</h2>
+<p><code>main.c</code></p>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token comment">/* Initialize all configured peripherals */</span>
+<span class="token function">MX_GPIO_Init</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token function">MX_USART1_UART_Init</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+<p><code>MX_GPIO_Init</code>开启了GPIO时钟</p>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token keyword">void</span> <span class="token function">MX_GPIO_Init</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+
+  <span class="token comment">/* GPIO Ports Clock Enable */</span>
+  <span class="token function">__HAL_RCC_GPIOC_CLK_ENABLE</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token function">__HAL_RCC_GPIOA_CLK_ENABLE</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p><code>MX_USART1_UART_Init</code>将UART相关参数保存到了 <code>huart1</code>结构体中</p>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c">UART_HandleTypeDef huart1<span class="token punctuation">;</span>
+<span class="token keyword">void</span> <span class="token function">MX_USART1_UART_Init</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+
+  <span class="token comment">/* USER CODE BEGIN USART1_Init 0 */</span>
+
+  <span class="token comment">/* USER CODE END USART1_Init 0 */</span>
+
+  <span class="token comment">/* USER CODE BEGIN USART1_Init 1 */</span>
+
+  <span class="token comment">/* USER CODE END USART1_Init 1 */</span>
+  huart1<span class="token punctuation">.</span>Instance <span class="token operator">=</span> USART1<span class="token punctuation">;</span>
+  huart1<span class="token punctuation">.</span>Init<span class="token punctuation">.</span>BaudRate <span class="token operator">=</span> <span class="token number">115200</span><span class="token punctuation">;</span>
+  huart1<span class="token punctuation">.</span>Init<span class="token punctuation">.</span>WordLength <span class="token operator">=</span> UART_WORDLENGTH_8B<span class="token punctuation">;</span>
+  huart1<span class="token punctuation">.</span>Init<span class="token punctuation">.</span>StopBits <span class="token operator">=</span> UART_STOPBITS_1<span class="token punctuation">;</span>
+  huart1<span class="token punctuation">.</span>Init<span class="token punctuation">.</span>Parity <span class="token operator">=</span> UART_PARITY_NONE<span class="token punctuation">;</span>
+  huart1<span class="token punctuation">.</span>Init<span class="token punctuation">.</span>Mode <span class="token operator">=</span> UART_MODE_TX_RX<span class="token punctuation">;</span>
+  huart1<span class="token punctuation">.</span>Init<span class="token punctuation">.</span>HwFlowCtl <span class="token operator">=</span> UART_HWCONTROL_NONE<span class="token punctuation">;</span>
+  huart1<span class="token punctuation">.</span>Init<span class="token punctuation">.</span>OverSampling <span class="token operator">=</span> UART_OVERSAMPLING_16<span class="token punctuation">;</span>
+  <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token function">HAL_UART_Init</span><span class="token punctuation">(</span><span class="token operator">&amp;</span>huart1<span class="token punctuation">)</span> <span class="token operator">!=</span> HAL_OK<span class="token punctuation">)</span>
+  <span class="token punctuation">{</span>
+    <span class="token function">Error_Handler</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
+  <span class="token comment">/* USER CODE BEGIN USART1_Init 2 */</span>
+
+  <span class="token comment">/* USER CODE END USART1_Init 2 */</span>
+
+<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p><code>HAL_UART_Init</code>主要关注一下两个函数的调用</p>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c">HAL_StatusTypeDef <span class="token function">HAL_UART_Init</span><span class="token punctuation">(</span>UART_HandleTypeDef <span class="token operator">*</span>huart<span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+    <span class="token function">HAL_UART_MspInit</span><span class="token punctuation">(</span>huart<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">UART_SetConfig</span><span class="token punctuation">(</span>huart<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p><code>usart.c</code>重写了 <code>HAL_UART_MspInit</code>函数</p>
+<ul>
+<li>对USART1依赖的GPIO进行配置</li>
+<li>使能USART1中断</li>
+</ul>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token keyword">void</span> <span class="token function">HAL_UART_MspInit</span><span class="token punctuation">(</span>UART_HandleTypeDef<span class="token operator">*</span> uartHandle<span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+
+  GPIO_InitTypeDef GPIO_InitStruct <span class="token operator">=</span> <span class="token punctuation">{</span><span class="token number">0</span><span class="token punctuation">}</span><span class="token punctuation">;</span>
+  <span class="token keyword">if</span><span class="token punctuation">(</span>uartHandle<span class="token operator">-&gt;</span>Instance<span class="token operator">==</span>USART1<span class="token punctuation">)</span>
+  <span class="token punctuation">{</span>
+  <span class="token comment">/* USER CODE BEGIN USART1_MspInit 0 */</span>
+
+  <span class="token comment">/* USER CODE END USART1_MspInit 0 */</span>
+    <span class="token comment">/* USART1 clock enable */</span>
+    <span class="token function">__HAL_RCC_USART1_CLK_ENABLE</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token function">__HAL_RCC_GPIOA_CLK_ENABLE</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token comment">/**USART1 GPIO Configuration
+    PA9     ------&gt; USART1_TX
+    PA10     ------&gt; USART1_RX
+    */</span>
+    GPIO_InitStruct<span class="token punctuation">.</span>Pin <span class="token operator">=</span> GPIO_PIN_9<span class="token punctuation">;</span>
+    GPIO_InitStruct<span class="token punctuation">.</span>Mode <span class="token operator">=</span> GPIO_MODE_AF_PP<span class="token punctuation">;</span>
+    GPIO_InitStruct<span class="token punctuation">.</span>Speed <span class="token operator">=</span> GPIO_SPEED_FREQ_HIGH<span class="token punctuation">;</span>
+    <span class="token function">HAL_GPIO_Init</span><span class="token punctuation">(</span>GPIOA<span class="token punctuation">,</span> <span class="token operator">&amp;</span>GPIO_InitStruct<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    GPIO_InitStruct<span class="token punctuation">.</span>Pin <span class="token operator">=</span> GPIO_PIN_10<span class="token punctuation">;</span>
+    GPIO_InitStruct<span class="token punctuation">.</span>Mode <span class="token operator">=</span> GPIO_MODE_INPUT<span class="token punctuation">;</span>
+    GPIO_InitStruct<span class="token punctuation">.</span>Pull <span class="token operator">=</span> GPIO_NOPULL<span class="token punctuation">;</span>
+    <span class="token function">HAL_GPIO_Init</span><span class="token punctuation">(</span>GPIOA<span class="token punctuation">,</span> <span class="token operator">&amp;</span>GPIO_InitStruct<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token comment">/* USART1 interrupt Init */</span>
+    <span class="token function">HAL_NVIC_SetPriority</span><span class="token punctuation">(</span>USART1_IRQn<span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">HAL_NVIC_EnableIRQ</span><span class="token punctuation">(</span>USART1_IRQn<span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token comment">/* USER CODE BEGIN USART1_MspInit 1 */</span>
+
+  <span class="token comment">/* USER CODE END USART1_MspInit 1 */</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <h1 id="the-end">THE END</h1>
 ]]></content>
       <categories>
@@ -2986,155 +3912,6 @@ USART1<span class="token operator">-&gt;</span>CR1 <span class="token operator">
         <tag>STM32</tag>
         <tag>UART</tag>
         <tag>串口</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>简易版裸机多任务调度框架</title>
-    <url>/2024/11/26/21297.html</url>
-    <content><![CDATA[<h1 id="kuang-jia-jian-mo">框架建模</h1>
-<h2 id="kuang-jia-chou-xiang">框架抽象</h2>
-<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241126093047180.png" alt="image-20241126093047180"></p>
-<h2 id="mo-kuai-hua-fen">模块划分</h2>
-<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241126094329449.png" alt="image-20241126094329449"></p>
-<h1 id="scheduler">Scheduler</h1>
-<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token comment">//</span>
-<span class="token comment">// Created by 86157 on 2024/11/25.</span>
-<span class="token comment">//</span>
-
-<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">ifndef</span> <span class="token expression">__SCHEDULER_H</span></span>
-<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name">__SCHEDULER_H</span></span>
-
-<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">"gd32f4xx.h"</span></span>
-<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">"stdbool.h"</span></span>
-
-<span class="token keyword">typedef</span> <span class="token keyword">void</span> <span class="token punctuation">(</span><span class="token operator">*</span><span class="token class-name">task_function_t</span><span class="token punctuation">)</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-
-<span class="token keyword">typedef</span> <span class="token keyword">enum</span> <span class="token punctuation">{</span>
-    TASK_READY<span class="token punctuation">,</span>
-    TASK_RUNNING<span class="token punctuation">,</span>
-    TASK_WAITING
-<span class="token punctuation">}</span> <span class="token class-name">task_state_t</span><span class="token punctuation">;</span>
-
-<span class="token keyword">typedef</span> <span class="token keyword">struct</span> <span class="token punctuation">{</span>
-    <span class="token class-name">task_state_t</span>  task_state<span class="token punctuation">;</span>
-    <span class="token class-name">uint16_t</span> task_interval_ms<span class="token punctuation">;</span>
-    <span class="token class-name">uint16_t</span> task_time_waiting_ms<span class="token punctuation">;</span>
-    <span class="token class-name">task_function_t</span> task_function<span class="token punctuation">;</span>
-<span class="token punctuation">}</span> <span class="token class-name">task_t</span><span class="token punctuation">;</span>
-
-<span class="token keyword">void</span> <span class="token function">task_update</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-<span class="token keyword">void</span> <span class="token function">task_execute</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-
-<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">endif</span><span class="token comment">//__SCHEDULER_H</span></span>
-<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token comment">//</span>
-<span class="token comment">// Created by 86157 on 2024/11/25.</span>
-<span class="token comment">//</span>
-
-<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">"scheduler.h"</span></span>
-<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">"app.h"</span></span>
-
-<span class="token keyword">static</span> <span class="token class-name">task_t</span> tasks<span class="token punctuation">[</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token punctuation">{</span>
-        TASK_READY<span class="token punctuation">,</span> <span class="token number">400</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> app_ui_led_flow<span class="token punctuation">,</span>
-        TASK_READY<span class="token punctuation">,</span> <span class="token number">20</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> app_debug_key_scan<span class="token punctuation">}</span><span class="token punctuation">;</span>
-
-<span class="token keyword">static</span> <span class="token keyword">const</span> <span class="token class-name">uint8_t</span> TASK_SIZE <span class="token operator">=</span> <span class="token keyword">sizeof</span><span class="token punctuation">(</span>tasks<span class="token punctuation">)</span> <span class="token operator">/</span> <span class="token keyword">sizeof</span><span class="token punctuation">(</span>tasks<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-
-<span class="token keyword">void</span> <span class="token function">task_update</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
-    <span class="token keyword">for</span> <span class="token punctuation">(</span><span class="token class-name">uint16_t</span> i <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span> i <span class="token operator">&lt;</span> TASK_SIZE<span class="token punctuation">;</span> <span class="token operator">++</span>i<span class="token punctuation">)</span> <span class="token punctuation">{</span>
-        tasks<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">.</span>task_time_waiting_ms<span class="token operator">++</span><span class="token punctuation">;</span>
-        <span class="token keyword">if</span> <span class="token punctuation">(</span>tasks<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">.</span>task_time_waiting_ms <span class="token operator">&gt;=</span> tasks<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">.</span>task_interval_ms<span class="token punctuation">)</span> <span class="token punctuation">{</span>
-            tasks<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">.</span>task_state <span class="token operator">=</span> TASK_READY<span class="token punctuation">;</span>
-            tasks<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">.</span>task_time_waiting_ms <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
-        <span class="token punctuation">}</span>
-    <span class="token punctuation">}</span>
-<span class="token punctuation">}</span>
-
-<span class="token keyword">void</span> <span class="token function">task_execute</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
-    <span class="token keyword">for</span> <span class="token punctuation">(</span><span class="token class-name">uint16_t</span> i <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span> i <span class="token operator">&lt;</span> TASK_SIZE<span class="token punctuation">;</span> <span class="token operator">++</span>i<span class="token punctuation">)</span> <span class="token punctuation">{</span>
-        <span class="token keyword">if</span> <span class="token punctuation">(</span>tasks<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">.</span>task_state <span class="token operator">==</span> TASK_READY<span class="token punctuation">)</span> <span class="token punctuation">{</span>
-            tasks<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">.</span>task_state <span class="token operator">=</span> TASK_RUNNING<span class="token punctuation">;</span>
-            tasks<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">.</span><span class="token function">task_function</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-            tasks<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">.</span>task_state <span class="token operator">=</span> TASK_WAITING<span class="token punctuation">;</span>
-        <span class="token punctuation">}</span>
-    <span class="token punctuation">}</span>
-<span class="token punctuation">}</span>
-<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<h1 id="app">App</h1>
-<h2 id="ren-wu-jie-kou-guan-li">任务接口管理</h2>
-<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token comment">//</span>
-<span class="token comment">// Created by 86157 on 2024/11/25.</span>
-<span class="token comment">//</span>
-
-<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">ifndef</span> <span class="token expression">APP_H</span></span>
-<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name">APP_H</span></span>
-
-<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">"logger.h"</span></span>
-
-<span class="token keyword">void</span> <span class="token function">app_init</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-<span class="token keyword">void</span> <span class="token function">app_ui_led_flow</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-<span class="token keyword">void</span> <span class="token function">app_debug_key_scan</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-
-<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">endif</span><span class="token comment">//APP_H</span></span>
-<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<h2 id="ying-yong-chu-shi-hua">应用初始化</h2>
-<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token comment">//</span>
-<span class="token comment">// Created by 86157 on 2024/11/25.</span>
-<span class="token comment">//</span>
-<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">"app.h"</span></span>
-<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">"int_led.h"</span></span>
-<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">"int_key.h"</span></span>
-
-<span class="token keyword">void</span> <span class="token function">app_init</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
-    <span class="token function">int_led_init</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-    <span class="token function">int_key_init</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-    <span class="token function">LOG_DEBUG</span><span class="token punctuation">(</span><span class="token string">"app_init done"</span><span class="token punctuation">)</span>
-<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<h2 id="liu-shui-deng-ren-wu-shi-xian">流水灯任务实现</h2>
-<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token comment">//</span>
-<span class="token comment">// Created by 86157 on 2024/11/25.</span>
-<span class="token comment">//</span>
-<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">"app.h"</span></span>
-<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">"int_led.h"</span></span>
-
-<span class="token keyword">void</span> <span class="token function">app_ui_led_flow</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
-<span class="token comment">//    LOG_DEBUG("app_ui_led_flow invoke")</span>
-    <span class="token keyword">static</span> <span class="token class-name">uint8_t</span> led_index <span class="token operator">=</span> LED1<span class="token punctuation">;</span>
-    <span class="token function">int_led_on</span><span class="token punctuation">(</span>led_index<span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-    led_index<span class="token operator">++</span><span class="token punctuation">;</span>
-    <span class="token keyword">if</span> <span class="token punctuation">(</span>led_index <span class="token operator">==</span> LED_SIZE<span class="token punctuation">)</span> <span class="token punctuation">{</span>
-        <span class="token function">int_led_off_all</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-        led_index <span class="token operator">=</span> LED1<span class="token punctuation">;</span>
-    <span class="token punctuation">}</span>
-<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<h2 id="an-jian-sao-miao-ren-wu-shi-xian">按键扫描任务实现</h2>
-<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token comment">//</span>
-<span class="token comment">// Created by 86157 on 2024/11/25.</span>
-<span class="token comment">//</span>
-<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">"app.h"</span></span>
-<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">"int_key.h"</span></span>
-
-<span class="token keyword">void</span> <span class="token function">app_debug_key_scan</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
-    <span class="token function">int_key_scan</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-<span class="token punctuation">}</span>
-
-<span class="token keyword">void</span> <span class="token function">key_up_callback</span><span class="token punctuation">(</span>KEY_NO key_no<span class="token punctuation">)</span> <span class="token punctuation">{</span>
-    <span class="token function">LOG_DEBUG</span><span class="token punctuation">(</span><span class="token string">"key up"</span><span class="token punctuation">)</span>
-<span class="token punctuation">}</span>
-<span class="token keyword">void</span> <span class="token function">key_down_callback</span><span class="token punctuation">(</span>KEY_NO key_no<span class="token punctuation">)</span> <span class="token punctuation">{</span>
-    <span class="token function">LOG_DEBUG</span><span class="token punctuation">(</span><span class="token string">"key down"</span><span class="token punctuation">)</span>
-<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<h1 id="ding-shi-qi-geng-xin-ren-wu-zhuang-tai">定时器更新任务状态</h1>
-<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token keyword">void</span> <span class="token function">hal_timer5_update_callback</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
-    <span class="token function">task_update</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
-]]></content>
-      <categories>
-        <category>架构</category>
-      </categories>
-      <tags>
-        <tag>多任务</tag>
-        <tag>调度</tag>
       </tags>
   </entry>
   <entry>
