@@ -6,7 +6,7 @@
   <link href="https://zanwen.github.io/atom.xml" rel="self"/>
   
   <link href="https://zanwen.github.io/"/>
-  <updated>2024-11-30T03:54:48.403Z</updated>
+  <updated>2024-12-01T12:23:35.794Z</updated>
   <id>https://zanwen.github.io/</id>
   
   <author>
@@ -17,11 +17,42 @@
   <generator uri="https://hexo.io/">Hexo</generator>
   
   <entry>
+    <title>深入理解I²C协议及底层原理（基于STM32F103ZE）</title>
+    <link href="https://zanwen.github.io/2024/11/30/28867.html"/>
+    <id>https://zanwen.github.io/2024/11/30/28867.html</id>
+    <published>2024-11-30T07:03:33.000Z</published>
+    <updated>2024-12-01T12:23:35.794Z</updated>
+    
+    
+      
+      
+        
+        
+    <summary type="html">&lt;h1 id=&quot;can-kao-shou-ce&quot;&gt;参考手册&lt;/h1&gt;
+&lt;ul&gt;
+&lt;li&gt;I²C协议手册：&lt;a href=&quot;https://www.nxp.com/docs/en/user-guide/UM10204.pdf&quot;&gt;UM10204  I2C-bus</summary>
+        
+      
+    
+    
+    
+    <category term="协议" scheme="https://zanwen.github.io/categories/%E5%8D%8F%E8%AE%AE/"/>
+    
+    <category term="STM32" scheme="https://zanwen.github.io/categories/%E5%8D%8F%E8%AE%AE/STM32/"/>
+    
+    
+    <category term="I2C" scheme="https://zanwen.github.io/tags/I2C/"/>
+    
+    <category term="I²C" scheme="https://zanwen.github.io/tags/I%C2%B2C/"/>
+    
+  </entry>
+  
+  <entry>
     <title>MDK调试之可视化外设&amp;内核寄存器</title>
     <link href="https://zanwen.github.io/2024/11/30/5535.html"/>
     <id>https://zanwen.github.io/2024/11/30/5535.html</id>
     <published>2024-11-30T03:04:15.000Z</published>
-    <updated>2024-11-30T03:54:48.403Z</updated>
+    <updated>2024-11-30T03:56:26.965Z</updated>
     
     
       
@@ -50,7 +81,7 @@
     <link href="https://zanwen.github.io/2024/11/28/38060.html"/>
     <id>https://zanwen.github.io/2024/11/28/38060.html</id>
     <published>2024-11-28T11:16:13.000Z</published>
-    <updated>2024-11-30T02:56:57.257Z</updated>
+    <updated>2024-11-30T06:02:07.018Z</updated>
     
     
       
@@ -200,11 +231,11 @@
   </entry>
   
   <entry>
-    <title>ARM核学习（四）ATPS标准_汇编与C混合编程_volatile关键字</title>
+    <title>ARM核学习（四）ATPCS标准_汇编与C混合编程_volatile关键字</title>
     <link href="https://zanwen.github.io/2024/11/24/59994.html"/>
     <id>https://zanwen.github.io/2024/11/24/59994.html</id>
     <published>2024-11-24T12:53:04.000Z</published>
-    <updated>2024-11-25T10:43:42.176Z</updated>
+    <updated>2024-11-30T07:05:56.685Z</updated>
     
     
       
@@ -225,7 +256,7 @@
     
     <category term="ARMv7" scheme="https://zanwen.github.io/tags/ARMv7/"/>
     
-    <category term="ATPS" scheme="https://zanwen.github.io/tags/ATPS/"/>
+    <category term="ATPCS" scheme="https://zanwen.github.io/tags/ATPCS/"/>
     
   </entry>
   
@@ -294,7 +325,7 @@
     <link href="https://zanwen.github.io/2024/11/23/1780.html"/>
     <id>https://zanwen.github.io/2024/11/23/1780.html</id>
     <published>2024-11-23T11:16:50.000Z</published>
-    <updated>2024-11-25T13:52:39.639Z</updated>
+    <updated>2024-12-01T12:24:03.490Z</updated>
     
     
       
@@ -361,7 +392,7 @@
     <link href="https://zanwen.github.io/2024/11/16/31289.html"/>
     <id>https://zanwen.github.io/2024/11/16/31289.html</id>
     <published>2024-11-16T11:36:55.000Z</published>
-    <updated>2024-11-23T11:23:02.982Z</updated>
+    <updated>2024-11-30T11:07:46.930Z</updated>
     
     
       
@@ -385,9 +416,11 @@
     
     <category term="I2C" scheme="https://zanwen.github.io/tags/I2C/"/>
     
-    <category term="时序要求" scheme="https://zanwen.github.io/tags/%E6%97%B6%E5%BA%8F%E8%A6%81%E6%B1%82/"/>
+    <category term="时序" scheme="https://zanwen.github.io/tags/%E6%97%B6%E5%BA%8F/"/>
     
     <category term="PCF8563" scheme="https://zanwen.github.io/tags/PCF8563/"/>
+    
+    <category term="I²C" scheme="https://zanwen.github.io/tags/I%C2%B2C/"/>
     
   </entry>
   
@@ -419,9 +452,9 @@
     
     <category term="GD32" scheme="https://zanwen.github.io/tags/GD32/"/>
     
-    <category term="时序要求" scheme="https://zanwen.github.io/tags/%E6%97%B6%E5%BA%8F%E8%A6%81%E6%B1%82/"/>
-    
     <category term="SN74HC595NSR" scheme="https://zanwen.github.io/tags/SN74HC595NSR/"/>
+    
+    <category term="时序要求" scheme="https://zanwen.github.io/tags/%E6%97%B6%E5%BA%8F%E8%A6%81%E6%B1%82/"/>
     
     <category term="移位寄存器" scheme="https://zanwen.github.io/tags/%E7%A7%BB%E4%BD%8D%E5%AF%84%E5%AD%98%E5%99%A8/"/>
     

@@ -416,14 +416,14 @@ STM32F101xx, STM32F102xx, STM32F103xx, STM32F105xx and STM32F107xx advanced Arm�
                 
                 <div class="info-break-policy">
                     <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
-                    8.1k
+                    9.1k
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-clock fa-fw"></i>阅读时长:&nbsp;&nbsp;
-                    37 分
+                    43 分
                 </div>
                 
 
@@ -1575,6 +1575,261 @@ __weak <span class="token keyword">void</span> <span class="token function">HAL_
   <span class="token comment">/* USER CODE END USART1_MspInit 1 */</span>
   <span class="token punctuation">}</span>
 <span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<h1 id="printf-zhong-ding-xiang">printf重定向</h1>
+<h2 id="zhong-xie-fputc">重写fputc</h2>
+<p><code>printf</code>是 <code>D:\Keil_v5\ARM\ARMCC\include\stdio.h</code>中定义的函数，底层会循环调用 <code>fputc</code>将要发送的字符串逐个字符地写入指定的文件流：</p>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token keyword">extern</span> _ARMABI <span class="token keyword">int</span> <span class="token function">fputc</span><span class="token punctuation">(</span><span class="token keyword">int</span> <span class="token comment">/*c*/</span><span class="token punctuation">,</span> FILE <span class="token operator">*</span> <span class="token comment">/*stream*/</span><span class="token punctuation">)</span> <span class="token keyword">__attribute__</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token function">__nonnull__</span><span class="token punctuation">(</span><span class="token number">2</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+   <span class="token comment">/*
+    * writes the character specified by c (converted to an unsigned char) to
+    * the output stream pointed to by stream, at the position indicated by the
+    * asociated file position indicator (if defined), and advances the
+    * indicator appropriately. If the file position indicator is not defined,
+    * the character is appended to the output stream.
+    * Returns: the character written. If a write error occurs, the error
+    *          indicator is set and fputc returns EOF.
+    */</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>我们可以重写该函数以实现将字符通过UART发送的逻辑，这样串口调式工具就能显示 <code>printf</code>输出的调试信息了。</p>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">"stdio.h"</span></span>
+<span class="token comment">// printf retarget</span>
+<span class="token keyword">int</span> <span class="token function">fputc</span><span class="token punctuation">(</span><span class="token keyword">int</span> ch<span class="token punctuation">,</span> FILE <span class="token operator">*</span> stream<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token function">uart_send_byte</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token class-name">uint8_t</span><span class="token punctuation">)</span>ch<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">return</span> ch<span class="token punctuation">;</span>
+<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<h2 id="lian-jie-printf">链接printf</h2>
+<p>需要注意的是，嵌入式要有平台的概念，基于Linux/Windows的C程序中的 <code>printf</code>需要链接GCC/MinGW中的<code>glibc</code>库；而在MDK嵌入式开发场景，下我们可以链接MDK提供的 <code>Micro LIB</code>，这样在链接阶段才能找到 <code>printf</code>所在的目标文件。</p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241130121901654.png" alt="image-20241130121901654"></p>
+<h2 id="wan-zheng-dai-ma-3">完整代码</h2>
+<p><code>uart.c</code></p>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">"uart.h"</span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">"stdio.h"</span></span>
+
+<span class="token keyword">void</span> <span class="token function">uart_init</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token comment">// enable clock</span>
+    RCC<span class="token operator">-&gt;</span>APB2ENR <span class="token operator">|=</span> RCC_APB2ENR_IOPAEN<span class="token punctuation">;</span>
+    RCC<span class="token operator">-&gt;</span>APB2ENR <span class="token operator">|=</span> RCC_APB2ENR_AFIOEN<span class="token punctuation">;</span>
+    RCC<span class="token operator">-&gt;</span>APB2ENR <span class="token operator">|=</span> RCC_APB2ENR_USART1EN<span class="token punctuation">;</span>
+
+    <span class="token comment">// GPIO CONFIG</span>
+    <span class="token comment">// PA9 TX  alternate pp output</span>
+    GPIOA<span class="token operator">-&gt;</span>CRH <span class="token operator">|=</span> GPIO_CRH_MODE9<span class="token punctuation">;</span>   <span class="token comment">// output</span>
+    GPIOA<span class="token operator">-&gt;</span>CRH <span class="token operator">|=</span> GPIO_CRH_CNF9_1<span class="token punctuation">;</span>   <span class="token comment">// alternate pp</span>
+    GPIOA<span class="token operator">-&gt;</span>CRH <span class="token operator">&amp;=</span> <span class="token operator">~</span>GPIO_CRH_CNF9_0<span class="token punctuation">;</span>
+    <span class="token comment">// PA10 RX alternate float input</span>
+    GPIOA<span class="token operator">-&gt;</span>CRH <span class="token operator">&amp;=</span> <span class="token operator">~</span>GPIO_CRH_MODE10<span class="token punctuation">;</span>   <span class="token comment">// input mode</span>
+    GPIOA<span class="token operator">-&gt;</span>CRH <span class="token operator">&amp;=</span> <span class="token operator">~</span>GPIO_CRH_CNF10_1<span class="token punctuation">;</span>
+    GPIOA<span class="token operator">-&gt;</span>CRH <span class="token operator">|=</span> GPIO_CRH_CNF10_0<span class="token punctuation">;</span>   <span class="token comment">// float input</span>
+
+    <span class="token comment">// AFIO CONFIG</span>
+    AFIO<span class="token operator">-&gt;</span>MAPR <span class="token operator">&amp;=</span> <span class="token operator">~</span>AFIO_MAPR_USART1_REMAP<span class="token punctuation">;</span>
+
+    <span class="token comment">// USART CONFIG</span>
+    <span class="token comment">// baud rate</span>
+    USART1<span class="token operator">-&gt;</span>BRR <span class="token operator">&amp;=</span> <span class="token operator">~</span>USART_BRR_DIV_Mantissa<span class="token punctuation">;</span>
+    USART1<span class="token operator">-&gt;</span>BRR <span class="token operator">&amp;=</span> <span class="token operator">~</span>USART_BRR_DIV_Fraction<span class="token punctuation">;</span>
+    USART1<span class="token operator">-&gt;</span>BRR <span class="token operator">|=</span> <span class="token punctuation">(</span><span class="token number">0x27</span> <span class="token operator">&lt;&lt;</span> <span class="token number">4</span> <span class="token operator">|</span> <span class="token number">0x01</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token comment">//USART1-&gt;BRR = 0x271;</span>
+    <span class="token comment">// data frame</span>
+    USART1<span class="token operator">-&gt;</span>CR1 <span class="token operator">&amp;=</span> <span class="token operator">~</span>USART_CR1_M<span class="token punctuation">;</span>   <span class="token comment">// 8 bit word length</span>
+    USART1<span class="token operator">-&gt;</span>CR1 <span class="token operator">&amp;=</span> <span class="token operator">~</span>USART_CR1_PCE<span class="token punctuation">;</span>   <span class="token comment">// diable parity</span>
+    USART1<span class="token operator">-&gt;</span>CR2 <span class="token operator">&amp;=</span> <span class="token operator">~</span>USART_CR2_STOP<span class="token punctuation">;</span>   <span class="token comment">// 1 stop bit</span>
+    <span class="token comment">// enable</span>
+    USART1<span class="token operator">-&gt;</span>CR1 <span class="token operator">|=</span> <span class="token punctuation">(</span>USART_CR1_UE <span class="token operator">|</span> USART_CR1_RE <span class="token operator">|</span> USART_CR1_TE<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token comment">// interrupt config</span>
+    USART1<span class="token operator">-&gt;</span>CR1 <span class="token operator">|=</span> USART_CR1_RXNEIE<span class="token punctuation">;</span>
+    USART1<span class="token operator">-&gt;</span>CR1 <span class="token operator">|=</span> USART_CR1_IDLEIE<span class="token punctuation">;</span>
+    <span class="token function">NVIC_SetPriorityGrouping</span><span class="token punctuation">(</span><span class="token number">3</span><span class="token punctuation">)</span><span class="token punctuation">;</span>   <span class="token comment">// only group priority</span>
+    <span class="token function">NVIC_SetPriority</span><span class="token punctuation">(</span>USART1_IRQn<span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">NVIC_EnableIRQ</span><span class="token punctuation">(</span>USART1_IRQn<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token class-name">uint8_t</span> buffer<span class="token punctuation">[</span><span class="token number">100</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token punctuation">{</span><span class="token number">0</span><span class="token punctuation">}</span><span class="token punctuation">;</span>
+<span class="token class-name">uint8_t</span> size <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
+<span class="token keyword">void</span> <span class="token function">USART1_IRQHandler</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">if</span><span class="token punctuation">(</span>USART1<span class="token operator">-&gt;</span>SR <span class="token operator">&amp;</span> USART_SR_RXNE<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        buffer<span class="token punctuation">[</span>size<span class="token operator">++</span><span class="token punctuation">]</span> <span class="token operator">=</span> USART1<span class="token operator">-&gt;</span>DR<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    <span class="token keyword">if</span><span class="token punctuation">(</span>USART1<span class="token operator">-&gt;</span>SR <span class="token operator">&amp;</span> USART_SR_IDLE<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        USART1<span class="token operator">-&gt;</span>DR<span class="token punctuation">;</span> <span class="token comment">// dummy read for clearing IDLE flag</span>
+        <span class="token function">uart1_received_callback</span><span class="token punctuation">(</span>buffer<span class="token punctuation">,</span> size<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        size <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+
+__weak <span class="token keyword">void</span> <span class="token function">uart1_received_callback</span><span class="token punctuation">(</span><span class="token class-name">uint8_t</span> <span class="token operator">*</span>buf<span class="token punctuation">,</span> <span class="token class-name">uint8_t</span> size<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    
+<span class="token punctuation">}</span>
+
+<span class="token keyword">void</span> <span class="token function">uart_send_byte</span><span class="token punctuation">(</span><span class="token class-name">uint8_t</span> byte<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token comment">// waits until transmit buffer is empty</span>
+    <span class="token keyword">while</span> <span class="token punctuation">(</span><span class="token punctuation">(</span>USART1<span class="token operator">-&gt;</span>SR <span class="token operator">&amp;</span> USART_SR_TXE<span class="token punctuation">)</span> <span class="token operator">==</span> <span class="token number">0</span><span class="token punctuation">)</span> <span class="token punctuation">{</span><span class="token punctuation">}</span>
+    USART1<span class="token operator">-&gt;</span>DR <span class="token operator">=</span> byte<span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">void</span> <span class="token function">uart_send_bytes</span><span class="token punctuation">(</span><span class="token class-name">uint8_t</span><span class="token operator">*</span> bytes<span class="token punctuation">,</span> u16 size<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">for</span> <span class="token punctuation">(</span>u16 i <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span> i <span class="token operator">&lt;</span> size<span class="token punctuation">;</span> i<span class="token operator">++</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token function">uart_send_byte</span><span class="token punctuation">(</span>bytes<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+
+<span class="token comment">// printf retarget</span>
+<span class="token keyword">int</span> <span class="token function">fputc</span><span class="token punctuation">(</span><span class="token keyword">int</span> ch<span class="token punctuation">,</span> FILE <span class="token operator">*</span> stream<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token function">uart_send_byte</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token class-name">uint8_t</span><span class="token punctuation">)</span>ch<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">return</span> ch<span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p><code>main.c</code></p>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token keyword">int</span> <span class="token function">main</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token function">uart_init</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">int</span> num <span class="token operator">=</span> <span class="token number">100</span><span class="token punctuation">;</span>
+    <span class="token function">printf</span><span class="token punctuation">(</span><span class="token string">"hello world\n"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">printf</span><span class="token punctuation">(</span><span class="token string">"num = %d\n"</span><span class="token punctuation">,</span> num<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">LOG_DEBUG</span><span class="token punctuation">(</span><span class="token string">"this is a debug info. num = %d"</span><span class="token punctuation">,</span> num<span class="token punctuation">)</span>
+    <span class="token keyword">while</span> <span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span> <span class="token punctuation">{</span><span class="token punctuation">}</span>
+<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<h2 id="ri-zhi-da-yin-gong-ju-ge-shi-hua-gao-liang-xing-hao">日志打印工具（格式化/高亮/行号）</h2>
+<h3 id="logger-c">logger.c</h3>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">"logger.h"</span></span>
+
+<span class="token keyword">void</span> <span class="token function">log_dump</span><span class="token punctuation">(</span><span class="token keyword">const</span> <span class="token class-name">uint8_t</span> <span class="token operator">*</span>data<span class="token punctuation">,</span> <span class="token class-name">uint16_t</span> len<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token class-name">uint8_t</span> ch<span class="token punctuation">,</span> cl<span class="token punctuation">;</span>
+    <span class="token keyword">for</span> <span class="token punctuation">(</span><span class="token keyword">int</span> i <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span> i <span class="token operator">&lt;</span> len<span class="token punctuation">;</span> i<span class="token operator">++</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        ch <span class="token operator">=</span> data<span class="token punctuation">[</span>i<span class="token punctuation">]</span> <span class="token operator">&gt;&gt;</span> <span class="token number">4</span><span class="token punctuation">;</span>
+        cl <span class="token operator">=</span> data<span class="token punctuation">[</span>i<span class="token punctuation">]</span> <span class="token operator">&amp;</span> <span class="token number">0x0F</span><span class="token punctuation">;</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>ch <span class="token operator">&lt;</span> <span class="token number">10</span><span class="token punctuation">)</span> ch <span class="token operator">+=</span> <span class="token char">'0'</span><span class="token punctuation">;</span>
+        <span class="token keyword">else</span>
+            ch <span class="token operator">+=</span> <span class="token char">'A'</span> <span class="token operator">-</span> <span class="token number">10</span><span class="token punctuation">;</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>cl <span class="token operator">&lt;</span> <span class="token number">10</span><span class="token punctuation">)</span> cl <span class="token operator">+=</span> <span class="token char">'0'</span><span class="token punctuation">;</span>
+        <span class="token keyword">else</span>
+            cl <span class="token operator">+=</span> <span class="token char">'A'</span> <span class="token operator">-</span> <span class="token number">10</span><span class="token punctuation">;</span>
+        <span class="token function">putchar</span><span class="token punctuation">(</span>ch<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token function">putchar</span><span class="token punctuation">(</span>cl<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token function">printf</span><span class="token punctuation">(</span><span class="token string">" "</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token punctuation">(</span>i <span class="token operator">+</span> <span class="token number">1</span><span class="token punctuation">)</span> <span class="token operator">%</span> <span class="token number">16</span> <span class="token operator">==</span> <span class="token number">0</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token function">printf</span><span class="token punctuation">(</span><span class="token string">"\r\n"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token punctuation">(</span>i <span class="token operator">+</span> <span class="token number">1</span><span class="token punctuation">)</span> <span class="token operator">%</span> <span class="token number">8</span> <span class="token operator">==</span> <span class="token number">0</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            ch <span class="token operator">=</span> <span class="token char">' '</span><span class="token punctuation">;</span>
+            <span class="token function">putchar</span><span class="token punctuation">(</span>ch<span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token function">putchar</span><span class="token punctuation">(</span>ch<span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token function">putchar</span><span class="token punctuation">(</span>ch<span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token function">putchar</span><span class="token punctuation">(</span>ch<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
+            ch <span class="token operator">=</span> <span class="token char">' '</span><span class="token punctuation">;</span>
+            <span class="token function">putchar</span><span class="token punctuation">(</span>ch<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+<span class="token comment">//    printf("\r\n");</span>
+<span class="token punctuation">}</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<h3 id="logger-h">logger.h</h3>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">ifndef</span> <span class="token expression">LOGGER_H</span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name">LOGGER_H</span></span>
+
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">ifdef</span> <span class="token expression">__cplusplus</span></span>
+<span class="token keyword">extern</span> <span class="token string">"C"</span>
+<span class="token punctuation">{</span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">endif</span></span>
+
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">"stm32f10x.h"</span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">"stdio.h"</span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;string.h&gt;</span></span>
+
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">ifndef</span> <span class="token expression">USE_LOG</span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name">USE_LOG</span> <span class="token expression"><span class="token number">1</span></span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">endif</span></span>
+
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">ifndef</span> <span class="token expression">USE_DUMP</span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name">USE_DUMP</span> <span class="token expression"><span class="token number">1</span></span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">endif</span></span>
+
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">ifndef</span> <span class="token expression">USE_BLOCK</span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name">USE_BLOCK</span> <span class="token expression"><span class="token number">1</span></span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">endif</span></span>
+
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name function">ONLY_FILENAME</span><span class="token expression"><span class="token punctuation">(</span>x<span class="token punctuation">)</span> <span class="token punctuation">(</span><span class="token function">strrchr</span><span class="token punctuation">(</span>x<span class="token punctuation">,</span> </span><span class="token char">'\\'</span><span class="token expression"><span class="token punctuation">)</span> <span class="token operator">?</span> <span class="token function">strrchr</span><span class="token punctuation">(</span>x<span class="token punctuation">,</span> </span><span class="token char">'\\'</span><span class="token expression"><span class="token punctuation">)</span> <span class="token operator">+</span> <span class="token number">1</span> <span class="token operator">:</span> x<span class="token punctuation">)</span></span></span>
+
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">if</span> <span class="token expression">USE_BLOCK <span class="token operator">&gt;</span> <span class="token number">0</span></span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name function">BLOCK</span><span class="token expression"><span class="token punctuation">(</span>s<span class="token punctuation">,</span> <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">)</span>                              </span><span class="token punctuation">\</span>
+	<span class="token expression"><span class="token keyword">do</span>                                             </span><span class="token punctuation">\</span>
+	<span class="token expression"><span class="token punctuation">{</span>                                              </span><span class="token punctuation">\</span>
+		<span class="token expression"><span class="token function">printf</span><span class="token punctuation">(</span></span><span class="token string">"\r\n[BLOCK %s:%d] "</span><span class="token expression"><span class="token punctuation">,</span>               </span><span class="token punctuation">\</span>
+			   <span class="token expression"><span class="token function">ONLY_FILENAME</span><span class="token punctuation">(</span><span class="token constant">__FILE__</span><span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token constant">__LINE__</span><span class="token punctuation">)</span><span class="token punctuation">;</span> </span><span class="token punctuation">\</span>
+		<span class="token expression"><span class="token function">printf</span><span class="token punctuation">(</span>s<span class="token punctuation">,</span> </span><span class="token punctuation">##</span><span class="token expression">__VA_ARGS__<span class="token punctuation">)</span><span class="token punctuation">;</span>                  </span><span class="token punctuation">\</span>
+		<span class="token expression"><span class="token function">printf</span><span class="token punctuation">(</span></span><span class="token string">",按任意键继续"</span><span class="token expression"><span class="token punctuation">)</span><span class="token punctuation">;</span>                   </span><span class="token punctuation">\</span>
+		<span class="token expression">block_flag <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>                            </span><span class="token punctuation">\</span>
+		<span class="token expression"><span class="token keyword">while</span> <span class="token punctuation">(</span>block_flag <span class="token operator">==</span> <span class="token number">0</span><span class="token punctuation">)</span>                    </span><span class="token punctuation">\</span>
+			<span class="token expression"><span class="token punctuation">;</span>                                      </span><span class="token punctuation">\</span>
+		<span class="token expression"><span class="token function">printf</span><span class="token punctuation">(</span></span><span class="token string">"\r\n"</span><span class="token expression"><span class="token punctuation">)</span><span class="token punctuation">;</span>                            </span><span class="token punctuation">\</span>
+	<span class="token expression"><span class="token punctuation">}</span> <span class="token keyword">while</span> <span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">)</span></span></span>
+
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">else</span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name function">BLOCK</span><span class="token expression"><span class="token punctuation">(</span>x<span class="token punctuation">)</span></span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">endif</span></span>
+
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">if</span> <span class="token expression">USE_LOG <span class="token operator">&gt;</span> <span class="token number">0</span></span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name function">LOG_DEBUG</span><span class="token expression"><span class="token punctuation">(</span>s<span class="token punctuation">,</span> <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">)</span>                          </span><span class="token punctuation">\</span>
+	<span class="token expression"><span class="token keyword">do</span>                                             </span><span class="token punctuation">\</span>
+	<span class="token expression"><span class="token punctuation">{</span>                                              </span><span class="token punctuation">\</span>
+		<span class="token expression"><span class="token function">printf</span><span class="token punctuation">(</span></span><span class="token string">"\033[1;36m\r\n[DEBUG %s:%d] "</span><span class="token expression"><span class="token punctuation">,</span>     </span><span class="token punctuation">\</span>
+			   <span class="token expression"><span class="token function">ONLY_FILENAME</span><span class="token punctuation">(</span><span class="token constant">__FILE__</span><span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token constant">__LINE__</span><span class="token punctuation">)</span><span class="token punctuation">;</span> </span><span class="token punctuation">\</span>
+		<span class="token expression"><span class="token function">printf</span><span class="token punctuation">(</span>s<span class="token punctuation">,</span> </span><span class="token punctuation">##</span><span class="token expression">__VA_ARGS__<span class="token punctuation">)</span><span class="token punctuation">;</span>                  </span><span class="token punctuation">\</span>
+		<span class="token expression"><span class="token function">printf</span><span class="token punctuation">(</span></span><span class="token string">"\33[0m\r\n"</span><span class="token expression"><span class="token punctuation">)</span><span class="token punctuation">;</span>                      </span><span class="token punctuation">\</span>
+	<span class="token expression"><span class="token punctuation">}</span> <span class="token keyword">while</span> <span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">;</span></span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name function">LOG_INFO</span><span class="token expression"><span class="token punctuation">(</span>s<span class="token punctuation">,</span> <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">)</span>                 </span><span class="token punctuation">\</span>
+	<span class="token expression"><span class="token keyword">do</span>                                   </span><span class="token punctuation">\</span>
+	<span class="token expression"><span class="token punctuation">{</span>                                    </span><span class="token punctuation">\</span>
+		<span class="token expression"><span class="token function">printf</span><span class="token punctuation">(</span></span><span class="token string">"\033[0;32m\r\n[INFO] "</span><span class="token expression"><span class="token punctuation">)</span><span class="token punctuation">;</span> </span><span class="token punctuation">\</span>
+		<span class="token expression"><span class="token function">printf</span><span class="token punctuation">(</span>s<span class="token punctuation">,</span> </span><span class="token punctuation">##</span><span class="token expression">__VA_ARGS__<span class="token punctuation">)</span><span class="token punctuation">;</span>        </span><span class="token punctuation">\</span>
+		<span class="token expression"><span class="token function">printf</span><span class="token punctuation">(</span></span><span class="token string">"\33[0m\r\n"</span><span class="token expression"><span class="token punctuation">)</span><span class="token punctuation">;</span>            </span><span class="token punctuation">\</span>
+	<span class="token expression"><span class="token punctuation">}</span> <span class="token keyword">while</span> <span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">;</span></span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name function">LOG_ERROR</span><span class="token expression"><span class="token punctuation">(</span>s<span class="token punctuation">,</span> <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">)</span>                          </span><span class="token punctuation">\</span>
+	<span class="token expression"><span class="token keyword">do</span>                                             </span><span class="token punctuation">\</span>
+	<span class="token expression"><span class="token punctuation">{</span>                                              </span><span class="token punctuation">\</span>
+		<span class="token expression"><span class="token function">printf</span><span class="token punctuation">(</span></span><span class="token string">"\033[0;31m\r\n[ERROR %s:%d] "</span><span class="token expression"><span class="token punctuation">,</span>     </span><span class="token punctuation">\</span>
+			   <span class="token expression"><span class="token function">ONLY_FILENAME</span><span class="token punctuation">(</span><span class="token constant">__FILE__</span><span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token constant">__LINE__</span><span class="token punctuation">)</span><span class="token punctuation">;</span> </span><span class="token punctuation">\</span>
+		<span class="token expression"><span class="token function">printf</span><span class="token punctuation">(</span>s<span class="token punctuation">,</span> </span><span class="token punctuation">##</span><span class="token expression">__VA_ARGS__<span class="token punctuation">)</span><span class="token punctuation">;</span>                  </span><span class="token punctuation">\</span>
+		<span class="token expression"><span class="token function">printf</span><span class="token punctuation">(</span></span><span class="token string">"\33[0m\r\n"</span><span class="token expression"><span class="token punctuation">)</span><span class="token punctuation">;</span>                      </span><span class="token punctuation">\</span>
+	<span class="token expression"><span class="token punctuation">}</span> <span class="token keyword">while</span> <span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">;</span></span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name function">LOG_ASSERT</span><span class="token expression"><span class="token punctuation">(</span>cond<span class="token punctuation">)</span>                                                                                                         </span><span class="token punctuation">\</span>
+	<span class="token expression"><span class="token keyword">do</span>                                                                                                                           </span><span class="token punctuation">\</span>
+	<span class="token expression"><span class="token punctuation">{</span>                                                                                                                            </span><span class="token punctuation">\</span>
+		<span class="token expression"><span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span><span class="token punctuation">(</span>cond<span class="token punctuation">)</span><span class="token punctuation">)</span>                                                                                                             </span><span class="token punctuation">\</span>
+		<span class="token expression"><span class="token punctuation">{</span>                                                                                                                        </span><span class="token punctuation">\</span>
+			<span class="token expression"><span class="token function">printf</span><span class="token punctuation">(</span></span><span class="token string">"\r\n[ASSERT] File=[%s],Line=[%ld] Failed to vertify thc condition [\"%s\"]\r\n"</span><span class="token expression"><span class="token punctuation">,</span> <span class="token constant">__FILE__</span><span class="token punctuation">,</span> <span class="token constant">__LINE__</span><span class="token punctuation">,</span> #cond<span class="token punctuation">)</span><span class="token punctuation">;</span> </span><span class="token punctuation">\</span>
+		<span class="token expression"><span class="token punctuation">}</span>                                                                                                                        </span><span class="token punctuation">\</span>
+	<span class="token expression"><span class="token punctuation">}</span> <span class="token keyword">while</span> <span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">;</span></span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">else</span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name function">LOG_DEBUG</span><span class="token expression"><span class="token punctuation">(</span>s<span class="token punctuation">,</span> <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">)</span></span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name function">LOG_INFO</span><span class="token expression"><span class="token punctuation">(</span>s<span class="token punctuation">,</span> <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">)</span></span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name function">LOG_ERROR</span><span class="token expression"><span class="token punctuation">(</span>s<span class="token punctuation">,</span> <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">)</span></span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name function">LOG_ERROR2</span><span class="token expression"><span class="token punctuation">(</span><span class="token punctuation">)</span></span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name function">LOG_ERROR3</span><span class="token expression"><span class="token punctuation">(</span>cond<span class="token punctuation">)</span></span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name function">LOG_ERROR4</span><span class="token expression"><span class="token punctuation">(</span>s<span class="token punctuation">,</span> <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">)</span></span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name function">LOG_ASSERT</span><span class="token expression"><span class="token punctuation">(</span>cond<span class="token punctuation">)</span></span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">endif</span></span>
+
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">if</span> <span class="token expression">USE_DUMP <span class="token operator">&gt;</span> <span class="token number">0</span></span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name function">LOG_DUMP</span><span class="token expression"><span class="token punctuation">(</span>info<span class="token punctuation">,</span> data<span class="token punctuation">,</span> len<span class="token punctuation">,</span> <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">)</span>   </span><span class="token punctuation">\</span>
+	<span class="token expression"><span class="token keyword">do</span>                                   </span><span class="token punctuation">\</span>
+	<span class="token expression"><span class="token punctuation">{</span>                                    </span><span class="token punctuation">\</span>
+		<span class="token expression"><span class="token function">printf</span><span class="token punctuation">(</span></span><span class="token string">"\033[1;36m\r\n[DUMP] "</span><span class="token expression"><span class="token punctuation">)</span><span class="token punctuation">;</span> </span><span class="token punctuation">\</span>
+		<span class="token expression"><span class="token function">printf</span><span class="token punctuation">(</span>info<span class="token punctuation">,</span> </span><span class="token punctuation">##</span><span class="token expression">__VA_ARGS__<span class="token punctuation">)</span><span class="token punctuation">;</span>     </span><span class="token punctuation">\</span>
+		<span class="token expression"><span class="token function">printf</span><span class="token punctuation">(</span></span><span class="token string">"\r\n\r\n"</span><span class="token expression"><span class="token punctuation">)</span><span class="token punctuation">;</span>              </span><span class="token punctuation">\</span>
+		<span class="token expression"><span class="token function">log_dump</span><span class="token punctuation">(</span>data<span class="token punctuation">,</span> len<span class="token punctuation">)</span><span class="token punctuation">;</span>             </span><span class="token punctuation">\</span>
+		<span class="token expression"><span class="token function">printf</span><span class="token punctuation">(</span></span><span class="token string">"\33[0m\r\n"</span><span class="token expression"><span class="token punctuation">)</span><span class="token punctuation">;</span>            </span><span class="token punctuation">\</span>
+	<span class="token expression"><span class="token punctuation">}</span> <span class="token keyword">while</span> <span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">;</span></span></span>
+
+	<span class="token keyword">void</span> <span class="token function">log_dump</span><span class="token punctuation">(</span><span class="token keyword">const</span> <span class="token class-name">uint8_t</span> <span class="token operator">*</span>data<span class="token punctuation">,</span> <span class="token class-name">uint16_t</span> len<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">else</span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name function">LOG_DUMP</span><span class="token expression"><span class="token punctuation">(</span>info<span class="token punctuation">,</span> data<span class="token punctuation">,</span> len<span class="token punctuation">)</span></span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">endif</span></span>
+
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">ifdef</span> <span class="token expression">__cplusplus</span></span>
+<span class="token punctuation">}</span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">endif</span></span>
+
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">endif</span> <span class="token comment">/* LOGGER_H */</span></span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <h1 id="the-end">THE END</h1>
 
                 
@@ -1974,7 +2229,7 @@ __weak <span class="token keyword">void</span> <span class="token function">HAL_
             <br>
             
                 &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                        class="white-color">30.7k</span>
+                        class="white-color">35.6k</span>
             
             
             

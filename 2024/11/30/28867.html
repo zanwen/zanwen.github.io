@@ -1,0 +1,1805 @@
+<!DOCTYPE HTML>
+<html lang="zh-CN">
+
+
+<head>
+    <meta charset="utf-8">
+    <meta name="keywords" content="深入理解I²C协议及底层原理（基于STM32F103ZE）, 安文的博客">
+    <meta name="description" content="参考手册
+
+I²C协议手册：UM10204  I2C-bus specification and user manual
+EEPROM M24C02
+STM32F103参考手册：rm0008-stm32f101xx-stm32f102xx-">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="renderer" content="webkit|ie-stand|ie-comp">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="format-detection" content="telephone=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="referrer" content="no-referrer-when-downgrade">
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+
+
+    <title>深入理解I²C协议及底层原理（基于STM32F103ZE） | 安文的博客</title>
+    <link rel="icon" type="image/png" href="/medias/logo.png">
+    
+
+
+    <!-- bg-cover style     -->
+
+
+
+<link rel="stylesheet" type="text/css" href="/libs/awesome/css/all.min.css">
+<link rel="stylesheet" type="text/css" href="/libs/materialize/materialize.min.css">
+<link rel="stylesheet" type="text/css" href="/libs/aos/aos.css">
+<link rel="stylesheet" type="text/css" href="/libs/animate/animate.min.css">
+<link rel="stylesheet" type="text/css" href="/libs/lightGallery/css/lightgallery.min.css">
+<link rel="stylesheet" type="text/css" href="/css/matery.css">
+<link rel="stylesheet" type="text/css" href="/css/my.css">
+<link rel="stylesheet" type="text/css" href="/css/dark.css" media="none" onload="if(media!='all')media='all'">
+
+
+
+
+    <link rel="stylesheet" href="/libs/tocbot/tocbot.css">
+    <link rel="stylesheet" href="/css/post.css">
+
+
+
+
+    
+        <link rel="stylesheet" type="text/css" href="/css/reward.css">
+    
+
+
+
+    <script src="/libs/jquery/jquery-3.6.0.min.js"></script>
+
+<meta name="generator" content="Hexo 7.3.0">
+<style>.github-emoji { position: relative; display: inline-block; width: 1.2em; min-height: 1.2em; overflow: hidden; vertical-align: top; color: transparent; }  .github-emoji > span { position: relative; z-index: 10; }  .github-emoji img, .github-emoji .fancybox { margin: 0 !important; padding: 0 !important; border: none !important; outline: none !important; text-decoration: none !important; user-select: none !important; cursor: auto !important; }  .github-emoji img { height: 1.2em !important; width: 1.2em !important; position: absolute !important; left: 50% !important; top: 50% !important; transform: translate(-50%, -50%) !important; user-select: none !important; cursor: auto !important; } .github-emoji-fallback { color: inherit; } .github-emoji-fallback img { opacity: 0 !important; }</style>
+<link rel="alternate" href="/atom.xml" title="安文的博客" type="application/atom+xml">
+</head>
+
+
+<body>
+    <header class="navbar-fixed">
+    <nav id="headNav" class="bg-color nav-transparent">
+        <div id="navContainer" class="nav-wrapper container">
+            <div class="brand-logo">
+                <a href="/" class="waves-effect waves-light">
+                    
+                    <img src="/medias/logo.png" class="logo-img" alt="LOGO">
+                    
+                    <span class="logo-span">安文的博客</span>
+                </a>
+            </div>
+            
+
+<a href="#" data-target="mobile-nav" class="sidenav-trigger button-collapse"><i class="fas fa-bars"></i></a>
+<ul class="right nav-menu">
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/" class="waves-effect waves-light">
+      
+      <i class="fas fa-home" style="zoom: 0.6;"></i>
+      
+      <span>首页</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/tags" class="waves-effect waves-light">
+      
+      <i class="fas fa-tags" style="zoom: 0.6;"></i>
+      
+      <span>标签</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/categories" class="waves-effect waves-light">
+      
+      <i class="fas fa-bookmark" style="zoom: 0.6;"></i>
+      
+      <span>分类</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/archives" class="waves-effect waves-light">
+      
+      <i class="fas fa-archive" style="zoom: 0.6;"></i>
+      
+      <span>归档</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/about" class="waves-effect waves-light">
+      
+      <i class="fas fa-user-circle" style="zoom: 0.6;"></i>
+      
+      <span>关于</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/contact" class="waves-effect waves-light">
+      
+      <i class="fas fa-comments" style="zoom: 0.6;"></i>
+      
+      <span>留言板</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/friends" class="waves-effect waves-light">
+      
+      <i class="fas fa-address-book" style="zoom: 0.6;"></i>
+      
+      <span>友情链接</span>
+    </a>
+    
+  </li>
+  
+  <li>
+    <a href="#searchModal" class="modal-trigger waves-effect waves-light">
+      <i id="searchIcon" class="fas fa-search" title="搜索" style="zoom: 0.85;"></i>
+    </a>
+  </li>
+  <li>
+    <a href="javascript:;" class="waves-effect waves-light" onclick="switchNightMode()" title="深色/浅色模式" >
+      <i id="sum-moon-icon" class="fas fa-sun" style="zoom: 0.85;"></i>
+    </a>
+  </li>
+</ul>
+
+
+<div id="mobile-nav" class="side-nav sidenav">
+
+    <div class="mobile-head bg-color">
+        
+        <img src="/medias/logo.png" class="logo-img circle responsive-img">
+        
+        <div class="logo-name">安文的博客</div>
+        <div class="logo-desc">
+            
+            安文的博客 | 嵌入式 | 算法 | AI | 人工智能
+            
+        </div>
+    </div>
+
+    <ul class="menu-list mobile-menu-list">
+        
+        <li class="m-nav-item">
+	  
+		<a href="/" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-home"></i>
+			
+			首页
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/tags" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-tags"></i>
+			
+			标签
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/categories" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-bookmark"></i>
+			
+			分类
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/archives" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-archive"></i>
+			
+			归档
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/about" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-user-circle"></i>
+			
+			关于
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/contact" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-comments"></i>
+			
+			留言板
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/friends" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-address-book"></i>
+			
+			友情链接
+		</a>
+          
+        </li>
+        
+        
+        <li><div class="divider"></div></li>
+        <li>
+            <a href="https://github.com/blinkfox/hexo-theme-matery" class="waves-effect waves-light" target="_blank">
+                <i class="fab fa-github-square fa-fw"></i>Fork Me
+            </a>
+        </li>
+        
+    </ul>
+</div>
+
+
+        </div>
+
+        
+            <style>
+    .nav-transparent .github-corner {
+        display: none !important;
+    }
+
+    .github-corner {
+        position: absolute;
+        z-index: 10;
+        top: 0;
+        right: 0;
+        border: 0;
+        transform: scale(1.1);
+    }
+
+    .github-corner svg {
+        color: #0f9d58;
+        fill: #fff;
+        height: 64px;
+        width: 64px;
+    }
+
+    .github-corner:hover .octo-arm {
+        animation: a 0.56s ease-in-out;
+    }
+
+    .github-corner .octo-arm {
+        animation: none;
+    }
+
+    @keyframes a {
+        0%,
+        to {
+            transform: rotate(0);
+        }
+        20%,
+        60% {
+            transform: rotate(-25deg);
+        }
+        40%,
+        80% {
+            transform: rotate(10deg);
+        }
+    }
+</style>
+
+<a href="https://github.com/blinkfox/hexo-theme-matery" class="github-corner tooltipped hide-on-med-and-down" target="_blank"
+   data-tooltip="Fork Me" data-position="left" data-delay="50">
+    <svg viewBox="0 0 250 250" aria-hidden="true">
+        <path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path>
+        <path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2"
+              fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path>
+        <path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z"
+              fill="currentColor" class="octo-body"></path>
+    </svg>
+</a>
+        
+    </nav>
+
+</header>
+
+    
+
+
+
+<div class="bg-cover pd-header post-cover" style="background-image: url('https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/pexels-319596550-28098320.jpg')">
+    <div class="container" style="right: 0px;left: 0px;">
+        <div class="row">
+            <div class="col s12 m12 l12">
+                <div class="brand">
+                    <h1 class="description center-align post-title">深入理解I²C协议及底层原理（基于STM32F103ZE）</h1>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+<main class="post-container content">
+
+    
+    <div class="row">
+    <div id="main-content" class="col s12 m12 l9">
+        <!-- 文章内容详情 -->
+<div id="artDetail">
+    <div class="card">
+        <div class="card-content article-info">
+            <div class="row tag-cate">
+                <div class="col s7">
+                    
+                    <div class="article-tag">
+                        
+                            <a href="/tags/I2C/">
+                                <span class="chip bg-color">I2C</span>
+                            </a>
+                        
+                            <a href="/tags/I%C2%B2C/">
+                                <span class="chip bg-color">I²C</span>
+                            </a>
+                        
+                    </div>
+                    
+                </div>
+                <div class="col s5 right-align">
+                    
+                    <div class="post-cate">
+                        <i class="fas fa-bookmark fa-fw icon-category"></i>
+                        
+                            <a href="/categories/%E5%8D%8F%E8%AE%AE/" class="post-category">
+                                协议
+                            </a>
+                        
+                            <a href="/categories/%E5%8D%8F%E8%AE%AE/STM32/" class="post-category">
+                                STM32
+                            </a>
+                        
+                    </div>
+                    
+                </div>
+            </div>
+
+            <div class="post-info">
+                
+                <div class="post-date info-break-policy">
+                    <i class="far fa-calendar-minus fa-fw"></i>发布日期:&nbsp;&nbsp;
+                    2024-11-30
+                </div>
+                
+
+                
+                <div class="post-date info-break-policy">
+                    <i class="far fa-calendar-check fa-fw"></i>更新日期:&nbsp;&nbsp;
+                    2024-12-01
+                </div>
+                
+
+                
+                <div class="info-break-policy">
+                    <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
+                    4k
+                </div>
+                
+
+                
+                <div class="info-break-policy">
+                    <i class="far fa-clock fa-fw"></i>阅读时长:&nbsp;&nbsp;
+                    16 分
+                </div>
+                
+
+                
+                    <div id="busuanzi_container_page_pv" class="info-break-policy">
+                        <i class="far fa-eye fa-fw"></i>阅读次数:&nbsp;&nbsp;
+                        <span id="busuanzi_value_page_pv"></span>
+                    </div>
+				
+            </div>
+        </div>
+        <hr class="clearfix">
+
+        
+        <!-- 是否加载使用自带的 prismjs. -->
+        <link rel="stylesheet" href="/libs/prism/prism.min.css">
+        
+
+        
+
+        <div class="card-content article-card-content">
+            <div id="articleContent">
+                <h1 id="can-kao-shou-ce">参考手册</h1>
+<ul>
+<li>I²C协议手册：<a target="_blank" rel="noopener" href="https://www.nxp.com/docs/en/user-guide/UM10204.pdf">UM10204  I2C-bus specification and user manual</a></li>
+<li><a target="_blank" rel="noopener" href="https://atta.szlcsc.com/upload/public/pdf/source/20140724/1457707167301.pdf">EEPROM M24C02</a></li>
+<li>STM32F103参考手册：<a target="_blank" rel="noopener" href="https://www.st.com/resource/en/reference_manual/rm0008-stm32f101xx-stm32f102xx-stm32f103xx-stm32f105xx-and-stm32f107xx-advanced-armbased-32bit-mcus-stmicroelectronics.pdf">rm0008-stm32f101xx-stm32f102xx-stm32f103xx-stm32f105xx-and-stm32f107xx</a></li>
+<li>STM32103ZE数据手册：<a target="_blank" rel="noopener" href="https://www.st.com/resource/en/datasheet/stm32f103rc.pdf">STM32F103xC, STM32F103xD, STM32F103xE </a></li>
+</ul>
+<h1 id="i-2-c-gai-lan">I²C概览</h1>
+<h2 id="gai-nian">概念</h2>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241130151131386.png" alt="image-20241130151131386"></p>
+<h2 id="wu-li-ceng-dian-lu-lian-jie">物理层电路连接</h2>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241130151722614.png" alt="image-20241130151722614"></p>
+<h2 id="xie-yi-ceng">协议层</h2>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241130152248208.png" alt="image-20241130152248208"></p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241130153034269.png" alt="image-20241130153034269"></p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241130152552172.png" alt="image-20241130152552172"></p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241130153259952.png" alt="image-20241130153259952"></p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241130153342500.png" alt="image-20241130153342500"></p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241130153713298.png" alt="image-20241130153713298"></p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241130153731435.png" alt="image-20241130153731435"></p>
+<h1 id="ruan-jian-kong-zhi-shi-xian-i-2-c-ji-cun-qi-ban-ben">软件控制实现I2C（寄存器版本）</h1>
+<h2 id="shi-xu-zong-lan">时序总览</h2>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241201154135590.png" alt="I2C参考手册"></p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241201154158566.png" alt="I2C参考手册"></p>
+<h2 id="gpio-chu-shi-hua">GPIO初始化</h2>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241201081651313.png" alt="image-20241201081651313"></p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241201082200624.png" alt="image-20241201082200624"></p>
+<h3 id="shi-neng-shi-zhong">使能时钟</h3>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c">RCC<span class="token operator">-&gt;</span>APB2ENR <span class="token operator">|=</span> RCC_APB2ENR_IOPBEN<span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<h3 id="pei-zhi-gong-zuo-mo-shi-wei-tong-yong-kai-lou-shu-chu">配置工作模式为通用开漏输出</h3>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241201154628032.png" alt="I2C参考手册"></p>
+<blockquote>
+<p>[!NOTE]</p>
+<p>如原理图所示，PB10/11外接了上拉电阻</p>
+</blockquote>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241130193839904.png" alt="STM32参考手册"></p>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c">GPIOB<span class="token operator">-&gt;</span>CRH <span class="token operator">|=</span> <span class="token punctuation">(</span>GPIO_CRH_MODE10 <span class="token operator">|</span> GPIO_CRH_MODE11<span class="token punctuation">)</span><span class="token punctuation">;</span>
+GPIOB<span class="token operator">-&gt;</span>CRH <span class="token operator">&amp;=</span> <span class="token operator">~</span><span class="token punctuation">(</span>GPIO_CRH_CNF10_1 <span class="token operator">|</span> GPIO_CRH_CNF11_1<span class="token punctuation">)</span><span class="token punctuation">;</span>
+GPIOB<span class="token operator">-&gt;</span>CRH <span class="token operator">|=</span> <span class="token punctuation">(</span>GPIO_CRH_CNF10_0 <span class="token operator">|</span> GPIO_CRH_CNF11_0<span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+<h3 id="mo-ren-shu-chu-gao-dian-ping">默认输出高电平</h3>
+<blockquote>
+<p>When the bus is free, both lines are HIGH.</p>
+</blockquote>
+<p>根据I2C协议规范，SDA和SCL应该在总线为空闲状态时保持高电平，因此我们可以将其初始化为高电平：</p>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name">SCL_HIGH</span> <span class="token expression"><span class="token punctuation">(</span>GPIOB<span class="token operator">-&gt;</span>ODR <span class="token operator">|=</span> GPIO_ODR_ODR10<span class="token punctuation">)</span></span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name">SCL_LOW</span> <span class="token expression"><span class="token punctuation">(</span>GPIOB<span class="token operator">-&gt;</span>ODR <span class="token operator">&amp;=</span> <span class="token operator">~</span>GPIO_ODR_ODR10<span class="token punctuation">)</span></span></span>
+
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name">SDA_HIGH</span> <span class="token expression"><span class="token punctuation">(</span>GPIOB<span class="token operator">-&gt;</span>ODR <span class="token operator">|=</span> GPIO_ODR_ODR11<span class="token punctuation">)</span></span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name">SDA_LOW</span> <span class="token expression"><span class="token punctuation">(</span>GPIOB<span class="token operator">-&gt;</span>ODR <span class="token operator">&amp;=</span> <span class="token operator">~</span>GPIO_ODR_ODR11<span class="token punctuation">)</span></span></span>
+
+SCL_HIGH<span class="token punctuation">;</span>
+SDA_HIGH<span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<h3 id="wan-zheng-chu-shi-hua-dai-ma">完整初始化代码</h3>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name">SCL_HIGH</span> <span class="token expression"><span class="token punctuation">(</span>GPIOB<span class="token operator">-&gt;</span>ODR <span class="token operator">|=</span> GPIO_ODR_ODR10<span class="token punctuation">)</span></span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name">SCL_LOW</span> <span class="token expression"><span class="token punctuation">(</span>GPIOB<span class="token operator">-&gt;</span>ODR <span class="token operator">&amp;=</span> <span class="token operator">~</span>GPIO_ODR_ODR10<span class="token punctuation">)</span></span></span>
+
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name">SDA_HIGH</span> <span class="token expression"><span class="token punctuation">(</span>GPIOB<span class="token operator">-&gt;</span>ODR <span class="token operator">|=</span> GPIO_ODR_ODR11<span class="token punctuation">)</span></span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name">SDA_LOW</span> <span class="token expression"><span class="token punctuation">(</span>GPIOB<span class="token operator">-&gt;</span>ODR <span class="token operator">&amp;=</span> <span class="token operator">~</span>GPIO_ODR_ODR11<span class="token punctuation">)</span></span></span>
+
+<span class="token keyword">void</span> <span class="token function">I2C_Init</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token comment">// 1. GPIO时钟配置</span>
+    RCC<span class="token operator">-&gt;</span>APB2ENR <span class="token operator">|=</span> RCC_APB2ENR_IOPBEN<span class="token punctuation">;</span>
+    
+    <span class="token comment">// 2. 配置GPIO工作模式为通用开漏输出 mode=11 cnf=01</span>
+    GPIOB<span class="token operator">-&gt;</span>CRH <span class="token operator">|=</span> <span class="token punctuation">(</span>GPIO_CRH_MODE10 <span class="token operator">|</span> GPIO_CRH_MODE11<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    GPIOB<span class="token operator">-&gt;</span>CRH <span class="token operator">&amp;=</span> <span class="token operator">~</span><span class="token punctuation">(</span>GPIO_CRH_CNF10_1 <span class="token operator">|</span> GPIO_CRH_CNF11_1<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    GPIOB<span class="token operator">-&gt;</span>CRH <span class="token operator">|=</span> <span class="token punctuation">(</span>GPIO_CRH_CNF10_0 <span class="token operator">|</span> GPIO_CRH_CNF11_0<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token comment">// 3. 总线空闲状态时，默认高电平</span>
+    SCL_HIGH<span class="token punctuation">;</span>
+    SDA_HIGH<span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<h2 id="scl-shi-zhong-pin-lu-amp-yan-shi-han-shu">SCL时钟频率&amp;延时函数</h2>
+<p>以I2C标准模式为例，需要考虑如下三个参数（<mark>下文以标准模式为例进行说明</mark>）</p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241201155642567.png" alt="image-20241201155642567"></p>
+<h3 id="scl-shi-zhong-pin-lu">SCL时钟频率</h3>
+<img src="C:\Users\86157\AppData\Roaming\Typora\typora-user-images\image-20241201155834783.png" alt="image-20241201155834783" style="zoom:50%;">
+<p>f<sub>SCL</sub>限制我们控制SCL输出高低电平产生方波脉冲时，频率<mark>最大</mark>为100kHz，即一个时钟周期（高电平时间+低电平时间）<mark>最短</mark>为<code>1/100kHz = 10us</code></p>
+<h3 id="gao-dian-ping-zhou-qi-amp-di-dian-ping-zhou-qi">高电平周期&amp;低电平周期</h3>
+<p>t<sub>LOW</sub>和t<sub>HIGH</sub>则要求我们SCL拉高时间至少持续4.7us，拉低时间至少持续4us</p>
+<h3 id="yan-shi-han-shu">延时函数</h3>
+<p>如下我们可以准备一个5us的延时函数（以STM32F103主频72M为例，通过逻辑分析仪调整其延时时间比5us略长即可），作为维持SCL高电平周期、低电平周期的时序控制；并且两者相加后为10us，也符合时钟周期要大于10us的规范</p>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">i2c_delay_2us</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token class-name">uint16_t</span> i <span class="token operator">=</span> <span class="token number">15</span><span class="token punctuation">;</span>
+    <span class="token keyword">do</span> <span class="token punctuation">{</span>
+        i<span class="token operator">--</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span> <span class="token keyword">while</span> <span class="token punctuation">(</span>i<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<blockquote>
+<p>[!NOTE]</p>
+<p>如果期望更低的延时，则可以针对4.7us和4us各自实现一个更精准地延时函数。</p>
+<p>但对于一般场景来说，没必要优化那一点时间效率，I2C本就是低速通信协议，标准模式下的速度瓶颈为100kHz，这是由设备的电气特性决定的，因此<mark>不用太纠结常数级别的性能优化</mark>（例如将函数延时优化到再靠近 <code>Min</code>值一点）。</p>
+</blockquote>
+<p>由于后续时序控制很多地方会用到延时，为了程序有更好的移植性，我们可以将其定义成宏：</p>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name">STANDARD_MODE</span> <span class="token expression"><span class="token number">0</span></span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name">FAST_MODE</span> <span class="token expression"><span class="token number">1</span></span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name">I2C_MODE</span> <span class="token expression">STANDARD_MODE</span></span>
+
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">if</span> <span class="token expression"><span class="token punctuation">(</span>I2C_MODE <span class="token operator">==</span> STANDARD_MODE<span class="token punctuation">)</span></span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name">I2C_DELAY</span> <span class="token expression"><span class="token function">i2c_delay_5us</span><span class="token punctuation">(</span><span class="token punctuation">)</span></span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">elif</span> <span class="token expression"><span class="token punctuation">(</span>I2C_MODE <span class="token operator">==</span> FAST_MODE<span class="token punctuation">)</span></span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name">I2C_DELAY</span> <span class="token expression"><span class="token function">i2c_delay_2us</span><span class="token punctuation">(</span><span class="token punctuation">)</span></span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">endif</span></span>
+
+<span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">i2c_delay_5us</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">i2c_delay_2us</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">i2c_delay_5us</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token class-name">uint16_t</span> i <span class="token operator">=</span> <span class="token number">40</span><span class="token punctuation">;</span>
+    <span class="token keyword">do</span> <span class="token punctuation">{</span>
+        i<span class="token operator">--</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span> <span class="token keyword">while</span> <span class="token punctuation">(</span>i<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">i2c_delay_2us</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token class-name">uint16_t</span> i <span class="token operator">=</span> <span class="token number">15</span><span class="token punctuation">;</span>
+    <span class="token keyword">do</span> <span class="token punctuation">{</span>
+        i<span class="token operator">--</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span> <span class="token keyword">while</span> <span class="token punctuation">(</span>i<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<h2 id="qi-shi-xin-hao-start-condition">起始信号（Start Condition）</h2>
+<blockquote>
+<p>A HIGH to LOW transition on the SDA line while SCL is HIGH defines a START condition</p>
+</blockquote>
+<p><mark>起始信号的定义：在SCL高电平时，SDA由高到低的跳变。</mark></p>
+<img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241201164737043.png" alt="image-20241201164737043" style="zoom:50%;">
+<p>这里需要关注两个时延参数，起始信号建立时间（SU，set-up）和保持时间（HD，hold）：</p>
+<ul>
+<li>起始信号建立时间（先要将SDA准备为高电平状态，随后才能由高拉低）：SCL为高时，将SDA准备为高电平状态，并至少保持<mark>4.7us</mark></li>
+<li>起始信号保持时间（在SCL为高时，将SDA拉低后，需要将SDA低电平状态保持一端时间）：至少为<mark>4us</mark></li>
+</ul>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241201165047337.png" alt="image-20241201165047337"></p>
+<p>虽然t<sub>SU;STA</sub>被描述为发送重复起始信号时所需的时序要求，但这里为了封装成统一的接口，让调用方发送起始信号时无需关心该细节，我们统一增加该延时。</p>
+<h3 id="shi-xu-kong-zhi">时序控制</h3>
+<ul>
+<li>拉高SCL，拉高SDA，维持一个SCL高电平周期（间接满足了SDA的建立时间）</li>
+<li>SDA拉低，维持一个Start保持时间4us（可以复用5us的延时函数）</li>
+</ul>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token keyword">void</span> <span class="token function">I2C_Start</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token comment">// 1. SCL, SDA拉高，并维持start建立时间</span>
+    SCL_HIGH<span class="token punctuation">;</span>
+    SDA_HIGH<span class="token punctuation">;</span>
+    I2C_DELAY<span class="token punctuation">;</span>
+
+    <span class="token comment">// 2. SDA拉低，并维持start保持时间</span>
+    SDA_LOW<span class="token punctuation">;</span>
+    I2C_DELAY<span class="token punctuation">;</span>
+<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<blockquote>
+<p>[!NOTE]</p>
+<p>关于重复起始信号的定义，可以考虑下EEPROM的随机读时序：</p>
+</blockquote>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241201170301458.png" alt="image-20241201170301458"></p>
+<p>为了能够从指定地址读数据，因此需要先发送一个假写（dummy write），设置EEPROM内部地址的地址寄存器（类比理解调整磁头到指定的位置、翻书到指定的页面），然后重复发送起始信号，进入读模式，读取指定地址的数据。</p>
+<h2 id="fa-song-zi-jie-shu-ju">发送字节数据</h2>
+<h3 id="zi-jie-ge-shi">字节格式</h3>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241201170805761.png" alt="image-20241201170805761"></p>
+<p>这里有几个细节需要注意：</p>
+<ul>
+<li>通过SDA传输的每个字节（数据）<mark>长度必须为8个bit</mark></li>
+<li>在单次传输中，可被发送的字节数没有限制</li>
+<li>发送方每发送一个字节，需要等待接收方响应一个ack确认信号</li>
+<li>数据传输遵循<mark>高位优先</mark>的模式</li>
+<li><mark>时钟拉伸/延展</mark>：如果一个目标（接收方/发送方）因为需要执行一些其他的操作（例如处理内部中断）无法接收/传输数据的下一个字节，它可以通过拉低SCL来强制控制器（主设备）进入等待模式（<mark>主设备尝试拉高SCL后需要轮询等待SCL真的为高电平状态</mark>），直到它准备好处理下个字节的传输了。</li>
+</ul>
+<h3 id="sda-shi-xu-can-shu">SDA时序参数</h3>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241201172812277.png" alt="image-20241201172812277"></p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241201173649085.png" alt="image-20241201173649085"></p>
+<ul>
+<li>数据建立时间（SU;DAT data set-up time）：在SCL低电平时，我们可以修改SDA为下一个要发送的比特位。该参数要求我们修改在SCL为低时，SDA跳变稳定后需要后维持一段时间（再将SCL拉高让接收方采样），至少为<mark>250ns</mark></li>
+<li>数据保持时间（HD;DAT data hold time）：tHD;DAT is the data hold time that is measured from the falling edge of SCL, applies to data in transmission and the acknowledge。该参数是指SDA在SCL下降沿之后需要保持的时间，表格中的 <code>Conditions</code>列标识了个该参数用于CBUS兼容控制器，对于I2C设备不做限制。<mark>这意味着，在SCL下降沿发生后，我们可以立即操作SDA的跳变。</mark></li>
+<li>数据有效（稳定）时间（VD;DAT，data valid time）：tVD;DAT = time for data signal from SCL LOW to SDA output。该参数是指从SCL下降沿到SDA跳变并稳定之间的时间，最大值为<mark>3.45us</mark>，因此简单的做法是将SCL拉低后，立即修改SDA为下一个要发送的bit即可。</li>
+</ul>
+<h3 id="zong-jie">总结</h3>
+<ul>
+<li>data hold time：我们不用关心，只需要遵循SDA在SCL高电平周期保持不变即可</li>
+<li>data valid time：我们只需要在SCL下降沿后立即修改SDA为下一个待发送bit即可（满足<code>&lt;3.45us</code>）</li>
+<li>data set-up time：由于我们在SCL拉低并修改SDA后，需要保持一个SCL低电平周期（如前文所述5us），SDA建立时间也间接变成了5us（满足<code>&gt;250ns</code>）</li>
+</ul>
+<h3 id="shi-xu-kong-zhi-1">时序控制</h3>
+<p>高位优先，依次发送数据字节的比特位：</p>
+<ul>
+<li>每次循环所做的操作：拉低SCL（拉低后才能修改SDA），修改SDA，等待SCL低电平周期过去，拉高SCL（让接收方采样），等待SCL高电平周期过去。</li>
+<li>每个循环产生一个时钟周期（SCL低电平、SCL高电平），因此该操作产生了8个时钟周期（从起始信号后开始计算）。</li>
+</ul>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token keyword">void</span> <span class="token function">I2C_SendByte</span><span class="token punctuation">(</span><span class="token class-name">uint8_t</span> data<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token class-name">uint8_t</span> i <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
+    <span class="token keyword">for</span> <span class="token punctuation">(</span>i <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span> i <span class="token operator">&lt;</span> <span class="token number">8</span><span class="token punctuation">;</span> i<span class="token operator">++</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        SCL_LOW<span class="token punctuation">;</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>data <span class="token operator">&amp;</span> <span class="token number">0x80</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            SDA_HIGH<span class="token punctuation">;</span>
+        <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
+            SDA_LOW<span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+        data <span class="token operator">&lt;&lt;=</span> <span class="token number">1</span><span class="token punctuation">;</span>
+        I2C_DELAY<span class="token punctuation">;</span>
+
+        SCL_HIGH<span class="token punctuation">;</span>
+        I2C_DELAY<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<h2 id="du-qu-ack-9-sub-th-sub-clock-cycle">读取ACK（9<sub>th</sub> Clock Cycle）</h2>
+<h3 id="sheng-cheng-di-jiu-ge-shi-zhong-zhou-qi-bing-du-qu-sda">生成第九个时钟周期并读取SDA</h3>
+<p>之前是接收方读取SDA（接收数据），现在轮到发送方读取SDA（接收响应）了，因此我们无需关心SDA的时序控制了，我们<mark>控制SCL产生第九个时钟周期</mark>即可：</p>
+<ul>
+<li>拉低SCL（因为要拉高SDA释放总线，操作SDA前必须拉低SCL），拉高SDA（释放总线，交出控制权），维持一个SCL低电平周期（从设备可以在此期间修改SDA）</li>
+<li>拉高SCL（告知从设备主设备要采样了，让它在SCL高电平期间维持SDA），维持一个SCL高电平周期，读取SDA（低电平为ACK，高电平为NACK）</li>
+</ul>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c">SCL_LOW<span class="token punctuation">;</span>
+SDA_HIGH<span class="token punctuation">;</span> <span class="token comment">// release bus</span>
+I2C_DELAY<span class="token punctuation">;</span>
+
+SCL_HIGH<span class="token punctuation">;</span>
+I2C_DELAY<span class="token punctuation">;</span>
+
+<span class="token class-name">uint8_t</span> ack <span class="token operator">=</span> READ_SDA<span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<h3 id="shou-hui-sda-kong-zhi-quan">收回SDA控制权</h3>
+<blockquote>
+<p>[!NOTE]</p>
+<p>值得注意的是，与之前发送字节时不同（SDA控制权在主设备），而这里我们读取SDA后，从设备仍然处于保持SDA的状态（因为只要SCL高电平，从设备就认为主设备采样没有结束），因此为了确保后续的操作能够正确控制SDA，主设备应该在读取ACK后拉低SCL（从设备释放SDA，SDA恢复高电平）收回SDA控制权</p>
+</blockquote>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token class-name">uint8_t</span> <span class="token function">I2C_WaitAck</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    SCL_LOW<span class="token punctuation">;</span>
+    SDA_HIGH<span class="token punctuation">;</span> <span class="token comment">// release bus</span>
+    I2C_DELAY<span class="token punctuation">;</span>
+
+    SCL_HIGH<span class="token punctuation">;</span>
+    I2C_DELAY<span class="token punctuation">;</span>
+
+    <span class="token class-name">uint8_t</span> ack <span class="token operator">=</span> READ_SDA<span class="token punctuation">;</span>
+
+    SCL_LOW<span class="token punctuation">;</span>
+    I2C_DELAY<span class="token punctuation">;</span>
+
+    <span class="token keyword">return</span> ack<span class="token punctuation">;</span>
+<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<h2 id="ting-zhi-xin-hao">停止信号</h2>
+<blockquote>
+<p>A LOW to HIGH transition on the SDA line while SCL is HIGH defines a STOP condition</p>
+</blockquote>
+<p><mark>停止信号的定义：在SCL高电平时，SDA由低到高的跳变。</mark></p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241201181729885.png" alt="image-20241201181729885"></p>
+<img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241201181710622.png" alt="image-20241201181710622" style="zoom:33%;">
+<p>如图，停止信号的时序参数有两个：</p>
+<ul>
+<li>建立时间：需要在SCL高电平时，将SDA准备为低电平状态，并保持至少4us</li>
+<li>总线释放时间：在两次连续的传输之间，前一个的停止信号和后一个的起始信号之间的间隔至少为4.7us（SCL和SDA保持为高电平的时间）</li>
+</ul>
+<blockquote>
+<p>[!NOTE]</p>
+<p>由于此前实现的 <code>I2C_Start</code>中已经强制加入了起始信号建立时间（SU;STA，SCL为高时将SDA拉高并保持）5us，因此这里的t<sub>BUF</sub>可以省略</p>
+</blockquote>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241201191223209.png" alt="image-20241201191223209"></p>
+<h3 id="shi-xu-kong-zhi-2">时序控制</h3>
+<ul>
+<li>拉低SCL（修改SDA前需拉低SCL），将SDA准备为低电平，维持一个SCL低电平周期</li>
+<li>拉高SDA</li>
+</ul>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token keyword">void</span> <span class="token function">I2C_Stop</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    SCL_LOW<span class="token punctuation">;</span>
+    SDA_LOW<span class="token punctuation">;</span>
+    I2C_DELAY<span class="token punctuation">;</span>
+
+    SCL_HIGH<span class="token punctuation">;</span>
+    I2C_DELAY<span class="token punctuation">;</span>
+
+    SDA_HIGH<span class="token punctuation">;</span>
+<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<h2 id="xie-eeprom-ce-shi">写EEPROM测试</h2>
+<ul>
+<li>写模式发送设备地址 <code>0xA0</code></li>
+<li>设置读写地址寄存器为 <code>0x00</code>（类比磁盘设置磁头）</li>
+<li>向 <code>0x00</code>地址写入数据 <code>‘a’</code></li>
+</ul>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241201191555496.png" alt="image-20241201191555496"></p>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">"i2c_soft.h"</span></span>
+
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name">SCL_HIGH</span> <span class="token expression"><span class="token punctuation">(</span>GPIOB<span class="token operator">-&gt;</span>ODR <span class="token operator">|=</span> GPIO_ODR_ODR10<span class="token punctuation">)</span></span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name">SCL_LOW</span> <span class="token expression"><span class="token punctuation">(</span>GPIOB<span class="token operator">-&gt;</span>ODR <span class="token operator">&amp;=</span> <span class="token operator">~</span>GPIO_ODR_ODR10<span class="token punctuation">)</span></span></span>
+
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name">SDA_HIGH</span> <span class="token expression"><span class="token punctuation">(</span>GPIOB<span class="token operator">-&gt;</span>ODR <span class="token operator">|=</span> GPIO_ODR_ODR11<span class="token punctuation">)</span></span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name">SDA_LOW</span> <span class="token expression"><span class="token punctuation">(</span>GPIOB<span class="token operator">-&gt;</span>ODR <span class="token operator">&amp;=</span> <span class="token operator">~</span>GPIO_ODR_ODR11<span class="token punctuation">)</span></span></span>
+
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name">READ_SDA</span> <span class="token expression"><span class="token punctuation">(</span><span class="token punctuation">(</span>GPIOB<span class="token operator">-&gt;</span>IDR <span class="token operator">&amp;</span> GPIO_IDR_IDR11<span class="token punctuation">)</span> <span class="token operator">?</span> <span class="token number">1</span> <span class="token operator">:</span> <span class="token number">0</span><span class="token punctuation">)</span></span></span>
+
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name">STANDARD_MODE</span> <span class="token expression"><span class="token number">0</span></span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name">FAST_MODE</span> <span class="token expression"><span class="token number">1</span></span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name">I2C_MODE</span> <span class="token expression">STANDARD_MODE</span></span>
+
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">if</span> <span class="token expression"><span class="token punctuation">(</span>I2C_MODE <span class="token operator">==</span> STANDARD_MODE<span class="token punctuation">)</span></span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name">I2C_DELAY</span> <span class="token expression"><span class="token function">i2c_delay_5us</span><span class="token punctuation">(</span><span class="token punctuation">)</span></span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">elif</span> <span class="token expression"><span class="token punctuation">(</span>I2C_MODE <span class="token operator">==</span> FAST_MODE<span class="token punctuation">)</span></span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name">I2C_DELAY</span> <span class="token expression"><span class="token function">i2c_delay_2us</span><span class="token punctuation">(</span><span class="token punctuation">)</span></span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">endif</span></span>
+
+<span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">i2c_delay_5us</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">i2c_delay_2us</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token keyword">void</span> <span class="token function">I2C_Init</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token comment">// 1. GPIO时钟配置</span>
+    RCC<span class="token operator">-&gt;</span>APB2ENR <span class="token operator">|=</span> RCC_APB2ENR_IOPBEN<span class="token punctuation">;</span>
+    
+    <span class="token comment">// 2. 配置GPIO工作模式为通用开漏输出 mode=11 cnf=01</span>
+    GPIOB<span class="token operator">-&gt;</span>CRH <span class="token operator">|=</span> <span class="token punctuation">(</span>GPIO_CRH_MODE10 <span class="token operator">|</span> GPIO_CRH_MODE11<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    GPIOB<span class="token operator">-&gt;</span>CRH <span class="token operator">&amp;=</span> <span class="token operator">~</span><span class="token punctuation">(</span>GPIO_CRH_CNF10_1 <span class="token operator">|</span> GPIO_CRH_CNF11_1<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    GPIOB<span class="token operator">-&gt;</span>CRH <span class="token operator">|=</span> <span class="token punctuation">(</span>GPIO_CRH_CNF10_0 <span class="token operator">|</span> GPIO_CRH_CNF11_0<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token comment">// 3. 总线空闲状态时，默认高电平</span>
+    SCL_HIGH<span class="token punctuation">;</span>
+    SDA_HIGH<span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">void</span> <span class="token function">I2C_Start</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token comment">// 1. SCL, SDA拉高，并维持start建立时间（for repeated start and bus free time）</span>
+    SCL_HIGH<span class="token punctuation">;</span>
+    SDA_HIGH<span class="token punctuation">;</span>
+    I2C_DELAY<span class="token punctuation">;</span>
+
+    <span class="token comment">// 2. SDA拉低，并维持start保持时间</span>
+    SDA_LOW<span class="token punctuation">;</span>
+    I2C_DELAY<span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">void</span> <span class="token function">I2C_Stop</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    SCL_LOW<span class="token punctuation">;</span>
+    SDA_LOW<span class="token punctuation">;</span>
+    I2C_DELAY<span class="token punctuation">;</span>
+
+    SCL_HIGH<span class="token punctuation">;</span>
+    I2C_DELAY<span class="token punctuation">;</span>
+
+    SDA_HIGH<span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token class-name">uint8_t</span> <span class="token function">I2C_WaitAck</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    SCL_LOW<span class="token punctuation">;</span>
+    SDA_HIGH<span class="token punctuation">;</span> <span class="token comment">// release bus</span>
+    I2C_DELAY<span class="token punctuation">;</span>
+
+    SCL_HIGH<span class="token punctuation">;</span>
+    I2C_DELAY<span class="token punctuation">;</span>
+
+    <span class="token class-name">uint8_t</span> ack <span class="token operator">=</span> READ_SDA<span class="token punctuation">;</span>
+
+    SCL_LOW<span class="token punctuation">;</span>
+    I2C_DELAY<span class="token punctuation">;</span>
+
+    <span class="token keyword">return</span> ack<span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">void</span> <span class="token function">I2C_SendByte</span><span class="token punctuation">(</span><span class="token class-name">uint8_t</span> data<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token class-name">uint8_t</span> i <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
+    <span class="token keyword">for</span> <span class="token punctuation">(</span>i <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span> i <span class="token operator">&lt;</span> <span class="token number">8</span><span class="token punctuation">;</span> i<span class="token operator">++</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        SCL_LOW<span class="token punctuation">;</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>data <span class="token operator">&amp;</span> <span class="token number">0x80</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            SDA_HIGH<span class="token punctuation">;</span>
+        <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
+            SDA_LOW<span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+        data <span class="token operator">&lt;&lt;=</span> <span class="token number">1</span><span class="token punctuation">;</span>
+        I2C_DELAY<span class="token punctuation">;</span>
+
+        SCL_HIGH<span class="token punctuation">;</span>
+        I2C_DELAY<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">void</span> <span class="token function">I2C_Test</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token function">I2C_Start</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">I2C_SendByte</span><span class="token punctuation">(</span><span class="token number">0xA0</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">I2C_WaitAck</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">I2C_SendByte</span><span class="token punctuation">(</span><span class="token number">0x0</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">I2C_WaitAck</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">I2C_SendByte</span><span class="token punctuation">(</span><span class="token char">'a'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">I2C_WaitAck</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">I2C_Stop</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">i2c_delay_5us</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token class-name">uint16_t</span> i <span class="token operator">=</span> <span class="token number">40</span><span class="token punctuation">;</span>
+    <span class="token keyword">do</span> <span class="token punctuation">{</span>
+        i<span class="token operator">--</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span> <span class="token keyword">while</span> <span class="token punctuation">(</span>i<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">i2c_delay_2us</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token class-name">uint16_t</span> i <span class="token operator">=</span> <span class="token number">15</span><span class="token punctuation">;</span>
+    <span class="token keyword">do</span> <span class="token punctuation">{</span>
+        i<span class="token operator">--</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span> <span class="token keyword">while</span> <span class="token punctuation">(</span>i<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<h2 id="jie-shou-shu-ju">接收数据</h2>
+<ul>
+<li>接收数据时，主设备只需控制SCL产生8个时钟周期，SDA控制权交给从设备</li>
+<li>低电平周期，从设备会建立（准备）SDA，并在高电平周期保持稳定（主设备可以在此期间读取SDA）</li>
+</ul>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token class-name">uint8_t</span> <span class="token function">I2C_ReceiveByte</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token class-name">uint8_t</span> i <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
+    <span class="token class-name">uint8_t</span> data <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
+    <span class="token keyword">for</span> <span class="token punctuation">(</span>i <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span> i <span class="token operator">&lt;</span> <span class="token number">8</span><span class="token punctuation">;</span> i<span class="token operator">++</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        SCL_LOW<span class="token punctuation">;</span>
+        I2C_DELAY<span class="token punctuation">;</span>
+
+        SCL_HIGH<span class="token punctuation">;</span>
+        I2C_DELAY<span class="token punctuation">;</span>
+        data <span class="token operator">&lt;&lt;=</span> <span class="token number">1</span><span class="token punctuation">;</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>READ_SDA<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            data <span class="token operator">|=</span> <span class="token number">0x01</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+    <span class="token keyword">return</span> data<span class="token punctuation">;</span>
+<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<h2 id="fa-song-ack-nack-9-sub-th-sub-clock-cycle">发送ACK/NACK（9<sub>th</sub> Clock Cycle）</h2>
+<p>在第九个时钟周期，主设备需要给从设备响应ACK/NACK，ACK表示需要从设备继续发送数据，NACK则指示从设备停止发送数据（主设备随后发送停止信号结束此次传输）：</p>
+<ul>
+<li>拉低SCL（因为马上要修改SDA），根据响应ACK还是NACK来拉低/拉高SDA，维持一个SCL低电平周期</li>
+<li>拉高SCL（让从设备采样），维持一个SCL高电平周期</li>
+</ul>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token keyword">void</span> <span class="token function">I2C_SendAck</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    SCL_LOW<span class="token punctuation">;</span>
+    SDA_LOW<span class="token punctuation">;</span>
+    I2C_DELAY<span class="token punctuation">;</span>
+
+    SCL_HIGH<span class="token punctuation">;</span>
+    I2C_DELAY<span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">void</span> <span class="token function">I2C_SendNAck</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    SCL_LOW<span class="token punctuation">;</span>
+    SDA_HIGH<span class="token punctuation">;</span>
+    I2C_DELAY<span class="token punctuation">;</span>
+
+    SCL_HIGH<span class="token punctuation">;</span>
+    I2C_DELAY<span class="token punctuation">;</span>
+<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<h2 id="du-eeprom-ce-shi">读EEPROM测试</h2>
+<ol>
+<li>假写（dummy write）
+<ol>
+<li>写模式发送设备地址 <code>0xA0</code></li>
+<li>设置读写地址寄存器为 <code>0x00</code></li>
+</ol>
+</li>
+<li>真读
+<ol>
+<li>读模式发送设备地址 <code>0xA1</code></li>
+<li>接收一个数据字节</li>
+<li>响应NACK</li>
+</ol>
+</li>
+</ol>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241201195027305.png" alt="image-20241201195027305"></p>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">"i2c_soft.h"</span></span>
+
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name">SCL_HIGH</span> <span class="token expression"><span class="token punctuation">(</span>GPIOB<span class="token operator">-&gt;</span>ODR <span class="token operator">|=</span> GPIO_ODR_ODR10<span class="token punctuation">)</span></span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name">SCL_LOW</span> <span class="token expression"><span class="token punctuation">(</span>GPIOB<span class="token operator">-&gt;</span>ODR <span class="token operator">&amp;=</span> <span class="token operator">~</span>GPIO_ODR_ODR10<span class="token punctuation">)</span></span></span>
+
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name">SDA_HIGH</span> <span class="token expression"><span class="token punctuation">(</span>GPIOB<span class="token operator">-&gt;</span>ODR <span class="token operator">|=</span> GPIO_ODR_ODR11<span class="token punctuation">)</span></span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name">SDA_LOW</span> <span class="token expression"><span class="token punctuation">(</span>GPIOB<span class="token operator">-&gt;</span>ODR <span class="token operator">&amp;=</span> <span class="token operator">~</span>GPIO_ODR_ODR11<span class="token punctuation">)</span></span></span>
+
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name">READ_SDA</span> <span class="token expression"><span class="token punctuation">(</span><span class="token punctuation">(</span>GPIOB<span class="token operator">-&gt;</span>IDR <span class="token operator">&amp;</span> GPIO_IDR_IDR11<span class="token punctuation">)</span> <span class="token operator">?</span> <span class="token number">1</span> <span class="token operator">:</span> <span class="token number">0</span><span class="token punctuation">)</span></span></span>
+
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name">STANDARD_MODE</span> <span class="token expression"><span class="token number">0</span></span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name">FAST_MODE</span> <span class="token expression"><span class="token number">1</span></span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name">I2C_MODE</span> <span class="token expression">STANDARD_MODE</span></span>
+
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">if</span> <span class="token expression"><span class="token punctuation">(</span>I2C_MODE <span class="token operator">==</span> STANDARD_MODE<span class="token punctuation">)</span></span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name">I2C_DELAY</span> <span class="token expression"><span class="token function">i2c_delay_5us</span><span class="token punctuation">(</span><span class="token punctuation">)</span></span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">elif</span> <span class="token expression"><span class="token punctuation">(</span>I2C_MODE <span class="token operator">==</span> FAST_MODE<span class="token punctuation">)</span></span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name">I2C_DELAY</span> <span class="token expression"><span class="token function">i2c_delay_2us</span><span class="token punctuation">(</span><span class="token punctuation">)</span></span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">endif</span></span>
+
+<span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">i2c_delay_5us</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">i2c_delay_2us</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token keyword">void</span> <span class="token function">I2C_Init</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token comment">// 1. GPIO时钟配置</span>
+    RCC<span class="token operator">-&gt;</span>APB2ENR <span class="token operator">|=</span> RCC_APB2ENR_IOPBEN<span class="token punctuation">;</span>
+    
+    <span class="token comment">// 2. 配置GPIO工作模式为通用开漏输出 mode=11 cnf=01</span>
+    GPIOB<span class="token operator">-&gt;</span>CRH <span class="token operator">|=</span> <span class="token punctuation">(</span>GPIO_CRH_MODE10 <span class="token operator">|</span> GPIO_CRH_MODE11<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    GPIOB<span class="token operator">-&gt;</span>CRH <span class="token operator">&amp;=</span> <span class="token operator">~</span><span class="token punctuation">(</span>GPIO_CRH_CNF10_1 <span class="token operator">|</span> GPIO_CRH_CNF11_1<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    GPIOB<span class="token operator">-&gt;</span>CRH <span class="token operator">|=</span> <span class="token punctuation">(</span>GPIO_CRH_CNF10_0 <span class="token operator">|</span> GPIO_CRH_CNF11_0<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token comment">// 3. 总线空闲状态时，默认高电平</span>
+    SCL_HIGH<span class="token punctuation">;</span>
+    SDA_HIGH<span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">void</span> <span class="token function">I2C_Start</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token comment">// 1. SCL, SDA拉高，并维持start建立时间（for repeated start and bus free time）</span>
+    SCL_HIGH<span class="token punctuation">;</span>
+    SDA_HIGH<span class="token punctuation">;</span>
+    I2C_DELAY<span class="token punctuation">;</span>
+
+    <span class="token comment">// 2. SDA拉低，并维持start保持时间</span>
+    SDA_LOW<span class="token punctuation">;</span>
+    I2C_DELAY<span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">void</span> <span class="token function">I2C_Stop</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    SCL_LOW<span class="token punctuation">;</span>
+    SDA_LOW<span class="token punctuation">;</span>
+    I2C_DELAY<span class="token punctuation">;</span>
+
+    SCL_HIGH<span class="token punctuation">;</span>
+    I2C_DELAY<span class="token punctuation">;</span>
+
+    SDA_HIGH<span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">void</span> <span class="token function">I2C_SendAck</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    SCL_LOW<span class="token punctuation">;</span>
+    SDA_LOW<span class="token punctuation">;</span>
+    I2C_DELAY<span class="token punctuation">;</span>
+
+    SCL_HIGH<span class="token punctuation">;</span>
+    I2C_DELAY<span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">void</span> <span class="token function">I2C_SendNAck</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    SCL_LOW<span class="token punctuation">;</span>
+    SDA_HIGH<span class="token punctuation">;</span>
+    I2C_DELAY<span class="token punctuation">;</span>
+
+    SCL_HIGH<span class="token punctuation">;</span>
+    I2C_DELAY<span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token class-name">uint8_t</span> <span class="token function">I2C_WaitAck</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    SCL_LOW<span class="token punctuation">;</span>
+    SDA_HIGH<span class="token punctuation">;</span> <span class="token comment">// release bus</span>
+    I2C_DELAY<span class="token punctuation">;</span>
+
+    SCL_HIGH<span class="token punctuation">;</span>
+    I2C_DELAY<span class="token punctuation">;</span>
+
+    <span class="token class-name">uint8_t</span> ack <span class="token operator">=</span> READ_SDA<span class="token punctuation">;</span>
+
+    SCL_LOW<span class="token punctuation">;</span>
+    I2C_DELAY<span class="token punctuation">;</span>
+
+    <span class="token keyword">return</span> ack<span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">void</span> <span class="token function">I2C_SendByte</span><span class="token punctuation">(</span><span class="token class-name">uint8_t</span> data<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token class-name">uint8_t</span> i <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
+    <span class="token keyword">for</span> <span class="token punctuation">(</span>i <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span> i <span class="token operator">&lt;</span> <span class="token number">8</span><span class="token punctuation">;</span> i<span class="token operator">++</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        SCL_LOW<span class="token punctuation">;</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>data <span class="token operator">&amp;</span> <span class="token number">0x80</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            SDA_HIGH<span class="token punctuation">;</span>
+        <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
+            SDA_LOW<span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+        data <span class="token operator">&lt;&lt;=</span> <span class="token number">1</span><span class="token punctuation">;</span>
+        I2C_DELAY<span class="token punctuation">;</span>
+
+        SCL_HIGH<span class="token punctuation">;</span>
+        I2C_DELAY<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+
+<span class="token class-name">uint8_t</span> <span class="token function">I2C_ReceiveByte</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token class-name">uint8_t</span> i <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
+    <span class="token class-name">uint8_t</span> data <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
+    <span class="token keyword">for</span> <span class="token punctuation">(</span>i <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span> i <span class="token operator">&lt;</span> <span class="token number">8</span><span class="token punctuation">;</span> i<span class="token operator">++</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        SCL_LOW<span class="token punctuation">;</span>
+        I2C_DELAY<span class="token punctuation">;</span>
+
+        SCL_HIGH<span class="token punctuation">;</span>
+        I2C_DELAY<span class="token punctuation">;</span>
+        data <span class="token operator">&lt;&lt;=</span> <span class="token number">1</span><span class="token punctuation">;</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>READ_SDA<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            data <span class="token operator">|=</span> <span class="token number">0x01</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+    <span class="token keyword">return</span> data<span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">void</span> <span class="token function">I2C_Test</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token function">I2C_Start</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">I2C_SendByte</span><span class="token punctuation">(</span><span class="token number">0xA0</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">I2C_WaitAck</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">I2C_SendByte</span><span class="token punctuation">(</span><span class="token number">0x0</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">I2C_WaitAck</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">I2C_SendByte</span><span class="token punctuation">(</span><span class="token char">'a'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">I2C_WaitAck</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">I2C_Stop</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token function">delay_ms</span><span class="token punctuation">(</span><span class="token number">5</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token function">I2C_Start</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">I2C_SendByte</span><span class="token punctuation">(</span><span class="token number">0xA0</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">I2C_WaitAck</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">I2C_SendByte</span><span class="token punctuation">(</span><span class="token number">0x0</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">I2C_WaitAck</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">I2C_Start</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">I2C_SendByte</span><span class="token punctuation">(</span><span class="token number">0xA0</span> <span class="token operator">+</span> <span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">I2C_WaitAck</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">I2C_ReceiveByte</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">I2C_SendNAck</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">I2C_Stop</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">i2c_delay_5us</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token class-name">uint16_t</span> i <span class="token operator">=</span> <span class="token number">40</span><span class="token punctuation">;</span>
+    <span class="token keyword">do</span> <span class="token punctuation">{</span>
+        i<span class="token operator">--</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span> <span class="token keyword">while</span> <span class="token punctuation">(</span>i<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">i2c_delay_2us</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token class-name">uint16_t</span> i <span class="token operator">=</span> <span class="token number">15</span><span class="token punctuation">;</span>
+    <span class="token keyword">do</span> <span class="token punctuation">{</span>
+        i<span class="token operator">--</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span> <span class="token keyword">while</span> <span class="token punctuation">(</span>i<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<h2 id="tuo-zhan-shang-sheng-yan-xia-jiang-yan-shi-jian">拓展：上升沿/下降沿时间</h2>
+<img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241201195756988.png" alt="image-20241201195756988" style="zoom: 33%;">
+<p>该参数描述的是引脚高低电平跳变（或者说转变/过度，transition）时间，需要查看MCU数据手册中关于IO口电气特性相关的描述：</p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241201200403108.png" alt="STM32F103数据手册"></p>
+<p>回看前文GPIO初始化：</p>
+<pre class="line-numbers language-none"><code class="language-none">GPIOB-&gt;CRH |= (GPIO_CRH_MODE10 | GPIO_CRH_MODE11);
+GPIOB-&gt;CRH &amp;= ~(GPIO_CRH_CNF10_1 | GPIO_CRH_CNF11_1);
+GPIOB-&gt;CRH |= (GPIO_CRH_CNF10_0 | GPIO_CRH_CNF11_0);<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241201200530058.png" alt="image-20241201200530058"></p>
+<p>我们配置的的是最大输出模式，因此满足I2C的条件</p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241201195656068.png" alt="image-20241201195656068"></p>
+<h1 id="eerom-mc-24-c-02">EEROM(MC24C02)</h1>
+<h2 id="te-xing">特性</h2>
+<ul>
+<li>支持I2C标准模式和快速模式</li>
+<li>MC24C01容量128字节，C02容量256字节</li>
+<li>每16个字节组织成一个页，可以推断：
+<ul>
+<li>有16个页</li>
+<li>一个字节可以满足寻址（0x0~0xFF，共256个地址），高四位用于页寻址，第四位用于页内字节寻址</li>
+</ul>
+</li>
+<li>写周期
+<ul>
+<li>单字节写操作、页内连续写操作，最大写周期为5ms</li>
+<li>写操作后（单次I2C传输后）的5ms内，不应该再开启I2C传输（芯片内部需要时间持久化数据）</li>
+</ul>
+</li>
+</ul>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241130155340046.png" alt="image-20241130155340046"></p>
+<h2 id="nei-cun-jie-gou">内存结构</h2>
+<ul>
+<li>WC，write control，写使能</li>
+<li>E2，E1，E0：设备地址中的低3位</li>
+</ul>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241201201711873.png" alt="image-20241201201711873"></p>
+<h2 id="she-bei-xun-zhi">设备寻址</h2>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241130155754947.png" alt="image-20241130155754947"></p>
+<h2 id="du-xie-cao-zuo">读/写操作</h2>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241201201953699.png" alt="image-20241201201953699"></p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241201202011850.png" alt="image-20241201202011850"></p>
+<h1 id="yi-liu-wen-ti">遗留问题</h1>
+<h2 id="di-ta-ding-shi-qi-yan-shi-chao-chang-wen-ti">嘀嗒定时器延时超长问题</h2>
+<blockquote>
+<p>[!IMPORTANT]</p>
+<p>值得注意的是，建议使用简单的循环或定时器中断来比较精准地实现延时，而不要使用复杂的延时函数，例如我最初使用如下嘀嗒定时器时，<code>SysTick-&gt;CTRL &amp; SysTick_CTRL_ENABLE</code>会导致延时有时比预期超出很多（例如预期5us，会出现偶尔延时了15us的情况），但是去掉该代码后就正常了，原因暂时还没找到</p>
+</blockquote>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token keyword">void</span> <span class="token function">delay_us</span><span class="token punctuation">(</span><span class="token class-name">uint16_t</span> us<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token comment">// AHB 72M</span>
+    SysTick<span class="token operator">-&gt;</span>LOAD <span class="token operator">=</span> <span class="token number">72</span> <span class="token operator">*</span> us<span class="token punctuation">;</span>
+    <span class="token comment">//101: clock source, tick interrupt, enable</span>
+    SysTick<span class="token operator">-&gt;</span>CTRL <span class="token operator">|=</span> <span class="token number">0x05</span><span class="token punctuation">;</span>
+    <span class="token comment">// wait for count flag</span>
+    <span class="token keyword">while</span> <span class="token punctuation">(</span><span class="token punctuation">(</span>SysTick<span class="token operator">-&gt;</span>CTRL <span class="token operator">&amp;</span> SysTick_CTRL_COUNTFLAG<span class="token punctuation">)</span> <span class="token operator">==</span> <span class="token number">0</span> 
+           <span class="token operator">&amp;&amp;</span> <span class="token punctuation">(</span>SysTick<span class="token operator">-&gt;</span>CTRL <span class="token operator">&amp;</span> SysTick_CTRL_ENABLE<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    SysTick<span class="token operator">-&gt;</span>CTRL <span class="token operator">&amp;=</span> <span class="token operator">~</span>SysTick_CTRL_ENABLE<span class="token punctuation">;</span>
+<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>在使用逻辑分析仪观察上述代码延时产生的时钟脉冲时，总是会出现有脉冲延时超长的情况（例如15us）</p>
+<img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241201161816608.png" alt="image-20241201161816608" style="zoom:33%;">
+<p>去掉 <code>SysTick-&gt;CTRL &amp; SysTick_CTRL_ENABLE</code>后则延时正常了：</p>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token keyword">void</span> <span class="token function">delay_us</span><span class="token punctuation">(</span><span class="token class-name">uint16_t</span> us<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token comment">// AHB 72M</span>
+    SysTick<span class="token operator">-&gt;</span>LOAD <span class="token operator">=</span> <span class="token number">72</span> <span class="token operator">*</span> us<span class="token punctuation">;</span>
+    <span class="token comment">//101: clock source, tick interrupt, enable</span>
+    SysTick<span class="token operator">-&gt;</span>CTRL <span class="token operator">|=</span> <span class="token number">0x05</span><span class="token punctuation">;</span>
+    <span class="token comment">// wait for count flag</span>
+    <span class="token keyword">while</span> <span class="token punctuation">(</span><span class="token punctuation">(</span>SysTick<span class="token operator">-&gt;</span>CTRL <span class="token operator">&amp;</span> SysTick_CTRL_COUNTFLAG<span class="token punctuation">)</span> <span class="token operator">==</span> <span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    SysTick<span class="token operator">-&gt;</span>CTRL <span class="token operator">&amp;=</span> <span class="token operator">~</span>SysTick_CTRL_ENABLE<span class="token punctuation">;</span>
+<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241201161925160.png" alt="image-20241201161925160" style="zoom:33%;">
+<p>并且前者直接导致I2C通信无法走通（只有 <code>start</code>），而后者可以：</p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241201162331212.png" alt="image-20241201162331212"></p>
+
+                
+            </div>
+            <hr/>
+
+            
+
+    <div class="reprint" id="reprint-statement">
+        
+            <div class="reprint__author">
+                <span class="reprint-meta" style="font-weight: bold;">
+                    <i class="fas fa-user">
+                        文章作者:
+                    </i>
+                </span>
+                <span class="reprint-info">
+                    <a href="/about" rel="external nofollow noreferrer">安文</a>
+                </span>
+            </div>
+            <div class="reprint__type">
+                <span class="reprint-meta" style="font-weight: bold;">
+                    <i class="fas fa-link">
+                        文章链接:
+                    </i>
+                </span>
+                <span class="reprint-info">
+                    <a href="https://zanwen.github.io/2024/11/30/28867.html">https://zanwen.github.io/2024/11/30/28867.html</a>
+                </span>
+            </div>
+            <div class="reprint__notice">
+                <span class="reprint-meta" style="font-weight: bold;">
+                    <i class="fas fa-copyright">
+                        版权声明:
+                    </i>
+                </span>
+                <span class="reprint-info">
+                    本博客所有文章除特別声明外，均采用
+                    <a href="https://creativecommons.org/licenses/by/4.0/deed.zh" rel="external nofollow noreferrer" target="_blank">CC BY 4.0</a>
+                    许可协议。转载请注明来源
+                    <a href="/about" target="_blank">安文</a>
+                    !
+                </span>
+            </div>
+        
+    </div>
+
+    <script async defer>
+      document.addEventListener("copy", function (e) {
+        let toastHTML = '<span>复制成功，请遵循本文的转载规则</span><button class="btn-flat toast-action" onclick="navToReprintStatement()" style="font-size: smaller">查看</a>';
+        M.toast({html: toastHTML})
+      });
+
+      function navToReprintStatement() {
+        $("html, body").animate({scrollTop: $("#reprint-statement").offset().top - 80}, 800);
+      }
+    </script>
+
+
+
+            <div class="tag_share" style="display: block;">
+                <div class="post-meta__tag-list" style="display: inline-block;">
+                    
+                        <div class="article-tag">
+                            
+                                <a href="/tags/I2C/">
+                                    <span class="chip bg-color">I2C</span>
+                                </a>
+                            
+                                <a href="/tags/I%C2%B2C/">
+                                    <span class="chip bg-color">I²C</span>
+                                </a>
+                            
+                        </div>
+                    
+                </div>
+                <div class="post_share" style="zoom: 80%; width: fit-content; display: inline-block; float: right; margin: -0.15rem 0;">
+                    <link rel="stylesheet" type="text/css" href="/libs/share/css/share.min.css">
+<div id="article-share">
+
+    
+    <div class="social-share" data-sites="twitter,facebook,google,qq,qzone,wechat,weibo,douban,linkedin" data-wechat-qrcode-helper="<p>微信扫一扫即可分享！</p>"></div>
+    <script src="/libs/share/js/social-share.min.js"></script>
+    
+
+    
+
+</div>
+
+                </div>
+            </div>
+            
+                <div id="reward">
+    <a href="#rewardModal" class="reward-link modal-trigger btn-floating btn-medium waves-effect waves-light red">赏</a>
+
+    <!-- Modal Structure -->
+    <div id="rewardModal" class="modal">
+        <div class="modal-content">
+            <a class="close modal-close"><i class="fas fa-times"></i></a>
+            <h4 class="reward-title">你的赏识是我前进的动力</h4>
+            <div class="reward-content">
+                <div class="reward-tabs">
+                    <ul class="tabs row">
+                        <li class="tab col s6 alipay-tab waves-effect waves-light"><a href="#alipay">支付宝</a></li>
+                        <li class="tab col s6 wechat-tab waves-effect waves-light"><a href="#wechat">微 信</a></li>
+                    </ul>
+                    <div id="alipay">
+                        <img src="/medias/reward/alipay.jpg" class="reward-img" alt="支付宝打赏二维码">
+                    </div>
+                    <div id="wechat">
+                        <img src="/medias/reward/wechat.jpg" class="reward-img" alt="微信打赏二维码">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(function () {
+        $('.tabs').tabs();
+    });
+</script>
+
+            
+        </div>
+    </div>
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+<article id="prenext-posts" class="prev-next articles">
+    <div class="row article-row">
+        
+        <div class="article col s12 m6" data-aos="fade-up" data-aos="fade-up">
+            <div class="article-badge left-badge text-color">
+                <i class="far fa-dot-circle"></i>&nbsp;本篇
+            </div>
+            <div class="card">
+                <a href="/2024/11/30/28867.html">
+                    <div class="card-image">
+                        
+                        <img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/pexels-319596550-28098320.jpg" class="responsive-img" alt="深入理解I²C协议及底层原理（基于STM32F103ZE）">
+                        
+                        <span class="card-title">深入理解I²C协议及底层原理（基于STM32F103ZE）</span>
+                    </div>
+                </a>
+                <div class="card-content article-content">
+                    <div class="summary block-with-text">
+                        
+                            
+                        
+                    </div>
+                    <div class="publish-info">
+                            <span class="publish-date">
+                                <i class="far fa-clock fa-fw icon-date"></i>2024-11-30
+                            </span>
+                        <span class="publish-author">
+                            
+                            <i class="fas fa-bookmark fa-fw icon-category"></i>
+                            
+                            <a href="/categories/%E5%8D%8F%E8%AE%AE/" class="post-category">
+                                    协议
+                                </a>
+                            
+                            <a href="/categories/%E5%8D%8F%E8%AE%AE/STM32/" class="post-category">
+                                    STM32
+                                </a>
+                            
+                            
+                        </span>
+                    </div>
+                </div>
+
+                
+                <div class="card-action article-tags">
+                    
+                    <a href="/tags/I2C/">
+                        <span class="chip bg-color">I2C</span>
+                    </a>
+                    
+                    <a href="/tags/I%C2%B2C/">
+                        <span class="chip bg-color">I²C</span>
+                    </a>
+                    
+                </div>
+                
+            </div>
+        </div>
+        
+        
+        <div class="article col s12 m6" data-aos="fade-up">
+            <div class="article-badge right-badge text-color">
+                下一篇&nbsp;<i class="fas fa-chevron-right"></i>
+            </div>
+            <div class="card">
+                <a href="/2024/11/30/5535.html">
+                    <div class="card-image">
+                        
+                        <img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/pexels-mei-lin-1483020-6666098.jpg" class="responsive-img" alt="MDK调试之可视化外设&amp;内核寄存器">
+                        
+                        <span class="card-title">MDK调试之可视化外设&amp;内核寄存器</span>
+                    </div>
+                </a>
+                <div class="card-content article-content">
+                    <div class="summary block-with-text">
+                        
+                            
+                        
+                    </div>
+                    <div class="publish-info">
+                            <span class="publish-date">
+                                <i class="far fa-clock fa-fw icon-date"></i>2024-11-30
+                            </span>
+                        <span class="publish-author">
+                            
+                            <i class="fas fa-bookmark fa-fw icon-category"></i>
+                            
+                            <a href="/categories/MDK/" class="post-category">
+                                    MDK
+                                </a>
+                            
+                            
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="card-action article-tags">
+                    
+                    <a href="/tags/MDK/">
+                        <span class="chip bg-color">MDK</span>
+                    </a>
+                    
+                    <a href="/tags/Debug/">
+                        <span class="chip bg-color">Debug</span>
+                    </a>
+                    
+                    <a href="/tags/%E5%AF%84%E5%AD%98%E5%99%A8%E5%8F%AF%E8%A7%86%E5%8C%96/">
+                        <span class="chip bg-color">寄存器可视化</span>
+                    </a>
+                    
+                </div>
+                
+            </div>
+        </div>
+        
+    </div>
+</article>
+
+</div>
+
+
+
+<!-- 代码块功能依赖 -->
+<script type="text/javascript" src="/libs/codeBlock/codeBlockFuction.js"></script>
+
+
+  <!-- 是否加载使用自带的 prismjs. -->
+  <script type="text/javascript" src="/libs/prism/prism.min.js"></script>
+
+
+<!-- 代码语言 -->
+
+<script type="text/javascript" src="/libs/codeBlock/codeLang.js"></script>
+
+
+<!-- 代码块复制 -->
+
+<script type="text/javascript" src="/libs/codeBlock/codeCopy.js"></script>
+
+
+<!-- 代码块收缩 -->
+
+<script type="text/javascript" src="/libs/codeBlock/codeShrink.js"></script>
+
+
+
+    </div>
+    <div id="toc-aside" class="expanded col l3 hide-on-med-and-down">
+        <div class="toc-widget card" style="background-color: white;">
+            <div class="toc-title"><i class="far fa-list-alt"></i>&nbsp;&nbsp;目录</div>
+            <div id="toc-content"></div>
+        </div>
+    </div>
+</div>
+
+<!-- TOC 悬浮按钮. -->
+
+<div id="floating-toc-btn" class="hide-on-med-and-down">
+    <a class="btn-floating btn-large bg-color">
+        <i class="fas fa-list-ul"></i>
+    </a>
+</div>
+
+
+<script src="/libs/tocbot/tocbot.min.js"></script>
+<script>
+    $(function () {
+        tocbot.init({
+            tocSelector: '#toc-content',
+            contentSelector: '#articleContent',
+            headingsOffset: -($(window).height() * 0.4 - 45),
+            collapseDepth: Number('0'),
+            headingSelector: 'h1, h2, h3'
+        });
+
+        // Set scroll toc fixed.
+        let tocHeight = parseInt($(window).height() * 0.4 - 64);
+        let $tocWidget = $('.toc-widget');
+        $(window).scroll(function () {
+            let scroll = $(window).scrollTop();
+            /* add post toc fixed. */
+            if (scroll > tocHeight) {
+                $tocWidget.addClass('toc-fixed');
+            } else {
+                $tocWidget.removeClass('toc-fixed');
+            }
+        });
+
+        
+        /* 修复文章卡片 div 的宽度. */
+        let fixPostCardWidth = function (srcId, targetId) {
+            let srcDiv = $('#' + srcId);
+            if (srcDiv.length === 0) {
+                return;
+            }
+
+            let w = srcDiv.width();
+            if (w >= 450) {
+                w = w + 21;
+            } else if (w >= 350 && w < 450) {
+                w = w + 18;
+            } else if (w >= 300 && w < 350) {
+                w = w + 16;
+            } else {
+                w = w + 14;
+            }
+            $('#' + targetId).width(w);
+        };
+
+        // 切换TOC目录展开收缩的相关操作.
+        const expandedClass = 'expanded';
+        let $tocAside = $('#toc-aside');
+        let $mainContent = $('#main-content');
+        $('#floating-toc-btn .btn-floating').click(function () {
+            if ($tocAside.hasClass(expandedClass)) {
+                $tocAside.removeClass(expandedClass).hide();
+                $mainContent.removeClass('l9');
+            } else {
+                $tocAside.addClass(expandedClass).show();
+                $mainContent.addClass('l9');
+            }
+            fixPostCardWidth('artDetail', 'prenext-posts');
+        });
+        
+    });
+</script>
+
+    
+
+</main>
+
+
+
+
+    <footer class="page-footer bg-color">
+    
+
+    <div class="container row center-align"
+         style="margin-bottom: 0px !important;">
+        <div class="col s12 m8 l8 copy-right">
+            Copyright&nbsp;&copy;
+            
+                <span id="year">2019-2024</span>
+            
+            <a href="/about" target="_blank">安文</a>
+            |&nbsp;Powered by&nbsp;<a href="https://hexo.io/" target="_blank">Hexo</a>
+            |&nbsp;Theme&nbsp;<a href="https://github.com/blinkfox/hexo-theme-matery" target="_blank">Matery</a>
+            
+            <br>
+            
+                &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
+                        class="white-color">35.6k</span>
+            
+            
+            
+                
+            
+            
+                <span id="busuanzi_container_site_pv">
+                &nbsp;|&nbsp;<i class="far fa-eye"></i>&nbsp;总访问量:&nbsp;
+                    <span id="busuanzi_value_site_pv" class="white-color"></span>
+            </span>
+            
+            
+                <span id="busuanzi_container_site_uv">
+                &nbsp;|&nbsp;<i class="fas fa-users"></i>&nbsp;总访问人数:&nbsp;
+                    <span id="busuanzi_value_site_uv" class="white-color"></span>
+            </span>
+            
+            <br>
+
+            <!-- 运行天数提醒. -->
+            
+            <br>
+            
+        </div>
+        <div class="col s12 m4 l4 social-link social-statis">
+    <a href="https://github.com/zanwen" class="tooltipped" target="_blank" data-tooltip="访问我的GitHub" data-position="top" data-delay="50">
+        <i class="fab fa-github"></i>
+    </a>
+
+
+
+    <a href="mailto:872852458@qq.com" class="tooltipped" target="_blank" data-tooltip="邮件联系我" data-position="top" data-delay="50">
+        <i class="fas fa-envelope-open"></i>
+    </a>
+
+
+
+
+
+
+
+    <a href="tencent://AddContact/?fromId=50&fromSubId=1&subcmd=all&uin=872852458" class="tooltipped" target="_blank" data-tooltip="QQ联系我: 872852458" data-position="top" data-delay="50">
+        <i class="fab fa-qq"></i>
+    </a>
+
+
+
+
+
+
+
+    <a href="/atom.xml" class="tooltipped" target="_blank" data-tooltip="RSS 订阅" data-position="top" data-delay="50">
+        <i class="fas fa-rss"></i>
+    </a>
+
+</div>
+    </div>
+</footer>
+
+<div class="progress-bar"></div>
+
+
+    <!-- 搜索遮罩框 -->
+<div id="searchModal" class="modal">
+    <div class="modal-content">
+        <div class="search-header">
+            <span class="title"><i class="fas fa-search"></i>&nbsp;&nbsp;搜索</span>
+            <input type="search" id="searchInput" name="s" placeholder="请输入搜索的关键字"
+                   class="search-input">
+        </div>
+        <div id="searchResult"></div>
+    </div>
+</div>
+
+<script type="text/javascript">
+$(function () {
+    var searchFunc = function (path, search_id, content_id) {
+        'use strict';
+        $.ajax({
+            url: path,
+            dataType: "xml",
+            success: function (xmlResponse) {
+                // get the contents from search data
+                var datas = $("entry", xmlResponse).map(function () {
+                    return {
+                        title: $("title", this).text(),
+                        content: $("content", this).text(),
+                        url: $("url", this).text()
+                    };
+                }).get();
+                var $input = document.getElementById(search_id);
+                var $resultContent = document.getElementById(content_id);
+                $input.addEventListener('input', function () {
+                    var str = '<ul class=\"search-result-list\">';
+                    var keywords = this.value.trim().toLowerCase().split(/[\s\-]+/);
+                    $resultContent.innerHTML = "";
+                    if (this.value.trim().length <= 0) {
+                        return;
+                    }
+                    // perform local searching
+                    datas.forEach(function (data) {
+                        var isMatch = true;
+                        var data_title = data.title.trim().toLowerCase();
+                        var data_content = data.content.trim().replace(/<[^>]+>/g, "").toLowerCase();
+                        var data_url = data.url;
+                        data_url = data_url.indexOf('/') === 0 ? data.url : '/' + data_url;
+                        var index_title = -1;
+                        var index_content = -1;
+                        var first_occur = -1;
+                        // only match artiles with not empty titles and contents
+                        if (data_title !== '' && data_content !== '') {
+                            keywords.forEach(function (keyword, i) {
+                                index_title = data_title.indexOf(keyword);
+                                index_content = data_content.indexOf(keyword);
+                                if (index_title < 0 && index_content < 0) {
+                                    isMatch = false;
+                                } else {
+                                    if (index_content < 0) {
+                                        index_content = 0;
+                                    }
+                                    if (i === 0) {
+                                        first_occur = index_content;
+                                    }
+                                }
+                            });
+                        }
+                        // show search results
+                        if (isMatch) {
+                            str += "<li><a href='" + data_url + "' class='search-result-title'>" + data_title + "</a>";
+                            var content = data.content.trim().replace(/<[^>]+>/g, "");
+                            if (first_occur >= 0) {
+                                // cut out 100 characters
+                                var start = first_occur - 20;
+                                var end = first_occur + 80;
+                                if (start < 0) {
+                                    start = 0;
+                                }
+                                if (start === 0) {
+                                    end = 100;
+                                }
+                                if (end > content.length) {
+                                    end = content.length;
+                                }
+                                var match_content = content.substr(start, end);
+                                // highlight all keywords
+                                keywords.forEach(function (keyword) {
+                                    var regS = new RegExp(keyword, "gi");
+                                    match_content = match_content.replace(regS, "<em class=\"search-keyword\">" + keyword + "</em>");
+                                });
+
+                                str += "<p class=\"search-result\">" + match_content + "...</p>"
+                            }
+                            str += "</li>";
+                        }
+                    });
+                    str += "</ul>";
+                    $resultContent.innerHTML = str;
+                });
+            }
+        });
+    };
+
+    searchFunc('/search.xml', 'searchInput', 'searchResult');
+});
+</script>
+
+    <!-- 白天和黑夜主题 -->
+<div class="stars-con">
+    <div id="stars"></div>
+    <div id="stars2"></div>
+    <div id="stars3"></div>  
+</div>
+
+<script>
+    function switchNightMode() {
+        $('<div class="Cuteen_DarkSky"><div class="Cuteen_DarkPlanet"></div></div>').appendTo($('body')),
+        setTimeout(function () {
+            $('body').hasClass('DarkMode') 
+            ? ($('body').removeClass('DarkMode'), localStorage.setItem('isDark', '0'), $('#sum-moon-icon').removeClass("fa-sun").addClass('fa-moon')) 
+            : ($('body').addClass('DarkMode'), localStorage.setItem('isDark', '1'), $('#sum-moon-icon').addClass("fa-sun").removeClass('fa-moon')),
+            
+            setTimeout(function () {
+            $('.Cuteen_DarkSky').fadeOut(1e3, function () {
+                $(this).remove()
+            })
+            }, 2e3)
+        })
+    }
+</script>
+
+    <!-- 回到顶部按钮 -->
+<div id="backTop" class="top-scroll">
+    <a class="btn-floating btn-large waves-effect waves-light" href="#!">
+        <i class="fas fa-arrow-up"></i>
+    </a>
+</div>
+
+
+    <script src="/libs/materialize/materialize.min.js"></script>
+    <script src="/libs/masonry/masonry.pkgd.min.js"></script>
+    <script src="/libs/aos/aos.js"></script>
+    <script src="/libs/scrollprogress/scrollProgress.min.js"></script>
+    <script src="/libs/lightGallery/js/lightgallery-all.min.js"></script>
+    <script src="/js/matery.js"></script>
+
+    
+
+    
+    
+    
+
+    <!-- 雪花特效 -->
+    
+
+    <!-- 鼠标星星特效 -->
+    
+
+     
+        <script src="https://ssl.captcha.qq.com/TCaptcha.js"></script>
+        <script src="/libs/others/TencentCaptcha.js"></script>
+        <button id="TencentCaptcha" data-appid="xxxxxxxxxx" data-cbfn="callback" type="button" hidden></button>
+    
+
+    <!-- Baidu Analytics -->
+
+    <!-- Baidu Push -->
+
+<script>
+    (function () {
+        var bp = document.createElement('script');
+        var curProtocol = window.location.protocol.split(':')[0];
+        if (curProtocol === 'https') {
+            bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+        } else {
+            bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+        }
+        var s = document.getElementsByTagName("script")[0];
+        s.parentNode.insertBefore(bp, s);
+    })();
+</script>
+
+    
+    <script src="/libs/others/clicklove.js" async="async"></script>
+    
+    
+    <script async src="/libs/others/busuanzi.pure.mini.js"></script>
+    
+
+    
+
+    
+
+    <!--腾讯兔小巢-->
+    
+    
+
+    
+
+    
+
+    
+    <script src="/libs/instantpage/instantpage.js" type="module"></script>
+    
+
+</body>
+
+</html>
