@@ -417,14 +417,14 @@ STM32F103参考手册：rm0008-stm32f101xx-stm32f102xx-">
                 
                 <div class="info-break-policy">
                     <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
-                    4k
+                    6.4k
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-clock fa-fw"></i>阅读时长:&nbsp;&nbsp;
-                    16 分
+                    28 分
                 </div>
                 
 
@@ -530,15 +530,20 @@ SDA_HIGH<span class="token punctuation">;</span><span aria-hidden="true" class="
 <p>t<sub>LOW</sub>和t<sub>HIGH</sub>则要求我们SCL拉高时间至少持续4.7us，拉低时间至少持续4us</p>
 <h3 id="yan-shi-han-shu">延时函数</h3>
 <p>如下我们可以准备一个5us的延时函数（以STM32F103主频72M为例，通过逻辑分析仪调整其延时时间比5us略长即可），作为维持SCL高电平周期、低电平周期的时序控制；并且两者相加后为10us，也符合时钟周期要大于10us的规范</p>
-<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">i2c_delay_2us</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
-    <span class="token class-name">uint16_t</span> i <span class="token operator">=</span> <span class="token number">15</span><span class="token punctuation">;</span>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">i2c_delay_5us</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">volatile</span> <span class="token class-name">uint16_t</span> i <span class="token operator">=</span> <span class="token number">25</span><span class="token punctuation">;</span>
     <span class="token keyword">do</span> <span class="token punctuation">{</span>
         i<span class="token operator">--</span><span class="token punctuation">;</span>
     <span class="token punctuation">}</span> <span class="token keyword">while</span> <span class="token punctuation">(</span>i<span class="token punctuation">)</span><span class="token punctuation">;</span>
-<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<span class="token punctuation">}</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <blockquote>
 <p>[!NOTE]</p>
-<p>如果期望更低的延时，则可以针对4.7us和4us各自实现一个更精准地延时函数。</p>
+<p>这里使用 <code>volatile</code>关键字来禁用编译器优化（例如将 <code>i</code>的值加载到寄存器后在寄存器中自减到0再回写内存），使得每次读写 <code>i</code>都强制访问内存，避免不同优化级别下该函数的延时表现不一致。</p>
+</blockquote>
+<blockquote>
+<p>[!NOTE]</p>
+<p>如果期望更短的延时，则可以针对4.7us和4us各自实现一个更精准地延时函数。</p>
 <p>但对于一般场景来说，没必要优化那一点时间效率，I2C本就是低速通信协议，标准模式下的速度瓶颈为100kHz，这是由设备的电气特性决定的，因此<mark>不用太纠结常数级别的性能优化</mark>（例如将函数延时优化到再靠近 <code>Min</code>值一点）。</p>
 </blockquote>
 <p>由于后续时序控制很多地方会用到延时，为了程序有更好的移植性，我们可以将其定义成宏：</p>
@@ -556,14 +561,14 @@ SDA_HIGH<span class="token punctuation">;</span><span aria-hidden="true" class="
 <span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">i2c_delay_2us</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 
 <span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">i2c_delay_5us</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
-    <span class="token class-name">uint16_t</span> i <span class="token operator">=</span> <span class="token number">40</span><span class="token punctuation">;</span>
+    <span class="token keyword">volatile</span> <span class="token class-name">uint16_t</span> i <span class="token operator">=</span> <span class="token number">25</span><span class="token punctuation">;</span>
     <span class="token keyword">do</span> <span class="token punctuation">{</span>
         i<span class="token operator">--</span><span class="token punctuation">;</span>
     <span class="token punctuation">}</span> <span class="token keyword">while</span> <span class="token punctuation">(</span>i<span class="token punctuation">)</span><span class="token punctuation">;</span>
 <span class="token punctuation">}</span>
 
 <span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">i2c_delay_2us</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
-    <span class="token class-name">uint16_t</span> i <span class="token operator">=</span> <span class="token number">15</span><span class="token punctuation">;</span>
+    <span class="token keyword">volatile</span> <span class="token class-name">uint16_t</span> i <span class="token operator">=</span> <span class="token number">10</span><span class="token punctuation">;</span>
     <span class="token keyword">do</span> <span class="token punctuation">{</span>
         i<span class="token operator">--</span><span class="token punctuation">;</span>
     <span class="token punctuation">}</span> <span class="token keyword">while</span> <span class="token punctuation">(</span>i<span class="token punctuation">)</span><span class="token punctuation">;</span>
@@ -827,14 +832,14 @@ I2C_DELAY<span class="token punctuation">;</span>
 <span class="token punctuation">}</span>
 
 <span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">i2c_delay_5us</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
-    <span class="token class-name">uint16_t</span> i <span class="token operator">=</span> <span class="token number">40</span><span class="token punctuation">;</span>
+    <span class="token keyword">volatile</span> <span class="token class-name">uint16_t</span> i <span class="token operator">=</span> <span class="token number">25</span><span class="token punctuation">;</span>
     <span class="token keyword">do</span> <span class="token punctuation">{</span>
         i<span class="token operator">--</span><span class="token punctuation">;</span>
     <span class="token punctuation">}</span> <span class="token keyword">while</span> <span class="token punctuation">(</span>i<span class="token punctuation">)</span><span class="token punctuation">;</span>
 <span class="token punctuation">}</span>
 
 <span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">i2c_delay_2us</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
-    <span class="token class-name">uint16_t</span> i <span class="token operator">=</span> <span class="token number">15</span><span class="token punctuation">;</span>
+    <span class="token keyword">volatile</span> <span class="token class-name">uint16_t</span> i <span class="token operator">=</span> <span class="token number">10</span><span class="token punctuation">;</span>
     <span class="token keyword">do</span> <span class="token punctuation">{</span>
         i<span class="token operator">--</span><span class="token punctuation">;</span>
     <span class="token punctuation">}</span> <span class="token keyword">while</span> <span class="token punctuation">(</span>i<span class="token punctuation">)</span><span class="token punctuation">;</span>
@@ -863,10 +868,11 @@ I2C_DELAY<span class="token punctuation">;</span>
 <span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <h2 id="fa-song-ack-nack-9-sub-th-sub-clock-cycle">发送ACK/NACK（9<sub>th</sub> Clock Cycle）</h2>
 <p>在第九个时钟周期，主设备需要给从设备响应ACK/NACK，ACK表示需要从设备继续发送数据，NACK则指示从设备停止发送数据（主设备随后发送停止信号结束此次传输）：</p>
-<ul>
+<ol>
 <li>拉低SCL（因为马上要修改SDA），根据响应ACK还是NACK来拉低/拉高SDA，维持一个SCL低电平周期</li>
-<li>拉高SCL（让从设备采样），维持一个SCL高电平周期</li>
-</ul>
+<li>拉高SCL（让从设备采样），维持一个SCL高电平周期（让从设备采样）</li>
+<li><mark>特别注意</mark>：如果是发送ACK，还需要将SDA拉高（当然别忘了修改SDA前先拉低SCL），以释放SDA总线，否则</li>
+</ol>
 <pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token keyword">void</span> <span class="token function">I2C_SendAck</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
     SCL_LOW<span class="token punctuation">;</span>
     SDA_LOW<span class="token punctuation">;</span>
@@ -874,6 +880,9 @@ I2C_DELAY<span class="token punctuation">;</span>
 
     SCL_HIGH<span class="token punctuation">;</span>
     I2C_DELAY<span class="token punctuation">;</span>
+
+    SCL_LOW<span class="token punctuation">;</span>
+    SDA_HIGH<span class="token punctuation">;</span>
 <span class="token punctuation">}</span>
 
 <span class="token keyword">void</span> <span class="token function">I2C_SendNAck</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
@@ -883,7 +892,7 @@ I2C_DELAY<span class="token punctuation">;</span>
 
     SCL_HIGH<span class="token punctuation">;</span>
     I2C_DELAY<span class="token punctuation">;</span>
-<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <h2 id="du-eeprom-ce-shi">读EEPROM测试</h2>
 <ol>
 <li>假写（dummy write）
@@ -967,6 +976,9 @@ I2C_DELAY<span class="token punctuation">;</span>
 
     SCL_HIGH<span class="token punctuation">;</span>
     I2C_DELAY<span class="token punctuation">;</span>
+
+    SCL_LOW<span class="token punctuation">;</span>
+    SDA_HIGH<span class="token punctuation">;</span>
 <span class="token punctuation">}</span>
 
 <span class="token keyword">void</span> <span class="token function">I2C_SendNAck</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
@@ -1054,19 +1066,19 @@ I2C_DELAY<span class="token punctuation">;</span>
 <span class="token punctuation">}</span>
 
 <span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">i2c_delay_5us</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
-    <span class="token class-name">uint16_t</span> i <span class="token operator">=</span> <span class="token number">40</span><span class="token punctuation">;</span>
+    <span class="token keyword">volatile</span> <span class="token class-name">uint16_t</span> i <span class="token operator">=</span> <span class="token number">25</span><span class="token punctuation">;</span>
     <span class="token keyword">do</span> <span class="token punctuation">{</span>
         i<span class="token operator">--</span><span class="token punctuation">;</span>
     <span class="token punctuation">}</span> <span class="token keyword">while</span> <span class="token punctuation">(</span>i<span class="token punctuation">)</span><span class="token punctuation">;</span>
 <span class="token punctuation">}</span>
 
 <span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">i2c_delay_2us</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
-    <span class="token class-name">uint16_t</span> i <span class="token operator">=</span> <span class="token number">15</span><span class="token punctuation">;</span>
+    <span class="token keyword">volatile</span> <span class="token class-name">uint16_t</span> i <span class="token operator">=</span> <span class="token number">10</span><span class="token punctuation">;</span>
     <span class="token keyword">do</span> <span class="token punctuation">{</span>
         i<span class="token operator">--</span><span class="token punctuation">;</span>
     <span class="token punctuation">}</span> <span class="token keyword">while</span> <span class="token punctuation">(</span>i<span class="token punctuation">)</span><span class="token punctuation">;</span>
 <span class="token punctuation">}</span>
-<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <h2 id="tuo-zhan-shang-sheng-yan-xia-jiang-yan-shi-jian">拓展：上升沿/下降沿时间</h2>
 <img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241201195756988.png" alt="image-20241201195756988" style="zoom: 33%;">
 <p>该参数描述的是引脚高低电平跳变（或者说转变/过度，transition）时间，需要查看MCU数据手册中关于IO口电气特性相关的描述：</p>
@@ -1078,6 +1090,199 @@ GPIOB-&gt;CRH |= (GPIO_CRH_CNF10_0 | GPIO_CRH_CNF11_0);<span aria-hidden="true" 
 <p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241201200530058.png" alt="image-20241201200530058"></p>
 <p>我们配置的的是最大输出模式，因此满足I2C的条件</p>
 <p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241201195656068.png" alt="image-20241201195656068"></p>
+<h2 id="wan-zheng-dai-ma">完整代码</h2>
+<h3 id="i-2-c-soft-h">i2c_soft.h</h3>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">"stm32f10x.h"</span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">"delay.h"</span></span>
+
+<span class="token keyword">void</span> <span class="token function">I2C_Init</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token keyword">void</span> <span class="token function">I2C_Start</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token keyword">void</span> <span class="token function">I2C_Stop</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token keyword">void</span> <span class="token function">I2C_SendAck</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token keyword">void</span> <span class="token function">I2C_SendNAck</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token class-name">uint8_t</span> <span class="token function">I2C_WaitAck</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token keyword">void</span> <span class="token function">I2C_SendByte</span><span class="token punctuation">(</span><span class="token class-name">uint8_t</span> data<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token class-name">uint8_t</span> <span class="token function">I2C_ReceiveByte</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token keyword">void</span> <span class="token function">I2C_Test</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<h3 id="i-2-c-soft-c">i2c_soft.c</h3>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">"i2c_soft.h"</span></span>
+
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name">SCL_HIGH</span> <span class="token expression"><span class="token punctuation">(</span>GPIOB<span class="token operator">-&gt;</span>ODR <span class="token operator">|=</span> GPIO_ODR_ODR10<span class="token punctuation">)</span></span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name">SCL_LOW</span> <span class="token expression"><span class="token punctuation">(</span>GPIOB<span class="token operator">-&gt;</span>ODR <span class="token operator">&amp;=</span> <span class="token operator">~</span>GPIO_ODR_ODR10<span class="token punctuation">)</span></span></span>
+
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name">SDA_HIGH</span> <span class="token expression"><span class="token punctuation">(</span>GPIOB<span class="token operator">-&gt;</span>ODR <span class="token operator">|=</span> GPIO_ODR_ODR11<span class="token punctuation">)</span></span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name">SDA_LOW</span> <span class="token expression"><span class="token punctuation">(</span>GPIOB<span class="token operator">-&gt;</span>ODR <span class="token operator">&amp;=</span> <span class="token operator">~</span>GPIO_ODR_ODR11<span class="token punctuation">)</span></span></span>
+
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name">READ_SDA</span> <span class="token expression"><span class="token punctuation">(</span><span class="token punctuation">(</span>GPIOB<span class="token operator">-&gt;</span>IDR <span class="token operator">&amp;</span> GPIO_IDR_IDR11<span class="token punctuation">)</span> <span class="token operator">?</span> <span class="token number">1</span> <span class="token operator">:</span> <span class="token number">0</span><span class="token punctuation">)</span></span></span>
+
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name">STANDARD_MODE</span> <span class="token expression"><span class="token number">0</span></span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name">FAST_MODE</span> <span class="token expression"><span class="token number">1</span></span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name">I2C_MODE</span> <span class="token expression">FAST_MODE</span></span>
+
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">if</span> <span class="token expression"><span class="token punctuation">(</span>I2C_MODE <span class="token operator">==</span> STANDARD_MODE<span class="token punctuation">)</span></span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name">I2C_DELAY</span> <span class="token expression"><span class="token function">i2c_delay_5us</span><span class="token punctuation">(</span><span class="token punctuation">)</span></span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">elif</span> <span class="token expression"><span class="token punctuation">(</span>I2C_MODE <span class="token operator">==</span> FAST_MODE<span class="token punctuation">)</span></span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name">I2C_DELAY</span> <span class="token expression"><span class="token function">i2c_delay_2us</span><span class="token punctuation">(</span><span class="token punctuation">)</span></span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">endif</span></span>
+
+<span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">i2c_delay_5us</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">i2c_delay_2us</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token keyword">void</span> <span class="token function">I2C_Init</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token comment">// 1. GPIO时钟配置</span>
+    RCC<span class="token operator">-&gt;</span>APB2ENR <span class="token operator">|=</span> RCC_APB2ENR_IOPBEN<span class="token punctuation">;</span>
+    
+    <span class="token comment">// 2. 配置GPIO工作模式为通用开漏输出 mode=11 cnf=01</span>
+    GPIOB<span class="token operator">-&gt;</span>CRH <span class="token operator">|=</span> <span class="token punctuation">(</span>GPIO_CRH_MODE10 <span class="token operator">|</span> GPIO_CRH_MODE11<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    GPIOB<span class="token operator">-&gt;</span>CRH <span class="token operator">&amp;=</span> <span class="token operator">~</span><span class="token punctuation">(</span>GPIO_CRH_CNF10_1 <span class="token operator">|</span> GPIO_CRH_CNF11_1<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    GPIOB<span class="token operator">-&gt;</span>CRH <span class="token operator">|=</span> <span class="token punctuation">(</span>GPIO_CRH_CNF10_0 <span class="token operator">|</span> GPIO_CRH_CNF11_0<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token comment">// 3. 总线空闲状态时，默认高电平</span>
+    SCL_HIGH<span class="token punctuation">;</span>
+    SDA_HIGH<span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">void</span> <span class="token function">I2C_Start</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token comment">// 1. SCL, SDA拉高，并维持start建立时间（for repeated start and bus free time）</span>
+    SCL_HIGH<span class="token punctuation">;</span>
+    SDA_HIGH<span class="token punctuation">;</span>
+    I2C_DELAY<span class="token punctuation">;</span>
+
+    <span class="token comment">// 2. SDA拉低，并维持start保持时间</span>
+    SDA_LOW<span class="token punctuation">;</span>
+    I2C_DELAY<span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">void</span> <span class="token function">I2C_Stop</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    SCL_LOW<span class="token punctuation">;</span>
+    SDA_LOW<span class="token punctuation">;</span>
+    I2C_DELAY<span class="token punctuation">;</span>
+
+    SCL_HIGH<span class="token punctuation">;</span>
+    I2C_DELAY<span class="token punctuation">;</span>
+
+    SDA_HIGH<span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">void</span> <span class="token function">I2C_SendAck</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    SCL_LOW<span class="token punctuation">;</span>
+    SDA_LOW<span class="token punctuation">;</span>
+    I2C_DELAY<span class="token punctuation">;</span>
+
+    SCL_HIGH<span class="token punctuation">;</span>
+    I2C_DELAY<span class="token punctuation">;</span>
+
+    SCL_LOW<span class="token punctuation">;</span>
+    SDA_HIGH<span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">void</span> <span class="token function">I2C_SendNAck</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    SCL_LOW<span class="token punctuation">;</span>
+    SDA_HIGH<span class="token punctuation">;</span>
+    I2C_DELAY<span class="token punctuation">;</span>
+
+    SCL_HIGH<span class="token punctuation">;</span>
+    I2C_DELAY<span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token class-name">uint8_t</span> <span class="token function">I2C_WaitAck</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    SCL_LOW<span class="token punctuation">;</span>
+    SDA_HIGH<span class="token punctuation">;</span> <span class="token comment">// release bus</span>
+    I2C_DELAY<span class="token punctuation">;</span>
+
+    SCL_HIGH<span class="token punctuation">;</span>
+    I2C_DELAY<span class="token punctuation">;</span>
+
+    <span class="token class-name">uint8_t</span> ack <span class="token operator">=</span> READ_SDA<span class="token punctuation">;</span>
+
+    SCL_LOW<span class="token punctuation">;</span>
+    I2C_DELAY<span class="token punctuation">;</span>
+
+    <span class="token keyword">return</span> ack<span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">void</span> <span class="token function">I2C_SendByte</span><span class="token punctuation">(</span><span class="token class-name">uint8_t</span> data<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token class-name">uint8_t</span> i <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
+    <span class="token keyword">for</span> <span class="token punctuation">(</span>i <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span> i <span class="token operator">&lt;</span> <span class="token number">8</span><span class="token punctuation">;</span> i<span class="token operator">++</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        SCL_LOW<span class="token punctuation">;</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>data <span class="token operator">&amp;</span> <span class="token number">0x80</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            SDA_HIGH<span class="token punctuation">;</span>
+        <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
+            SDA_LOW<span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+        data <span class="token operator">&lt;&lt;=</span> <span class="token number">1</span><span class="token punctuation">;</span>
+        I2C_DELAY<span class="token punctuation">;</span>
+
+        SCL_HIGH<span class="token punctuation">;</span>
+        I2C_DELAY<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+
+<span class="token class-name">uint8_t</span> <span class="token function">I2C_ReceiveByte</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token class-name">uint8_t</span> i <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
+    <span class="token class-name">uint8_t</span> data <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
+    <span class="token keyword">for</span> <span class="token punctuation">(</span>i <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span> i <span class="token operator">&lt;</span> <span class="token number">8</span><span class="token punctuation">;</span> i<span class="token operator">++</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        SCL_LOW<span class="token punctuation">;</span>
+        I2C_DELAY<span class="token punctuation">;</span>
+
+        SCL_HIGH<span class="token punctuation">;</span>
+        I2C_DELAY<span class="token punctuation">;</span>
+        data <span class="token operator">&lt;&lt;=</span> <span class="token number">1</span><span class="token punctuation">;</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>READ_SDA<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            data <span class="token operator">|=</span> <span class="token number">0x01</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+    <span class="token keyword">return</span> data<span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">void</span> <span class="token function">I2C_Test</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token function">I2C_Start</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">I2C_SendByte</span><span class="token punctuation">(</span><span class="token number">0xA0</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">I2C_WaitAck</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">I2C_SendByte</span><span class="token punctuation">(</span><span class="token number">0x0</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">I2C_WaitAck</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">I2C_SendByte</span><span class="token punctuation">(</span><span class="token char">'a'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">I2C_WaitAck</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">I2C_Stop</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token function">delay_ms</span><span class="token punctuation">(</span><span class="token number">5</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token function">I2C_Start</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">I2C_SendByte</span><span class="token punctuation">(</span><span class="token number">0xA0</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">I2C_WaitAck</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">I2C_SendByte</span><span class="token punctuation">(</span><span class="token number">0x0</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">I2C_WaitAck</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">I2C_Start</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">I2C_SendByte</span><span class="token punctuation">(</span><span class="token number">0xA0</span> <span class="token operator">+</span> <span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">I2C_WaitAck</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">I2C_ReceiveByte</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">I2C_SendNAck</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">I2C_Stop</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">i2c_delay_5us</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">volatile</span> <span class="token class-name">uint16_t</span> i <span class="token operator">=</span> <span class="token number">25</span><span class="token punctuation">;</span>
+    <span class="token keyword">do</span> <span class="token punctuation">{</span>
+        i<span class="token operator">--</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span> <span class="token keyword">while</span> <span class="token punctuation">(</span>i<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">i2c_delay_2us</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">volatile</span> <span class="token class-name">uint16_t</span> i <span class="token operator">=</span> <span class="token number">10</span><span class="token punctuation">;</span>
+    <span class="token keyword">do</span> <span class="token punctuation">{</span>
+        i<span class="token operator">--</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span> <span class="token keyword">while</span> <span class="token punctuation">(</span>i<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <h1 id="eerom-mc-24-c-02">EEROM(MC24C02)</h1>
 <h2 id="te-xing">特性</h2>
 <ul>
@@ -1108,6 +1313,99 @@ GPIOB-&gt;CRH |= (GPIO_CRH_CNF10_0 | GPIO_CRH_CNF11_0);<span aria-hidden="true" 
 <h2 id="du-xie-cao-zuo">读/写操作</h2>
 <p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241201201953699.png" alt="image-20241201201953699"></p>
 <p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241201202011850.png" alt="image-20241201202011850"></p>
+<h2 id="mo-kuai-feng-zhuang">模块封装</h2>
+<h3 id="m-24-c-02-h">m24c02.h</h3>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">ifndef</span> <span class="token expression">__M24C02_H__</span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name">__M24C02_H__</span></span>
+
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">"i2c_soft.h"</span></span>
+
+<span class="token keyword">void</span> <span class="token function">M24C02_Init</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token keyword">void</span> <span class="token function">M24C02_WriteByte</span><span class="token punctuation">(</span><span class="token class-name">uint8_t</span> addr<span class="token punctuation">,</span> <span class="token class-name">uint8_t</span> byte<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">void</span> <span class="token function">M24C02_WriteBytes</span><span class="token punctuation">(</span><span class="token class-name">uint8_t</span> addr<span class="token punctuation">,</span> <span class="token class-name">uint8_t</span> <span class="token operator">*</span>bytes<span class="token punctuation">,</span> <span class="token class-name">uint8_t</span> size<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token class-name">uint8_t</span> <span class="token function">M24C02_ReadByte</span><span class="token punctuation">(</span><span class="token class-name">uint8_t</span> addr<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">void</span> <span class="token function">M24C02_ReadBytes</span><span class="token punctuation">(</span><span class="token class-name">uint8_t</span> addr<span class="token punctuation">,</span> <span class="token class-name">uint8_t</span> <span class="token operator">*</span>bytes<span class="token punctuation">,</span> <span class="token class-name">uint8_t</span> size<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">void</span> <span class="token function">M24C02_Test</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">endif</span> <span class="token comment">/* __M24C02_H__ */</span></span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<h3 id="m-24-c-02-c">m24c02.c</h3>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">"m24c02.h"</span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">"logger.h"</span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">"string.h"</span></span>
+
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name">DEV_ADDR_W</span> <span class="token expression"><span class="token number">0xA0</span></span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name">DEV_ADDR_R</span> <span class="token expression"><span class="token number">0xA1</span></span></span>
+
+<span class="token keyword">void</span> <span class="token function">M24C02_Init</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span> <span class="token punctuation">{</span> <span class="token function">I2C_Init</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token punctuation">}</span>
+
+<span class="token keyword">void</span> <span class="token function">M24C02_WriteByte</span><span class="token punctuation">(</span><span class="token class-name">uint8_t</span> addr<span class="token punctuation">,</span> <span class="token class-name">uint8_t</span> byte<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token function">M24C02_WriteBytes</span><span class="token punctuation">(</span>addr<span class="token punctuation">,</span> <span class="token operator">&amp;</span>byte<span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+<span class="token keyword">void</span> <span class="token function">M24C02_WriteBytes</span><span class="token punctuation">(</span><span class="token class-name">uint8_t</span> addr<span class="token punctuation">,</span> <span class="token class-name">uint8_t</span> <span class="token operator">*</span>bytes<span class="token punctuation">,</span> <span class="token class-name">uint8_t</span> size<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token function">I2C_Start</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">I2C_SendByte</span><span class="token punctuation">(</span>DEV_ADDR_W<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">I2C_WaitAck</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">I2C_SendByte</span><span class="token punctuation">(</span>addr<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">I2C_WaitAck</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">for</span> <span class="token punctuation">(</span><span class="token class-name">uint8_t</span> i <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span> i <span class="token operator">&lt;</span> size<span class="token punctuation">;</span> i<span class="token operator">++</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token function">I2C_SendByte</span><span class="token punctuation">(</span>bytes<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token function">I2C_WaitAck</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token function">I2C_Stop</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">delay_ms</span><span class="token punctuation">(</span><span class="token number">5</span><span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment">// wait for write cycle</span>
+<span class="token punctuation">}</span>
+
+<span class="token class-name">uint8_t</span> <span class="token function">M24C02_ReadByte</span><span class="token punctuation">(</span><span class="token class-name">uint8_t</span> addr<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token class-name">uint8_t</span> byte <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
+    <span class="token function">M24C02_ReadBytes</span><span class="token punctuation">(</span>addr<span class="token punctuation">,</span> <span class="token operator">&amp;</span>byte<span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">return</span> byte<span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">void</span> <span class="token function">M24C02_ReadBytes</span><span class="token punctuation">(</span><span class="token class-name">uint8_t</span> addr<span class="token punctuation">,</span> <span class="token class-name">uint8_t</span> <span class="token operator">*</span>bytes<span class="token punctuation">,</span> <span class="token class-name">uint8_t</span> size<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token function">I2C_Start</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">I2C_SendByte</span><span class="token punctuation">(</span>DEV_ADDR_W<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">I2C_WaitAck</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">I2C_SendByte</span><span class="token punctuation">(</span>addr<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">I2C_WaitAck</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token function">I2C_Start</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">I2C_SendByte</span><span class="token punctuation">(</span>DEV_ADDR_R<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">I2C_WaitAck</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">for</span> <span class="token punctuation">(</span><span class="token class-name">uint8_t</span> i <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span> i <span class="token operator">&lt;</span> size<span class="token punctuation">;</span> i<span class="token operator">++</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        bytes<span class="token punctuation">[</span>i<span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token function">I2C_ReceiveByte</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>i <span class="token operator">==</span> size <span class="token operator">-</span> <span class="token number">1</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token function">I2C_SendNAck</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
+            <span class="token function">I2C_SendAck</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token function">I2C_Stop</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">void</span> <span class="token function">M24C02_Test</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token function">M24C02_WriteByte</span><span class="token punctuation">(</span><span class="token number">0x00</span><span class="token punctuation">,</span> <span class="token char">'a'</span> <span class="token operator">-</span> <span class="token number">32</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">M24C02_WriteByte</span><span class="token punctuation">(</span><span class="token number">0x01</span><span class="token punctuation">,</span> <span class="token char">'b'</span> <span class="token operator">-</span> <span class="token number">32</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">M24C02_WriteByte</span><span class="token punctuation">(</span><span class="token number">0x02</span><span class="token punctuation">,</span> <span class="token char">'c'</span> <span class="token operator">-</span> <span class="token number">32</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token class-name">uint8_t</span> b1 <span class="token operator">=</span> <span class="token function">M24C02_ReadByte</span><span class="token punctuation">(</span><span class="token number">0x00</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token class-name">uint8_t</span> b2 <span class="token operator">=</span> <span class="token function">M24C02_ReadByte</span><span class="token punctuation">(</span><span class="token number">0x01</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token class-name">uint8_t</span> b3 <span class="token operator">=</span> <span class="token function">M24C02_ReadByte</span><span class="token punctuation">(</span><span class="token number">0x02</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">LOG_DEBUG</span><span class="token punctuation">(</span><span class="token string">"b1 = %d, b2 = %d, b3 = %d"</span><span class="token punctuation">,</span> b1<span class="token punctuation">,</span> b2<span class="token punctuation">,</span> b3<span class="token punctuation">)</span>
+    
+    <span class="token function">M24C02_WriteBytes</span><span class="token punctuation">(</span><span class="token number">0x00</span><span class="token punctuation">,</span> <span class="token string">"56789"</span><span class="token punctuation">,</span> <span class="token number">5</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token class-name">uint8_t</span> buffer<span class="token punctuation">[</span><span class="token number">100</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token punctuation">{</span><span class="token number">0</span><span class="token punctuation">}</span><span class="token punctuation">;</span>
+    <span class="token function">M24C02_ReadBytes</span><span class="token punctuation">(</span><span class="token number">0x00</span><span class="token punctuation">,</span> buffer<span class="token punctuation">,</span> <span class="token number">5</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">LOG_DEBUG</span><span class="token punctuation">(</span><span class="token string">"buffer = %s"</span><span class="token punctuation">,</span> buffer<span class="token punctuation">)</span>
+
+    <span class="token function">memset</span><span class="token punctuation">(</span>buffer<span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token keyword">sizeof</span><span class="token punctuation">(</span>buffer<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+	<span class="token function">M24C02_WriteBytes</span><span class="token punctuation">(</span><span class="token number">0x00</span><span class="token punctuation">,</span> <span class="token string">"1234567890abcdefghijk"</span><span class="token punctuation">,</span> <span class="token number">21</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+	<span class="token function">M24C02_ReadBytes</span><span class="token punctuation">(</span><span class="token number">0x00</span><span class="token punctuation">,</span> buffer<span class="token punctuation">,</span> <span class="token number">21</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+	<span class="token function">LOG_DEBUG</span><span class="token punctuation">(</span><span class="token string">"buffer = %s"</span><span class="token punctuation">,</span> buffer<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <h1 id="yi-liu-wen-ti">遗留问题</h1>
 <h2 id="di-ta-ding-shi-qi-yan-shi-chao-chang-wen-ti">嘀嗒定时器延时超长问题</h2>
 <blockquote>
@@ -1139,6 +1437,473 @@ GPIOB-&gt;CRH |= (GPIO_CRH_CNF10_0 | GPIO_CRH_CNF11_0);<span aria-hidden="true" 
 <img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241201161925160.png" alt="image-20241201161925160" style="zoom:33%;">
 <p>并且前者直接导致I2C通信无法走通（只有 <code>start</code>），而后者可以：</p>
 <p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241201162331212.png" alt="image-20241201162331212"></p>
+<h1 id="cu-yan-shi-ban-ben-can-kao-dai-ma">粗延时版本参考代码</h1>
+<blockquote>
+<p>[!NOTE]</p>
+<p>该版本代码在每个SCL/SDA状态变更节点都进行足够长的延时来稳定信号，并增加冗余延时来确保时序的正确性，例如每个节点都延时10us、冗余拉低SCL等。这样做的好处就是不用精细分析/把控I2C规范中各个阶段对SCL/SDA的时序限制（例如建立时间最少为xxx，维持时间至少为xxx，等等），大大简化了开发流程，但会消耗一定性能。</p>
+<p>由于I2C本身就是一种低速通信协议，协议本身规范了传输速度瓶颈（例如标准模式100kHz），即使更精细一点控制延时，也只能带来常数级别的性能提升，所以如果不是有特定的需求，建议优先考虑粗延时版本的实现（开发流程简单，功能更加稳定，容易排查错误）。</p>
+<p>以下是精准延时和粗延时的性能对比</p>
+</blockquote>
+<h2 id="biao-zhun-mo-shi-jing-zhun-yan-shi">标准模式-精准延时</h2>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241201224438177.png" alt="image-20241201224438177"></p>
+<h2 id="biao-zhun-mo-shi-cu-yan-shi">标准模式-粗延时</h2>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241201224556682.png" alt="image-20241201224556682"></p>
+<h2 id="i-2-c-h">i2c.h</h2>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">ifndef</span> <span class="token expression">__I2C_H</span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name">__I2C_H</span></span>
+
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">"stm32f10x.h"</span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">"delay.h"</span></span>
+
+<span class="token comment">// 宏定义</span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name">ACK</span> <span class="token expression"><span class="token number">0</span></span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name">NACK</span> <span class="token expression"><span class="token number">1</span></span></span>
+
+<span class="token comment">// 控制SCL、SDA的输出高低电平</span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name">SCL_HIGH</span> <span class="token expression"><span class="token punctuation">(</span>GPIOB<span class="token operator">-&gt;</span>ODR <span class="token operator">|=</span> GPIO_ODR_ODR10<span class="token punctuation">)</span></span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name">SCL_LOW</span> <span class="token expression"><span class="token punctuation">(</span>GPIOB<span class="token operator">-&gt;</span>ODR <span class="token operator">&amp;=</span> <span class="token operator">~</span>GPIO_ODR_ODR10<span class="token punctuation">)</span></span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name">SDA_HIGH</span> <span class="token expression"><span class="token punctuation">(</span>GPIOB<span class="token operator">-&gt;</span>ODR <span class="token operator">|=</span> GPIO_ODR_ODR11<span class="token punctuation">)</span></span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name">SDA_LOW</span> <span class="token expression"><span class="token punctuation">(</span>GPIOB<span class="token operator">-&gt;</span>ODR <span class="token operator">&amp;=</span> <span class="token operator">~</span>GPIO_ODR_ODR11<span class="token punctuation">)</span></span></span>
+
+<span class="token comment">// 读取操作</span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name">READ_SDA</span> <span class="token expression"><span class="token punctuation">(</span>GPIOB<span class="token operator">-&gt;</span>IDR <span class="token operator">&amp;</span> GPIO_IDR_IDR11<span class="token punctuation">)</span></span></span>
+
+<span class="token comment">// 定义操作的基本延迟</span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name">I2C_DELAY</span> <span class="token expression"><span class="token function">Delay_us</span><span class="token punctuation">(</span><span class="token number">10</span><span class="token punctuation">)</span></span></span>
+
+<span class="token comment">// 初始化</span>
+<span class="token keyword">void</span> <span class="token function">I2C_Init</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token comment">// 发出起始信号</span>
+<span class="token keyword">void</span> <span class="token function">I2C_Start</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token comment">// 发出停止信号</span>
+<span class="token keyword">void</span> <span class="token function">I2C_Stop</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token comment">// 主机发出应答信号</span>
+<span class="token keyword">void</span> <span class="token function">I2C_Ack</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token comment">// 主机发出非应答信号</span>
+<span class="token keyword">void</span> <span class="token function">I2C_Nack</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token comment">// 主机等待从设备发来应答信号</span>
+<span class="token class-name">uint8_t</span> <span class="token function">I2C_Wait4Ack</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token comment">// 主机发送一个字节的数据（写入）</span>
+<span class="token keyword">void</span> <span class="token function">I2C_SendByte</span><span class="token punctuation">(</span><span class="token class-name">uint8_t</span> byte<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token comment">// 主机从EEPROM接收一个字节的数据（读取）</span>
+<span class="token class-name">uint8_t</span> <span class="token function">I2C_ReadByte</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">endif</span></span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<h2 id="i-2-c-c">i2c.c</h2>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">"i2c.h"</span></span>
+
+<span class="token comment">// 初始化</span>
+<span class="token keyword">void</span> <span class="token function">I2C_Init</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+    <span class="token comment">// 1. 配置时钟</span>
+    RCC<span class="token operator">-&gt;</span>APB2ENR <span class="token operator">|=</span> RCC_APB2ENR_IOPBEN<span class="token punctuation">;</span>
+
+    <span class="token comment">// 2. GPIO工作模式配置：通用开漏输出 CNF-01，MODE-11</span>
+    GPIOB<span class="token operator">-&gt;</span>CRH <span class="token operator">|=</span> <span class="token punctuation">(</span>GPIO_CRH_MODE10 <span class="token operator">|</span> GPIO_CRH_MODE11<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    GPIOB<span class="token operator">-&gt;</span>CRH <span class="token operator">&amp;=</span> <span class="token operator">~</span><span class="token punctuation">(</span>GPIO_CRH_CNF10_1 <span class="token operator">|</span> GPIO_CRH_CNF11_1<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    GPIOB<span class="token operator">-&gt;</span>CRH <span class="token operator">|=</span> <span class="token punctuation">(</span>GPIO_CRH_CNF10_0 <span class="token operator">|</span> GPIO_CRH_CNF11_0<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token comment">// 发出起始信号</span>
+<span class="token keyword">void</span> <span class="token function">I2C_Start</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+    <span class="token comment">// 1. SCL拉高，SDA拉高</span>
+    SCL_HIGH<span class="token punctuation">;</span>
+    SDA_HIGH<span class="token punctuation">;</span>
+    I2C_DELAY<span class="token punctuation">;</span>
+
+    <span class="token comment">// 2. SCL保持不变，SDA拉低</span>
+    SDA_LOW<span class="token punctuation">;</span>
+    I2C_DELAY<span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token comment">// 发出停止信号</span>
+<span class="token keyword">void</span> <span class="token function">I2C_Stop</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+    <span class="token comment">// 1. SCL拉高，SDA拉低</span>
+    SCL_HIGH<span class="token punctuation">;</span>
+    SDA_LOW<span class="token punctuation">;</span>
+    I2C_DELAY<span class="token punctuation">;</span>
+
+    <span class="token comment">// 2. SCL保持不变，SDA拉高</span>
+    SDA_HIGH<span class="token punctuation">;</span>
+    I2C_DELAY<span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token comment">// 主机发出应答信号</span>
+<span class="token keyword">void</span> <span class="token function">I2C_Ack</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+    <span class="token comment">// 1. SCL拉低，SDA拉高，准备发出信号</span>
+    SCL_LOW<span class="token punctuation">;</span>
+    SDA_HIGH<span class="token punctuation">;</span>
+    I2C_DELAY<span class="token punctuation">;</span>
+
+    <span class="token comment">// 2. SCL保持不变，SDA拉低，输出应答</span>
+    SDA_LOW<span class="token punctuation">;</span>
+    I2C_DELAY<span class="token punctuation">;</span>
+
+    <span class="token comment">// 3. SDA保持不变，SCL拉高，开始数据线上信号采样</span>
+    SCL_HIGH<span class="token punctuation">;</span>
+    I2C_DELAY<span class="token punctuation">;</span>
+
+    <span class="token comment">// 4. SDA保持不变，SCL拉低，结束数据线上信号采样</span>
+    SCL_LOW<span class="token punctuation">;</span>
+    I2C_DELAY<span class="token punctuation">;</span>
+
+    <span class="token comment">// 5. SDA拉高，释放数据总线</span>
+    SDA_HIGH<span class="token punctuation">;</span>
+    I2C_DELAY<span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token comment">// 主机发出非应答信号</span>
+<span class="token keyword">void</span> <span class="token function">I2C_Nack</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+    <span class="token comment">// 1. SCL拉低，SDA拉高，准备发出信号</span>
+    SCL_LOW<span class="token punctuation">;</span>
+    SDA_HIGH<span class="token punctuation">;</span>
+    I2C_DELAY<span class="token punctuation">;</span>
+
+    <span class="token comment">// 2. SDA保持不变，SCL拉高，开始数据线上信号采样</span>
+    SCL_HIGH<span class="token punctuation">;</span>
+    I2C_DELAY<span class="token punctuation">;</span>
+
+    <span class="token comment">// 3. SDA保持不变，SCL拉低，结束数据线上信号采样</span>
+    SCL_LOW<span class="token punctuation">;</span>
+    I2C_DELAY<span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token comment">// 主机等待从设备发来应答信号</span>
+<span class="token class-name">uint8_t</span> <span class="token function">I2C_Wait4Ack</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+    <span class="token comment">// 1. SCL拉低，SDA拉高，释放数据总线</span>
+    SCL_LOW<span class="token punctuation">;</span>
+    SDA_HIGH<span class="token punctuation">;</span>
+    I2C_DELAY<span class="token punctuation">;</span>
+
+    <span class="token comment">// 2. SCL拉高，开始数据采样</span>
+    SCL_HIGH<span class="token punctuation">;</span>
+    I2C_DELAY<span class="token punctuation">;</span>
+
+    <span class="token comment">// 3. 读取SDA数据线上的电平</span>
+    <span class="token class-name">uint16_t</span> ack <span class="token operator">=</span> READ_SDA<span class="token punctuation">;</span>
+
+    <span class="token comment">// 4. SCL拉低，结束数据采样</span>
+    SCL_LOW<span class="token punctuation">;</span>
+    I2C_DELAY<span class="token punctuation">;</span>
+
+    <span class="token keyword">return</span> ack <span class="token operator">?</span> NACK <span class="token operator">:</span> ACK<span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token comment">// 主机发送一个字节的数据（写入）</span>
+<span class="token keyword">void</span> <span class="token function">I2C_SendByte</span><span class="token punctuation">(</span><span class="token class-name">uint8_t</span> byte<span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+    <span class="token keyword">for</span> <span class="token punctuation">(</span><span class="token class-name">uint8_t</span> i <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span> i <span class="token operator">&lt;</span> <span class="token number">8</span><span class="token punctuation">;</span> i<span class="token operator">++</span><span class="token punctuation">)</span>
+    <span class="token punctuation">{</span>
+        <span class="token comment">// 1. SCL、SDA都拉低，等待数据翻转</span>
+        SCL_LOW<span class="token punctuation">;</span>
+        SDA_LOW<span class="token punctuation">;</span>
+        I2C_DELAY<span class="token punctuation">;</span>
+
+        <span class="token comment">// 2. 取字节的最高位，向SDA写入数据</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>byte <span class="token operator">&amp;</span> <span class="token number">0x80</span><span class="token punctuation">)</span>
+        <span class="token punctuation">{</span>
+            SDA_HIGH<span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+        <span class="token keyword">else</span>
+        <span class="token punctuation">{</span>
+            SDA_LOW<span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+        I2C_DELAY<span class="token punctuation">;</span>
+
+        <span class="token comment">// 3. SCL拉高，数据采样</span>
+        SCL_HIGH<span class="token punctuation">;</span>
+        I2C_DELAY<span class="token punctuation">;</span>
+
+        <span class="token comment">// 4. SCL拉低，采样结束</span>
+        SCL_LOW<span class="token punctuation">;</span>
+        I2C_DELAY<span class="token punctuation">;</span>
+
+        <span class="token comment">// 5. 左移1位</span>
+        byte <span class="token operator">&lt;&lt;=</span> <span class="token number">1</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>  
+<span class="token punctuation">}</span>
+
+<span class="token comment">// 主机从EEPROM接收一个字节的数据（读取）</span>
+<span class="token class-name">uint8_t</span> <span class="token function">I2C_ReadByte</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+    <span class="token comment">// 定义一个变量，用来保存接收的数据</span>
+    <span class="token class-name">uint8_t</span> data <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
+
+    <span class="token comment">// 循环处理每一位</span>
+    <span class="token keyword">for</span> <span class="token punctuation">(</span><span class="token class-name">uint8_t</span> i <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span> i <span class="token operator">&lt;</span> <span class="token number">8</span><span class="token punctuation">;</span> i<span class="token operator">++</span><span class="token punctuation">)</span>
+    <span class="token punctuation">{</span>
+        <span class="token comment">// 1. SCL拉低，等待数据翻转</span>
+        SCL_LOW<span class="token punctuation">;</span>
+        I2C_DELAY<span class="token punctuation">;</span>
+
+        <span class="token comment">// 2. SCL拉高，开始采样</span>
+        SCL_HIGH<span class="token punctuation">;</span>
+        I2C_DELAY<span class="token punctuation">;</span>
+
+        <span class="token comment">// 3. 数据采样，读取SDA</span>
+        data <span class="token operator">&lt;&lt;=</span> <span class="token number">1</span><span class="token punctuation">;</span>     <span class="token comment">// 先做左移，新存入的位永远在最低位</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>READ_SDA<span class="token punctuation">)</span>
+        <span class="token punctuation">{</span>
+            data <span class="token operator">|=</span> <span class="token number">0x01</span><span class="token punctuation">;</span>   <span class="token comment">// 先存入最低位，然后每次都左移1位</span>
+        <span class="token punctuation">}</span>
+
+        <span class="token comment">// 4. SCL拉低，结束采样</span>
+        SCL_LOW<span class="token punctuation">;</span>
+        I2C_DELAY<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    
+    <span class="token keyword">return</span> data<span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<h2 id="m-24-c-02-h-1">m24c02.h</h2>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">ifndef</span> <span class="token expression">__M24C02_H</span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name">__M24C02_H</span></span>
+
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">"i2c.h"</span></span>
+
+<span class="token comment">// 宏定义</span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name">W_ADDR</span> <span class="token expression"><span class="token number">0xA0</span></span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name">R_ADDR</span> <span class="token expression"><span class="token number">0xA1</span></span></span>
+
+<span class="token comment">// 初始化</span>
+<span class="token keyword">void</span> <span class="token function">M24C02_Init</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token comment">// 向EEPROM写入一个字节</span>
+<span class="token keyword">void</span> <span class="token function">M24C02_WriteByte</span><span class="token punctuation">(</span><span class="token class-name">uint8_t</span> innerAddr<span class="token punctuation">,</span> <span class="token class-name">uint8_t</span> byte<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token comment">// 读取EEPROM的一个字节</span>
+<span class="token class-name">uint8_t</span> <span class="token function">M24C02_ReadByte</span><span class="token punctuation">(</span><span class="token class-name">uint8_t</span> innerAddr<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token comment">// 连续写入多个字节（页写）</span>
+<span class="token keyword">void</span> <span class="token function">M24C02_WriteBytes</span><span class="token punctuation">(</span><span class="token class-name">uint8_t</span> innerAddr<span class="token punctuation">,</span> <span class="token class-name">uint8_t</span> <span class="token operator">*</span> bytes<span class="token punctuation">,</span> <span class="token class-name">uint8_t</span> size<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token comment">// 连续读取多个字节</span>
+<span class="token keyword">void</span> <span class="token function">M24C02_ReadBytes</span><span class="token punctuation">(</span><span class="token class-name">uint8_t</span> innerAddr<span class="token punctuation">,</span> <span class="token class-name">uint8_t</span> <span class="token operator">*</span> buffer<span class="token punctuation">,</span> <span class="token class-name">uint8_t</span> size<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">endif</span></span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<h2 id="m-24-c-02-c-1">m24c02.c</h2>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token comment">/*
+ * @Author: wushengran
+ * @Date: 2024-05-31 11:48:48
+ * @Description:
+ *
+ * Copyright (c) 2024 by atguigu, All Rights Reserved.
+ */</span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">"m24c02.h"</span></span>
+
+<span class="token comment">// 初始化</span>
+<span class="token keyword">void</span> <span class="token function">M24C02_Init</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+    <span class="token function">I2C_Init</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token comment">// 向EEPROM写入一个字节</span>
+<span class="token keyword">void</span> <span class="token function">M24C02_WriteByte</span><span class="token punctuation">(</span><span class="token class-name">uint8_t</span> innerAddr<span class="token punctuation">,</span> <span class="token class-name">uint8_t</span> byte<span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+    <span class="token comment">// 1. 发出开始信号</span>
+    <span class="token function">I2C_Start</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token comment">// 2. 发送写地址</span>
+    <span class="token function">I2C_SendByte</span><span class="token punctuation">(</span>W_ADDR<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token comment">// 3. 等待EEPROM应答</span>
+    <span class="token class-name">uint8_t</span> ack <span class="token operator">=</span> <span class="token function">I2C_Wait4Ack</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>ack <span class="token operator">==</span> ACK<span class="token punctuation">)</span>
+    <span class="token punctuation">{</span>
+        <span class="token comment">// 4. 发送内部地址</span>
+        <span class="token function">I2C_SendByte</span><span class="token punctuation">(</span>innerAddr<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+        <span class="token comment">// 5. 等待应答</span>
+        <span class="token function">I2C_Wait4Ack</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+        <span class="token comment">// 6. 发送具体数据</span>
+        <span class="token function">I2C_SendByte</span><span class="token punctuation">(</span>byte<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+        <span class="token comment">// 7. 等待应答</span>
+        <span class="token function">I2C_Wait4Ack</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+        <span class="token comment">// 8. 发出一个停止信号</span>
+        <span class="token function">I2C_Stop</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token comment">// 延迟等待写入周期结束</span>
+    <span class="token function">Delay_ms</span><span class="token punctuation">(</span><span class="token number">5</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token comment">// 读取EEPROM的一个字节</span>
+<span class="token class-name">uint8_t</span> <span class="token function">M24C02_ReadByte</span><span class="token punctuation">(</span><span class="token class-name">uint8_t</span> innerAddr<span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+    <span class="token comment">// 1. 发出开始信号</span>
+    <span class="token function">I2C_Start</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token comment">// 2. 发送写地址（假写）</span>
+    <span class="token function">I2C_SendByte</span><span class="token punctuation">(</span>W_ADDR<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token comment">// 3. 等待EEPROM应答</span>
+    <span class="token function">I2C_Wait4Ack</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token comment">// 4. 发送内部地址</span>
+    <span class="token function">I2C_SendByte</span><span class="token punctuation">(</span>innerAddr<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token comment">// 5. 等待应答</span>
+    <span class="token function">I2C_Wait4Ack</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token comment">// 6. 发出开始信号</span>
+    <span class="token function">I2C_Start</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token comment">// 7. 发送读地址（真读）</span>
+    <span class="token function">I2C_SendByte</span><span class="token punctuation">(</span>R_ADDR<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token comment">// 8. 等待EEPROM应答</span>
+    <span class="token function">I2C_Wait4Ack</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token comment">// 9. 读取一个字节</span>
+    <span class="token class-name">uint8_t</span> byte <span class="token operator">=</span> <span class="token function">I2C_ReadByte</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token comment">// 10. 发送一个非应答</span>
+    <span class="token function">I2C_Nack</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token comment">// 11. 发出一个停止信号</span>
+    <span class="token function">I2C_Stop</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token keyword">return</span> byte<span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token comment">// 连续写入多个字节（页写）</span>
+<span class="token keyword">void</span> <span class="token function">M24C02_WriteBytes</span><span class="token punctuation">(</span><span class="token class-name">uint8_t</span> innerAddr<span class="token punctuation">,</span> <span class="token class-name">uint8_t</span> <span class="token operator">*</span>bytes<span class="token punctuation">,</span> <span class="token class-name">uint8_t</span> size<span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+    <span class="token comment">// 1. 发出开始信号</span>
+    <span class="token function">I2C_Start</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token comment">// 2. 发送写地址</span>
+    <span class="token function">I2C_SendByte</span><span class="token punctuation">(</span>W_ADDR<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token comment">// 3. 等待EEPROM应答</span>
+    <span class="token class-name">uint8_t</span> ack <span class="token operator">=</span> <span class="token function">I2C_Wait4Ack</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>ack <span class="token operator">==</span> ACK<span class="token punctuation">)</span>
+    <span class="token punctuation">{</span>
+        <span class="token comment">// 4. 发送内部地址</span>
+        <span class="token function">I2C_SendByte</span><span class="token punctuation">(</span>innerAddr<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+        <span class="token comment">// 5. 等待应答</span>
+        <span class="token function">I2C_Wait4Ack</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+        <span class="token comment">// 利用循环不停发送数据</span>
+        <span class="token keyword">for</span> <span class="token punctuation">(</span><span class="token class-name">uint8_t</span> i <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span> i <span class="token operator">&lt;</span> size<span class="token punctuation">;</span> i<span class="token operator">++</span><span class="token punctuation">)</span>
+        <span class="token punctuation">{</span>
+            <span class="token comment">// 6. 发送具体数据</span>
+            <span class="token function">I2C_SendByte</span><span class="token punctuation">(</span>bytes<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+            <span class="token comment">// 7. 等待应答</span>
+            <span class="token function">I2C_Wait4Ack</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+
+        <span class="token comment">// 8. 发出一个停止信号</span>
+        <span class="token function">I2C_Stop</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token comment">// 延迟等待写入周期结束</span>
+    <span class="token function">Delay_ms</span><span class="token punctuation">(</span><span class="token number">5</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token comment">// 连续读取多个字节</span>
+<span class="token keyword">void</span> <span class="token function">M24C02_ReadBytes</span><span class="token punctuation">(</span><span class="token class-name">uint8_t</span> innerAddr<span class="token punctuation">,</span> <span class="token class-name">uint8_t</span> <span class="token operator">*</span>buffer<span class="token punctuation">,</span> <span class="token class-name">uint8_t</span> size<span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+    <span class="token comment">// 1. 发出开始信号</span>
+    <span class="token function">I2C_Start</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token comment">// 2. 发送写地址（假写）</span>
+    <span class="token function">I2C_SendByte</span><span class="token punctuation">(</span>W_ADDR<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token comment">// 3. 等待EEPROM应答</span>
+    <span class="token function">I2C_Wait4Ack</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token comment">// 4. 发送内部地址</span>
+    <span class="token function">I2C_SendByte</span><span class="token punctuation">(</span>innerAddr<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token comment">// 5. 等待应答</span>
+    <span class="token function">I2C_Wait4Ack</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token comment">// 6. 发出开始信号</span>
+    <span class="token function">I2C_Start</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token comment">// 7. 发送读地址（真读）</span>
+    <span class="token function">I2C_SendByte</span><span class="token punctuation">(</span>R_ADDR<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token comment">// 8. 等待EEPROM应答</span>
+    <span class="token function">I2C_Wait4Ack</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token comment">// 利用循环连续读取多个字节</span>
+    <span class="token keyword">for</span> <span class="token punctuation">(</span><span class="token class-name">uint8_t</span> i <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span> i <span class="token operator">&lt;</span> size<span class="token punctuation">;</span> i<span class="token operator">++</span><span class="token punctuation">)</span>
+    <span class="token punctuation">{</span>
+        <span class="token comment">// 9. 读取一个字节</span>
+        buffer<span class="token punctuation">[</span>i<span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token function">I2C_ReadByte</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+        <span class="token comment">// 10. 发送一个应答或非应答</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>i <span class="token operator">&lt;</span> size <span class="token operator">-</span> <span class="token number">1</span><span class="token punctuation">)</span>
+        <span class="token punctuation">{</span>
+            <span class="token function">I2C_Ack</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+        <span class="token keyword">else</span>
+        <span class="token punctuation">{</span>
+            <span class="token function">I2C_Nack</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token comment">// 11. 发出一个停止信号</span>
+    <span class="token function">I2C_Stop</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<h2 id="main-c">main.c</h2>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token comment">// 1. 初始化</span>
+<span class="token function">USART_Init</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token function">M24C02_Init</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token comment">// 2. 向EEPROM依次写入单个字符</span>
+<span class="token function">M24C02_WriteByte</span><span class="token punctuation">(</span><span class="token number">0x00</span><span class="token punctuation">,</span> <span class="token char">'a'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token function">M24C02_WriteByte</span><span class="token punctuation">(</span><span class="token number">0x01</span><span class="token punctuation">,</span> <span class="token char">'b'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token function">M24C02_WriteByte</span><span class="token punctuation">(</span><span class="token number">0x02</span><span class="token punctuation">,</span> <span class="token char">'c'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token comment">// 3. 读取字符</span>
+<span class="token class-name">uint8_t</span> byte1 <span class="token operator">=</span> <span class="token function">M24C02_ReadByte</span><span class="token punctuation">(</span><span class="token number">0x00</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token class-name">uint8_t</span> byte2 <span class="token operator">=</span> <span class="token function">M24C02_ReadByte</span><span class="token punctuation">(</span><span class="token number">0x01</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token class-name">uint8_t</span> byte3 <span class="token operator">=</span> <span class="token function">M24C02_ReadByte</span><span class="token punctuation">(</span><span class="token number">0x02</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token comment">// 4. 串口输出打印</span>
+<span class="token function">printf</span><span class="token punctuation">(</span><span class="token string">"byte1 = %c\t byte2 = %c\t byte3 = %c\n"</span><span class="token punctuation">,</span> byte1<span class="token punctuation">,</span> byte2<span class="token punctuation">,</span> byte3<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token comment">// 5. 写入多个字符</span>
+<span class="token function">M24C02_WriteBytes</span><span class="token punctuation">(</span><span class="token number">0x00</span><span class="token punctuation">,</span> <span class="token string">"123456"</span><span class="token punctuation">,</span> <span class="token number">6</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token comment">// 6. 读取多个字符</span>
+<span class="token class-name">uint8_t</span> buffer<span class="token punctuation">[</span><span class="token number">100</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token punctuation">{</span><span class="token number">0</span><span class="token punctuation">}</span><span class="token punctuation">;</span>
+<span class="token function">M24C02_ReadBytes</span><span class="token punctuation">(</span><span class="token number">0x00</span><span class="token punctuation">,</span> buffer<span class="token punctuation">,</span> <span class="token number">6</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token comment">// 7. 串口打印</span>
+<span class="token function">printf</span><span class="token punctuation">(</span><span class="token string">"buffer = %s\n"</span><span class="token punctuation">,</span> buffer<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token comment">// 8. 测试超出16个字节的写入</span>
+<span class="token comment">// 清零缓冲区</span>
+<span class="token function">memset</span><span class="token punctuation">(</span>buffer<span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token keyword">sizeof</span><span class="token punctuation">(</span>buffer<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token function">M24C02_WriteBytes</span><span class="token punctuation">(</span><span class="token number">0x00</span><span class="token punctuation">,</span> <span class="token string">"1234567890abcdefghijk"</span><span class="token punctuation">,</span> <span class="token number">21</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token function">M24C02_ReadBytes</span><span class="token punctuation">(</span><span class="token number">0x00</span><span class="token punctuation">,</span> buffer<span class="token punctuation">,</span> <span class="token number">21</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token function">printf</span><span class="token punctuation">(</span><span class="token string">"buffer = %s\n"</span><span class="token punctuation">,</span> buffer<span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
                 
             </div>
@@ -1535,7 +2300,7 @@ GPIOB-&gt;CRH |= (GPIO_CRH_CNF10_0 | GPIO_CRH_CNF11_0);<span aria-hidden="true" 
             <br>
             
                 &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                        class="white-color">35.6k</span>
+                        class="white-color">38k</span>
             
             
             
