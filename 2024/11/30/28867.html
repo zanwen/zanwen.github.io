@@ -410,21 +410,21 @@ STM32F103参考手册：rm0008-stm32f101xx-stm32f102xx-">
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-check fa-fw"></i>更新日期:&nbsp;&nbsp;
-                    2024-12-01
+                    2024-12-02
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
-                    6.4k
+                    6.6k
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-clock fa-fw"></i>阅读时长:&nbsp;&nbsp;
-                    28 分
+                    29 分
                 </div>
                 
 
@@ -624,7 +624,7 @@ SDA_HIGH<span class="token punctuation">;</span><span aria-hidden="true" class="
 <ul>
 <li>数据建立时间（SU;DAT data set-up time）：在SCL低电平时，我们可以修改SDA为下一个要发送的比特位。该参数要求我们修改在SCL为低时，SDA跳变稳定后需要后维持一段时间（再将SCL拉高让接收方采样），至少为<mark>250ns</mark></li>
 <li>数据保持时间（HD;DAT data hold time）：tHD;DAT is the data hold time that is measured from the falling edge of SCL, applies to data in transmission and the acknowledge。该参数是指SDA在SCL下降沿之后需要保持的时间，表格中的 <code>Conditions</code>列标识了个该参数用于CBUS兼容控制器，对于I2C设备不做限制。<mark>这意味着，在SCL下降沿发生后，我们可以立即操作SDA的跳变。</mark></li>
-<li>数据有效（稳定）时间（VD;DAT，data valid time）：tVD;DAT = time for data signal from SCL LOW to SDA output。该参数是指从SCL下降沿到SDA跳变并稳定之间的时间，最大值为<mark>3.45us</mark>，因此简单的做法是将SCL拉低后，立即修改SDA为下一个要发送的bit即可。</li>
+<li>数据有效（稳定）时间（VD;DAT，data valid time）：tVD;DAT = time for data signal from SCL LOW to SDA output。该参数是指<mark>从设备发送数据时</mark>，从SCL下降沿到SDA跳变并稳定之间的时间，最大值为<mark>3.45us</mark>（<mark>这意味着我们应该延时3.45us来确保从设备建立了SDA并读取数据</mark>）</li>
 </ul>
 <h3 id="zong-jie">总结</h3>
 <ul>
@@ -848,13 +848,14 @@ I2C_DELAY<span class="token punctuation">;</span>
 <h2 id="jie-shou-shu-ju">接收数据</h2>
 <ul>
 <li>接收数据时，主设备只需控制SCL产生8个时钟周期，SDA控制权交给从设备</li>
-<li>低电平周期，从设备会建立（准备）SDA，并在高电平周期保持稳定（主设备可以在此期间读取SDA）</li>
+<li>低电平周期，从设备会建立（准备）SDA（<mark>前提是主设备对SDA总线是释放状态</mark>），并在高电平周期保持稳定（主设备可以在此期间读取SDA）</li>
 </ul>
 <pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token class-name">uint8_t</span> <span class="token function">I2C_ReceiveByte</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
     <span class="token class-name">uint8_t</span> i <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
     <span class="token class-name">uint8_t</span> data <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
     <span class="token keyword">for</span> <span class="token punctuation">(</span>i <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span> i <span class="token operator">&lt;</span> <span class="token number">8</span><span class="token punctuation">;</span> i<span class="token operator">++</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
         SCL_LOW<span class="token punctuation">;</span>
+        SDA_HIGH<span class="token punctuation">;</span> <span class="token comment">// 释放SDA总线</span>
         I2C_DELAY<span class="token punctuation">;</span>
 
         SCL_HIGH<span class="token punctuation">;</span>
@@ -865,7 +866,7 @@ I2C_DELAY<span class="token punctuation">;</span>
         <span class="token punctuation">}</span>
     <span class="token punctuation">}</span>
     <span class="token keyword">return</span> data<span class="token punctuation">;</span>
-<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <h2 id="fa-song-ack-nack-9-sub-th-sub-clock-cycle">发送ACK/NACK（9<sub>th</sub> Clock Cycle）</h2>
 <p>在第九个时钟周期，主设备需要给从设备响应ACK/NACK，ACK表示需要从设备继续发送数据，NACK则指示从设备停止发送数据（主设备随后发送停止信号结束此次传输）：</p>
 <ol>
@@ -1079,6 +1080,15 @@ I2C_DELAY<span class="token punctuation">;</span>
     <span class="token punctuation">}</span> <span class="token keyword">while</span> <span class="token punctuation">(</span>i<span class="token punctuation">)</span><span class="token punctuation">;</span>
 <span class="token punctuation">}</span>
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<h2 id="zong-jie-1">总结🌟</h2>
+<blockquote>
+<p>[!IMPORTANT]</p>
+<p>简而言之，在I2C通信过程中，根据不同阶段状态（接收数据、发送数据），要严格遵循相应的SCL/SDA时序：</p>
+<ul>
+<li>发送数据时（字节比特位或ACK）：先拉低SCL，建立SDA，并维持SDA建立时间，然后拉高SCL让接收方采样。</li>
+<li>接收数据时（字节比特位或ACK）：先拉低SCL，主设备释放SDA，而后从设备应该在t<sub>VD;DAT</sub>/t<sub>VD;ACK</sub>时间内建立SDA（字节比特位或ACK），然后主设备延时至少t<sub>VD;DAT</sub>/t<sub>VD;ACK</sub>后拉高SCL读取SDA</li>
+</ul>
+</blockquote>
 <h2 id="tuo-zhan-shang-sheng-yan-xia-jiang-yan-shi-jian">拓展：上升沿/下降沿时间</h2>
 <img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241201195756988.png" alt="image-20241201195756988" style="zoom: 33%;">
 <p>该参数描述的是引脚高低电平跳变（或者说转变/过度，transition）时间，需要查看MCU数据手册中关于IO口电气特性相关的描述：</p>
@@ -2300,7 +2310,7 @@ GPIOB-&gt;CRH |= (GPIO_CRH_CNF10_0 | GPIO_CRH_CNF11_0);<span aria-hidden="true" 
             <br>
             
                 &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                        class="white-color">38k</span>
+                        class="white-color">38.2k</span>
             
             
             
