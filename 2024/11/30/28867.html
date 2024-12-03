@@ -410,21 +410,21 @@ STM32F103参考手册：rm0008-stm32f101xx-stm32f102xx-">
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-check fa-fw"></i>更新日期:&nbsp;&nbsp;
-                    2024-12-02
+                    2024-12-03
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
-                    6.6k
+                    13.9k
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-clock fa-fw"></i>阅读时长:&nbsp;&nbsp;
-                    29 分
+                    58 分
                 </div>
                 
 
@@ -1081,6 +1081,7 @@ I2C_DELAY<span class="token punctuation">;</span>
 <span class="token punctuation">}</span>
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <h2 id="zong-jie-1">总结🌟</h2>
+<h3 id="fan-shi">范式</h3>
 <blockquote>
 <p>[!IMPORTANT]</p>
 <p>简而言之，在I2C通信过程中，根据不同阶段状态（接收数据、发送数据），要严格遵循相应的SCL/SDA时序：</p>
@@ -1089,7 +1090,12 @@ I2C_DELAY<span class="token punctuation">;</span>
 <li>接收数据时（字节比特位或ACK）：先拉低SCL，主设备释放SDA，而后从设备应该在t<sub>VD;DAT</sub>/t<sub>VD;ACK</sub>时间内建立SDA（字节比特位或ACK），然后主设备延时至少t<sub>VD;DAT</sub>/t<sub>VD;ACK</sub>后拉高SCL读取SDA</li>
 </ul>
 </blockquote>
-<h2 id="tuo-zhan-shang-sheng-yan-xia-jiang-yan-shi-jian">拓展：上升沿/下降沿时间</h2>
+<h3 id="xing-neng-ce-shi">性能测试</h3>
+<p>标准模式</p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241202111727091.png" alt="标准模式"></p>
+<p>快速模式</p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241202111845187.png" alt="image-20241202111845187"></p>
+<h2 id="tuo-zhan-shang-sheng-xia-jiang-shi-jian">拓展：上升/下降时间</h2>
 <img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241201195756988.png" alt="image-20241201195756988" style="zoom: 33%;">
 <p>该参数描述的是引脚高低电平跳变（或者说转变/过度，transition）时间，需要查看MCU数据手册中关于IO口电气特性相关的描述：</p>
 <p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241201200403108.png" alt="STM32F103数据手册"></p>
@@ -1323,6 +1329,14 @@ GPIOB-&gt;CRH |= (GPIO_CRH_CNF10_0 | GPIO_CRH_CNF11_0);<span aria-hidden="true" 
 <h2 id="du-xie-cao-zuo">读/写操作</h2>
 <p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241201201953699.png" alt="image-20241201201953699"></p>
 <p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241201202011850.png" alt="image-20241201202011850"></p>
+<h3 id="zhu-yi">注意</h3>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241202114206166.png" alt="image-20241202114206166"></p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241202114116570.png" alt="image-20241202114116570"></p>
+<blockquote>
+<p>[!NOTE]</p>
+<p>连续写时，页内16字节相当于一个环形结构，写到页内最后一个字节时，下次写入将从页头重新开始。</p>
+<p>而连续读时，则是将整个256字节作为一个环形结构，读到0xFF时，下次读将从0x00重新开始。</p>
+</blockquote>
 <h2 id="mo-kuai-feng-zhuang">模块封装</h2>
 <h3 id="m-24-c-02-h">m24c02.h</h3>
 <pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">ifndef</span> <span class="token expression">__M24C02_H__</span></span>
@@ -1447,7 +1461,7 @@ GPIOB-&gt;CRH |= (GPIO_CRH_CNF10_0 | GPIO_CRH_CNF11_0);<span aria-hidden="true" 
 <img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241201161925160.png" alt="image-20241201161925160" style="zoom:33%;">
 <p>并且前者直接导致I2C通信无法走通（只有 <code>start</code>），而后者可以：</p>
 <p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241201162331212.png" alt="image-20241201162331212"></p>
-<h1 id="cu-yan-shi-ban-ben-can-kao-dai-ma">粗延时版本参考代码</h1>
+<h1 id="ruan-i-2-c-cu-yan-shi-ban-ben-can-kao-dai-ma">软I2C粗延时版本参考代码</h1>
 <blockquote>
 <p>[!NOTE]</p>
 <p>该版本代码在每个SCL/SDA状态变更节点都进行足够长的延时来稳定信号，并增加冗余延时来确保时序的正确性，例如每个节点都延时10us、冗余拉低SCL等。这样做的好处就是不用精细分析/把控I2C规范中各个阶段对SCL/SDA的时序限制（例如建立时间最少为xxx，维持时间至少为xxx，等等），大大简化了开发流程，但会消耗一定性能。</p>
@@ -1914,6 +1928,690 @@ GPIOB-&gt;CRH |= (GPIO_CRH_CNF10_0 | GPIO_CRH_CNF11_0);<span aria-hidden="true" 
 <span class="token function">M24C02_WriteBytes</span><span class="token punctuation">(</span><span class="token number">0x00</span><span class="token punctuation">,</span> <span class="token string">"1234567890abcdefghijk"</span><span class="token punctuation">,</span> <span class="token number">21</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 <span class="token function">M24C02_ReadBytes</span><span class="token punctuation">(</span><span class="token number">0x00</span><span class="token punctuation">,</span> buffer<span class="token punctuation">,</span> <span class="token number">21</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 <span class="token function">printf</span><span class="token punctuation">(</span><span class="token string">"buffer = %s\n"</span><span class="token punctuation">,</span> buffer<span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<h1 id="shen-ru-li-jie-stm-32-i-2-c-wai-she">深入理解STM32 I²C外设</h1>
+<h2 id="i-2-c-wai-she-kuang-tu-gai-lan">I2C外设框图概览</h2>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241203131201258.png" alt="image-20241203131201258"></p>
+<h3 id="sda-shu-ju-zong-xian-xiang-guan">SDA数据总线相关</h3>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241203131730495.png" alt="image-20241203131730495"></p>
+<ul>
+<li>Data register：数据寄存器DR，我们可以通过读/写DR来实现接收/发送数据</li>
+<li>Data shift register
+<ul>
+<li>发送模式下，写到DR的数据，最终会通过底层硬件电路移位寄存器来逐位发送（I2C协议规定MSB，即高位优先）</li>
+<li>接收模式下，从SDA接收到的逻辑高低电平会逐位进入移位寄存器保存，并最终递交给DR</li>
+<li>如果DR、移位寄存器都为空，那么写DR会直接递交给移位寄存器</li>
+</ul>
+</li>
+<li>Comparator：在从设备模式下（当前MCU作为从设备），用于将接收到的数据和自己的设备地址比较，如果匹配，那么需要向主设备回复ACK
+<ul>
+<li>Own address register：I2C通信中自己的设备地址</li>
+<li>Dual address register：该寄存器支持配置第二个设备地址</li>
+</ul>
+</li>
+<li>PEC：Packet Error Check，帧错误检查相关
+<ul>
+<li>STM32内置了数据帧校验机制来提升通信的可靠性</li>
+</ul>
+</li>
+</ul>
+<h3 id="scl-shi-zhong-zong-xian-xiang-guan">SCL时钟总线相关</h3>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241203133135507.png" alt="image-20241203133135507"></p>
+<ul>
+<li>
+<p>CCR：时钟控制寄存器，用于配置SCL的频率以遵循I2C协议标准</p>
+</li>
+<li>
+<p>CR1&amp;CR2：外设控制寄存器，用于控制外设发出I2C通信各个阶段对应的信号，例如起始信号、停止信号、响应ACK等</p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241203133634503.png" alt="image-20241203133634503"></p>
+</li>
+<li>
+<p>SR1&amp;SR2：外设状态寄存器，外设硬件在完成某个I2C通信节点时会置位相应的标志位，软件可以通过轮询这些标志位的状态来控制通信过程。例如SB（Start Bit）置1表示起始信号已发送，ADDR置1表示发送了从设备地址并收到了从设备的ACK响应等</p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241203133750393.png" alt="image-20241203133750393"></p>
+</li>
+</ul>
+<h2 id="i-2-c-wai-she-chu-shi-hua">I2C外设初始化</h2>
+<p>下面我们就以当前MCU的I2C外设作为I2C主设备来实现收发数据、读写EEPROM的功能，在此过程中分析相关寄存器的作用及底层原理。</p>
+<blockquote>
+<p>[!NOTE]</p>
+<p><a target="_blank" rel="noopener" href="https://www.st.com/resource/en/reference_manual/rm0008-stm32f101xx-stm32f102xx-stm32f103xx-stm32f105xx-and-stm32f107xx-advanced-armbased-32bit-mcus-stmicroelectronics.pdf">rm0008-stm32f101xx-stm32f102xx-stm32f103xx-stm32f105xx-and-stm32f107xx</a></p>
+<p>主设备模式通信流程参考 26.3.3 I2C master mode</p>
+<p>I2C外设寄存器描述参考 26.6 I2C registers</p>
+</blockquote>
+<h3 id="gpio-pei-zhi">GPIO配置</h3>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241203140210631.png" alt="image-20241203140210631"></p>
+<p>关于引脚的复用功能映射可以在MCU数据手册的引脚描述相关章节找到：</p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241203142124640.png" alt="STM32F103ZE数据手册"></p>
+<p>GPIO配置为外设的复用功能</p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241203142343120.png" alt="参考手册 GPIO configurations for device peripherals  "></p>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token comment">// 1. GPIO时钟配置</span>
+RCC<span class="token operator">-&gt;</span>APB2ENR <span class="token operator">|=</span> RCC_APB2ENR_IOPBEN<span class="token punctuation">;</span>
+RCC<span class="token operator">-&gt;</span>APB1ENR <span class="token operator">|=</span> RCC_APB1ENR_I2C2EN<span class="token punctuation">;</span>
+
+<span class="token comment">// 2. 配置GPIO工作模式为复用开漏输出 mode=11 cnf=11</span>
+GPIOB<span class="token operator">-&gt;</span>CRH <span class="token operator">|=</span> <span class="token punctuation">(</span>GPIO_CRH_MODE11 <span class="token operator">|</span> GPIO_CRH_CNF11<span class="token punctuation">)</span><span class="token punctuation">;</span>
+GPIOB<span class="token operator">-&gt;</span>CRH <span class="token operator">|=</span> <span class="token punctuation">(</span>GPIO_CRH_MODE10 <span class="token operator">|</span> GPIO_CRH_CNF10<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token comment">// 特别注意，如下操作无法得到预期结果，GPIO工作不正常</span>
+<span class="token comment">// GPIOB-&gt;CRH |= (GPIO_CRH_CNF10 | GPIO_CRH_CNF11);</span>
+<span class="token comment">// GPIOB-&gt;CRH |= (GPIO_CRH_MODE10 | GPIO_CRH_MODE11);</span>
+<span class="token comment">// 如下则是可以的</span>
+<span class="token comment">// GPIOB-&gt;CRH |= (GPIO_CRH_MODE11 | GPIO_CRH_CNF11 | GPIO_CRH_MODE10 | GPIO_CRH_CNF10);</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<blockquote>
+<p>[!IMPORTANT]</p>
+<p>这里需要特别注意的是：</p>
+<p>如下配置（同时配置PB10/11的CNF、同时配置PB10/11的MODE会导致GPIO工作不正常，暂时还未找到原因）</p>
+<p>GPIOB-&gt;CRH |= (GPIO_CRH_CNF10 | GPIO_CRH_CNF11);</p>
+<p>GPIOB-&gt;CRH |= (GPIO_CRH_MODE10 | GPIO_CRH_MODE11);</p>
+<p>但如下一次性配置是可以的</p>
+<p>GPIOB-&gt;CRH |= (GPIO_CRH_MODE11 | GPIO_CRH_CNF11 | GPIO_CRH_MODE10 | GPIO_CRH_CNF10);</p>
+</blockquote>
+<h3 id="zhu-she-bei-mo-shi-suo-xu-pei-zhi">主设备模式所需配置</h3>
+<blockquote>
+<p>In Master mode, the I2C interface initiates a data transfer and generates the clock signal. A serial data transfer always begins with a Start condition and ends with a Stop condition.</p>
+<p>Master mode is selected as soon as the Start condition is generated on the bus with a START bit.</p>
+</blockquote>
+<p>在主模式下，由I2C外设发起数据传输请求并控制SCL生成时钟信号。一次连续的数据传输总是开始于一个起始信号，终止于一个停止信号。</p>
+<p>一旦通过总线产生了一个起始信号，当前I2C外设就会进入主设备模式。</p>
+<blockquote>
+<p>The following is the required sequence in master mode.<br>
+ Program the peripheral input clock in I2C_CR2 register in order to generate correct<br>
+timings<br>
+ Configure the clock control registers<br>
+ Configure the rise time register<br>
+ Program the I2C_CR1 register to enable the peripheral<br>
+ Set the START bit in the I2C_CR1 register to generate a Start condition</p>
+</blockquote>
+<p>在使用主设备模式之前，需要先操作如下软件序列</p>
+<ol>
+<li>为了产生正确的时序，需要配置I2C_CR2寄存器以设置外设输入时钟</li>
+<li>配置时钟控制寄存器（SCL时钟频率）</li>
+<li>配置上升时间寄存器</li>
+<li>设置I2C_CR1寄存器使能外设</li>
+<li>设置I2C_CR1寄存器中的START位来产生起始信号</li>
+</ol>
+<p>下面我们查阅寄存器描述章节来分析以上这几个操作所蕴含的细节。</p>
+<h4 id="wai-she-shu-ru-shi-zhong-i-2-c-cr-2">外设输入时钟（I2C_CR2）</h4>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241203150802143.png" alt="image-20241203150802143"></p>
+<blockquote>
+<p>The FREQ bits must be configured with the APB clock frequency value (I2C peripheral connected to APB). The FREQ field is used by the peripheral to generate data setup and hold times compliant with the I2C specifications. The minimum allowed frequency is 2 MHz, the maximum frequency is limited by the maximum APB frequency and cannot exceed 50 MHz (peripheral intrinsic maximum limit).</p>
+</blockquote>
+<p><code>FREQ</code>比特位用来配置I2C外设的输入时钟频率，且必须参考APB时钟频率来配置（因为I2C外设挂载在APB总线上）。在STM32F103中，I2C挂载在APB1总线上，APB1最大频率为<mark>36MHz</mark>。</p>
+<p>外设依赖该时钟源来遵循I2C协议规范产生数据建立和维持时间。</p>
+<p>该字段最小可以配置为2MHz，最大不能超过APB总线时钟频率的限制，也不能超过50MHz（外设本身的物理特性限制）。</p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241203151357832.png" alt="image-20241203151357832"></p>
+<p>如下，我们可以配置为APB1最大频率36MHz来发挥外设最大性能：</p>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c">I2C2<span class="token operator">-&gt;</span>CR2 <span class="token operator">|=</span> <span class="token number">36</span><span class="token punctuation">;</span> <span class="token comment">// 必须小于等于APB1的最大时钟36MHz</span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<h4 id="scl-shi-zhong-pin-lu-ccr">SCL时钟频率(CCR)</h4>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241203152828329.png" alt="image-20241203152828329"></p>
+<blockquote>
+<p>[!NOTE]</p>
+<p>f<sub>PCLK1</sub> must be at least 2 MHz to achieve Sm mode I²C frequencies. It must be at least 4 MHz to achieve Fm mode I²C frequencies. It must be a multiple of 10MHz to reach the 400 kHz maximum I²C Fm mode clock. The CCR register must be configured only when the I2C is disabled (PE = 0)</p>
+</blockquote>
+<p>这里再次提到了I2C对外设输入时钟（I2C_CR2中的FREQ）的要求：</p>
+<ul>
+<li>I2C标准模式：外设时钟至少为2MHz</li>
+<li>I2C快速模式：外设时钟至少为4MHz</li>
+<li>达到I2C快速模式最大速率400MHz：外设时钟必须为10MHz的倍数</li>
+</ul>
+<p>需要注意的是，CCR寄存器必须在PE=0（使能外设之前）时进行配置。</p>
+<p>下面<mark>标准模式</mark>为例，配置SCL总线时钟频率：</p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241203153643894.png" alt="image-20241203153643894"></p>
+<p>标准模式下，I2C外设的SCL高电平和低电平周期均为 CCR * T<sub>PCLK1</sub>（外设时钟周期），要想计算CCR，我们需要知道高电平周期t<sub>high</sub>和低电平周期t<sub>low</sub>，<code>Note</code>中提到需要查看数据手册中t<sub>r(SCL)</sub>和t<sub>w(SCLH)</sub>等参数的定义</p>
+<img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241203154217552.png" alt="image-20241203154217552" style="zoom: 50%;">
+<p>可以发现数据手册对于SCL高电平周期、低电平周期、SDA/SCL上升时间和下降时间等参数的范围限制和I2C协议手册是一致的。</p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241203154644942.png" alt="image-20241203154644942">那么如果想实现标准模式下100kHz的最大频率，我们可以计算出对应的周期为10us。如果观察t<sub>w(SCLL)</sub>+t<sub>f(SCL)</sub>即SCL低电平最小宽度4.7us和下降时间最大值0.3us（300ns)，发现两者之和正好为5us，同样的SCL高电平最小宽度4us与上升时间最大宽度1us（1000ns)之和也正好为5us。这也解释了为什么标准模式下将T<sub>high</sub>和T<sub>low</sub>都设置为CCR * T<sub>PCLK1</sub>，<mark>相当于50%占空比</mark></p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241203155632578.png" alt="image-20241203155632578"></p>
+<p>既然知道了目标频率100kHz（对应周期10us），以及目标高低电平周期为5us，那么可以推出CCR为 5us / T<sub>PCLK1</sub>，即 5us / (1 / 36MHz)，即CCR = 180。</p>
+<p>至此我们可以配置外设的速度模式和SCL的时钟频率了：</p>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token comment">// 5. 配置外设模式：标准模式（100kb/s）、SCL时钟频率（100kHz）</span>
+I2C2<span class="token operator">-&gt;</span>CCR <span class="token operator">&amp;=</span> <span class="token operator">~</span>I2C_CCR_FS<span class="token punctuation">;</span>
+I2C2<span class="token operator">-&gt;</span>CCR <span class="token operator">|=</span> <span class="token number">180</span><span class="token punctuation">;</span> <span class="token comment">// 5us/T(PCLK)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+<h4 id="scl-sda-zui-da-shang-sheng-shi-jian-trise">SCL/SDA最大上升时间（TRISE）</h4>
+<blockquote>
+<p>[!NOTE]</p>
+<p>上升时间是指释放总线后，总线电压上升到逻辑高电平所需的时间</p>
+</blockquote>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241203170939359.png" alt="image-20241203170939359"></p>
+<p>寄存器描述：</p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241203160222421.png" alt="image-20241203160222421"></p>
+<p>为什么要配置一个SCL最大上升时间TRISE呢？从上一节的分析中我们知道T<sub>high</sub>是包括上升时间和逻辑高电平时间的。从软件操作SCL拉高之后到物理层面SCL真正变为逻辑高电平是由一定的延时的，该延时由电路上拉电阻以及电容的电气特性决定。外设为了确保能够根据CCR的配置产生T<sub>high</sub>长度的高电平，会在拉高SCL后通过反馈回路（例如IDR寄存器）检测SCL的电压状态，当其达到逻辑高电平时，外设内部的高电平计数器就会开始计数（逻辑高电平每持续一个PCLK，就自增），直到计数值为我们配置的CCR，这样就实现了我们预期的5us高电平周期。</p>
+<p>但是这样就有一个问题，根据I2C规范，真正的逻辑高电平持续4us就够了，上升时间可以最大容许1us（1000ns）；对于频率100kHz，周期为10us，占空比为5us的标准模式最大速率，<mark>I2C将5us高电平时间划分为了上升时间1us和逻辑高电平时间4us。</mark></p>
+<p>而如果按照上述高电平计数器的工作机制，如果上升时间为0.5us，再加上计数器对应的逻辑高电平时间5us，</p>
+<p>整体高电平周期就变成了0.5+5=5.5us，导致拉长了SCL的时钟周期（预期高电平周期只持续5us），<mark>降低了SCL的预期频率</mark>，从而降低了传输速率。</p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241203161544044.png" alt="image-20241203161544044"></p>
+<p>因此，TRISE其实是让我们告诉I2C外设的高电平周期计数器，不用从逻辑高电平才开始计数，从开始拉高SCL那一刻就可以开始计数（即使电压还没有到达逻辑高电平），并当计数值等于TRISE时（例如36，36 * T<sub>PCLK</sub> = 1us，<mark>该值用于提醒计数器到了最大上升的临界值，剩下的计数必须等到SCL逻辑高电平才能继续</mark>），才通过反馈回路检测SCL电压状态，如果SCL为逻辑高电平则继续计数直到CCR（这样确保了逻辑高电平<code>&gt;= 4us</code>），如果SCL没有达到逻辑高电平（例如上拉电阻、电容、滤波导致的时延，从设备拉低SCL导致的时钟拉伸等），那么计数器就会暂停计数，直到检测到SCL达到逻辑高电平才继续剩余的CCR-TRISE计数周期。</p>
+<blockquote>
+<p>[!NOTE]</p>
+<p>简而言之，将TRISE配置为I2C规范的最大上升时间对应的计数值（最大上升时间 / 外设工作频率）之后，无论在该时间内的哪个时刻电压达到逻辑高电平，SCL高电平周期都为CCR对应的5us。而如果不配置TRISE，就会存在这种情况：0.8us后电压达到逻辑高电平，计数器开始计数CCR个周期（5us），SCL高电平为5.8us，SCL周期为10.8us，这样就降低了SCL的频率（预期为10us）</p>
+</blockquote>
+<p>现在我们来计算下TRISE的配置值</p>
+<ul>
+<li>36MHz外设频率，周期为1/36us</li>
+<li>I2C规范标准模式下上升时间最大为1000ns，即1us</li>
+<li>因此TRISE = 上升时间1us / 外设时钟周期 + 1 = <code>1 / (1 / 36) + 1 = 37</code></li>
+</ul>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c">I2C2<span class="token operator">-&gt;</span>TRISE <span class="token operator">&amp;=</span> <span class="token operator">~</span>I2C_TRISE_TRISE<span class="token punctuation">;</span>
+I2C2<span class="token operator">-&gt;</span>TRISE <span class="token operator">|=</span> <span class="token number">37</span><span class="token punctuation">;</span> <span class="token comment">// 36 clock cycle + 1</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<h4 id="wai-she-shi-neng">外设使能</h4>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241203171424466.png" alt="image-20241203171424466"></p>
+<blockquote>
+<p>[!NOTE]</p>
+<p>需要注意，该配置应该在所有I2C配置完成之后</p>
+</blockquote>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c">I2C2<span class="token operator">-&gt;</span>CR1 <span class="token operator">|=</span> I2C_CR1_PE<span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<h3 id="shi-li-dai-ma">示例代码</h3>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token keyword">void</span> <span class="token function">I2C_Init</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token comment">// 1. GPIO时钟配置</span>
+    RCC<span class="token operator">-&gt;</span>APB2ENR <span class="token operator">|=</span> RCC_APB2ENR_IOPBEN<span class="token punctuation">;</span>
+    RCC<span class="token operator">-&gt;</span>APB1ENR <span class="token operator">|=</span> RCC_APB1ENR_I2C2EN<span class="token punctuation">;</span>
+
+    <span class="token comment">// 2. 配置GPIO工作模式为复用开漏输出 mode=11 cnf=11</span>
+    GPIOB<span class="token operator">-&gt;</span>CRH <span class="token operator">|=</span> <span class="token punctuation">(</span>GPIO_CRH_MODE11 <span class="token operator">|</span> GPIO_CRH_CNF11<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    GPIOB<span class="token operator">-&gt;</span>CRH <span class="token operator">|=</span> <span class="token punctuation">(</span>GPIO_CRH_MODE10 <span class="token operator">|</span> GPIO_CRH_CNF10<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token comment">// 特别注意，如下操作无法得到预期结果，GPIO工作不正常</span>
+    <span class="token comment">// GPIOB-&gt;CRH |= (GPIO_CRH_CNF10 | GPIO_CRH_CNF11);</span>
+    <span class="token comment">// GPIOB-&gt;CRH |= (GPIO_CRH_MODE10 | GPIO_CRH_MODE11);</span>
+    <span class="token comment">// 如下则是可以的</span>
+    <span class="token comment">// GPIOB-&gt;CRH |= (GPIO_CRH_MODE11 | GPIO_CRH_CNF11 | GPIO_CRH_MODE10 | GPIO_CRH_CNF10);</span>
+
+    <span class="token comment">// 3. 配置外设为I2C模式（默认就是I2C模式，1-SMBUS模式）</span>
+    I2C2<span class="token operator">-&gt;</span>CR1 <span class="token operator">&amp;=</span> <span class="token operator">~</span>I2C_CR1_SMBUS<span class="token punctuation">;</span>
+
+    <span class="token comment">// 4. 配置外设时钟</span>
+    I2C2<span class="token operator">-&gt;</span>CR2 <span class="token operator">|=</span> <span class="token number">36</span><span class="token punctuation">;</span> <span class="token comment">// 必须小于等于APB1的最大时钟频率36MHz</span>
+
+    <span class="token comment">// 5. 配置外设模式：I2C标准模式（100kHz）、SCL时钟频率（100kHz）</span>
+    I2C2<span class="token operator">-&gt;</span>CCR <span class="token operator">&amp;=</span> <span class="token operator">~</span>I2C_CCR_FS<span class="token punctuation">;</span> <span class="token comment">// 标准模式</span>
+    I2C2<span class="token operator">-&gt;</span>CCR <span class="token operator">|=</span> <span class="token number">180</span><span class="token punctuation">;</span> <span class="token comment">// SCL高低电平周期5us / 外设时钟周期(1/36us) = 5 * 36</span>
+
+    <span class="token comment">// 6. 配置TRISE-SCL最大上升时间</span>
+    I2C2<span class="token operator">-&gt;</span>TRISE <span class="token operator">&amp;=</span> <span class="token operator">~</span>I2C_TRISE_TRISE<span class="token punctuation">;</span> <span class="token comment">// 清零</span>
+    I2C2<span class="token operator">-&gt;</span>TRISE <span class="token operator">|=</span> <span class="token number">37</span><span class="token punctuation">;</span> <span class="token comment">// I2C标准模式最大上升时间1us / 外设时钟周期(1/36us) + 1 = 36 + 1</span>
+
+    <span class="token comment">// 7. 使能外设</span>
+    I2C2<span class="token operator">-&gt;</span>CR1 <span class="token operator">|=</span> I2C_CR1_PE<span class="token punctuation">;</span> <span class="token comment">// Peripheral(I2C) Enable</span>
+<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<h2 id="fa-song-qi-shi-xin-hao">发送起始信号</h2>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241203171713561.png" alt="image-20241203171713561"></p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241203171644654.png" alt="image-20241203171644654"></p>
+<p>设置 <code>START</code>位后，外设会在BUSY位被清除后产生一个起始信号并切换到主设备模式。</p>
+<p><mark>起始信号的产生有个前提：总线是空闲状态</mark></p>
+<ul>
+<li>BUSY复位值为清除状态</li>
+<li>当SDA或SCL被拉低时，BUSY会被硬件置位，表示总线正在用于通信</li>
+<li>当停止条件产生后，BUSY会被硬件清除<img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241203172040017.png" alt="image-20241203172040017" style="zoom: 33%;"></li>
+</ul>
+<p>在主设备模式下，再次置位START会使外设在当前字节传输完成（如果移位寄存器正在传输字节数据）时产生ReStart重复起始信号。</p>
+<p>一旦产生了起始信号，SB会被硬件置位，并且产生中断（如果设置了ITEVTEN位）。</p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241203173333175.png" alt="image-20241203173333175"></p>
+<p>因此主设备可以在设置START之后，轮询SR1中的SB，并在SB被置位后将从设备地址写入DR发送缓冲区。</p>
+<h3 id="shi-li-dai-ma-1">示例代码</h3>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token keyword">void</span> <span class="token function">I2C_Start</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token comment">// 产生起始信号（当BUSY=1时不会立即产生）</span>
+    I2C2<span class="token operator">-&gt;</span>CR1 <span class="token operator">|=</span> I2C_CR1_START<span class="token punctuation">;</span>
+    <span class="token class-name">uint16_t</span> timeout <span class="token operator">=</span> TIMEOUT_COUNT<span class="token punctuation">;</span>
+    <span class="token comment">// 起始信号产生后，由硬件置位SB</span>
+    <span class="token keyword">while</span> <span class="token punctuation">(</span><span class="token punctuation">(</span>I2C2<span class="token operator">-&gt;</span>SR1 <span class="token operator">&amp;</span> I2C_SR1_SB<span class="token punctuation">)</span> <span class="token operator">==</span> <span class="token number">0</span> <span class="token operator">&amp;&amp;</span> timeout <span class="token operator">&gt;</span> <span class="token number">0</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        timeout<span class="token operator">--</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>timeout <span class="token operator">==</span> <span class="token number">0</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token function">LOG_ERROR</span><span class="token punctuation">(</span><span class="token string">"I2C_Start timeout, timeout = %d"</span><span class="token punctuation">,</span> timeout<span class="token punctuation">)</span>
+    <span class="token punctuation">}</span>
+    <span class="token comment">// 紧接着发送设备地址会写DR，读SR1写DR序列会清除SB，因此这里不需要手动清除SB</span>
+<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<h2 id="fa-song-cong-she-bei-di-zhi">发送从设备地址</h2>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241203174842914.png" alt="image-20241203174842914"></p>
+<p>轮询SR1等待起始信号发出后，主设备可以将从设备地址写入DR，然后从设备地址就会通过内部的移位寄存器发送到SDA总线上。</p>
+<p>一旦从设备地址字节发送完成后，SR1中的ADDR会被硬件置位，并产生中断（如果配置了CR2中的ITEVFEN）。</p>
+<p>因此，主设备可以轮询SR1中的ADDR，当其被置位后跟随一个读SR2操作，就可以清除ADDR标志位。</p>
+<img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241203175416218.png" alt="image-20241203175416218" style="zoom: 50%;">
+<blockquote>
+<p>[!NOTE]</p>
+<p>注意：当地址数据发送到SDA总线之后，并且收到了从设备的ACK，ADDR才会被置位。因此，与软件模拟I2C相比，我们不需要手动读取SDA并判断ACK/NACK了，硬件帮我们完成了这一步。</p>
+</blockquote>
+<h3 id="shi-li-dai-ma-2">示例代码</h3>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token keyword">void</span> <span class="token function">I2C_SendAddr</span><span class="token punctuation">(</span><span class="token class-name">uint8_t</span> addr<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token class-name">uint16_t</span> timeout <span class="token operator">=</span> TIMEOUT_COUNT<span class="token punctuation">;</span>
+    <span class="token comment">// 产生起始信号后，DR肯定为空，可以将从设备地址直接写入DR</span>
+    I2C2<span class="token operator">-&gt;</span>DR <span class="token operator">=</span> addr<span class="token punctuation">;</span>
+    <span class="token comment">// 等待硬件置位ADDR（表明从设备地址以发出并收到了相应从设备的ACK）</span>
+    <span class="token keyword">while</span> <span class="token punctuation">(</span><span class="token punctuation">(</span>I2C2<span class="token operator">-&gt;</span>SR1 <span class="token operator">&amp;</span> I2C_SR1_ADDR<span class="token punctuation">)</span> <span class="token operator">==</span> <span class="token number">0</span> <span class="token operator">&amp;&amp;</span> timeout <span class="token operator">&gt;</span> <span class="token number">0</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        timeout<span class="token operator">--</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>timeout <span class="token operator">==</span> <span class="token number">0</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token function">LOG_ERROR</span><span class="token punctuation">(</span><span class="token string">"I2C_SendAddr timeout"</span><span class="token punctuation">)</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token comment">// 清除ADDR标志位操作序列：读SR1后跟随一个读SR2</span>
+    I2C2<span class="token operator">-&gt;</span>SR2<span class="token punctuation">;</span>
+<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<h3 id="zui-di-you-xiao-wei-biao-shi-du-xie">最低有效位表示读/写</h3>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241203180555453.png" alt="image-20241203180555453"></p>
+<p>发送从设备地址时，主设备可以通过其中的最低有效为（LSB）来决定后续通信过程中，当前外设充当发送方还是接收方。</p>
+<h2 id="zhu-she-bei-fa-song-shu-ju">主设备发送数据</h2>
+<blockquote>
+<p>Following the address transmission and after clearing ADDR, the master sends bytes from the DR register to the SDA line via the internal shift register.</p>
+</blockquote>
+<p>在发送完从设备地址并清除ADDR之后，接下来主设备可以经由内部的移位寄存器将写入DR的字节数据发送到SDA总线上。</p>
+<blockquote>
+<p>The master waits until the first data byte is written into I2C_DR (see Figure 273 Transfer sequencing EV8_1).</p>
+</blockquote>
+<p>主设备可以轮询SR1中的TXE，开始将第一个数据字节写入DR发送缓冲区：</p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241203181334652.png" alt="image-20241203181334652"></p>
+<p>按照手册所述（see Figure 273 Transfer sequencing EV8_1），当前我们所处的阶段对应EV8_1，移位寄存器和DR缓冲区都为空，轮询TXE会立即通过，可以将第一个数据字节Data1写入DR。由于移位寄存器为空，写入DR的字节会被直接递交给移位寄存器并传输到SDA总线上。因为DR仍然是空的，第二次轮询TXE也会立即通过，会将第二个数据字节Data2写入DR。后续字节写入DR时则会出现移位寄存器正在发送Data1、DR缓冲区数据Data2等待递交移位寄存器的情况，因此轮询TXE可能会耗费一些时间。</p>
+<blockquote>
+<p>When the acknowledge pulse is received, the TxE bit is set by hardware and an interrupt is generated if the ITEVFEN and ITBUFEN bits are set</p>
+</blockquote>
+<p>当移位寄存器发送完一个字节（例如Data1）并且收到了从设备的ACK时，DR缓冲区中的数据会被递交给移位寄存器并且TXE会被硬件置位（指示我们可以向DR写入下一个要发送的数据了）。这时发送Data3前的轮询会通过，并将Data3写入DR。</p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241203184111734.png" alt="image-20241203184111734"></p>
+<p>如上，我们可以从TxE的描述中获取更多细节。</p>
+<ul>
+<li>发送过程中，当DR寄存器为空时，DR会被硬件置位，但发送地址阶段除外</li>
+<li>写DR可以清除该标志位；在起始信号、停止信号、外设使能后会由硬件清除。</li>
+<li>如果收到了从设备的NACK，或者下个要发送的字节是帧错误检查字节，则TXE不会被置位。</li>
+</ul>
+<blockquote>
+<p>[!NOTE]</p>
+<p>以下两种情况TXE不会被清除：</p>
+<ul>
+<li>发送第一个数据字节时（因为直接写入了移位寄存器中，DR仍然是空的）。</li>
+<li>当BTF被置位时向DR写入数据（该标志在TXE=1并且移位寄存器没有正在发送的数据时被置位），数据会被直接递交给移位寄存器。</li>
+</ul>
+</blockquote>
+<blockquote>
+<p>If TxE is set and a data byte was not written in the DR register before the end of the last data transmission, BTF is set and the interface waits until BTF is cleared by a read from I2C_SR1 followed by a write to I2C_DR, stretching SCL low.</p>
+</blockquote>
+<p>如果TXE被置位了，并且在上一个数据发送结束之前都没有数据字节被写入DR，BTF被置位。此时，外设会通过延伸（延展）SCL低电平，直到BTF被清除（读SR1后跟随一个写DR）</p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241203185842734.png" alt="image-20241203185842734"></p>
+<p>想一想，正常情况下，为了更好的连贯性和发送速率，主设备应该不论轮询TXE并向DR写入待发送的字节，尽管移位寄存器可能还正在传输上个字节，但这并不影响将下个要传输的字节写入DR。</p>
+<p>当TXE被置位（发送缓冲区为空），并且移位寄存器中的传输也结束了，还没写DR操作，会有如下几种情况：</p>
+<ul>
+<li>此次通信所有数据都一次写入DR了，此时可能移位寄存器正在传输倒数第二个字节，DR还暂存着最后一个要发送的字节，因此主设备在发送停止信号前需要轮询BTF确认DR为空了（TXE=1），移位寄存器也结束传输状态了并且最后一个字节的ACK也收到了（TXE=1），这时可以发出停止信号，随后TXE和BTF都会被清除。</li>
+<li>主设备对该传输任务设置的优先级不高，不能及时检测到TXE并写DR，可以使用轮询BTF的方式来代替轮询TXE，但传输速率会下降，因为BTF被置位期间，SCL会处于低电平拉伸状态（stretch）</li>
+<li><mark>主设备期望知道每个字节是否收到了ACK</mark>，因此每次向DR写入字节后，都轮询BTF，确认该字节发送完成并收到了从设备的ACK时才继续向DR写入下一个字节，这样能在某个字节收到不期望的NACK时做一些异常处理。</li>
+</ul>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241203192337639.png" alt="image-20241203192337639"></p>
+<p>手册中发送时序图也提到了这一点（参考EV_8），如果采用轮询TXE的方式连续发送多个字节，那么必须在DR为空，移位寄存器（非空）时，将下个字节写入DR以清除TXE。如果无法实现该操作序列，则建议轮询BTF来代替TXE以避免降低通信效率。</p>
+<h4 id="shi-li-dai-ma-bu-deng-dai-mei-ge-zi-jie-de-ack-jie-guo">示例代码-不等待每个字节的ACK结果</h4>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token keyword">void</span> <span class="token function">I2C_SendByte</span><span class="token punctuation">(</span><span class="token class-name">uint8_t</span> data<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token class-name">uint16_t</span> timeout <span class="token operator">=</span> TIMEOUT_COUNT<span class="token punctuation">;</span>
+    <span class="token comment">// 等待发送缓冲区非空</span>
+    <span class="token keyword">while</span> <span class="token punctuation">(</span><span class="token punctuation">(</span>I2C2<span class="token operator">-&gt;</span>SR1 <span class="token operator">&amp;</span> I2C_SR1_TXE<span class="token punctuation">)</span> <span class="token operator">==</span> <span class="token number">0</span> <span class="token operator">&amp;&amp;</span> timeout <span class="token operator">&gt;</span> <span class="token number">0</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        timeout<span class="token operator">--</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>timeout <span class="token operator">==</span> <span class="token number">0</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token function">LOG_ERROR</span><span class="token punctuation">(</span><span class="token string">"I2C_SendByte wait TXE timeout"</span><span class="token punctuation">)</span>
+    <span class="token punctuation">}</span>
+    <span class="token comment">// 将数据传输到发送缓冲区，同时读SR1跟随一个写DR将清除TXE标志</span>
+    I2C2<span class="token operator">-&gt;</span>DR <span class="token operator">=</span> data<span class="token punctuation">;</span>
+<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<h4 id="shi-li-dai-ma-deng-dai-mei-ge-zi-jie-de-ack-jie-guo">示例代码-等待每个字节的ACK结果</h4>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token keyword">void</span> <span class="token function">I2C_SendByte</span><span class="token punctuation">(</span><span class="token class-name">uint8_t</span> data<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token class-name">uint16_t</span> timeout <span class="token operator">=</span> TIMEOUT_COUNT<span class="token punctuation">;</span>
+    <span class="token comment">// 等待发送缓冲区非空</span>
+    <span class="token keyword">while</span> <span class="token punctuation">(</span><span class="token punctuation">(</span>I2C2<span class="token operator">-&gt;</span>SR1 <span class="token operator">&amp;</span> I2C_SR1_TXE<span class="token punctuation">)</span> <span class="token operator">==</span> <span class="token number">0</span> <span class="token operator">&amp;&amp;</span> timeout <span class="token operator">&gt;</span> <span class="token number">0</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        timeout<span class="token operator">--</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>timeout <span class="token operator">==</span> <span class="token number">0</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token function">LOG_ERROR</span><span class="token punctuation">(</span><span class="token string">"I2C_SendByte wait TXE timeout"</span><span class="token punctuation">)</span>
+    <span class="token punctuation">}</span>
+    <span class="token comment">// 将数据传输到发送缓冲区，同时读SR1跟随一个写DR将清除TXE标志</span>
+    I2C2<span class="token operator">-&gt;</span>DR <span class="token operator">=</span> data<span class="token punctuation">;</span>
+
+    <span class="token comment">// 等待当前字节传输完成且收到ACK（可选，可以在超时时针对当前字节的NACK做异常处理）</span>
+    timeout <span class="token operator">=</span> TIMEOUT_COUNT<span class="token punctuation">;</span>
+    <span class="token keyword">while</span> <span class="token punctuation">(</span><span class="token punctuation">(</span>I2C2<span class="token operator">-&gt;</span>SR1 <span class="token operator">&amp;</span> I2C_SR1_BTF<span class="token punctuation">)</span> <span class="token operator">==</span> <span class="token number">0</span> <span class="token operator">&amp;&amp;</span> timeout <span class="token operator">&gt;</span> <span class="token number">0</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        timeout<span class="token operator">--</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>timeout <span class="token operator">==</span> <span class="token number">0</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token function">LOG_ERROR</span><span class="token punctuation">(</span><span class="token string">"I2C_SendByte wait BTF timeout"</span><span class="token punctuation">)</span>
+    <span class="token punctuation">}</span>
+    <span class="token comment">// 这里不需要手动清除BTF，下一个字节的写DR会清除BTF，停止信号也会清除BTF</span>
+<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<h2 id="fa-song-ting-zhi-xin-hao-fa-song-mo-shi-xia">发送停止信号（发送模式下）</h2>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241203194648097.png" alt="image-20241203194648097"></p>
+<p>在向DR写入最后一个数据字节后，软件可以产生一个停止信号，外设会自动返回从设备模式。</p>
+<blockquote>
+<p>[!NOTE]</p>
+<p>产生停止信号的时机应该在检查到TXE或BTF被置位之后。</p>
+</blockquote>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241203194909773.png" alt="image-20241203194909773"></p>
+<p>设置该位后，在当前字节传输完成之后或当前起始信号发送之后将会产生停止信号。</p>
+<h4 id="shi-li-dai-ma-3">示例代码</h4>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token keyword">void</span> <span class="token function">I2C_Stop4Send</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token class-name">uint16_t</span> timeout <span class="token operator">=</span> TIMEOUT_COUNT<span class="token punctuation">;</span>
+    <span class="token comment">// 等待条件: 发送缓冲区为空</span>
+    <span class="token keyword">while</span> <span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token punctuation">(</span>I2C2<span class="token operator">-&gt;</span>SR1 <span class="token operator">&amp;</span> I2C_SR1_TXE<span class="token punctuation">)</span> <span class="token operator">==</span> <span class="token number">0</span><span class="token punctuation">)</span> <span class="token operator">&amp;&amp;</span> timeout <span class="token operator">&gt;</span> <span class="token number">0</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        timeout<span class="token operator">--</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    I2C2<span class="token operator">-&gt;</span>CR1 <span class="token operator">|=</span> I2C_CR1_STOP<span class="token punctuation">;</span>
+<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<h2 id="zhu-she-bei-jie-shou-shu-ju">主设备接收数据</h2>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241203195407265.png" alt="image-20241203195407265"></p>
+<p>在以写模式发送从设备地址，并清除ADDR标志后，I2C外设会进入主设备接收模式。</p>
+<p>在该模式下，外设通过内部移位寄存器从SDA总线接收字节到DR中。在接收到每个字节后，外设会产生如下操作序列：</p>
+<ol>
+<li>如果设置了CR1中的ACK=1，外设会自动响应ACK脉冲</li>
+<li>SR1中的RXNE会被硬件置位，并产生中断（如果使能了中断）</li>
+</ol>
+<p>如果RXNE被置位，并且DR中的数据在最近一次接收数据完成之前还没有被读取，此时接收到的数据无法存入DR，那么BTF会被硬件置位。外设会延伸SCL低电平（总线挂起），直到BTF被清除（一个读SR1操作后跟随一个读DR操作）</p>
+<h4 id="shi-li-dai-ma-4">示例代码</h4>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token class-name">uint8_t</span> <span class="token function">I2C_ReceiveByte</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token class-name">uint16_t</span> timeout <span class="token operator">=</span> TIMEOUT_COUNT<span class="token punctuation">;</span>
+    <span class="token keyword">while</span> <span class="token punctuation">(</span><span class="token punctuation">(</span>I2C2<span class="token operator">-&gt;</span>SR1 <span class="token operator">&amp;</span> I2C_SR1_RXNE<span class="token punctuation">)</span> <span class="token operator">==</span> <span class="token number">0</span> <span class="token operator">&amp;&amp;</span> timeout <span class="token operator">&gt;</span> <span class="token number">0</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        timeout<span class="token operator">--</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>timeout <span class="token operator">==</span> <span class="token number">0</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token function">LOG_ERROR</span><span class="token punctuation">(</span><span class="token string">"I2C_ReceiveByte timeout, timeout = %d"</span><span class="token punctuation">,</span> timeout<span class="token punctuation">)</span>
+    <span class="token punctuation">}</span>
+    <span class="token keyword">return</span> I2C2<span class="token operator">-&gt;</span>DR<span class="token punctuation">;</span>
+<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<h2 id="xiang-ying-ack-nack">响应ACK/NACK</h2>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241203201826539.png" alt="image-20241203201826539"></p>
+<p>将ACK设置为1后，外设会对每个接收到的字节响应ACK。如果设置为0，则对每个接收到的字节响应NACK。</p>
+<h4 id="shi-li-dai-ma-5">示例代码：</h4>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token keyword">void</span> <span class="token function">I2C_EnableAutoAck</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span> <span class="token punctuation">{</span> I2C2<span class="token operator">-&gt;</span>CR1 <span class="token operator">|=</span> I2C_CR1_ACK<span class="token punctuation">;</span> <span class="token punctuation">}</span>
+
+<span class="token keyword">void</span> <span class="token function">I2C_DisableAutoAck</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span> <span class="token punctuation">{</span> I2C2<span class="token operator">-&gt;</span>CR1 <span class="token operator">&amp;=</span> <span class="token operator">~</span>I2C_CR1_ACK<span class="token punctuation">;</span> <span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+<h2 id="fa-song-ting-zhi-xin-hao-jie-shou-mo-shi-xia">发送停止信号（接收模式下）</h2>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token keyword">void</span> <span class="token function">I2C_EnableStop</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span> <span class="token punctuation">{</span> I2C2<span class="token operator">-&gt;</span>CR1 <span class="token operator">|=</span> I2C_CR1_STOP<span class="token punctuation">;</span> <span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<h2 id="zhu-she-bei-jie-shou-liu-cheng">主设备接收流程</h2>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241203202947534.png" alt="image-20241203202947534"></p>
+<p>如果该任务有最高优先级可以使用该方式一。</p>
+<p>主设备需要针对从设备接收的最后一个字节发送NACK。从设备在收到该NACK后，会释放对SCL和SDA总线的控制。接着主设备就可以发送停止信号或重新开始信号。</p>
+<ol>
+<li>为了在接收到最后一个字节后产生NACK脉冲，必须恰好在读倒数第二个数据字节时（在倒数第二个RXNE事件发生时）将ACK清零。否则最后一个字节传输结束时，ACK如果没有清零，外设就会自动响应ACK。</li>
+<li>为了产生停止/重新开始信号，软件必须恰好在读倒数第二个数据字节时（在倒数第二个RXNE事件发生时）将STOP/START置位。</li>
+<li>如果只需要接收一个字节，那么应该在紧跟着发送设备地址并清除ADDR之后将ACK清零并置位STOP。</li>
+</ol>
+<p>在停止信号产生之后，外设将自动回到从设备模式（SCL/SDA为释放状态）。</p>
+<h3 id="shi-li-dai-ma-6">示例代码</h3>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token keyword">void</span> <span class="token function">I2C_Test</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token function">I2C_Start</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">I2C_SendAddr</span><span class="token punctuation">(</span><span class="token number">0xA0</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">I2C_SendByte</span><span class="token punctuation">(</span><span class="token number">0x0</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">I2C_SendByte</span><span class="token punctuation">(</span><span class="token char">'a'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">I2C_SendByte</span><span class="token punctuation">(</span><span class="token char">'b'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">I2C_Stop4Send</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token function">delay_ms</span><span class="token punctuation">(</span><span class="token number">5</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token function">I2C_Start</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">I2C_SendAddr</span><span class="token punctuation">(</span><span class="token number">0xA0</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">I2C_SendByte</span><span class="token punctuation">(</span><span class="token number">0x00</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token function">I2C_EnableAutoAck</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">I2C_Start</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">I2C_SendAddr</span><span class="token punctuation">(</span><span class="token number">0xA0</span> <span class="token operator">+</span> <span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">I2C_ReceiveByte</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">I2C_DisableAutoAck</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">I2C_EnableStop</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">I2C_ReceiveByte</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<h2 id="wan-zheng-dai-ma-1">完整代码</h2>
+<h3 id="i-2-c-hard-h">i2c_hard.h</h3>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">"delay.h"</span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">"stm32f10x.h"</span></span>
+
+<span class="token keyword">void</span> <span class="token function">I2C_Init</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token keyword">void</span> <span class="token function">I2C_Start</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token keyword">void</span> <span class="token function">I2C_EnableAutoAck</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">void</span> <span class="token function">I2C_DisableAutoAck</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token keyword">void</span> <span class="token function">I2C_SendByte</span><span class="token punctuation">(</span><span class="token class-name">uint8_t</span> data<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">void</span> <span class="token function">I2C_SendAddr</span><span class="token punctuation">(</span><span class="token class-name">uint8_t</span> data<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token class-name">uint8_t</span> <span class="token function">I2C_ReceiveByte</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token keyword">void</span> <span class="token function">I2C_Stop4Send</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">void</span> <span class="token function">I2C_EnableStop</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">void</span> <span class="token function">I2C_Test</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<h3 id="i-2-c-hard-c">i2c_hard.c</h3>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">"i2c_hard.h"</span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">"logger.h"</span></span>
+
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name">TIMEOUT_COUNT</span> <span class="token expression"><span class="token number">0xFFFF</span></span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name">OK</span> <span class="token expression"><span class="token number">0</span></span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name">FAIL</span> <span class="token expression"><span class="token number">1</span></span></span>
+
+<span class="token keyword">void</span> <span class="token function">I2C_Init</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token comment">// 1. GPIO时钟配置</span>
+    RCC<span class="token operator">-&gt;</span>APB2ENR <span class="token operator">|=</span> RCC_APB2ENR_IOPBEN<span class="token punctuation">;</span>
+    RCC<span class="token operator">-&gt;</span>APB1ENR <span class="token operator">|=</span> RCC_APB1ENR_I2C2EN<span class="token punctuation">;</span>
+
+    <span class="token comment">// 2. 配置GPIO工作模式为复用开漏输出 mode=11 cnf=11</span>
+    GPIOB<span class="token operator">-&gt;</span>CRH <span class="token operator">|=</span> <span class="token punctuation">(</span>GPIO_CRH_MODE11 <span class="token operator">|</span> GPIO_CRH_CNF11<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    GPIOB<span class="token operator">-&gt;</span>CRH <span class="token operator">|=</span> <span class="token punctuation">(</span>GPIO_CRH_MODE10 <span class="token operator">|</span> GPIO_CRH_CNF10<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token comment">// 特别注意，如下操作无法得到预期结果，GPIO工作不正常</span>
+    <span class="token comment">// GPIOB-&gt;CRH |= (GPIO_CRH_CNF10 | GPIO_CRH_CNF11);</span>
+    <span class="token comment">// GPIOB-&gt;CRH |= (GPIO_CRH_MODE10 | GPIO_CRH_MODE11);</span>
+    <span class="token comment">// 如下则是可以的</span>
+    <span class="token comment">// GPIOB-&gt;CRH |= (GPIO_CRH_MODE11 | GPIO_CRH_CNF11 | GPIO_CRH_MODE10 |</span>
+    <span class="token comment">// GPIO_CRH_CNF10);</span>
+
+    <span class="token comment">// 3. 配置外设为I2C模式（默认就是I2C模式，1-SMBUS模式）</span>
+    I2C2<span class="token operator">-&gt;</span>CR1 <span class="token operator">&amp;=</span> <span class="token operator">~</span>I2C_CR1_SMBUS<span class="token punctuation">;</span>
+
+    <span class="token comment">// 4. 配置外设时钟</span>
+    I2C2<span class="token operator">-&gt;</span>CR2 <span class="token operator">|=</span> <span class="token number">36</span><span class="token punctuation">;</span> <span class="token comment">// 必须小于等于APB1的最大时钟频率36MHz</span>
+
+    <span class="token comment">// 5. 配置外设模式：I2C标准模式（100kHz）、SCL时钟频率（100kHz）</span>
+    I2C2<span class="token operator">-&gt;</span>CCR <span class="token operator">&amp;=</span> <span class="token operator">~</span>I2C_CCR_FS<span class="token punctuation">;</span> <span class="token comment">// 标准模式</span>
+    I2C2<span class="token operator">-&gt;</span>CCR <span class="token operator">|=</span> <span class="token number">180</span><span class="token punctuation">;</span> <span class="token comment">// SCL高低电平周期5us / 外设时钟周期(1/36us) = 5 * 36</span>
+
+    <span class="token comment">// 6. 配置TRISE-SCL最大上升时间</span>
+    I2C2<span class="token operator">-&gt;</span>TRISE <span class="token operator">&amp;=</span> <span class="token operator">~</span>I2C_TRISE_TRISE<span class="token punctuation">;</span> <span class="token comment">// 清零</span>
+    I2C2<span class="token operator">-&gt;</span>TRISE <span class="token operator">|=</span>
+        <span class="token number">37</span><span class="token punctuation">;</span> <span class="token comment">// I2C标准模式最大上升时间1us / 外设时钟周期(1/36us) + 1 = 36 + 1</span>
+
+    <span class="token comment">// 7. 使能外设</span>
+    I2C2<span class="token operator">-&gt;</span>CR1 <span class="token operator">|=</span> I2C_CR1_PE<span class="token punctuation">;</span> <span class="token comment">// Peripheral(I2C) Enable</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">void</span> <span class="token function">I2C_Start</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token comment">// 产生起始信号（当BUSY=1时不会立即产生）</span>
+    I2C2<span class="token operator">-&gt;</span>CR1 <span class="token operator">|=</span> I2C_CR1_START<span class="token punctuation">;</span>
+    <span class="token class-name">uint16_t</span> timeout <span class="token operator">=</span> TIMEOUT_COUNT<span class="token punctuation">;</span>
+    <span class="token comment">// 起始信号产生后，由硬件置位SB</span>
+    <span class="token keyword">while</span> <span class="token punctuation">(</span><span class="token punctuation">(</span>I2C2<span class="token operator">-&gt;</span>SR1 <span class="token operator">&amp;</span> I2C_SR1_SB<span class="token punctuation">)</span> <span class="token operator">==</span> <span class="token number">0</span> <span class="token operator">&amp;&amp;</span> timeout <span class="token operator">&gt;</span> <span class="token number">0</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        timeout<span class="token operator">--</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>timeout <span class="token operator">==</span> <span class="token number">0</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token function">LOG_ERROR</span><span class="token punctuation">(</span><span class="token string">"I2C_Start timeout, timeout = %d"</span><span class="token punctuation">,</span> timeout<span class="token punctuation">)</span>
+    <span class="token punctuation">}</span>
+    <span class="token comment">// 紧接着发送设备地址会写DR，读SR1写DR序列会清除SB，因此这里不需要手动清除SB</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">void</span> <span class="token function">I2C_SendAddr</span><span class="token punctuation">(</span><span class="token class-name">uint8_t</span> addr<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token class-name">uint16_t</span> timeout <span class="token operator">=</span> TIMEOUT_COUNT<span class="token punctuation">;</span>
+    <span class="token comment">// 产生起始信号后，DR肯定为空，可以将从设备地址直接写入DR</span>
+    I2C2<span class="token operator">-&gt;</span>DR <span class="token operator">=</span> addr<span class="token punctuation">;</span>
+    <span class="token comment">// 等待硬件置位ADDR（表明从设备地址以发出并收到了相应从设备的ACK）</span>
+    <span class="token keyword">while</span> <span class="token punctuation">(</span><span class="token punctuation">(</span>I2C2<span class="token operator">-&gt;</span>SR1 <span class="token operator">&amp;</span> I2C_SR1_ADDR<span class="token punctuation">)</span> <span class="token operator">==</span> <span class="token number">0</span> <span class="token operator">&amp;&amp;</span> timeout <span class="token operator">&gt;</span> <span class="token number">0</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        timeout<span class="token operator">--</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>timeout <span class="token operator">==</span> <span class="token number">0</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token function">LOG_ERROR</span><span class="token punctuation">(</span><span class="token string">"I2C_SendAddr timeout"</span><span class="token punctuation">)</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token comment">// 清除ADDR标志位操作序列：读SR1后跟随一个读SR2</span>
+    I2C2<span class="token operator">-&gt;</span>SR2<span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">void</span> <span class="token function">I2C_SendByte</span><span class="token punctuation">(</span><span class="token class-name">uint8_t</span> data<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token class-name">uint16_t</span> timeout <span class="token operator">=</span> TIMEOUT_COUNT<span class="token punctuation">;</span>
+    <span class="token comment">// 等待发送缓冲区非空</span>
+    <span class="token keyword">while</span> <span class="token punctuation">(</span><span class="token punctuation">(</span>I2C2<span class="token operator">-&gt;</span>SR1 <span class="token operator">&amp;</span> I2C_SR1_TXE<span class="token punctuation">)</span> <span class="token operator">==</span> <span class="token number">0</span> <span class="token operator">&amp;&amp;</span> timeout <span class="token operator">&gt;</span> <span class="token number">0</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        timeout<span class="token operator">--</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>timeout <span class="token operator">==</span> <span class="token number">0</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token function">LOG_ERROR</span><span class="token punctuation">(</span><span class="token string">"I2C_SendByte wait TXE timeout"</span><span class="token punctuation">)</span>
+    <span class="token punctuation">}</span>
+    <span class="token comment">// 将数据传输到发送缓冲区，同时读SR1跟随一个写DR将清除TXE标志</span>
+    I2C2<span class="token operator">-&gt;</span>DR <span class="token operator">=</span> data<span class="token punctuation">;</span>
+
+    <span class="token comment">// 等待当前字节传输完成且收到ACK（可选，可以在超时时针对当前字节的NACK做异常处理）</span>
+    timeout <span class="token operator">=</span> TIMEOUT_COUNT<span class="token punctuation">;</span>
+    <span class="token keyword">while</span> <span class="token punctuation">(</span><span class="token punctuation">(</span>I2C2<span class="token operator">-&gt;</span>SR1 <span class="token operator">&amp;</span> I2C_SR1_BTF<span class="token punctuation">)</span> <span class="token operator">==</span> <span class="token number">0</span> <span class="token operator">&amp;&amp;</span> timeout <span class="token operator">&gt;</span> <span class="token number">0</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        timeout<span class="token operator">--</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>timeout <span class="token operator">==</span> <span class="token number">0</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token function">LOG_ERROR</span><span class="token punctuation">(</span><span class="token string">"I2C_SendByte wait BTF timeout"</span><span class="token punctuation">)</span>
+    <span class="token punctuation">}</span>
+    <span class="token comment">// 这里不需要手动清除BTF，下一个字节的写DR会清除BTF，停止信号也会清除BTF</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">void</span> <span class="token function">I2C_Stop4Send</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token class-name">uint16_t</span> timeout <span class="token operator">=</span> TIMEOUT_COUNT<span class="token punctuation">;</span>
+    <span class="token comment">// 等待条件: 发送缓冲区为空</span>
+    <span class="token keyword">while</span> <span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token punctuation">(</span>I2C2<span class="token operator">-&gt;</span>SR1 <span class="token operator">&amp;</span> I2C_SR1_TXE<span class="token punctuation">)</span> <span class="token operator">==</span> <span class="token number">0</span><span class="token punctuation">)</span> <span class="token operator">&amp;&amp;</span> timeout <span class="token operator">&gt;</span> <span class="token number">0</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        timeout<span class="token operator">--</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    I2C2<span class="token operator">-&gt;</span>CR1 <span class="token operator">|=</span> I2C_CR1_STOP<span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">void</span> <span class="token function">I2C_EnableStop</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span> <span class="token punctuation">{</span> I2C2<span class="token operator">-&gt;</span>CR1 <span class="token operator">|=</span> I2C_CR1_STOP<span class="token punctuation">;</span> <span class="token punctuation">}</span>
+
+<span class="token class-name">uint8_t</span> <span class="token function">I2C_ReceiveByte</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token class-name">uint16_t</span> timeout <span class="token operator">=</span> TIMEOUT_COUNT<span class="token punctuation">;</span>
+    <span class="token keyword">while</span> <span class="token punctuation">(</span><span class="token punctuation">(</span>I2C2<span class="token operator">-&gt;</span>SR1 <span class="token operator">&amp;</span> I2C_SR1_RXNE<span class="token punctuation">)</span> <span class="token operator">==</span> <span class="token number">0</span> <span class="token operator">&amp;&amp;</span> timeout <span class="token operator">&gt;</span> <span class="token number">0</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        timeout<span class="token operator">--</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>timeout <span class="token operator">==</span> <span class="token number">0</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token function">LOG_ERROR</span><span class="token punctuation">(</span><span class="token string">"I2C_ReceiveByte timeout, timeout = %d"</span><span class="token punctuation">,</span> timeout<span class="token punctuation">)</span>
+    <span class="token punctuation">}</span>
+    <span class="token keyword">return</span> I2C2<span class="token operator">-&gt;</span>DR<span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">void</span> <span class="token function">I2C_EnableAutoAck</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span> <span class="token punctuation">{</span> I2C2<span class="token operator">-&gt;</span>CR1 <span class="token operator">|=</span> I2C_CR1_ACK<span class="token punctuation">;</span> <span class="token punctuation">}</span>
+
+<span class="token keyword">void</span> <span class="token function">I2C_DisableAutoAck</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span> <span class="token punctuation">{</span> I2C2<span class="token operator">-&gt;</span>CR1 <span class="token operator">&amp;=</span> <span class="token operator">~</span>I2C_CR1_ACK<span class="token punctuation">;</span> <span class="token punctuation">}</span>
+
+<span class="token keyword">void</span> <span class="token function">I2C_Test</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token function">I2C_Start</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">I2C_SendAddr</span><span class="token punctuation">(</span><span class="token number">0xA0</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">I2C_SendByte</span><span class="token punctuation">(</span><span class="token number">0x0</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">I2C_SendByte</span><span class="token punctuation">(</span><span class="token char">'a'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">I2C_SendByte</span><span class="token punctuation">(</span><span class="token char">'b'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">I2C_Stop4Send</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token function">delay_ms</span><span class="token punctuation">(</span><span class="token number">5</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token function">I2C_Start</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">I2C_SendAddr</span><span class="token punctuation">(</span><span class="token number">0xA0</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">I2C_SendByte</span><span class="token punctuation">(</span><span class="token number">0x00</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token function">I2C_EnableAutoAck</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">I2C_Start</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">I2C_SendAddr</span><span class="token punctuation">(</span><span class="token number">0xA0</span> <span class="token operator">+</span> <span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">I2C_ReceiveByte</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">I2C_DisableAutoAck</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">I2C_EnableStop</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">I2C_ReceiveByte</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<h3 id="eeprom">EEPROM</h3>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">ifndef</span> <span class="token expression">__M24C02_H__</span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name">__M24C02_H__</span></span>
+
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">"i2c_hard.h"</span></span>
+
+<span class="token keyword">void</span> <span class="token function">M24C02_Init</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token keyword">void</span> <span class="token function">M24C02_WriteByte</span><span class="token punctuation">(</span><span class="token class-name">uint8_t</span> addr<span class="token punctuation">,</span> <span class="token class-name">uint8_t</span> byte<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">void</span> <span class="token function">M24C02_WriteBytes</span><span class="token punctuation">(</span><span class="token class-name">uint8_t</span> addr<span class="token punctuation">,</span> <span class="token class-name">uint8_t</span> <span class="token operator">*</span>bytes<span class="token punctuation">,</span> <span class="token class-name">uint8_t</span> size<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token class-name">uint8_t</span> <span class="token function">M24C02_ReadByte</span><span class="token punctuation">(</span><span class="token class-name">uint8_t</span> addr<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">void</span> <span class="token function">M24C02_ReadBytes</span><span class="token punctuation">(</span><span class="token class-name">uint8_t</span> addr<span class="token punctuation">,</span> <span class="token class-name">uint8_t</span> <span class="token operator">*</span>bytes<span class="token punctuation">,</span> <span class="token class-name">uint8_t</span> size<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">void</span> <span class="token function">M24C02_Test</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">endif</span> <span class="token comment">/* __M24C02_H__ */</span></span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">"m24c02.h"</span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">"logger.h"</span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">"string.h"</span></span>
+
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name">DEV_ADDR_W</span> <span class="token expression"><span class="token number">0xA0</span></span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name">DEV_ADDR_R</span> <span class="token expression"><span class="token number">0xA1</span></span></span>
+
+<span class="token keyword">void</span> <span class="token function">M24C02_Init</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span> <span class="token punctuation">{</span> <span class="token function">I2C_Init</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token punctuation">}</span>
+
+<span class="token keyword">void</span> <span class="token function">M24C02_WriteByte</span><span class="token punctuation">(</span><span class="token class-name">uint8_t</span> addr<span class="token punctuation">,</span> <span class="token class-name">uint8_t</span> byte<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token function">M24C02_WriteBytes</span><span class="token punctuation">(</span>addr<span class="token punctuation">,</span> <span class="token operator">&amp;</span>byte<span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+<span class="token keyword">void</span> <span class="token function">M24C02_WriteBytes</span><span class="token punctuation">(</span><span class="token class-name">uint8_t</span> addr<span class="token punctuation">,</span> <span class="token class-name">uint8_t</span> <span class="token operator">*</span>bytes<span class="token punctuation">,</span> <span class="token class-name">uint8_t</span> size<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token function">I2C_Start</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">I2C_SendAddr</span><span class="token punctuation">(</span>DEV_ADDR_W<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">I2C_SendByte</span><span class="token punctuation">(</span>addr<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">for</span> <span class="token punctuation">(</span><span class="token class-name">uint8_t</span> i <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span> i <span class="token operator">&lt;</span> size<span class="token punctuation">;</span> i<span class="token operator">++</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token function">I2C_SendByte</span><span class="token punctuation">(</span>bytes<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    <span class="token function">I2C_Stop4Send</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">delay_ms</span><span class="token punctuation">(</span><span class="token number">5</span><span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment">// wait for write cycle</span>
+<span class="token punctuation">}</span>
+
+<span class="token class-name">uint8_t</span> <span class="token function">M24C02_ReadByte</span><span class="token punctuation">(</span><span class="token class-name">uint8_t</span> addr<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token class-name">uint8_t</span> byte <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
+    <span class="token function">M24C02_ReadBytes</span><span class="token punctuation">(</span>addr<span class="token punctuation">,</span> <span class="token operator">&amp;</span>byte<span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">return</span> byte<span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">void</span> <span class="token function">M24C02_ReadBytes</span><span class="token punctuation">(</span><span class="token class-name">uint8_t</span> addr<span class="token punctuation">,</span> <span class="token class-name">uint8_t</span> <span class="token operator">*</span>bytes<span class="token punctuation">,</span> <span class="token class-name">uint8_t</span> size<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token function">I2C_Start</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">I2C_SendAddr</span><span class="token punctuation">(</span>DEV_ADDR_W<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">I2C_SendByte</span><span class="token punctuation">(</span>addr<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token function">I2C_Start</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">I2C_SendAddr</span><span class="token punctuation">(</span>DEV_ADDR_R<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">I2C_EnableAutoAck</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">for</span> <span class="token punctuation">(</span><span class="token class-name">uint8_t</span> i <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span> i <span class="token operator">&lt;</span> size<span class="token punctuation">;</span> i<span class="token operator">++</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>i <span class="token operator">==</span> size <span class="token operator">-</span> <span class="token number">1</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token function">I2C_DisableAutoAck</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token function">I2C_EnableStop</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+        bytes<span class="token punctuation">[</span>i<span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token function">I2C_ReceiveByte</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">void</span> <span class="token function">M24C02_Test</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token function">M24C02_WriteByte</span><span class="token punctuation">(</span><span class="token number">0x00</span><span class="token punctuation">,</span> <span class="token char">'a'</span> <span class="token operator">-</span> <span class="token number">32</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">M24C02_WriteByte</span><span class="token punctuation">(</span><span class="token number">0x01</span><span class="token punctuation">,</span> <span class="token char">'b'</span> <span class="token operator">-</span> <span class="token number">32</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">M24C02_WriteByte</span><span class="token punctuation">(</span><span class="token number">0x02</span><span class="token punctuation">,</span> <span class="token char">'c'</span> <span class="token operator">-</span> <span class="token number">32</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token class-name">uint8_t</span> b1 <span class="token operator">=</span> <span class="token function">M24C02_ReadByte</span><span class="token punctuation">(</span><span class="token number">0x00</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token class-name">uint8_t</span> b2 <span class="token operator">=</span> <span class="token function">M24C02_ReadByte</span><span class="token punctuation">(</span><span class="token number">0x01</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token class-name">uint8_t</span> b3 <span class="token operator">=</span> <span class="token function">M24C02_ReadByte</span><span class="token punctuation">(</span><span class="token number">0x02</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">LOG_DEBUG</span><span class="token punctuation">(</span><span class="token string">"b1 = %d, b2 = %d, b3 = %d"</span><span class="token punctuation">,</span> b1<span class="token punctuation">,</span> b2<span class="token punctuation">,</span> b3<span class="token punctuation">)</span>
+
+    <span class="token function">M24C02_WriteBytes</span><span class="token punctuation">(</span><span class="token number">0x00</span><span class="token punctuation">,</span> <span class="token string">"56789"</span><span class="token punctuation">,</span> <span class="token number">5</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token class-name">uint8_t</span> buffer<span class="token punctuation">[</span><span class="token number">100</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token punctuation">{</span><span class="token number">0</span><span class="token punctuation">}</span><span class="token punctuation">;</span>
+    <span class="token function">M24C02_ReadBytes</span><span class="token punctuation">(</span><span class="token number">0x00</span><span class="token punctuation">,</span> buffer<span class="token punctuation">,</span> <span class="token number">5</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">LOG_DEBUG</span><span class="token punctuation">(</span><span class="token string">"buffer = %s"</span><span class="token punctuation">,</span> buffer<span class="token punctuation">)</span>
+
+    <span class="token function">memset</span><span class="token punctuation">(</span>buffer<span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token keyword">sizeof</span><span class="token punctuation">(</span>buffer<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">M24C02_WriteBytes</span><span class="token punctuation">(</span><span class="token number">0x00</span><span class="token punctuation">,</span> <span class="token string">"12345"</span><span class="token punctuation">,</span> <span class="token number">5</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">M24C02_ReadBytes</span><span class="token punctuation">(</span><span class="token number">0xFF</span><span class="token punctuation">,</span> buffer<span class="token punctuation">,</span> <span class="token number">5</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">LOG_DEBUG</span><span class="token punctuation">(</span><span class="token string">"buffer = %s"</span><span class="token punctuation">,</span> buffer<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<h2 id="kuo-zhan-btf-biao-zhi-wei-de-zuo-yong">扩展：BTF标志位的作用</h2>
+<p><code>BTF</code> (Byte Transfer Finished) 标志位的作用是指示当前<strong>字节传输完成</strong>，包括发送和接收场景。具体来说，它是一个硬件状态位，反映了数据寄存器（<code>DR</code>）和移位寄存器之间的数据传输状态。</p>
+<h3 id="strong-btf-de-ding-yi-yu-zuo-yong-strong"><strong>BTF 的定义与作用</strong></h3>
+<ol>
+<li><strong>定义</strong>：
+<ul>
+<li>当移位寄存器中当前数据字节的传输完成（无论是发送还是接收），并且数据寄存器（<code>DR</code>）为空时，硬件会设置 <code>BTF</code> 标志位。</li>
+<li>如果在接收模式中，<code>DR</code> 中的数据未被读取，或者在发送模式中新的数据未被写入，I2C 外设会拉低时钟线（SCL），即 <strong>“总线挂起”</strong>，以等待软件处理。</li>
+</ul>
+</li>
+<li><strong>作用</strong>：
+<ul>
+<li>用于协调主机（MCU）和外设之间的数据流，避免数据丢失或错误。</li>
+<li>指示是否需要读取 <code>DR</code>（在接收模式）或写入 <code>DR</code>（在发送模式）。</li>
+</ul>
+</li>
+</ol>
+<h1 id="the-end">THE END</h1>
 
                 
             </div>
@@ -2310,7 +3008,7 @@ GPIOB-&gt;CRH |= (GPIO_CRH_CNF10_0 | GPIO_CRH_CNF11_0);<span aria-hidden="true" 
             <br>
             
                 &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                        class="white-color">38.2k</span>
+                        class="white-color">45.6k</span>
             
             
             
