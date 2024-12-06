@@ -404,7 +404,7 @@
                     <div class="post-statis col l4 hide-on-med-and-down" data-aos="zoom-in-right">
                         
 <div class="statis">
-    <span class="count"><a href="/">16</a></span>
+    <span class="count"><a href="/">17</a></span>
     <span class="name">文章</span>
 </div>
 
@@ -418,7 +418,7 @@
 
 
 <div class="statis">
-    <span class="count"><a href="/tags">32</a></span>
+    <span class="count"><a href="/tags">35</a></span>
     <span class="name">标签</span>
 </div>
 
@@ -434,7 +434,7 @@
                                 <div class="post-statis hide-on-large-only" data-aos="zoom-in-right">
                                     
 <div class="statis">
-    <span class="count"><a href="/">16</a></span>
+    <span class="count"><a href="/">17</a></span>
     <span class="name">文章</span>
 </div>
 
@@ -448,7 +448,7 @@
 
 
 <div class="statis">
-    <span class="count"><a href="/tags">32</a></span>
+    <span class="count"><a href="/tags">35</a></span>
     <span class="name">标签</span>
 </div>
 
@@ -592,7 +592,7 @@
                 name: '文章篇数',
                 type: 'line',
                 color: ['#6772e5'],
-                data: [0,0,0,0,0,0,0,0,0,0,0,16,0],
+                data: [0,0,0,0,0,0,0,0,0,0,0,16,1],
                 markPoint: {
                     symbolSize: 45,
                     color: ['#fa755a','#3ecf8e','#82d3f4'],
@@ -634,7 +634,7 @@
                 type: 'pie',
                 radius: '50%',
                 color: ['#6772e5', '#ff9e0f', '#fa755a', '#3ecf8e', '#82d3f4', '#ab47bc', '#525f7f', '#f51c47', '#26A69A'],
-                data: [{"name":"ARM","value":5},{"name":"MDK","value":1},{"name":"STM32","value":4},{"name":"协议","value":2},{"name":"源码分析","value":1},{"name":"算法","value":1},{"name":"架构","value":1},{"name":"踩坑记录","value":1},{"name":"GD32","value":1},{"name":"STM32","value":1},{"name":"踩坑记录","value":1}],
+                data: [{"name":"ARM","value":5},{"name":"MDK","value":1},{"name":"STM32","value":5},{"name":"协议","value":2},{"name":"踩坑记录","value":1},{"name":"架构","value":1},{"name":"源码分析","value":1},{"name":"算法","value":1},{"name":"STM32","value":1},{"name":"GD32","value":1},{"name":"踩坑记录","value":1}],
                 itemStyle: {
                     emphasis: {
                         shadowBlur: 10,
@@ -658,7 +658,7 @@
         xAxis: [
             {
                 type: 'category',
-                data: ["ARM","ARMv7","STM32","GD32","UART","I2C","I²C","指令流水线","指令集","异常"]
+                data: ["ARM","ARMv7","STM32","GD32","UART","I2C","I²C","指令流水线","指令集","ATPCS"]
             }
         ],
         yAxis: [
@@ -865,18 +865,6 @@
             
             
             
-            <a href="/tags/%E5%BC%82%E5%B8%B8/">
-                <span class="chip center-align waves-effect waves-light chip-default">异常</span>
-            </a>
-            
-            
-            
-            <a href="/tags/%E4%B8%AD%E6%96%AD/">
-                <span class="chip center-align waves-effect waves-light chip-default">中断</span>
-            </a>
-            
-            
-            
             <a href="/tags/ATPCS/">
                 <span class="chip center-align waves-effect waves-light chip-default">ATPCS</span>
             </a>
@@ -901,32 +889,26 @@
             
             
             
-            <a href="/tags/STM32/">
-                <span class="chip center-align waves-effect waves-light chip-default">STM32</span>
+            <a href="/tags/%E5%BC%82%E5%B8%B8/">
+                <span class="chip center-align waves-effect waves-light chip-default">异常</span>
             </a>
             
             
             
-            <a href="/tags/SPL/">
-                <span class="chip center-align waves-effect waves-light chip-default">SPL</span>
-            </a>
-            
-            
-            
-            <a href="/tags/STM32F103ZE/">
-                <span class="chip center-align waves-effect waves-light chip-default">STM32F103ZE</span>
-            </a>
-            
-            
-            
-            <a href="/tags/%E6%97%B6%E9%92%9F/">
-                <span class="chip center-align waves-effect waves-light chip-default">时钟</span>
+            <a href="/tags/%E4%B8%AD%E6%96%AD/">
+                <span class="chip center-align waves-effect waves-light chip-default">中断</span>
             </a>
             
             
             
             <a href="/tags/Clion/">
                 <span class="chip center-align waves-effect waves-light chip-default">Clion</span>
+            </a>
+            
+            
+            
+            <a href="/tags/STM32/">
+                <span class="chip center-align waves-effect waves-light chip-default">STM32</span>
             </a>
             
             
@@ -949,6 +931,24 @@
             
             
             
+            <a href="/tags/SPL/">
+                <span class="chip center-align waves-effect waves-light chip-default">SPL</span>
+            </a>
+            
+            
+            
+            <a href="/tags/STM32F103ZE/">
+                <span class="chip center-align waves-effect waves-light chip-default">STM32F103ZE</span>
+            </a>
+            
+            
+            
+            <a href="/tags/%E6%97%B6%E9%92%9F/">
+                <span class="chip center-align waves-effect waves-light chip-default">时钟</span>
+            </a>
+            
+            
+            
             <a href="/tags/%E5%A4%96%E9%83%A8%E4%B8%AD%E6%96%AD/">
                 <span class="chip center-align waves-effect waves-light chip-default">外部中断</span>
             </a>
@@ -957,6 +957,24 @@
             
             <a href="/tags/EXTI/">
                 <span class="chip center-align waves-effect waves-light chip-default">EXTI</span>
+            </a>
+            
+            
+            
+            <a href="/tags/TIMER/">
+                <span class="chip center-align waves-effect waves-light chip-default">TIMER</span>
+            </a>
+            
+            
+            
+            <a href="/tags/%E5%AE%9A%E6%97%B6%E5%99%A8/">
+                <span class="chip center-align waves-effect waves-light chip-default">定时器</span>
+            </a>
+            
+            
+            
+            <a href="/tags/TIM/">
+                <span class="chip center-align waves-effect waves-light chip-default">TIM</span>
             </a>
             
             
@@ -985,14 +1003,8 @@
             
             
             
-            <a href="/tags/%E7%AE%97%E6%B3%95/">
-                <span class="chip center-align waves-effect waves-light chip-default">算法</span>
-            </a>
-            
-            
-            
-            <a href="/tags/LeetCode/">
-                <span class="chip center-align waves-effect waves-light chip-default">LeetCode</span>
+            <a href="/tags/%E4%B8%B2%E5%8F%A3/">
+                <span class="chip center-align waves-effect waves-light chip-default">串口</span>
             </a>
             
             
@@ -1009,8 +1021,14 @@
             
             
             
-            <a href="/tags/%E4%B8%B2%E5%8F%A3/">
-                <span class="chip center-align waves-effect waves-light chip-default">串口</span>
+            <a href="/tags/%E7%AE%97%E6%B3%95/">
+                <span class="chip center-align waves-effect waves-light chip-default">算法</span>
+            </a>
+            
+            
+            
+            <a href="/tags/LeetCode/">
+                <span class="chip center-align waves-effect waves-light chip-default">LeetCode</span>
             </a>
             
             
@@ -1109,7 +1127,7 @@
             <br>
             
                 &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                        class="white-color">45.6k</span>
+                        class="white-color">53.7k</span>
             
             
             

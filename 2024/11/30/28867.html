@@ -410,21 +410,21 @@ STM32F103参考手册：rm0008-stm32f101xx-stm32f102xx-">
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-check fa-fw"></i>更新日期:&nbsp;&nbsp;
-                    2024-12-03
+                    2024-12-04
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
-                    13.9k
+                    14.2k
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-clock fa-fw"></i>阅读时长:&nbsp;&nbsp;
-                    58 分
+                    60 分
                 </div>
                 
 
@@ -2611,6 +2611,114 @@ I2C2<span class="token operator">-&gt;</span>TRISE <span class="token operator">
 </ul>
 </li>
 </ol>
+<h1 id="stm-32-cube-mx-shi-xian-eeprom-du-xie">STM32CubeMX实现EEPROM读写</h1>
+<h2 id="cube-pei-zhi">Cube配置</h2>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241204094331841.png" alt="image-20241204094331841"></p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241204094511416.png" alt="image-20241204094511416"></p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241204094540825.png" alt="image-20241204094540825"></p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241204094637054.png" alt="image-20241204094637054"></p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241204094700542.png" alt="image-20241204094700542"></p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241204094733818.png" alt="image-20241204094733818"></p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241204094745141.png" alt="image-20241204094745141"></p>
+<h2 id="mdk-pei-zhi">MDK配置</h2>
+<img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241204094958368.png" alt="image-20241204094958368" style="zoom:50%;">
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241204095038798.png" alt="image-20241204095038798"></p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241204095126110.png" alt="image-20241204095126110"></p>
+<img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241204095213099.png" alt="image-20241204095213099" style="zoom:50%;">
+<h2 id="shi-li-dai-ma-7">示例代码</h2>
+<h3 id="m-24-c-02-h-2">m24c02.h</h3>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">ifndef</span> <span class="token expression">__M24C02_H__</span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name">__M24C02_H__</span></span>
+
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">"i2c.h"</span></span>
+
+<span class="token keyword">void</span> <span class="token function">M24C02_Init</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token keyword">void</span> <span class="token function">M24C02_WriteByte</span><span class="token punctuation">(</span><span class="token class-name">uint8_t</span> addr<span class="token punctuation">,</span> <span class="token class-name">uint8_t</span> byte<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">void</span> <span class="token function">M24C02_WriteBytes</span><span class="token punctuation">(</span><span class="token class-name">uint8_t</span> addr<span class="token punctuation">,</span> <span class="token class-name">uint8_t</span> <span class="token operator">*</span>bytes<span class="token punctuation">,</span> <span class="token class-name">uint8_t</span> size<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token class-name">uint8_t</span> <span class="token function">M24C02_ReadByte</span><span class="token punctuation">(</span><span class="token class-name">uint8_t</span> addr<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">void</span> <span class="token function">M24C02_ReadBytes</span><span class="token punctuation">(</span><span class="token class-name">uint8_t</span> addr<span class="token punctuation">,</span> <span class="token class-name">uint8_t</span> <span class="token operator">*</span>bytes<span class="token punctuation">,</span> <span class="token class-name">uint8_t</span> size<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">void</span> <span class="token function">M24C02_Test</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">endif</span> <span class="token comment">/* __M24C02_H__ */</span></span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<h3 id="m-24-c-02-c-2">m24c02.c</h3>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">"m24c02.h"</span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">"string.h"</span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">"stdio.h"</span></span>
+
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name">DEV_ADDR_W</span> <span class="token expression"><span class="token number">0xA0</span></span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name">DEV_ADDR_R</span> <span class="token expression"><span class="token number">0xA1</span></span></span>
+
+<span class="token keyword">void</span> <span class="token function">M24C02_Init</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>  <span class="token punctuation">}</span>
+
+<span class="token keyword">void</span> <span class="token function">M24C02_WriteByte</span><span class="token punctuation">(</span><span class="token class-name">uint8_t</span> addr<span class="token punctuation">,</span> <span class="token class-name">uint8_t</span> byte<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token function">M24C02_WriteBytes</span><span class="token punctuation">(</span>addr<span class="token punctuation">,</span> <span class="token operator">&amp;</span>byte<span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+<span class="token keyword">void</span> <span class="token function">M24C02_WriteBytes</span><span class="token punctuation">(</span><span class="token class-name">uint8_t</span> addr<span class="token punctuation">,</span> <span class="token class-name">uint8_t</span> <span class="token operator">*</span>bytes<span class="token punctuation">,</span> <span class="token class-name">uint8_t</span> size<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token function">HAL_I2C_Mem_Write</span><span class="token punctuation">(</span><span class="token operator">&amp;</span>hi2c2<span class="token punctuation">,</span> DEV_ADDR_W<span class="token punctuation">,</span> addr<span class="token punctuation">,</span> I2C_MEMADD_SIZE_8BIT<span class="token punctuation">,</span> bytes<span class="token punctuation">,</span>
+                      size<span class="token punctuation">,</span> <span class="token number">100</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token comment">// 等待EEPROM写周期结束</span>
+    <span class="token function">HAL_Delay</span><span class="token punctuation">(</span><span class="token number">5</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token class-name">uint8_t</span> <span class="token function">M24C02_ReadByte</span><span class="token punctuation">(</span><span class="token class-name">uint8_t</span> addr<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token class-name">uint8_t</span> byte<span class="token punctuation">;</span>
+    <span class="token function">M24C02_ReadBytes</span><span class="token punctuation">(</span>addr<span class="token punctuation">,</span> <span class="token operator">&amp;</span>byte<span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">return</span> byte<span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">void</span> <span class="token function">M24C02_ReadBytes</span><span class="token punctuation">(</span><span class="token class-name">uint8_t</span> addr<span class="token punctuation">,</span> <span class="token class-name">uint8_t</span> <span class="token operator">*</span>bytes<span class="token punctuation">,</span> <span class="token class-name">uint8_t</span> size<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token function">HAL_I2C_Mem_Read</span><span class="token punctuation">(</span><span class="token operator">&amp;</span>hi2c2<span class="token punctuation">,</span> DEV_ADDR_W<span class="token punctuation">,</span> addr<span class="token punctuation">,</span> I2C_MEMADD_SIZE_8BIT<span class="token punctuation">,</span> bytes<span class="token punctuation">,</span>
+                     size<span class="token punctuation">,</span> <span class="token number">100</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">void</span> <span class="token function">M24C02_Test</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token function">M24C02_WriteByte</span><span class="token punctuation">(</span><span class="token number">0x00</span><span class="token punctuation">,</span> <span class="token char">'a'</span> <span class="token operator">-</span> <span class="token number">32</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">M24C02_WriteByte</span><span class="token punctuation">(</span><span class="token number">0x01</span><span class="token punctuation">,</span> <span class="token char">'b'</span> <span class="token operator">-</span> <span class="token number">32</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">M24C02_WriteByte</span><span class="token punctuation">(</span><span class="token number">0x02</span><span class="token punctuation">,</span> <span class="token char">'c'</span> <span class="token operator">-</span> <span class="token number">32</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token class-name">uint8_t</span> b1 <span class="token operator">=</span> <span class="token function">M24C02_ReadByte</span><span class="token punctuation">(</span><span class="token number">0x00</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token class-name">uint8_t</span> b2 <span class="token operator">=</span> <span class="token function">M24C02_ReadByte</span><span class="token punctuation">(</span><span class="token number">0x01</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token class-name">uint8_t</span> b3 <span class="token operator">=</span> <span class="token function">M24C02_ReadByte</span><span class="token punctuation">(</span><span class="token number">0x02</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">printf</span><span class="token punctuation">(</span><span class="token string">"b1 = %d, b2 = %d, b3 = %d\n"</span><span class="token punctuation">,</span> b1<span class="token punctuation">,</span> b2<span class="token punctuation">,</span> b3<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token function">M24C02_WriteBytes</span><span class="token punctuation">(</span><span class="token number">0x00</span><span class="token punctuation">,</span> <span class="token string">"56789"</span><span class="token punctuation">,</span> <span class="token number">5</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token class-name">uint8_t</span> buffer<span class="token punctuation">[</span><span class="token number">100</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token punctuation">{</span><span class="token number">0</span><span class="token punctuation">}</span><span class="token punctuation">;</span>
+    <span class="token function">M24C02_ReadBytes</span><span class="token punctuation">(</span><span class="token number">0x00</span><span class="token punctuation">,</span> buffer<span class="token punctuation">,</span> <span class="token number">5</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">printf</span><span class="token punctuation">(</span><span class="token string">"buffer = %s\n"</span><span class="token punctuation">,</span> buffer<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token function">memset</span><span class="token punctuation">(</span>buffer<span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token keyword">sizeof</span><span class="token punctuation">(</span>buffer<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">M24C02_WriteBytes</span><span class="token punctuation">(</span><span class="token number">0x00</span><span class="token punctuation">,</span> <span class="token string">"12345"</span><span class="token punctuation">,</span> <span class="token number">5</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">M24C02_ReadBytes</span><span class="token punctuation">(</span><span class="token number">0xFF</span><span class="token punctuation">,</span> buffer<span class="token punctuation">,</span> <span class="token number">5</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">printf</span><span class="token punctuation">(</span><span class="token string">"buffer = %s\n"</span><span class="token punctuation">,</span> buffer<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<h3 id="printf-zhong-ding-xiang">printf重定向</h3>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token keyword">int</span> <span class="token function">fputc</span><span class="token punctuation">(</span><span class="token keyword">int</span> ch<span class="token punctuation">,</span> FILE <span class="token operator">*</span>stream<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token function">HAL_UART_Transmit</span><span class="token punctuation">(</span><span class="token operator">&amp;</span>huart1<span class="token punctuation">,</span> <span class="token punctuation">(</span><span class="token class-name">uint8_t</span> <span class="token operator">*</span><span class="token punctuation">)</span><span class="token operator">&amp;</span>ch<span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">,</span> <span class="token number">10</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">return</span> ch<span class="token punctuation">;</span>
+<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
+<h3 id="main-c-1">main.c</h3>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token comment">/* USER CODE BEGIN Includes */</span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">"m24c02.h"</span></span>
+<span class="token comment">/* USER CODE END Includes */</span>  
+
+<span class="token comment">/* Initialize all configured peripherals */</span>
+  <span class="token function">MX_GPIO_Init</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token function">MX_I2C2_Init</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token function">MX_USART1_UART_Init</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token comment">/* USER CODE BEGIN 2 */</span>
+    <span class="token function">M24C02_Test</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token comment">/* USER CODE END 2 */</span>
+
+  <span class="token comment">/* Infinite loop */</span>
+  <span class="token comment">/* USER CODE BEGIN WHILE */</span>
+  <span class="token keyword">while</span> <span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span>
+  <span class="token punctuation">{</span>
+    <span class="token comment">/* USER CODE END WHILE */</span>
+
+    <span class="token comment">/* USER CODE BEGIN 3 */</span>
+  <span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <h1 id="the-end">THE END</h1>
 
                 
@@ -2760,17 +2868,16 @@ I2C2<span class="token operator">-&gt;</span>TRISE <span class="token operator">
 <article id="prenext-posts" class="prev-next articles">
     <div class="row article-row">
         
-        <div class="article col s12 m6" data-aos="fade-up" data-aos="fade-up">
+        <div class="article col s12 m6" data-aos="fade-up">
             <div class="article-badge left-badge text-color">
-                <i class="far fa-dot-circle"></i>&nbsp;本篇
-            </div>
+                <i class="fas fa-chevron-left"></i>&nbsp;上一篇</div>
             <div class="card">
-                <a href="/2024/11/30/28867.html">
+                <a href="/2024/12/04/52886.html">
                     <div class="card-image">
                         
-                        <img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/pexels-319596550-28098320.jpg" class="responsive-img" alt="深入理解I²C协议及底层原理（基于STM32F103ZE）">
+                        <img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/pexels-248509299-12441849.jpg" class="responsive-img" alt="定时器的本质就是数数（基于STM32F103深入理解定时器）">
                         
-                        <span class="card-title">深入理解I²C协议及底层原理（基于STM32F103ZE）</span>
+                        <span class="card-title">定时器的本质就是数数（基于STM32F103深入理解定时器）</span>
                     </div>
                 </a>
                 <div class="card-content article-content">
@@ -2780,18 +2887,14 @@ I2C2<span class="token operator">-&gt;</span>TRISE <span class="token operator">
                         
                     </div>
                     <div class="publish-info">
-                            <span class="publish-date">
-                                <i class="far fa-clock fa-fw icon-date"></i>2024-11-30
-                            </span>
+                        <span class="publish-date">
+                            <i class="far fa-clock fa-fw icon-date"></i>2024-12-04
+                        </span>
                         <span class="publish-author">
                             
                             <i class="fas fa-bookmark fa-fw icon-category"></i>
                             
-                            <a href="/categories/%E5%8D%8F%E8%AE%AE/" class="post-category">
-                                    协议
-                                </a>
-                            
-                            <a href="/categories/%E5%8D%8F%E8%AE%AE/STM32/" class="post-category">
+                            <a href="/categories/STM32/" class="post-category">
                                     STM32
                                 </a>
                             
@@ -2799,16 +2902,19 @@ I2C2<span class="token operator">-&gt;</span>TRISE <span class="token operator">
                         </span>
                     </div>
                 </div>
-
                 
                 <div class="card-action article-tags">
                     
-                    <a href="/tags/I2C/">
-                        <span class="chip bg-color">I2C</span>
+                    <a href="/tags/TIMER/">
+                        <span class="chip bg-color">TIMER</span>
                     </a>
                     
-                    <a href="/tags/I%C2%B2C/">
-                        <span class="chip bg-color">I²C</span>
+                    <a href="/tags/%E5%AE%9A%E6%97%B6%E5%99%A8/">
+                        <span class="chip bg-color">定时器</span>
+                    </a>
+                    
+                    <a href="/tags/TIM/">
+                        <span class="chip bg-color">TIM</span>
                     </a>
                     
                 </div>
@@ -3008,7 +3114,7 @@ I2C2<span class="token operator">-&gt;</span>TRISE <span class="token operator">
             <br>
             
                 &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                        class="white-color">45.6k</span>
+                        class="white-color">53.7k</span>
             
             
             
