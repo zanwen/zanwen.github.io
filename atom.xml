@@ -6,7 +6,7 @@
   <link href="https://zanwen.github.io/atom.xml" rel="self"/>
   
   <link href="https://zanwen.github.io/"/>
-  <updated>2024-12-06T10:54:38.343Z</updated>
+  <updated>2024-12-08T13:37:25.612Z</updated>
   <id>https://zanwen.github.io/</id>
   
   <author>
@@ -17,11 +17,125 @@
   <generator uri="https://hexo.io/">Hexo</generator>
   
   <entry>
+    <title>STM32存储器和寄存器分析</title>
+    <link href="https://zanwen.github.io/2024/12/08/34188.html"/>
+    <id>https://zanwen.github.io/2024/12/08/34188.html</id>
+    <published>2024-12-08T12:22:43.000Z</published>
+    <updated>2024-12-08T13:37:25.612Z</updated>
+    
+    
+      
+      
+        
+        
+    <summary type="html">&lt;h1 id=&quot;chang-jian-cun-chu-qi-jie-shao&quot;&gt;常见存储器介绍&lt;/h1&gt;
+&lt;p&gt;存储器是计算机结构的重要组成部分。存储器是用来存储程序代码和数据的部件，有了存储器计算机才具有记忆功能。&lt;/p&gt;
+&lt;p&gt;&lt;img</summary>
+        
+      
+    
+    
+    
+    <category term="STM32" scheme="https://zanwen.github.io/categories/STM32/"/>
+    
+    
+    <category term="Memory" scheme="https://zanwen.github.io/tags/Memory/"/>
+    
+    <category term="存储器" scheme="https://zanwen.github.io/tags/%E5%AD%98%E5%82%A8%E5%99%A8/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>高速通信协议SPI（基于STM32F103）</title>
+    <link href="https://zanwen.github.io/2024/12/08/56962.html"/>
+    <id>https://zanwen.github.io/2024/12/08/56962.html</id>
+    <published>2024-12-08T00:52:36.000Z</published>
+    <updated>2024-12-08T14:19:52.458Z</updated>
+    
+    
+      
+      
+        
+        
+    <summary type="html">&lt;h1 id=&quot;can-kao-zi-liao&quot;&gt;参考资料&lt;/h1&gt;
+&lt;ul&gt;
+&lt;li&gt;STM32F103参考手册：&lt;a</summary>
+        
+      
+    
+    
+    
+    <category term="STM32" scheme="https://zanwen.github.io/categories/STM32/"/>
+    
+    <category term="协议" scheme="https://zanwen.github.io/categories/STM32/%E5%8D%8F%E8%AE%AE/"/>
+    
+    
+    <category term="STM32" scheme="https://zanwen.github.io/tags/STM32/"/>
+    
+    <category term="SPI" scheme="https://zanwen.github.io/tags/SPI/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>模数转换ADC(STM32F103ZE)</title>
+    <link href="https://zanwen.github.io/2024/12/07/52846.html"/>
+    <id>https://zanwen.github.io/2024/12/07/52846.html</id>
+    <published>2024-12-07T05:18:22.000Z</published>
+    <updated>2024-12-08T00:54:28.090Z</updated>
+    
+    
+      
+      
+        
+        
+    <summary type="html">&lt;h1 id=&quot;gai-shu&quot;&gt;概述&lt;/h1&gt;
+&lt;p&gt;&lt;img src=&quot;https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241207132054463.png&quot;</summary>
+        
+      
+    
+    
+    
+    <category term="STM32" scheme="https://zanwen.github.io/categories/STM32/"/>
+    
+    
+    <category term="STM32" scheme="https://zanwen.github.io/tags/STM32/"/>
+    
+    <category term="ADC" scheme="https://zanwen.github.io/tags/ADC/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>专职搬运工DMA(STM32F103ZE)</title>
+    <link href="https://zanwen.github.io/2024/12/06/62380.html"/>
+    <id>https://zanwen.github.io/2024/12/06/62380.html</id>
+    <published>2024-12-06T14:41:32.000Z</published>
+    <updated>2024-12-07T14:09:15.851Z</updated>
+    
+    
+      
+      
+        
+        
+    <summary type="html">&lt;h1 id=&quot;dma-jie-shao&quot;&gt;DMA介绍&lt;/h1&gt;
+&lt;p&gt;直接存储器存取（direct memory</summary>
+        
+      
+    
+    
+    
+    <category term="STM32" scheme="https://zanwen.github.io/categories/STM32/"/>
+    
+    
+    <category term="DMA" scheme="https://zanwen.github.io/tags/DMA/"/>
+    
+  </entry>
+  
+  <entry>
     <title>定时器的本质就是数数（基于STM32F103深入理解定时器）</title>
     <link href="https://zanwen.github.io/2024/12/04/52886.html"/>
     <id>https://zanwen.github.io/2024/12/04/52886.html</id>
     <published>2024-12-04T02:29:56.000Z</published>
-    <updated>2024-12-06T10:54:38.343Z</updated>
+    <updated>2024-12-06T14:17:52.002Z</updated>
     
     
       
@@ -527,27 +641,6 @@
     <category term="HAL" scheme="https://zanwen.github.io/tags/HAL/"/>
     
     <category term="UART" scheme="https://zanwen.github.io/tags/UART/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>Hello World</title>
-    <link href="https://zanwen.github.io/2024/11/12/16107.html"/>
-    <id>https://zanwen.github.io/2024/11/12/16107.html</id>
-    <published>2024-11-12T07:26:24.388Z</published>
-    <updated>2024-11-12T12:10:52.330Z</updated>
-    
-    
-      
-      
-        
-        
-    <summary type="html">&lt;p&gt;Welcome to &lt;a href=&quot;https://hexo.io/&quot;&gt;Hexo&lt;/a&gt;! This is your very first post. Check &lt;a href=&quot;https://hexo.io/docs/&quot;&gt;documentation&lt;/a&gt;</summary>
-        
-      
-    
-    
-    
     
   </entry>
   

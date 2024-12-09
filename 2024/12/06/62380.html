@@ -1,0 +1,1411 @@
+<!DOCTYPE HTML>
+<html lang="zh-CN">
+
+
+<head>
+    <meta charset="utf-8">
+    <meta name="keywords" content="专职搬运工DMA(STM32F103ZE), 安文的博客">
+    <meta name="description" content="DMA介绍
+直接存储器存取（direct memory access，DMA）用来提供在外设和存储器之间或者存储器和存储器之间的高速数据传输。无须CPU干预，数据可以通过DMA快速地移动，这就节省了CPU的资源来做其他操作。
+2个DMA控制">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="renderer" content="webkit|ie-stand|ie-comp">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="format-detection" content="telephone=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="referrer" content="no-referrer-when-downgrade">
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+
+
+    <title>专职搬运工DMA(STM32F103ZE) | 安文的博客</title>
+    <link rel="icon" type="image/png" href="/medias/logo.png">
+    
+
+
+    <!-- bg-cover style     -->
+
+
+
+<link rel="stylesheet" type="text/css" href="/libs/awesome/css/all.min.css">
+<link rel="stylesheet" type="text/css" href="/libs/materialize/materialize.min.css">
+<link rel="stylesheet" type="text/css" href="/libs/aos/aos.css">
+<link rel="stylesheet" type="text/css" href="/libs/animate/animate.min.css">
+<link rel="stylesheet" type="text/css" href="/libs/lightGallery/css/lightgallery.min.css">
+<link rel="stylesheet" type="text/css" href="/css/matery.css">
+<link rel="stylesheet" type="text/css" href="/css/my.css">
+<link rel="stylesheet" type="text/css" href="/css/dark.css" media="none" onload="if(media!='all')media='all'">
+
+
+
+
+    <link rel="stylesheet" href="/libs/tocbot/tocbot.css">
+    <link rel="stylesheet" href="/css/post.css">
+
+
+
+
+    
+        <link rel="stylesheet" type="text/css" href="/css/reward.css">
+    
+
+
+
+    <script src="/libs/jquery/jquery-3.6.0.min.js"></script>
+
+<meta name="generator" content="Hexo 7.3.0">
+<style>.github-emoji { position: relative; display: inline-block; width: 1.2em; min-height: 1.2em; overflow: hidden; vertical-align: top; color: transparent; }  .github-emoji > span { position: relative; z-index: 10; }  .github-emoji img, .github-emoji .fancybox { margin: 0 !important; padding: 0 !important; border: none !important; outline: none !important; text-decoration: none !important; user-select: none !important; cursor: auto !important; }  .github-emoji img { height: 1.2em !important; width: 1.2em !important; position: absolute !important; left: 50% !important; top: 50% !important; transform: translate(-50%, -50%) !important; user-select: none !important; cursor: auto !important; } .github-emoji-fallback { color: inherit; } .github-emoji-fallback img { opacity: 0 !important; }</style>
+<link rel="alternate" href="/atom.xml" title="安文的博客" type="application/atom+xml">
+</head>
+
+
+<body>
+    <header class="navbar-fixed">
+    <nav id="headNav" class="bg-color nav-transparent">
+        <div id="navContainer" class="nav-wrapper container">
+            <div class="brand-logo">
+                <a href="/" class="waves-effect waves-light">
+                    
+                    <img src="/medias/logo.png" class="logo-img" alt="LOGO">
+                    
+                    <span class="logo-span">安文的博客</span>
+                </a>
+            </div>
+            
+
+<a href="#" data-target="mobile-nav" class="sidenav-trigger button-collapse"><i class="fas fa-bars"></i></a>
+<ul class="right nav-menu">
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/" class="waves-effect waves-light">
+      
+      <i class="fas fa-home" style="zoom: 0.6;"></i>
+      
+      <span>首页</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/tags" class="waves-effect waves-light">
+      
+      <i class="fas fa-tags" style="zoom: 0.6;"></i>
+      
+      <span>标签</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/categories" class="waves-effect waves-light">
+      
+      <i class="fas fa-bookmark" style="zoom: 0.6;"></i>
+      
+      <span>分类</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/archives" class="waves-effect waves-light">
+      
+      <i class="fas fa-archive" style="zoom: 0.6;"></i>
+      
+      <span>归档</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/about" class="waves-effect waves-light">
+      
+      <i class="fas fa-user-circle" style="zoom: 0.6;"></i>
+      
+      <span>关于</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/contact" class="waves-effect waves-light">
+      
+      <i class="fas fa-comments" style="zoom: 0.6;"></i>
+      
+      <span>留言板</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/friends" class="waves-effect waves-light">
+      
+      <i class="fas fa-address-book" style="zoom: 0.6;"></i>
+      
+      <span>友情链接</span>
+    </a>
+    
+  </li>
+  
+  <li>
+    <a href="#searchModal" class="modal-trigger waves-effect waves-light">
+      <i id="searchIcon" class="fas fa-search" title="搜索" style="zoom: 0.85;"></i>
+    </a>
+  </li>
+  <li>
+    <a href="javascript:;" class="waves-effect waves-light" onclick="switchNightMode()" title="深色/浅色模式" >
+      <i id="sum-moon-icon" class="fas fa-sun" style="zoom: 0.85;"></i>
+    </a>
+  </li>
+</ul>
+
+
+<div id="mobile-nav" class="side-nav sidenav">
+
+    <div class="mobile-head bg-color">
+        
+        <img src="/medias/logo.png" class="logo-img circle responsive-img">
+        
+        <div class="logo-name">安文的博客</div>
+        <div class="logo-desc">
+            
+            安文的博客 | 嵌入式 | 算法 | AI | 人工智能
+            
+        </div>
+    </div>
+
+    <ul class="menu-list mobile-menu-list">
+        
+        <li class="m-nav-item">
+	  
+		<a href="/" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-home"></i>
+			
+			首页
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/tags" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-tags"></i>
+			
+			标签
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/categories" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-bookmark"></i>
+			
+			分类
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/archives" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-archive"></i>
+			
+			归档
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/about" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-user-circle"></i>
+			
+			关于
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/contact" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-comments"></i>
+			
+			留言板
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/friends" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-address-book"></i>
+			
+			友情链接
+		</a>
+          
+        </li>
+        
+        
+        <li><div class="divider"></div></li>
+        <li>
+            <a href="https://github.com/blinkfox/hexo-theme-matery" class="waves-effect waves-light" target="_blank">
+                <i class="fab fa-github-square fa-fw"></i>Fork Me
+            </a>
+        </li>
+        
+    </ul>
+</div>
+
+
+        </div>
+
+        
+            <style>
+    .nav-transparent .github-corner {
+        display: none !important;
+    }
+
+    .github-corner {
+        position: absolute;
+        z-index: 10;
+        top: 0;
+        right: 0;
+        border: 0;
+        transform: scale(1.1);
+    }
+
+    .github-corner svg {
+        color: #0f9d58;
+        fill: #fff;
+        height: 64px;
+        width: 64px;
+    }
+
+    .github-corner:hover .octo-arm {
+        animation: a 0.56s ease-in-out;
+    }
+
+    .github-corner .octo-arm {
+        animation: none;
+    }
+
+    @keyframes a {
+        0%,
+        to {
+            transform: rotate(0);
+        }
+        20%,
+        60% {
+            transform: rotate(-25deg);
+        }
+        40%,
+        80% {
+            transform: rotate(10deg);
+        }
+    }
+</style>
+
+<a href="https://github.com/blinkfox/hexo-theme-matery" class="github-corner tooltipped hide-on-med-and-down" target="_blank"
+   data-tooltip="Fork Me" data-position="left" data-delay="50">
+    <svg viewBox="0 0 250 250" aria-hidden="true">
+        <path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path>
+        <path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2"
+              fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path>
+        <path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z"
+              fill="currentColor" class="octo-body"></path>
+    </svg>
+</a>
+        
+    </nav>
+
+</header>
+
+    
+
+
+
+<div class="bg-cover pd-header post-cover" style="background-image: url('https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/lin-zhi-7151302.jpg')">
+    <div class="container" style="right: 0px;left: 0px;">
+        <div class="row">
+            <div class="col s12 m12 l12">
+                <div class="brand">
+                    <h1 class="description center-align post-title">专职搬运工DMA(STM32F103ZE)</h1>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+<main class="post-container content">
+
+    
+    <div class="row">
+    <div id="main-content" class="col s12 m12 l9">
+        <!-- 文章内容详情 -->
+<div id="artDetail">
+    <div class="card">
+        <div class="card-content article-info">
+            <div class="row tag-cate">
+                <div class="col s7">
+                    
+                    <div class="article-tag">
+                        
+                            <a href="/tags/DMA/">
+                                <span class="chip bg-color">DMA</span>
+                            </a>
+                        
+                    </div>
+                    
+                </div>
+                <div class="col s5 right-align">
+                    
+                    <div class="post-cate">
+                        <i class="fas fa-bookmark fa-fw icon-category"></i>
+                        
+                            <a href="/categories/STM32/" class="post-category">
+                                STM32
+                            </a>
+                        
+                    </div>
+                    
+                </div>
+            </div>
+
+            <div class="post-info">
+                
+                <div class="post-date info-break-policy">
+                    <i class="far fa-calendar-minus fa-fw"></i>发布日期:&nbsp;&nbsp;
+                    2024-12-06
+                </div>
+                
+
+                
+                <div class="post-date info-break-policy">
+                    <i class="far fa-calendar-check fa-fw"></i>更新日期:&nbsp;&nbsp;
+                    2024-12-07
+                </div>
+                
+
+                
+                <div class="info-break-policy">
+                    <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
+                    1.9k
+                </div>
+                
+
+                
+                <div class="info-break-policy">
+                    <i class="far fa-clock fa-fw"></i>阅读时长:&nbsp;&nbsp;
+                    8 分
+                </div>
+                
+
+                
+                    <div id="busuanzi_container_page_pv" class="info-break-policy">
+                        <i class="far fa-eye fa-fw"></i>阅读次数:&nbsp;&nbsp;
+                        <span id="busuanzi_value_page_pv"></span>
+                    </div>
+				
+            </div>
+        </div>
+        <hr class="clearfix">
+
+        
+        <!-- 是否加载使用自带的 prismjs. -->
+        <link rel="stylesheet" href="/libs/prism/prism.min.css">
+        
+
+        
+
+        <div class="card-content article-card-content">
+            <div id="articleContent">
+                <h1 id="dma-jie-shao">DMA介绍</h1>
+<p>直接存储器存取（direct memory access，DMA）用来提供在<mark>外设和存储器之间</mark>或者<mark>存储器和存储器之间</mark>的高速数据传输。无须CPU干预，数据可以通过DMA快速地移动，这就节省了CPU的资源来做其他操作。</p>
+<p>2个DMA控制器有12个通道（DMA1有7个通道，DMA2有5个通道），每个通道专门用来管理来自于一个或多个外设对存储器访问的请求。还有一个仲裁器来协调各个DMA请求的优先权。</p>
+<p>DMA控制器和Cortex™-M3核心共享系统数据总线，执行直接存储器数据传输。当CPU和DMA同时访问相同的目标（RAM或外设）时，DMA请求会暂停CPU访问系统总线达若干个周期，总线仲裁器执行循环调度，以保证CPU至少可以得到一半的系统总线（存储器或外设）带宽。</p>
+<p>要注意的是DMA2只存在于大容量产品和互联型产品中。</p>
+<h2 id="dma-kuang-tu">DMA框图</h2>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241206225250686.png" alt="image-20241206225250686"></p>
+<h2 id="dma-qing-qiu">DMA请求</h2>
+<p>如果外设要想通过DMA来传输数据，必须先给DMA控制器发送DMA请求，DMA控制器收到请求信号之后，控制器会给外设一个应答信号，当外设得到控制器的应答信号后，外设会立即释放它的请求。</p>
+<p>DMA有DMA1和DMA2两个控制器，DMA1有7个通道，DMA2有5个通道，不同DMA控制器的通道对应着不同的外设请求，这决定了我们在软件编程上该怎么设置。</p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241206225359841.png" alt="image-20241206225359841"></p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/Snipaste_2024-12-06_22-54-12.png" alt=""></p>
+<h2 id="dma-tong-dao">DMA通道</h2>
+<p>DMA具有12个独立可编程的通道，其中 DMA1有7个通道，DMA2有5个通道，每个通道对应不同的外设的DMA请求。虽然每个通道可以接收多个外设的请求，但是<strong>同一时间只能接收一个</strong>，不能同时接收多个。</p>
+<h2 id="zhong-cai-qi">仲裁器</h2>
+<p>当发生多个DMA通道请求时，就意味着有先后响应处理的顺序问题，这个就由仲裁器管理。仲裁器管理DMA通道请求分为两个阶段。</p>
+<p>第一阶段属于软件阶段，可以在DMA_CCRx寄存器中设置，有4个等级：非常高、高、中和低四个优先级。</p>
+<p>第二阶段属于硬件阶段，如果两个或以上的DMA通道请求设置的优先级一样，则他们优先级取决于通道编号，编号越低优先权越高，比如通道 1 高于通道 2。</p>
+<p>在大容量产品和互联型产品中，DMA1控制器拥有高于DMA2控制器的优先级。</p>
+<h2 id="chuan-shu-fang-xiang">传输方向</h2>
+<p>存储器到外设，外设到存储器，存储器到存储器。这里的存储器指的是ROM和RAM。注意DMA没有办法把数据从RAM传输到ROM（flash）。</p>
+<h1 id="shi-yan-rom-dao-ram">实验-ROM到RAM</h1>
+<h2 id="xu-qiu">需求</h2>
+<p>使用寄存器操作把ROM中的数据通过DMA传输到RAM，然后把数据通过printf发送到串口验证是否正确。</p>
+<p>DMA传输不涉及外设，所以通道随便选。我们选DMA1的1通道。</p>
+<h2 id="ji-cun-qi-fen-xi">寄存器分析</h2>
+<h3 id="rcc-shi-zhong">RCC时钟</h3>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241206230728038.png" alt="image-20241206230728038"></p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241206230802590.png" alt="image-20241206230802590"></p>
+<h3 id="chuan-shu-fang-xiang-1">传输方向</h3>
+<p><img src="C:%5CUsers%5C86157%5CAppData%5CRoaming%5CTypora%5Ctypora-user-images%5Cimage-20241206231014436.png" alt="image-20241206231014436"></p>
+<blockquote>
+<p>[!NOTE]</p>
+<p>可以将ROM当做外设</p>
+</blockquote>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241206231212616.png" alt="image-20241206231212616"></p>
+<h3 id="yuan-mu-biao-de-ji-di-zhi">源/目标的基地址</h3>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241206232727151.png" alt="image-20241206232727151"></p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241206232751481.png" alt="image-20241206232751481"></p>
+<h3 id="chuan-shu-shu-ju-de-kuan-du">传输数据的宽度</h3>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241206231527504.png" alt="image-20241206231527504"></p>
+<h3 id="wai-she-he-nei-cun-di-zhi-shi-fou-zi-zeng">外设和内存地址是否自增</h3>
+<img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241206231649649.png" alt="image-20241206231649649" style="zoom:50%;">
+<h3 id="chuan-shu-shu-ju-de-chang-du">传输数据的长度</h3>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241206232018096.png" alt="image-20241206232018096"></p>
+<h3 id="chuan-shu-zhong-duan-shi-neng">传输中断使能</h3>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241206232112172.png" alt="image-20241206232112172"></p>
+<h3 id="tong-dao-chuan-shu-shi-neng">通道传输使能</h3>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241206232831121.png" alt="image-20241206232831121"></p>
+<h3 id="zhong-duan-zhuang-tai-r-amp-zhong-duan-biao-zhi-qing-chu-w">中断状态® &amp; 中断标志清除(w)</h3>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241206233352731.png" alt="image-20241206233352731"></p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241206233342185.png" alt="image-20241206233342185"></p>
+<h2 id="shi-li-dai-ma">示例代码</h2>
+<h3 id="dma-1-h">dma1.h</h3>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">ifndef</span> <span class="token expression">__DMA1_H__</span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name">__DMA1_H__</span></span>
+
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">"stm32f10x.h"</span></span>
+
+<span class="token keyword">void</span> <span class="token function">DMA1_Init</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token keyword">void</span> <span class="token function">DMA1_Transmit</span><span class="token punctuation">(</span><span class="token class-name">uint32_t</span> srcAddr<span class="token punctuation">,</span> <span class="token class-name">uint32_t</span> destAddr<span class="token punctuation">,</span> <span class="token class-name">uint16_t</span> byteSize<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token keyword">void</span> <span class="token function">DMA1_CH1_TransmitCompleteCallback</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">endif</span> <span class="token comment">/* __DMA1_H__ */</span></span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<h3 id="dma-1-c">dma1.c</h3>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">"dma1.h"</span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">"logger.h"</span></span>
+
+<span class="token keyword">void</span> <span class="token function">DMA1_Init</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token comment">// 使能AHB时钟</span>
+    RCC<span class="token operator">-&gt;</span>AHBENR <span class="token operator">|=</span> RCC_AHBENR_DMA1EN<span class="token punctuation">;</span>
+
+    <span class="token comment">// 配置DMA通道（使用内存到内存模式时，DMA所有通道都可以选择，这里以通道1为例）</span>
+    <span class="token comment">// 传输模式：内存到内存</span>
+    DMA1_Channel1<span class="token operator">-&gt;</span>CCR <span class="token operator">|=</span> DMA_CCR1_MEM2MEM<span class="token punctuation">;</span>
+    <span class="token comment">// 传输方向：从外设读取数据（内存到内存模式下，提供数据的内存可以当做外设）</span>
+    DMA1_Channel1<span class="token operator">-&gt;</span>CCR <span class="token operator">&amp;=</span> <span class="token operator">~</span>DMA_CCR1_DIR<span class="token punctuation">;</span>
+    <span class="token comment">// 数据宽度，统一为8字节</span>
+    DMA1_Channel1<span class="token operator">-&gt;</span>CCR <span class="token operator">&amp;=</span> <span class="token operator">~</span>DMA_CCR1_PSIZE<span class="token punctuation">;</span>
+    DMA1_Channel1<span class="token operator">-&gt;</span>CCR <span class="token operator">&amp;=</span> <span class="token operator">~</span>DMA_CCR1_MSIZE<span class="token punctuation">;</span>
+    <span class="token comment">// 地址自动递增</span>
+    DMA1_Channel1<span class="token operator">-&gt;</span>CCR <span class="token operator">|=</span> DMA_CCR1_PINC<span class="token punctuation">;</span>
+    DMA1_Channel1<span class="token operator">-&gt;</span>CCR <span class="token operator">|=</span> DMA_CCR1_MINC<span class="token punctuation">;</span>
+
+    <span class="token comment">// 使能传输完成中断 Transmit Complete Interrupt Enable</span>
+    DMA1_Channel1<span class="token operator">-&gt;</span>CCR <span class="token operator">|=</span> DMA_CCR1_TCIE<span class="token punctuation">;</span>
+    <span class="token function">NVIC_SetPriorityGrouping</span><span class="token punctuation">(</span><span class="token number">3</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">NVIC_SetPriority</span><span class="token punctuation">(</span>DMA1_Channel1_IRQn<span class="token punctuation">,</span> <span class="token number">3</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">NVIC_EnableIRQ</span><span class="token punctuation">(</span>DMA1_Channel1_IRQn<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">void</span> <span class="token function">DMA1_Transmit</span><span class="token punctuation">(</span><span class="token class-name">uint32_t</span> srcAddr<span class="token punctuation">,</span> <span class="token class-name">uint32_t</span> destAddr<span class="token punctuation">,</span> <span class="token class-name">uint16_t</span> byteSize<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token comment">// 外设地址（内存到内存模式下，为内存中源数据的基地址）</span>
+    DMA1_Channel1<span class="token operator">-&gt;</span>CPAR <span class="token operator">=</span> srcAddr<span class="token punctuation">;</span>
+    <span class="token comment">// 内存地址（内存到内存模式下，为内存中存放数据的目标地址）</span>
+    DMA1_Channel1<span class="token operator">-&gt;</span>CMAR <span class="token operator">=</span> destAddr<span class="token punctuation">;</span>
+    <span class="token comment">// 指定要传输的数据数量</span>
+    DMA1_Channel1<span class="token operator">-&gt;</span>CNDTR <span class="token operator">=</span> byteSize<span class="token punctuation">;</span>
+
+    <span class="token comment">// 使能通道，开始传输</span>
+    DMA1_Channel1<span class="token operator">-&gt;</span>CCR <span class="token operator">|=</span> DMA_CCR1_EN<span class="token punctuation">;</span>
+    <span class="token function">LOG_DEBUG</span><span class="token punctuation">(</span><span class="token string">"DMA start"</span><span class="token punctuation">)</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">void</span> <span class="token function">DMA1_Channel1_IRQHandler</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token function">LOG_DEBUG</span><span class="token punctuation">(</span><span class="token string">"DMA1_Channel1_IRQHandler"</span><span class="token punctuation">)</span>
+    <span class="token comment">// 判断是否为传输完成事件对应的中断</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>DMA1<span class="token operator">-&gt;</span>ISR <span class="token operator">&amp;</span> DMA_ISR_TCIF1<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token comment">// 清除中断标志</span>
+        DMA1<span class="token operator">-&gt;</span>IFCR <span class="token operator">|=</span> DMA_IFCR_CTCIF1<span class="token punctuation">;</span>
+        <span class="token function">DMA1_CH1_TransmitCompleteCallback</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token comment">// 关闭DMA通道</span>
+        DMA1_Channel1<span class="token operator">-&gt;</span>CCR <span class="token operator">&amp;=</span> <span class="token operator">~</span>DMA_CCR1_EN<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+
+__weak <span class="token keyword">void</span> <span class="token function">DMA1_CH1_TransmitCompleteCallback</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+
+<span class="token punctuation">}</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<h3 id="main-c">main.c</h3>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">"delay.h"</span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">"dma1.h"</span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">"key.h"</span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">"led.h"</span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">"logger.h"</span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">"stdio.h"</span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">"stm32f10x.h"</span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">"string.h"</span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">"uart.h"</span></span>
+
+<span class="token keyword">void</span> <span class="token function">uart1_received_callback</span><span class="token punctuation">(</span><span class="token class-name">uint8_t</span> buf<span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">,</span> <span class="token class-name">uint8_t</span> size<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token function">uart_send_bytes</span><span class="token punctuation">(</span>buf<span class="token punctuation">,</span> size<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">const</span> <span class="token class-name">uint8_t</span> src<span class="token punctuation">[</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token punctuation">{</span><span class="token number">0x11</span><span class="token punctuation">,</span> <span class="token number">0x22</span><span class="token punctuation">,</span> <span class="token number">0x33</span><span class="token punctuation">,</span> <span class="token number">0x44</span><span class="token punctuation">}</span><span class="token punctuation">;</span>
+<span class="token class-name">uint8_t</span> dest<span class="token punctuation">[</span><span class="token number">4</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token punctuation">{</span><span class="token number">0</span><span class="token punctuation">}</span><span class="token punctuation">;</span>
+
+<span class="token keyword">void</span> <span class="token function">DMA1_CH1_TransmitCompleteCallback</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token function">LOG_DUMP</span><span class="token punctuation">(</span><span class="token string">"dest data =&gt; "</span><span class="token punctuation">,</span> dest<span class="token punctuation">,</span> <span class="token number">4</span><span class="token punctuation">)</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">int</span> <span class="token function">main</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token function">uart_init</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">DMA1_Init</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">LOG_DEBUG</span><span class="token punctuation">(</span><span class="token string">"main start"</span><span class="token punctuation">)</span>
+
+    <span class="token function">LOG_DEBUG</span><span class="token punctuation">(</span><span class="token string">"src address =&gt; %p, dest address =&gt; %p"</span><span class="token punctuation">,</span> src<span class="token punctuation">,</span> dest<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">DMA1_Transmit</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token class-name">uint32_t</span><span class="token punctuation">)</span>src<span class="token punctuation">,</span> <span class="token punctuation">(</span><span class="token class-name">uint32_t</span><span class="token punctuation">)</span>dest<span class="token punctuation">,</span> <span class="token number">4</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token keyword">while</span> <span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<h2 id="rom-amp-ram-di-zhi-yan-zheng">ROM &amp; RAM地址验证</h2>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241207104428811.png" alt="image-20241207104428811"></p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241207104440939.png" alt="image-20241207104440939"></p>
+<h2 id="hal-ku-shi-xian">HAL库实现</h2>
+<h3 id="cube-pei-zhi">Cube配置</h3>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241207110716672.png" alt="image-20241207110716672"></p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241207110804672.png" alt="image-20241207110804672"></p>
+<h3 id="zhu-ce-chuan-shu-wan-cheng-hui-diao-amp-zhong-duan-fang-shi-kai-qi-dma-chuan-shu">注册传输完成回调 &amp; 中断方式开启DMA传输</h3>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token comment">/* USER CODE BEGIN PV */</span>
+<span class="token keyword">const</span> <span class="token class-name">uint8_t</span> src<span class="token punctuation">[</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token punctuation">{</span><span class="token number">11</span><span class="token punctuation">,</span> <span class="token number">22</span><span class="token punctuation">,</span> <span class="token number">33</span><span class="token punctuation">,</span> <span class="token number">44</span><span class="token punctuation">}</span><span class="token punctuation">;</span>
+<span class="token class-name">uint8_t</span> dest<span class="token punctuation">[</span><span class="token number">4</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token punctuation">{</span><span class="token number">0</span><span class="token punctuation">}</span><span class="token punctuation">;</span>
+<span class="token comment">/* USER CODE END PV */</span>
+
+<span class="token comment">/* Private function prototypes -----------------------------------------------*/</span>
+<span class="token keyword">void</span> <span class="token function">SystemClock_Config</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token comment">/* USER CODE BEGIN PFP */</span>
+<span class="token keyword">void</span> <span class="token function">DMA_XferCpltCallback</span><span class="token punctuation">(</span>DMA_HandleTypeDef <span class="token operator">*</span>_hdma<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token comment">/* USER CODE END PFP */</span>
+
+
+<span class="token comment">/* USER CODE BEGIN 4 */</span>
+<span class="token keyword">void</span> <span class="token function">DMA_XferCpltCallback</span><span class="token punctuation">(</span>DMA_HandleTypeDef <span class="token operator">*</span>_hdma<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token function">HAL_DMA_Abort_IT</span><span class="token punctuation">(</span>_hdma<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">for</span> <span class="token punctuation">(</span><span class="token class-name">uint8_t</span> i <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span> i <span class="token operator">&lt;</span> <span class="token number">4</span><span class="token punctuation">;</span> i<span class="token operator">++</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token function">printf</span><span class="token punctuation">(</span><span class="token string">"%d\t"</span><span class="token punctuation">,</span> dest<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    <span class="token function">printf</span><span class="token punctuation">(</span><span class="token string">"\n"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+<span class="token comment">/* USER CODE END 4 */</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token comment">/* Initialize all configured peripherals */</span>
+<span class="token function">MX_GPIO_Init</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token function">MX_DMA_Init</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token function">MX_USART1_UART_Init</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token comment">/* USER CODE BEGIN 2 */</span>
+<span class="token function">HAL_DMA_RegisterCallback</span><span class="token punctuation">(</span><span class="token operator">&amp;</span>hdma_memtomem_dma1_channel1<span class="token punctuation">,</span>
+                         HAL_DMA_XFER_CPLT_CB_ID<span class="token punctuation">,</span> DMA_XferCpltCallback<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token function">printf</span><span class="token punctuation">(</span><span class="token string">"src =&gt; %p, dest =&gt; %p\n"</span><span class="token punctuation">,</span> src<span class="token punctuation">,</span> dest<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token function">HAL_DMA_Start_IT</span><span class="token punctuation">(</span><span class="token operator">&amp;</span>hdma_memtomem_dma1_channel1<span class="token punctuation">,</span> <span class="token punctuation">(</span><span class="token class-name">uint32_t</span><span class="token punctuation">)</span>src<span class="token punctuation">,</span>
+                 <span class="token punctuation">(</span><span class="token class-name">uint32_t</span><span class="token punctuation">)</span>dest<span class="token punctuation">,</span> <span class="token number">4</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token comment">/* USER CODE END 2 */</span>
+
+<span class="token comment">/* Infinite loop */</span>
+<span class="token comment">/* USER CODE BEGIN WHILE */</span>
+<span class="token keyword">while</span> <span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token comment">/* USER CODE END WHILE */</span>
+
+    <span class="token comment">/* USER CODE BEGIN 3 */</span>
+<span class="token punctuation">}</span>
+<span class="token comment">/* USER CODE END 3 */</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<h1 id="shi-yan-ram-dao-uart">实验-RAM到UART</h1>
+<h2 id="wai-she-te-ding-dma-tong-dao">外设特定DMA通道</h2>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241207114408798.png" alt="image-20241207114408798"></p>
+<h2 id="wai-she-shi-neng-dma-mo-shi">外设使能DMA模式</h2>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241207114541503.png" alt="image-20241207114541503"></p>
+<h2 id="shi-li-dai-ma-1">示例代码</h2>
+<h3 id="dma-1-ch-4">DMA1_CH4</h3>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">"dma1.h"</span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">"logger.h"</span></span>
+
+<span class="token keyword">void</span> <span class="token function">DMA1_Init</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token comment">// 使能AHB时钟</span>
+    RCC<span class="token operator">-&gt;</span>AHBENR <span class="token operator">|=</span> RCC_AHBENR_DMA1EN<span class="token punctuation">;</span>
+
+    <span class="token comment">// 配置DMA通道（使用内存到内存模式时，DMA所有通道都可以选择，这里以通道1为例）</span>
+    <span class="token comment">// 传输方向：从内存读，发送到外设uart</span>
+    DMA1_Channel4<span class="token operator">-&gt;</span>CCR <span class="token operator">|=</span> DMA_CCR4_DIR<span class="token punctuation">;</span>
+    <span class="token comment">// 数据宽度，统一为8字节</span>
+    DMA1_Channel4<span class="token operator">-&gt;</span>CCR <span class="token operator">&amp;=</span> <span class="token operator">~</span>DMA_CCR4_PSIZE<span class="token punctuation">;</span>
+    DMA1_Channel4<span class="token operator">-&gt;</span>CCR <span class="token operator">&amp;=</span> <span class="token operator">~</span>DMA_CCR4_MSIZE<span class="token punctuation">;</span>
+    <span class="token comment">// 内存地址自增，UART缓冲区地址不自增</span>
+    DMA1_Channel4<span class="token operator">-&gt;</span>CCR <span class="token operator">|=</span> DMA_CCR4_MINC<span class="token punctuation">;</span>
+    DMA1_Channel4<span class="token operator">-&gt;</span>CCR <span class="token operator">&amp;=</span> <span class="token operator">~</span>DMA_CCR4_PINC<span class="token punctuation">;</span>
+
+    <span class="token comment">// 如果开启循环传输模式，那么传输完成中断中不要停止DMA通道</span>
+    <span class="token comment">//DMA1_Channel4-&gt;CCR |= DMA_CCR4_CIRC;</span>
+
+    <span class="token comment">// 使能传输完成中断 Transmit Complete Interrupt Enable</span>
+    DMA1_Channel4<span class="token operator">-&gt;</span>CCR <span class="token operator">|=</span> DMA_CCR4_TCIE<span class="token punctuation">;</span>
+    <span class="token function">NVIC_SetPriorityGrouping</span><span class="token punctuation">(</span><span class="token number">3</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">NVIC_SetPriority</span><span class="token punctuation">(</span>DMA1_Channel4_IRQn<span class="token punctuation">,</span> <span class="token number">3</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">NVIC_EnableIRQ</span><span class="token punctuation">(</span>DMA1_Channel4_IRQn<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">void</span> <span class="token function">DMA1_Transmit</span><span class="token punctuation">(</span><span class="token class-name">uint32_t</span> srcAddr<span class="token punctuation">,</span> <span class="token class-name">uint32_t</span> destAddr<span class="token punctuation">,</span> <span class="token class-name">uint16_t</span> byteSize<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    DMA1_Channel4<span class="token operator">-&gt;</span>CMAR <span class="token operator">=</span> srcAddr<span class="token punctuation">;</span>
+    DMA1_Channel4<span class="token operator">-&gt;</span>CPAR <span class="token operator">=</span> destAddr<span class="token punctuation">;</span>
+    DMA1_Channel4<span class="token operator">-&gt;</span>CNDTR <span class="token operator">=</span> byteSize<span class="token punctuation">;</span>
+
+    <span class="token comment">// 使能通道，开始传输</span>
+    DMA1_Channel4<span class="token operator">-&gt;</span>CCR <span class="token operator">|=</span> DMA_CCR4_EN<span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">void</span> <span class="token function">DMA1_Channel4_IRQHandler</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token comment">// 判断是否为传输完成事件对应的中断</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>DMA1<span class="token operator">-&gt;</span>ISR <span class="token operator">&amp;</span> DMA_ISR_TCIF4<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token comment">// 清除中断标志</span>
+        DMA1<span class="token operator">-&gt;</span>IFCR <span class="token operator">|=</span> DMA_IFCR_CTCIF4<span class="token punctuation">;</span>
+        <span class="token comment">// 关闭DMA通道</span>
+        DMA1_Channel4<span class="token operator">-&gt;</span>CCR <span class="token operator">&amp;=</span> <span class="token operator">~</span>DMA_CCR4_EN<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<h3 id="uart-shi-neng-dma-fa-song">UART使能DMA发送</h3>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token comment">// 发送数据使能DMA</span>
+USART1<span class="token operator">-&gt;</span>CR3 <span class="token operator">|=</span> USART_CR3_DMAT<span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<h3 id="main">main</h3>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">"delay.h"</span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">"dma1.h"</span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">"key.h"</span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">"led.h"</span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">"logger.h"</span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">"stdio.h"</span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">"stm32f10x.h"</span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">"string.h"</span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">"uart.h"</span></span>
+
+<span class="token keyword">void</span> <span class="token function">uart1_received_callback</span><span class="token punctuation">(</span><span class="token class-name">uint8_t</span> buf<span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">,</span> <span class="token class-name">uint8_t</span> size<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token function">uart_send_bytes</span><span class="token punctuation">(</span>buf<span class="token punctuation">,</span> size<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">const</span> <span class="token class-name">uint8_t</span> src<span class="token punctuation">[</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token punctuation">{</span><span class="token char">'a'</span><span class="token punctuation">,</span> <span class="token char">'b'</span><span class="token punctuation">,</span> <span class="token char">'c'</span><span class="token punctuation">,</span> <span class="token char">'d'</span><span class="token punctuation">}</span><span class="token punctuation">;</span>
+
+<span class="token keyword">int</span> <span class="token function">main</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token function">uart_init</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">DMA1_Init</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token function">DMA1_Transmit</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token class-name">uint32_t</span><span class="token punctuation">)</span>src<span class="token punctuation">,</span> <span class="token punctuation">(</span><span class="token class-name">uint32_t</span><span class="token punctuation">)</span><span class="token operator">&amp;</span><span class="token punctuation">(</span>USART1<span class="token operator">-&gt;</span>DR<span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token number">4</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token keyword">while</span> <span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<h2 id="hal-ku-shi-xian-1">HAL库实现</h2>
+<h3 id="wai-she-xia-de-dma-she-zhi">外设下的DMA设置</h3>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241207121451388.png" alt="image-20241207121451388"></p>
+<h3 id="yi-dma-fang-shi-qu-dong-wai-she">以DMA方式驱动外设</h3>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token comment">/* Initialize all configured peripherals */</span>
+<span class="token function">MX_GPIO_Init</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token function">MX_DMA_Init</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token function">MX_USART1_UART_Init</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token comment">/* USER CODE BEGIN 2 */</span>
+  <span class="token class-name">uint8_t</span> data<span class="token punctuation">[</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token punctuation">{</span><span class="token char">'a'</span><span class="token punctuation">,</span> <span class="token char">'b'</span><span class="token punctuation">,</span> <span class="token char">'c'</span><span class="token punctuation">,</span> <span class="token char">'d'</span><span class="token punctuation">,</span> <span class="token char">'e'</span><span class="token punctuation">}</span><span class="token punctuation">;</span>
+  <span class="token function">HAL_UART_Transmit_DMA</span><span class="token punctuation">(</span><span class="token operator">&amp;</span>huart1<span class="token punctuation">,</span> data<span class="token punctuation">,</span> <span class="token number">5</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token comment">/* USER CODE END 2 */</span>
+
+<span class="token comment">/* Infinite loop */</span>
+<span class="token comment">/* USER CODE BEGIN WHILE */</span>
+<span class="token keyword">while</span> <span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+  <span class="token comment">/* USER CODE END WHILE */</span>
+
+  <span class="token comment">/* USER CODE BEGIN 3 */</span>
+<span class="token punctuation">}</span>
+<span class="token comment">/* USER CODE END 3 */</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<h3 id="yuan-ma-fen-xi">源码分析</h3>
+<ul>
+<li><code>MX_USART1_UART_Init</code>：DMA初始化：<code>HAL_UART_MspInit</code></li>
+<li><code>HAL_UART_Transmit_DMA</code>：调用 <code>HAL_DMA_Start_IT</code></li>
+</ul>
+<h1 id="xun-huan-chuan-shu-mo-shi">循环传输模式</h1>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241207120044568.png" alt="image-20241207120044568"></p>
+
+                
+            </div>
+            <hr/>
+
+            
+
+    <div class="reprint" id="reprint-statement">
+        
+            <div class="reprint__author">
+                <span class="reprint-meta" style="font-weight: bold;">
+                    <i class="fas fa-user">
+                        文章作者:
+                    </i>
+                </span>
+                <span class="reprint-info">
+                    <a href="/about" rel="external nofollow noreferrer">安文</a>
+                </span>
+            </div>
+            <div class="reprint__type">
+                <span class="reprint-meta" style="font-weight: bold;">
+                    <i class="fas fa-link">
+                        文章链接:
+                    </i>
+                </span>
+                <span class="reprint-info">
+                    <a href="https://zanwen.github.io/2024/12/06/62380.html">https://zanwen.github.io/2024/12/06/62380.html</a>
+                </span>
+            </div>
+            <div class="reprint__notice">
+                <span class="reprint-meta" style="font-weight: bold;">
+                    <i class="fas fa-copyright">
+                        版权声明:
+                    </i>
+                </span>
+                <span class="reprint-info">
+                    本博客所有文章除特別声明外，均采用
+                    <a href="https://creativecommons.org/licenses/by/4.0/deed.zh" rel="external nofollow noreferrer" target="_blank">CC BY 4.0</a>
+                    许可协议。转载请注明来源
+                    <a href="/about" target="_blank">安文</a>
+                    !
+                </span>
+            </div>
+        
+    </div>
+
+    <script async defer>
+      document.addEventListener("copy", function (e) {
+        let toastHTML = '<span>复制成功，请遵循本文的转载规则</span><button class="btn-flat toast-action" onclick="navToReprintStatement()" style="font-size: smaller">查看</a>';
+        M.toast({html: toastHTML})
+      });
+
+      function navToReprintStatement() {
+        $("html, body").animate({scrollTop: $("#reprint-statement").offset().top - 80}, 800);
+      }
+    </script>
+
+
+
+            <div class="tag_share" style="display: block;">
+                <div class="post-meta__tag-list" style="display: inline-block;">
+                    
+                        <div class="article-tag">
+                            
+                                <a href="/tags/DMA/">
+                                    <span class="chip bg-color">DMA</span>
+                                </a>
+                            
+                        </div>
+                    
+                </div>
+                <div class="post_share" style="zoom: 80%; width: fit-content; display: inline-block; float: right; margin: -0.15rem 0;">
+                    <link rel="stylesheet" type="text/css" href="/libs/share/css/share.min.css">
+<div id="article-share">
+
+    
+    <div class="social-share" data-sites="twitter,facebook,google,qq,qzone,wechat,weibo,douban,linkedin" data-wechat-qrcode-helper="<p>微信扫一扫即可分享！</p>"></div>
+    <script src="/libs/share/js/social-share.min.js"></script>
+    
+
+    
+
+</div>
+
+                </div>
+            </div>
+            
+                <div id="reward">
+    <a href="#rewardModal" class="reward-link modal-trigger btn-floating btn-medium waves-effect waves-light red">赏</a>
+
+    <!-- Modal Structure -->
+    <div id="rewardModal" class="modal">
+        <div class="modal-content">
+            <a class="close modal-close"><i class="fas fa-times"></i></a>
+            <h4 class="reward-title">你的赏识是我前进的动力</h4>
+            <div class="reward-content">
+                <div class="reward-tabs">
+                    <ul class="tabs row">
+                        <li class="tab col s6 alipay-tab waves-effect waves-light"><a href="#alipay">支付宝</a></li>
+                        <li class="tab col s6 wechat-tab waves-effect waves-light"><a href="#wechat">微 信</a></li>
+                    </ul>
+                    <div id="alipay">
+                        <img src="/medias/reward/alipay.jpg" class="reward-img" alt="支付宝打赏二维码">
+                    </div>
+                    <div id="wechat">
+                        <img src="/medias/reward/wechat.jpg" class="reward-img" alt="微信打赏二维码">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(function () {
+        $('.tabs').tabs();
+    });
+</script>
+
+            
+        </div>
+    </div>
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+<article id="prenext-posts" class="prev-next articles">
+    <div class="row article-row">
+        
+        <div class="article col s12 m6" data-aos="fade-up">
+            <div class="article-badge left-badge text-color">
+                <i class="fas fa-chevron-left"></i>&nbsp;上一篇</div>
+            <div class="card">
+                <a href="/2024/12/07/52846.html">
+                    <div class="card-image">
+                        
+                        <img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/pexels-dimengliu-3213577.jpg" class="responsive-img" alt="模数转换ADC(STM32F103ZE)">
+                        
+                        <span class="card-title">模数转换ADC(STM32F103ZE)</span>
+                    </div>
+                </a>
+                <div class="card-content article-content">
+                    <div class="summary block-with-text">
+                        
+                            
+                        
+                    </div>
+                    <div class="publish-info">
+                        <span class="publish-date">
+                            <i class="far fa-clock fa-fw icon-date"></i>2024-12-07
+                        </span>
+                        <span class="publish-author">
+                            
+                            <i class="fas fa-bookmark fa-fw icon-category"></i>
+                            
+                            <a href="/categories/STM32/" class="post-category">
+                                    STM32
+                                </a>
+                            
+                            
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="card-action article-tags">
+                    
+                    <a href="/tags/STM32/">
+                        <span class="chip bg-color">STM32</span>
+                    </a>
+                    
+                    <a href="/tags/ADC/">
+                        <span class="chip bg-color">ADC</span>
+                    </a>
+                    
+                </div>
+                
+            </div>
+        </div>
+        
+        
+        <div class="article col s12 m6" data-aos="fade-up">
+            <div class="article-badge right-badge text-color">
+                下一篇&nbsp;<i class="fas fa-chevron-right"></i>
+            </div>
+            <div class="card">
+                <a href="/2024/12/04/52886.html">
+                    <div class="card-image">
+                        
+                        <img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/pexels-248509299-12441849.jpg" class="responsive-img" alt="定时器的本质就是数数（基于STM32F103深入理解定时器）">
+                        
+                        <span class="card-title">定时器的本质就是数数（基于STM32F103深入理解定时器）</span>
+                    </div>
+                </a>
+                <div class="card-content article-content">
+                    <div class="summary block-with-text">
+                        
+                            
+                        
+                    </div>
+                    <div class="publish-info">
+                            <span class="publish-date">
+                                <i class="far fa-clock fa-fw icon-date"></i>2024-12-04
+                            </span>
+                        <span class="publish-author">
+                            
+                            <i class="fas fa-bookmark fa-fw icon-category"></i>
+                            
+                            <a href="/categories/STM32/" class="post-category">
+                                    STM32
+                                </a>
+                            
+                            
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="card-action article-tags">
+                    
+                    <a href="/tags/TIMER/">
+                        <span class="chip bg-color">TIMER</span>
+                    </a>
+                    
+                    <a href="/tags/%E5%AE%9A%E6%97%B6%E5%99%A8/">
+                        <span class="chip bg-color">定时器</span>
+                    </a>
+                    
+                    <a href="/tags/TIM/">
+                        <span class="chip bg-color">TIM</span>
+                    </a>
+                    
+                </div>
+                
+            </div>
+        </div>
+        
+    </div>
+</article>
+
+</div>
+
+
+
+<!-- 代码块功能依赖 -->
+<script type="text/javascript" src="/libs/codeBlock/codeBlockFuction.js"></script>
+
+
+  <!-- 是否加载使用自带的 prismjs. -->
+  <script type="text/javascript" src="/libs/prism/prism.min.js"></script>
+
+
+<!-- 代码语言 -->
+
+<script type="text/javascript" src="/libs/codeBlock/codeLang.js"></script>
+
+
+<!-- 代码块复制 -->
+
+<script type="text/javascript" src="/libs/codeBlock/codeCopy.js"></script>
+
+
+<!-- 代码块收缩 -->
+
+<script type="text/javascript" src="/libs/codeBlock/codeShrink.js"></script>
+
+
+
+    </div>
+    <div id="toc-aside" class="expanded col l3 hide-on-med-and-down">
+        <div class="toc-widget card" style="background-color: white;">
+            <div class="toc-title"><i class="far fa-list-alt"></i>&nbsp;&nbsp;目录</div>
+            <div id="toc-content"></div>
+        </div>
+    </div>
+</div>
+
+<!-- TOC 悬浮按钮. -->
+
+<div id="floating-toc-btn" class="hide-on-med-and-down">
+    <a class="btn-floating btn-large bg-color">
+        <i class="fas fa-list-ul"></i>
+    </a>
+</div>
+
+
+<script src="/libs/tocbot/tocbot.min.js"></script>
+<script>
+    $(function () {
+        tocbot.init({
+            tocSelector: '#toc-content',
+            contentSelector: '#articleContent',
+            headingsOffset: -($(window).height() * 0.4 - 45),
+            collapseDepth: Number('0'),
+            headingSelector: 'h1, h2, h3'
+        });
+
+        // Set scroll toc fixed.
+        let tocHeight = parseInt($(window).height() * 0.4 - 64);
+        let $tocWidget = $('.toc-widget');
+        $(window).scroll(function () {
+            let scroll = $(window).scrollTop();
+            /* add post toc fixed. */
+            if (scroll > tocHeight) {
+                $tocWidget.addClass('toc-fixed');
+            } else {
+                $tocWidget.removeClass('toc-fixed');
+            }
+        });
+
+        
+        /* 修复文章卡片 div 的宽度. */
+        let fixPostCardWidth = function (srcId, targetId) {
+            let srcDiv = $('#' + srcId);
+            if (srcDiv.length === 0) {
+                return;
+            }
+
+            let w = srcDiv.width();
+            if (w >= 450) {
+                w = w + 21;
+            } else if (w >= 350 && w < 450) {
+                w = w + 18;
+            } else if (w >= 300 && w < 350) {
+                w = w + 16;
+            } else {
+                w = w + 14;
+            }
+            $('#' + targetId).width(w);
+        };
+
+        // 切换TOC目录展开收缩的相关操作.
+        const expandedClass = 'expanded';
+        let $tocAside = $('#toc-aside');
+        let $mainContent = $('#main-content');
+        $('#floating-toc-btn .btn-floating').click(function () {
+            if ($tocAside.hasClass(expandedClass)) {
+                $tocAside.removeClass(expandedClass).hide();
+                $mainContent.removeClass('l9');
+            } else {
+                $tocAside.addClass(expandedClass).show();
+                $mainContent.addClass('l9');
+            }
+            fixPostCardWidth('artDetail', 'prenext-posts');
+        });
+        
+    });
+</script>
+
+    
+
+</main>
+
+
+
+
+    <footer class="page-footer bg-color">
+    
+
+    <div class="container row center-align"
+         style="margin-bottom: 0px !important;">
+        <div class="col s12 m8 l8 copy-right">
+            Copyright&nbsp;&copy;
+            
+                <span id="year">2019-2024</span>
+            
+            <a href="/about" target="_blank">安文</a>
+            |&nbsp;Powered by&nbsp;<a href="https://hexo.io/" target="_blank">Hexo</a>
+            |&nbsp;Theme&nbsp;<a href="https://github.com/blinkfox/hexo-theme-matery" target="_blank">Matery</a>
+            
+            <br>
+            
+                &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
+                        class="white-color">64.9k</span>
+            
+            
+            
+                
+            
+            
+                <span id="busuanzi_container_site_pv">
+                &nbsp;|&nbsp;<i class="far fa-eye"></i>&nbsp;总访问量:&nbsp;
+                    <span id="busuanzi_value_site_pv" class="white-color"></span>
+            </span>
+            
+            
+                <span id="busuanzi_container_site_uv">
+                &nbsp;|&nbsp;<i class="fas fa-users"></i>&nbsp;总访问人数:&nbsp;
+                    <span id="busuanzi_value_site_uv" class="white-color"></span>
+            </span>
+            
+            <br>
+
+            <!-- 运行天数提醒. -->
+            
+            <br>
+            
+        </div>
+        <div class="col s12 m4 l4 social-link social-statis">
+    <a href="https://github.com/zanwen" class="tooltipped" target="_blank" data-tooltip="访问我的GitHub" data-position="top" data-delay="50">
+        <i class="fab fa-github"></i>
+    </a>
+
+
+
+    <a href="mailto:872852458@qq.com" class="tooltipped" target="_blank" data-tooltip="邮件联系我" data-position="top" data-delay="50">
+        <i class="fas fa-envelope-open"></i>
+    </a>
+
+
+
+
+
+
+
+    <a href="tencent://AddContact/?fromId=50&fromSubId=1&subcmd=all&uin=872852458" class="tooltipped" target="_blank" data-tooltip="QQ联系我: 872852458" data-position="top" data-delay="50">
+        <i class="fab fa-qq"></i>
+    </a>
+
+
+
+
+
+
+
+    <a href="/atom.xml" class="tooltipped" target="_blank" data-tooltip="RSS 订阅" data-position="top" data-delay="50">
+        <i class="fas fa-rss"></i>
+    </a>
+
+</div>
+    </div>
+</footer>
+
+<div class="progress-bar"></div>
+
+
+    <!-- 搜索遮罩框 -->
+<div id="searchModal" class="modal">
+    <div class="modal-content">
+        <div class="search-header">
+            <span class="title"><i class="fas fa-search"></i>&nbsp;&nbsp;搜索</span>
+            <input type="search" id="searchInput" name="s" placeholder="请输入搜索的关键字"
+                   class="search-input">
+        </div>
+        <div id="searchResult"></div>
+    </div>
+</div>
+
+<script type="text/javascript">
+$(function () {
+    var searchFunc = function (path, search_id, content_id) {
+        'use strict';
+        $.ajax({
+            url: path,
+            dataType: "xml",
+            success: function (xmlResponse) {
+                // get the contents from search data
+                var datas = $("entry", xmlResponse).map(function () {
+                    return {
+                        title: $("title", this).text(),
+                        content: $("content", this).text(),
+                        url: $("url", this).text()
+                    };
+                }).get();
+                var $input = document.getElementById(search_id);
+                var $resultContent = document.getElementById(content_id);
+                $input.addEventListener('input', function () {
+                    var str = '<ul class=\"search-result-list\">';
+                    var keywords = this.value.trim().toLowerCase().split(/[\s\-]+/);
+                    $resultContent.innerHTML = "";
+                    if (this.value.trim().length <= 0) {
+                        return;
+                    }
+                    // perform local searching
+                    datas.forEach(function (data) {
+                        var isMatch = true;
+                        var data_title = data.title.trim().toLowerCase();
+                        var data_content = data.content.trim().replace(/<[^>]+>/g, "").toLowerCase();
+                        var data_url = data.url;
+                        data_url = data_url.indexOf('/') === 0 ? data.url : '/' + data_url;
+                        var index_title = -1;
+                        var index_content = -1;
+                        var first_occur = -1;
+                        // only match artiles with not empty titles and contents
+                        if (data_title !== '' && data_content !== '') {
+                            keywords.forEach(function (keyword, i) {
+                                index_title = data_title.indexOf(keyword);
+                                index_content = data_content.indexOf(keyword);
+                                if (index_title < 0 && index_content < 0) {
+                                    isMatch = false;
+                                } else {
+                                    if (index_content < 0) {
+                                        index_content = 0;
+                                    }
+                                    if (i === 0) {
+                                        first_occur = index_content;
+                                    }
+                                }
+                            });
+                        }
+                        // show search results
+                        if (isMatch) {
+                            str += "<li><a href='" + data_url + "' class='search-result-title'>" + data_title + "</a>";
+                            var content = data.content.trim().replace(/<[^>]+>/g, "");
+                            if (first_occur >= 0) {
+                                // cut out 100 characters
+                                var start = first_occur - 20;
+                                var end = first_occur + 80;
+                                if (start < 0) {
+                                    start = 0;
+                                }
+                                if (start === 0) {
+                                    end = 100;
+                                }
+                                if (end > content.length) {
+                                    end = content.length;
+                                }
+                                var match_content = content.substr(start, end);
+                                // highlight all keywords
+                                keywords.forEach(function (keyword) {
+                                    var regS = new RegExp(keyword, "gi");
+                                    match_content = match_content.replace(regS, "<em class=\"search-keyword\">" + keyword + "</em>");
+                                });
+
+                                str += "<p class=\"search-result\">" + match_content + "...</p>"
+                            }
+                            str += "</li>";
+                        }
+                    });
+                    str += "</ul>";
+                    $resultContent.innerHTML = str;
+                });
+            }
+        });
+    };
+
+    searchFunc('/search.xml', 'searchInput', 'searchResult');
+});
+</script>
+
+    <!-- 白天和黑夜主题 -->
+<div class="stars-con">
+    <div id="stars"></div>
+    <div id="stars2"></div>
+    <div id="stars3"></div>  
+</div>
+
+<script>
+    function switchNightMode() {
+        $('<div class="Cuteen_DarkSky"><div class="Cuteen_DarkPlanet"></div></div>').appendTo($('body')),
+        setTimeout(function () {
+            $('body').hasClass('DarkMode') 
+            ? ($('body').removeClass('DarkMode'), localStorage.setItem('isDark', '0'), $('#sum-moon-icon').removeClass("fa-sun").addClass('fa-moon')) 
+            : ($('body').addClass('DarkMode'), localStorage.setItem('isDark', '1'), $('#sum-moon-icon').addClass("fa-sun").removeClass('fa-moon')),
+            
+            setTimeout(function () {
+            $('.Cuteen_DarkSky').fadeOut(1e3, function () {
+                $(this).remove()
+            })
+            }, 2e3)
+        })
+    }
+</script>
+
+    <!-- 回到顶部按钮 -->
+<div id="backTop" class="top-scroll">
+    <a class="btn-floating btn-large waves-effect waves-light" href="#!">
+        <i class="fas fa-arrow-up"></i>
+    </a>
+</div>
+
+
+    <script src="/libs/materialize/materialize.min.js"></script>
+    <script src="/libs/masonry/masonry.pkgd.min.js"></script>
+    <script src="/libs/aos/aos.js"></script>
+    <script src="/libs/scrollprogress/scrollProgress.min.js"></script>
+    <script src="/libs/lightGallery/js/lightgallery-all.min.js"></script>
+    <script src="/js/matery.js"></script>
+
+    
+
+    
+    
+    
+
+    <!-- 雪花特效 -->
+    
+
+    <!-- 鼠标星星特效 -->
+    
+
+     
+        <script src="https://ssl.captcha.qq.com/TCaptcha.js"></script>
+        <script src="/libs/others/TencentCaptcha.js"></script>
+        <button id="TencentCaptcha" data-appid="xxxxxxxxxx" data-cbfn="callback" type="button" hidden></button>
+    
+
+    <!-- Baidu Analytics -->
+
+    <!-- Baidu Push -->
+
+<script>
+    (function () {
+        var bp = document.createElement('script');
+        var curProtocol = window.location.protocol.split(':')[0];
+        if (curProtocol === 'https') {
+            bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+        } else {
+            bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+        }
+        var s = document.getElementsByTagName("script")[0];
+        s.parentNode.insertBefore(bp, s);
+    })();
+</script>
+
+    
+    <script src="/libs/others/clicklove.js" async="async"></script>
+    
+    
+    <script async src="/libs/others/busuanzi.pure.mini.js"></script>
+    
+
+    
+
+    
+
+    <!--腾讯兔小巢-->
+    
+    
+
+    
+
+    
+
+    
+    <script src="/libs/instantpage/instantpage.js" type="module"></script>
+    
+
+</body>
+
+</html>

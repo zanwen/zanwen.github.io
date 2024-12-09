@@ -1,0 +1,1934 @@
+<!DOCTYPE HTML>
+<html lang="zh-CN">
+
+
+<head>
+    <meta charset="utf-8">
+    <meta name="keywords" content="高速通信协议SPI（基于STM32F103）, 安文的博客">
+    <meta name="description" content="参考资料
+
+STM32F103参考手册：rm0008-stm32f101xx-stm32f102xx-stm32f103xx-stm32f105xx-and-stm32f107xx
+STM32103ZE数据手册：STM32F103xC, S">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="renderer" content="webkit|ie-stand|ie-comp">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="format-detection" content="telephone=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="referrer" content="no-referrer-when-downgrade">
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+
+
+    <title>高速通信协议SPI（基于STM32F103） | 安文的博客</title>
+    <link rel="icon" type="image/png" href="/medias/logo.png">
+    
+
+
+    <!-- bg-cover style     -->
+
+
+
+<link rel="stylesheet" type="text/css" href="/libs/awesome/css/all.min.css">
+<link rel="stylesheet" type="text/css" href="/libs/materialize/materialize.min.css">
+<link rel="stylesheet" type="text/css" href="/libs/aos/aos.css">
+<link rel="stylesheet" type="text/css" href="/libs/animate/animate.min.css">
+<link rel="stylesheet" type="text/css" href="/libs/lightGallery/css/lightgallery.min.css">
+<link rel="stylesheet" type="text/css" href="/css/matery.css">
+<link rel="stylesheet" type="text/css" href="/css/my.css">
+<link rel="stylesheet" type="text/css" href="/css/dark.css" media="none" onload="if(media!='all')media='all'">
+
+
+
+
+    <link rel="stylesheet" href="/libs/tocbot/tocbot.css">
+    <link rel="stylesheet" href="/css/post.css">
+
+
+
+
+    
+        <link rel="stylesheet" type="text/css" href="/css/reward.css">
+    
+
+
+
+    <script src="/libs/jquery/jquery-3.6.0.min.js"></script>
+
+<meta name="generator" content="Hexo 7.3.0">
+<style>.github-emoji { position: relative; display: inline-block; width: 1.2em; min-height: 1.2em; overflow: hidden; vertical-align: top; color: transparent; }  .github-emoji > span { position: relative; z-index: 10; }  .github-emoji img, .github-emoji .fancybox { margin: 0 !important; padding: 0 !important; border: none !important; outline: none !important; text-decoration: none !important; user-select: none !important; cursor: auto !important; }  .github-emoji img { height: 1.2em !important; width: 1.2em !important; position: absolute !important; left: 50% !important; top: 50% !important; transform: translate(-50%, -50%) !important; user-select: none !important; cursor: auto !important; } .github-emoji-fallback { color: inherit; } .github-emoji-fallback img { opacity: 0 !important; }</style>
+<link rel="alternate" href="/atom.xml" title="安文的博客" type="application/atom+xml">
+</head>
+
+
+<body>
+    <header class="navbar-fixed">
+    <nav id="headNav" class="bg-color nav-transparent">
+        <div id="navContainer" class="nav-wrapper container">
+            <div class="brand-logo">
+                <a href="/" class="waves-effect waves-light">
+                    
+                    <img src="/medias/logo.png" class="logo-img" alt="LOGO">
+                    
+                    <span class="logo-span">安文的博客</span>
+                </a>
+            </div>
+            
+
+<a href="#" data-target="mobile-nav" class="sidenav-trigger button-collapse"><i class="fas fa-bars"></i></a>
+<ul class="right nav-menu">
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/" class="waves-effect waves-light">
+      
+      <i class="fas fa-home" style="zoom: 0.6;"></i>
+      
+      <span>首页</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/tags" class="waves-effect waves-light">
+      
+      <i class="fas fa-tags" style="zoom: 0.6;"></i>
+      
+      <span>标签</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/categories" class="waves-effect waves-light">
+      
+      <i class="fas fa-bookmark" style="zoom: 0.6;"></i>
+      
+      <span>分类</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/archives" class="waves-effect waves-light">
+      
+      <i class="fas fa-archive" style="zoom: 0.6;"></i>
+      
+      <span>归档</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/about" class="waves-effect waves-light">
+      
+      <i class="fas fa-user-circle" style="zoom: 0.6;"></i>
+      
+      <span>关于</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/contact" class="waves-effect waves-light">
+      
+      <i class="fas fa-comments" style="zoom: 0.6;"></i>
+      
+      <span>留言板</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/friends" class="waves-effect waves-light">
+      
+      <i class="fas fa-address-book" style="zoom: 0.6;"></i>
+      
+      <span>友情链接</span>
+    </a>
+    
+  </li>
+  
+  <li>
+    <a href="#searchModal" class="modal-trigger waves-effect waves-light">
+      <i id="searchIcon" class="fas fa-search" title="搜索" style="zoom: 0.85;"></i>
+    </a>
+  </li>
+  <li>
+    <a href="javascript:;" class="waves-effect waves-light" onclick="switchNightMode()" title="深色/浅色模式" >
+      <i id="sum-moon-icon" class="fas fa-sun" style="zoom: 0.85;"></i>
+    </a>
+  </li>
+</ul>
+
+
+<div id="mobile-nav" class="side-nav sidenav">
+
+    <div class="mobile-head bg-color">
+        
+        <img src="/medias/logo.png" class="logo-img circle responsive-img">
+        
+        <div class="logo-name">安文的博客</div>
+        <div class="logo-desc">
+            
+            安文的博客 | 嵌入式 | 算法 | AI | 人工智能
+            
+        </div>
+    </div>
+
+    <ul class="menu-list mobile-menu-list">
+        
+        <li class="m-nav-item">
+	  
+		<a href="/" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-home"></i>
+			
+			首页
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/tags" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-tags"></i>
+			
+			标签
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/categories" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-bookmark"></i>
+			
+			分类
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/archives" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-archive"></i>
+			
+			归档
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/about" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-user-circle"></i>
+			
+			关于
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/contact" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-comments"></i>
+			
+			留言板
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/friends" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-address-book"></i>
+			
+			友情链接
+		</a>
+          
+        </li>
+        
+        
+        <li><div class="divider"></div></li>
+        <li>
+            <a href="https://github.com/blinkfox/hexo-theme-matery" class="waves-effect waves-light" target="_blank">
+                <i class="fab fa-github-square fa-fw"></i>Fork Me
+            </a>
+        </li>
+        
+    </ul>
+</div>
+
+
+        </div>
+
+        
+            <style>
+    .nav-transparent .github-corner {
+        display: none !important;
+    }
+
+    .github-corner {
+        position: absolute;
+        z-index: 10;
+        top: 0;
+        right: 0;
+        border: 0;
+        transform: scale(1.1);
+    }
+
+    .github-corner svg {
+        color: #0f9d58;
+        fill: #fff;
+        height: 64px;
+        width: 64px;
+    }
+
+    .github-corner:hover .octo-arm {
+        animation: a 0.56s ease-in-out;
+    }
+
+    .github-corner .octo-arm {
+        animation: none;
+    }
+
+    @keyframes a {
+        0%,
+        to {
+            transform: rotate(0);
+        }
+        20%,
+        60% {
+            transform: rotate(-25deg);
+        }
+        40%,
+        80% {
+            transform: rotate(10deg);
+        }
+    }
+</style>
+
+<a href="https://github.com/blinkfox/hexo-theme-matery" class="github-corner tooltipped hide-on-med-and-down" target="_blank"
+   data-tooltip="Fork Me" data-position="left" data-delay="50">
+    <svg viewBox="0 0 250 250" aria-hidden="true">
+        <path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path>
+        <path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2"
+              fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path>
+        <path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z"
+              fill="currentColor" class="octo-body"></path>
+    </svg>
+</a>
+        
+    </nav>
+
+</header>
+
+    
+
+
+
+<div class="bg-cover pd-header post-cover" style="background-image: url('https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/sapp-kailash-4595562.jpg')">
+    <div class="container" style="right: 0px;left: 0px;">
+        <div class="row">
+            <div class="col s12 m12 l12">
+                <div class="brand">
+                    <h1 class="description center-align post-title">高速通信协议SPI（基于STM32F103）</h1>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+<main class="post-container content">
+
+    
+    <div class="row">
+    <div id="main-content" class="col s12 m12 l9">
+        <!-- 文章内容详情 -->
+<div id="artDetail">
+    <div class="card">
+        <div class="card-content article-info">
+            <div class="row tag-cate">
+                <div class="col s7">
+                    
+                    <div class="article-tag">
+                        
+                            <a href="/tags/STM32/">
+                                <span class="chip bg-color">STM32</span>
+                            </a>
+                        
+                            <a href="/tags/SPI/">
+                                <span class="chip bg-color">SPI</span>
+                            </a>
+                        
+                    </div>
+                    
+                </div>
+                <div class="col s5 right-align">
+                    
+                    <div class="post-cate">
+                        <i class="fas fa-bookmark fa-fw icon-category"></i>
+                        
+                            <a href="/categories/STM32/" class="post-category">
+                                STM32
+                            </a>
+                        
+                            <a href="/categories/STM32/%E5%8D%8F%E8%AE%AE/" class="post-category">
+                                协议
+                            </a>
+                        
+                    </div>
+                    
+                </div>
+            </div>
+
+            <div class="post-info">
+                
+                <div class="post-date info-break-policy">
+                    <i class="far fa-calendar-minus fa-fw"></i>发布日期:&nbsp;&nbsp;
+                    2024-12-08
+                </div>
+                
+
+                
+                <div class="post-date info-break-policy">
+                    <i class="far fa-calendar-check fa-fw"></i>更新日期:&nbsp;&nbsp;
+                    2024-12-08
+                </div>
+                
+
+                
+                <div class="info-break-policy">
+                    <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
+                    3.9k
+                </div>
+                
+
+                
+                <div class="info-break-policy">
+                    <i class="far fa-clock fa-fw"></i>阅读时长:&nbsp;&nbsp;
+                    19 分
+                </div>
+                
+
+                
+                    <div id="busuanzi_container_page_pv" class="info-break-policy">
+                        <i class="far fa-eye fa-fw"></i>阅读次数:&nbsp;&nbsp;
+                        <span id="busuanzi_value_page_pv"></span>
+                    </div>
+				
+            </div>
+        </div>
+        <hr class="clearfix">
+
+        
+        <!-- 是否加载使用自带的 prismjs. -->
+        <link rel="stylesheet" href="/libs/prism/prism.min.css">
+        
+
+        
+
+        <div class="card-content article-card-content">
+            <div id="articleContent">
+                <h1 id="can-kao-zi-liao">参考资料</h1>
+<ul>
+<li>STM32F103参考手册：<a target="_blank" rel="noopener" href="https://www.st.com/resource/en/reference_manual/rm0008-stm32f101xx-stm32f102xx-stm32f103xx-stm32f105xx-and-stm32f107xx-advanced-armbased-32bit-mcus-stmicroelectronics.pdf">rm0008-stm32f101xx-stm32f102xx-stm32f103xx-stm32f105xx-and-stm32f107xx</a></li>
+<li>STM32103ZE数据手册：<a target="_blank" rel="noopener" href="https://www.st.com/resource/en/datasheet/stm32f103rc.pdf">STM32F103xC, STM32F103xD, STM32F103xE </a></li>
+<li><a target="_blank" rel="noopener" href="https://docs.rs-online.com/0d6a/0900766b81622f91.pdf">W25Q32JV Datasheet</a></li>
+</ul>
+<h1 id="spi-gai-shu">SPI概述</h1>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241208085758199.png" alt="image-20241208085758199"></p>
+<h2 id="wu-li-ceng">物理层</h2>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241208085826672.png" alt="image-20241208085826672"></p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241208085922892.png" alt="image-20241208085922892"></p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241208090013844.png" alt="image-20241208090013844"></p>
+<h2 id="xie-yi-ceng">协议层</h2>
+<h3 id="zhu-ji-he-cong-ji-zhi-jian-de-shu-ju-jiao-huan">主机和从机之间的数据交换</h3>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241208090106193.png" alt="image-20241208090106193"></p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241208090214243.png" alt="image-20241208090214243"></p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241208090240645.png" alt="image-20241208090240645"></p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241208090322157.png" alt="image-20241208090322157"></p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241208090347725.png" alt="image-20241208090347725"></p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241208090549989.png" alt="image-20241208090549989"></p>
+<h3 id="shi-zhong-de-ji-xing-he-xiang-wei">时钟的极性和相位</h3>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241208091011305.png" alt="image-20241208091011305"></p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241208091050562.png" alt="image-20241208091050562"></p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241208091403040.png" alt="STM32参考手册"></p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241208091412303.png" alt="STM32参考手册"></p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241208091524655.png" alt="image-20241208091524655"></p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241208114103130.png" alt="image-20241208114103130"></p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241208114140123.png" alt="image-20241208114140123"></p>
+<h1 id="an-li-w-25-q-32">案例-W25Q32</h1>
+<h2 id="w-25-q-32-jie-shao">W25Q32介绍</h2>
+<p>W25Q32是一种使用SPI通讯协议的<strong>NOR FLASH</strong>存储器，它的CLK/DI/DO引脚分别连接到了STM32对应的SPI引脚SCK/MOSI/MISO上，其中STM32的NSS引脚虽然是其片上SPI外设的硬件引脚，但实际上后面的程序只是把它当成一个普通的GPIO，使用软件的方式控制NSS信号，所以在SPI的硬件设计中，NSS可以随便选择普通的GPIO，不必纠结于选择硬件NSS信号。</p>
+<p>FLASH 芯片中还有WP和HOLD引脚。WP引脚可控制写保护功能，当该引脚为低电平时，禁止写入数据。我们直接接电源，不使用写保护功能。HOLD引脚可用于暂停通讯，该引脚为低电平时，通讯暂停，数据输出引脚输出高阻抗状态，时钟和数据输入引脚无效。我们直接接电源，不使用通讯暂停功能。</p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241208132401090.png" alt="image-20241208132401090"></p>
+<p>（1）这个flash芯片只支持<strong>模式0和模式3</strong>。</p>
+<p>（2）写的时候必须是先擦除，擦除后再写入。</p>
+<p>（3）移位是高位优先。</p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241208132526999.png" alt="image-20241208132526999"></p>
+<h2 id="w-25-q-32-kuang-tu">W25Q32框图</h2>
+<p>4M-byte存储空间，所需寻址bit为22，为了8bit对齐，采用24bit编址</p>
+<ul>
+<li>[23:16]：其中高2位没有用，低6位用于Block寻址，对应64个Block</li>
+<li>[15:12]：4个bit用于Sector寻址，对应16个Sector</li>
+<li>[11:8]：4个bit用于Page寻址，对应一个Sector中的16个Page</li>
+<li>[7:0]：8个bit用于页内字节寻址，对应一个Page中的256个字节</li>
+</ul>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241208132710140.png" alt="image-20241208132710140"></p>
+<h2 id="xie-ru-cao-zuo-zhu-yi-shi-xiang">写入操作注意事项</h2>
+<p>（1）写入操作前，必须先进行写使能。</p>
+<p>（2）每个数据位只能由1改写为0，不能由0改写为1。</p>
+<p>（3）写入数据前必须先檫除，檫除后，所有数据位变为1。擦除必须按最小擦除单元进行。</p>
+<p>（4）连续写入多字节时，最多写入一页的数据，超过页尾位置的数据，会回到页首覆盖写入。</p>
+<p>（5）写入操作结束后，芯片进入忙状态，不响应新的读写操作。</p>
+<h3 id="xie-shi-neng">写使能</h3>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241208140636281.png" alt="image-20241208140636281"></p>
+<h3 id="ye-xie">页写</h3>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241208142927822.png" alt="image-20241208142927822"></p>
+<h3 id="mang-zhuang-tai">忙状态</h3>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241208141022091.png" alt="image-20241208141022091"></p>
+<h2 id="du-qu-cao-zuo-zhu-yi-shi-xiang">读取操作注意事项</h2>
+<p>（1）直接调用读取时序，无需读使能，无需额外操作，没有页的限制。</p>
+<p>（2）读取操作结束后不会进入忙状态，但不能在忙状态时读取。</p>
+<h2 id="dian-qi-te-xing-amp-shi-xu-yao-qiu-fen-xi">电气特性&amp;时序要求分析</h2>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241208144515657.png" alt="W25Q32"></p>
+<p>如图3.3V工作电压条件下，SCK时钟频率最高可达133MHz（非03h指令，03h指令则为50MHz）。对于STM32F103而言，GPIO输出的最大频率为50MHz（如下图）。</p>
+<p>其他时序要求参数大都在10ns以内，而STM32F103的主频为72MHz，时钟周期约为13.8ns，因此大多数情况下都不需要刻意延时。</p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241208144853915.png" alt="STM32F103数据手册"></p>
+<p>对于擦除和页写相关操作，则需要增加一定的延时来等待芯片内部完成相应的操作。</p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241208145935374.png" alt="image-20241208145935374"></p>
+<h2 id="shi-yan-du-qu-han-shang-id-he-she-bei-id">实验-读取厂商ID和设备ID</h2>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241208143740884.png" alt="image-20241208143740884"><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241208144153347.png" alt="image-20241208144153347"></p>
+<h3 id="spi-h">spi.h</h3>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">ifndef</span> <span class="token expression">__SPI_H__</span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name">__SPI_H__</span></span>
+
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">"stm32f10x.h"</span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">"delay.h"</span></span>
+
+<span class="token comment">// CS PC13</span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name">CS_HIGH</span> <span class="token expression"><span class="token punctuation">(</span>GPIOC<span class="token operator">-&gt;</span>ODR <span class="token operator">|=</span> GPIO_ODR_ODR13<span class="token punctuation">)</span></span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name">CS_LOW</span> <span class="token expression"><span class="token punctuation">(</span>GPIOC<span class="token operator">-&gt;</span>ODR <span class="token operator">&amp;=</span> <span class="token operator">~</span>GPIO_ODR_ODR13<span class="token punctuation">)</span></span></span>
+
+<span class="token comment">// SCK PA5</span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name">SCK_HIGH</span> <span class="token expression"><span class="token punctuation">(</span>GPIOA<span class="token operator">-&gt;</span>ODR <span class="token operator">|=</span> GPIO_ODR_ODR5<span class="token punctuation">)</span></span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name">SCK_LOW</span> <span class="token expression"><span class="token punctuation">(</span>GPIOA<span class="token operator">-&gt;</span>ODR <span class="token operator">&amp;=</span> <span class="token operator">~</span>GPIO_ODR_ODR5<span class="token punctuation">)</span></span></span>
+
+<span class="token comment">// MOSI PA7</span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name">MOSI_LOW</span> <span class="token expression"><span class="token punctuation">(</span>GPIOA<span class="token operator">-&gt;</span>ODR <span class="token operator">&amp;=</span> <span class="token operator">~</span>GPIO_ODR_ODR7<span class="token punctuation">)</span></span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name">MOSI_HIGH</span> <span class="token expression"><span class="token punctuation">(</span>GPIOA<span class="token operator">-&gt;</span>ODR <span class="token operator">|=</span> GPIO_ODR_ODR7<span class="token punctuation">)</span></span></span>
+
+
+<span class="token comment">// MISO PA6</span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name">MISO_READ</span> <span class="token expression"><span class="token punctuation">(</span><span class="token punctuation">(</span>GPIOA<span class="token operator">-&gt;</span>IDR <span class="token operator">&amp;</span> GPIO_IDR_IDR6<span class="token punctuation">)</span> <span class="token operator">?</span> <span class="token number">1</span> <span class="token operator">:</span> <span class="token number">0</span><span class="token punctuation">)</span></span></span>
+
+<span class="token keyword">void</span> <span class="token function">SPI_Init</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token keyword">void</span> <span class="token function">SPI_Start</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">void</span> <span class="token function">SPI_Stop</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token class-name">uint8_t</span> <span class="token function">SPI_SwapByte</span><span class="token punctuation">(</span><span class="token class-name">uint8_t</span> dataByte<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">endif</span> <span class="token comment">/* __SPI_H__ */</span></span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<h3 id="spi-c">spi.c</h3>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">"spi.h"</span></span>
+
+<span class="token keyword">void</span> <span class="token function">SPI_Init</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    RCC<span class="token operator">-&gt;</span>APB2ENR <span class="token operator">|=</span> RCC_APB2ENR_IOPAEN<span class="token punctuation">;</span>
+    RCC<span class="token operator">-&gt;</span>APB2ENR <span class="token operator">|=</span> RCC_APB2ENR_IOPCEN<span class="token punctuation">;</span>
+
+    <span class="token comment">// CS-PC13 和 SCK-PA5，MOSI-PA7 通用推挽 MODE=11 CNF=00</span>
+    GPIOC<span class="token operator">-&gt;</span>CRH <span class="token operator">|=</span> GPIO_CRH_MODE13<span class="token punctuation">;</span>
+    GPIOC<span class="token operator">-&gt;</span>CRH <span class="token operator">&amp;=</span> <span class="token operator">~</span>GPIO_CRH_CNF13<span class="token punctuation">;</span>
+
+    GPIOA<span class="token operator">-&gt;</span>CRL <span class="token operator">|=</span> GPIO_CRL_MODE5<span class="token punctuation">;</span>
+    GPIOA<span class="token operator">-&gt;</span>CRL <span class="token operator">&amp;=</span> <span class="token operator">~</span>GPIO_CRL_CNF5<span class="token punctuation">;</span>
+
+    GPIOA<span class="token operator">-&gt;</span>CRL <span class="token operator">|=</span> GPIO_CRL_MODE7<span class="token punctuation">;</span>
+    GPIOA<span class="token operator">-&gt;</span>CRL <span class="token operator">&amp;=</span> <span class="token operator">~</span>GPIO_CRL_CNF7<span class="token punctuation">;</span>
+
+    <span class="token comment">// MISO-PA6 浮空输入 MODE=00, CNF=01</span>
+    GPIOA<span class="token operator">-&gt;</span>CRL <span class="token operator">&amp;=</span> <span class="token operator">~</span>GPIO_CRL_MODE6<span class="token punctuation">;</span>
+    GPIOA<span class="token operator">-&gt;</span>CRL <span class="token operator">|=</span> GPIO_CRL_CNF6_0<span class="token punctuation">;</span>
+    GPIOA<span class="token operator">-&gt;</span>CRL <span class="token operator">&amp;=</span> <span class="token operator">~</span>GPIO_CRL_CNF6_1<span class="token punctuation">;</span>
+
+    <span class="token comment">// SPI模式0（极性=0，相位=0） 空闲状态 CS拉高（低电平使能），SCK拉低</span>
+    CS_HIGH<span class="token punctuation">;</span>
+    SCK_LOW<span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">void</span> <span class="token function">SPI_Start</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span> <span class="token punctuation">{</span> CS_LOW<span class="token punctuation">;</span> <span class="token punctuation">}</span>
+<span class="token keyword">void</span> <span class="token function">SPI_Stop</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span> <span class="token punctuation">{</span> CS_HIGH<span class="token punctuation">;</span> <span class="token punctuation">}</span>
+
+<span class="token class-name">uint8_t</span> <span class="token function">SPI_SwapByte</span><span class="token punctuation">(</span><span class="token class-name">uint8_t</span> dataByte<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token class-name">uint8_t</span> readByte <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
+    <span class="token keyword">for</span> <span class="token punctuation">(</span><span class="token class-name">uint8_t</span> i <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span> i <span class="token operator">&lt;</span> <span class="token number">8</span><span class="token punctuation">;</span> i<span class="token operator">++</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token comment">// 主设备准备数据到输出线MOSI上</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>dataByte <span class="token operator">&amp;</span> <span class="token number">0x80</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            MOSI_HIGH<span class="token punctuation">;</span>
+        <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
+            MOSI_LOW<span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+        dataByte <span class="token operator">&lt;&lt;=</span> <span class="token number">1</span><span class="token punctuation">;</span>
+        <span class="token comment">// 主设备拉高SCK（双方发送数据阶段），让从设备读取数据</span>
+        SCK_HIGH<span class="token punctuation">;</span>
+        <span class="token comment">// 主设备读取从设备的数据</span>
+        readByte <span class="token operator">&lt;&lt;=</span> <span class="token number">1</span><span class="token punctuation">;</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>MISO_READ<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            readByte <span class="token operator">|=</span> <span class="token number">0x01</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+        <span class="token comment">// 主设备拉低SCK（双方准备数据阶段），让从设备准备下一个数据</span>
+        SCK_LOW<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    <span class="token keyword">return</span> readByte<span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<h3 id="w-25-q-32-h">w25q32.h</h3>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">ifndef</span> <span class="token expression">__W25Q32_H__</span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name">__W25Q32_H__</span></span>
+
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">"spi.h"</span></span>
+
+<span class="token keyword">void</span> <span class="token function">W25Q32_Init</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token keyword">void</span> <span class="token function">W25Q32_ReadID</span><span class="token punctuation">(</span><span class="token class-name">uint8_t</span> <span class="token operator">*</span>manufactureID<span class="token punctuation">,</span> <span class="token class-name">uint16_t</span> <span class="token operator">*</span>deviceID<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">endif</span> <span class="token comment">/* __W25Q32_H__ */</span></span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<h3 id="w-25-q-32-c">w25q32.c</h3>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">"w25q32.h"</span></span>
+
+<span class="token keyword">void</span> <span class="token function">W25Q32_Init</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token function">SPI_Init</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">void</span> <span class="token function">W25Q32_ReadID</span><span class="token punctuation">(</span><span class="token class-name">uint8_t</span> <span class="token operator">*</span>manufactureId<span class="token punctuation">,</span> <span class="token class-name">uint16_t</span> <span class="token operator">*</span>deviceId<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token comment">// 片选使能</span>
+    <span class="token function">SPI_Start</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token comment">// 发送Read JEDEC ID指令9Fh，读取生产厂商和设备ID</span>
+    <span class="token function">SPI_SwapByte</span><span class="token punctuation">(</span><span class="token number">0x9F</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token comment">// 读取从设备响应数据</span>
+    <span class="token operator">*</span>manufactureId <span class="token operator">=</span> <span class="token function">SPI_SwapByte</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token operator">*</span>deviceId <span class="token operator">|=</span> <span class="token punctuation">(</span><span class="token function">SPI_SwapByte</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">)</span> <span class="token operator">&lt;&lt;</span> <span class="token number">8</span><span class="token punctuation">)</span> <span class="token operator">&amp;</span> <span class="token number">0xFF00</span><span class="token punctuation">;</span>
+    <span class="token operator">*</span>deviceId <span class="token operator">|=</span> <span class="token function">SPI_SwapByte</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">)</span> <span class="token operator">&amp;</span> <span class="token number">0x00FF</span><span class="token punctuation">;</span>
+
+    <span class="token comment">// 片选失能</span>
+    <span class="token function">SPI_Stop</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<h3 id="logger">logger</h3>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241208163556410.png" alt="image-20241208163556410"></p>
+<h3 id="luo-ji-fen-xi">逻辑分析</h3>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241208150354261.png" alt="image-20241208150354261"></p>
+<h2 id="shi-yan-ca-chu-amp-ye-xie-amp-lian-xu-du">实验-擦除&amp;页写&amp;连续读</h2>
+<h3 id="deng-dai-busy-zhuang-tai">等待BUSY状态</h3>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241208155727798.png" alt="image-20241208155727798"></p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241208155924081.png" alt="image-20241208155924081"></p>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token keyword">void</span> <span class="token function">W25Q32_WaitNotBusy</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token function">SPI_Start</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token comment">// 发送读取状态寄存器指令</span>
+    <span class="token function">SPI_SwapByte</span><span class="token punctuation">(</span><span class="token number">0x05</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token comment">// 轮询接收从设备响应的状态字节，直到其中的最低位为0</span>
+    <span class="token keyword">while</span> <span class="token punctuation">(</span><span class="token function">SPI_SwapByte</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">)</span> <span class="token operator">&amp;</span> <span class="token number">0x01</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token punctuation">}</span>
+    <span class="token function">SPI_Stop</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<h3 id="ca-chu-shan-qu">擦除扇区</h3>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241208164659395.png" alt="image-20241208164659395"></p>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token keyword">void</span> <span class="token function">W25Q32_WriteEnable</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token function">SPI_Start</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">SPI_SwapByte</span><span class="token punctuation">(</span><span class="token number">0x06</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">SPI_Stop</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+<span class="token keyword">void</span> <span class="token function">W25Q32_WriteDisable</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token function">SPI_Start</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">SPI_SwapByte</span><span class="token punctuation">(</span><span class="token number">0x04</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">SPI_Stop</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+<span class="token keyword">void</span> <span class="token function">W25Q32_SectorErase</span><span class="token punctuation">(</span><span class="token class-name">uint8_t</span> block<span class="token punctuation">,</span> <span class="token class-name">uint8_t</span> sector<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token comment">// 执行擦除前必须等待BUSY状态和开启写使能</span>
+    <span class="token function">W25Q32_WaitNotBusy</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">W25Q32_WriteEnable</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token function">SPI_Start</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">SPI_SwapByte</span><span class="token punctuation">(</span><span class="token number">0x20</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token comment">// 发送24bit地址数据，高8位[23:16]为block地址，[15:12]为sector地址</span>
+    <span class="token class-name">uint32_t</span> addr <span class="token operator">=</span> <span class="token punctuation">(</span>block <span class="token operator">&lt;&lt;</span> <span class="token number">16</span><span class="token punctuation">)</span> <span class="token operator">|</span> <span class="token punctuation">(</span><span class="token punctuation">(</span>sector <span class="token operator">&amp;</span> <span class="token number">0x0F</span><span class="token punctuation">)</span> <span class="token operator">&lt;&lt;</span> <span class="token number">12</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token comment">// 高位优先，逐字节发送24bit</span>
+    <span class="token function">SPI_SwapByte</span><span class="token punctuation">(</span><span class="token punctuation">(</span>addr <span class="token operator">&gt;&gt;</span> <span class="token number">16</span><span class="token punctuation">)</span> <span class="token operator">&amp;</span> <span class="token number">0xFF</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">SPI_SwapByte</span><span class="token punctuation">(</span><span class="token punctuation">(</span>addr <span class="token operator">&gt;&gt;</span> <span class="token number">8</span><span class="token punctuation">)</span> <span class="token operator">&amp;</span> <span class="token number">0xFF</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">SPI_SwapByte</span><span class="token punctuation">(</span>addr <span class="token operator">&amp;</span> <span class="token number">0xFF</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">SPI_Stop</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token function">W25Q32_WriteDisable</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<h3 id="ye-xie-1">页写</h3>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token keyword">void</span> <span class="token function">W25Q32_WritePage</span><span class="token punctuation">(</span><span class="token class-name">uint8_t</span> block<span class="token punctuation">,</span> <span class="token class-name">uint8_t</span> sector<span class="token punctuation">,</span> <span class="token class-name">uint8_t</span> page<span class="token punctuation">,</span>
+                      <span class="token class-name">uint8_t</span> innerAddr<span class="token punctuation">,</span> <span class="token class-name">uint8_t</span> <span class="token operator">*</span>data<span class="token punctuation">,</span> <span class="token class-name">uint16_t</span> size<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token comment">// 执行页写前必须等待BUSY状态和开启写使能</span>
+    <span class="token function">W25Q32_WaitNotBusy</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">W25Q32_WriteEnable</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token function">SPI_Start</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">SPI_SwapByte</span><span class="token punctuation">(</span><span class="token number">0x02</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token comment">// 发送24bit地址数据，高8位[23:16]为block地址，[15:12]为sector地址</span>
+    <span class="token class-name">uint32_t</span> addr <span class="token operator">=</span> <span class="token punctuation">(</span>block <span class="token operator">&lt;&lt;</span> <span class="token number">16</span><span class="token punctuation">)</span> <span class="token operator">|</span> <span class="token punctuation">(</span><span class="token punctuation">(</span>sector <span class="token operator">&amp;</span> <span class="token number">0x0F</span><span class="token punctuation">)</span> <span class="token operator">&lt;&lt;</span> <span class="token number">12</span><span class="token punctuation">)</span> <span class="token operator">|</span>
+                    <span class="token punctuation">(</span><span class="token punctuation">(</span>page <span class="token operator">&amp;</span> <span class="token number">0x0F</span><span class="token punctuation">)</span> <span class="token operator">&lt;&lt;</span> <span class="token number">8</span><span class="token punctuation">)</span> <span class="token operator">|</span> innerAddr<span class="token punctuation">;</span>
+    <span class="token comment">// 高位优先，逐字节发送24bit</span>
+    <span class="token function">SPI_SwapByte</span><span class="token punctuation">(</span><span class="token punctuation">(</span>addr <span class="token operator">&gt;&gt;</span> <span class="token number">16</span><span class="token punctuation">)</span> <span class="token operator">&amp;</span> <span class="token number">0xFF</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">SPI_SwapByte</span><span class="token punctuation">(</span><span class="token punctuation">(</span>addr <span class="token operator">&gt;&gt;</span> <span class="token number">8</span><span class="token punctuation">)</span> <span class="token operator">&amp;</span> <span class="token number">0xFF</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">SPI_SwapByte</span><span class="token punctuation">(</span>addr <span class="token operator">&amp;</span> <span class="token number">0xFF</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token comment">// 发送待写入数据</span>
+    <span class="token keyword">for</span> <span class="token punctuation">(</span><span class="token class-name">uint8_t</span> i <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span> i <span class="token operator">&lt;</span> size<span class="token punctuation">;</span> i<span class="token operator">++</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token function">SPI_SwapByte</span><span class="token punctuation">(</span>data<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token function">SPI_Stop</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token function">W25Q32_WriteDisable</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<h3 id="lian-xu-du">连续读</h3>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241208164826767.png" alt="image-20241208164826767"></p>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token keyword">void</span> <span class="token function">W25Q32_ReadBytes</span><span class="token punctuation">(</span><span class="token class-name">uint8_t</span> block<span class="token punctuation">,</span> <span class="token class-name">uint8_t</span> sector<span class="token punctuation">,</span> <span class="token class-name">uint8_t</span> page<span class="token punctuation">,</span>
+                      <span class="token class-name">uint8_t</span> innerAddr<span class="token punctuation">,</span> <span class="token class-name">uint8_t</span> <span class="token operator">*</span>buf<span class="token punctuation">,</span> <span class="token class-name">uint16_t</span> size<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token comment">// 读取数据前等待BUSY状态</span>
+    <span class="token function">W25Q32_WaitNotBusy</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token function">SPI_Start</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">SPI_SwapByte</span><span class="token punctuation">(</span><span class="token number">0x03</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token comment">// 发送24bit地址数据，高8位[23:16]为block地址，[15:12]为sector地址</span>
+    <span class="token class-name">uint32_t</span> addr <span class="token operator">=</span> <span class="token punctuation">(</span>block <span class="token operator">&lt;&lt;</span> <span class="token number">16</span><span class="token punctuation">)</span> <span class="token operator">|</span> <span class="token punctuation">(</span><span class="token punctuation">(</span>sector <span class="token operator">&amp;</span> <span class="token number">0x0F</span><span class="token punctuation">)</span> <span class="token operator">&lt;&lt;</span> <span class="token number">12</span><span class="token punctuation">)</span> <span class="token operator">|</span>
+                    <span class="token punctuation">(</span><span class="token punctuation">(</span>page <span class="token operator">&amp;</span> <span class="token number">0x0F</span><span class="token punctuation">)</span> <span class="token operator">&lt;&lt;</span> <span class="token number">8</span><span class="token punctuation">)</span> <span class="token operator">|</span> innerAddr<span class="token punctuation">;</span>
+    <span class="token comment">// 高位优先，逐字节发送24bit</span>
+    <span class="token function">SPI_SwapByte</span><span class="token punctuation">(</span><span class="token punctuation">(</span>addr <span class="token operator">&gt;&gt;</span> <span class="token number">16</span><span class="token punctuation">)</span> <span class="token operator">&amp;</span> <span class="token number">0xFF</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">SPI_SwapByte</span><span class="token punctuation">(</span><span class="token punctuation">(</span>addr <span class="token operator">&gt;&gt;</span> <span class="token number">8</span><span class="token punctuation">)</span> <span class="token operator">&amp;</span> <span class="token number">0xFF</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">SPI_SwapByte</span><span class="token punctuation">(</span>addr <span class="token operator">&amp;</span> <span class="token number">0xFF</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token comment">// 发送待写入数据</span>
+    <span class="token keyword">for</span> <span class="token punctuation">(</span><span class="token class-name">uint16_t</span> i <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span> i <span class="token operator">&lt;</span> size<span class="token punctuation">;</span> i<span class="token operator">++</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        buf<span class="token punctuation">[</span>i<span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token function">SPI_SwapByte</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token function">SPI_Stop</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<h3 id="wan-zheng-dai-ma">完整代码</h3>
+<h4 id="w-25-q-32-h-1">w25q32.h</h4>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">ifndef</span> <span class="token expression">__W25Q32_H__</span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name">__W25Q32_H__</span></span>
+
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">"spi.h"</span></span>
+
+<span class="token keyword">void</span> <span class="token function">W25Q32_Init</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token keyword">void</span> <span class="token function">W25Q32_ReadID</span><span class="token punctuation">(</span><span class="token class-name">uint8_t</span> <span class="token operator">*</span>manufactureID<span class="token punctuation">,</span> <span class="token class-name">uint16_t</span> <span class="token operator">*</span>deviceID<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token keyword">void</span> <span class="token function">W25Q32_WaitNotBusy</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token keyword">void</span> <span class="token function">W25Q32_WriteEnable</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">void</span> <span class="token function">W25Q32_WriteDisable</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token keyword">void</span> <span class="token function">W25Q32_SectorErase</span><span class="token punctuation">(</span><span class="token class-name">uint8_t</span> block<span class="token punctuation">,</span> <span class="token class-name">uint8_t</span> sector<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token keyword">void</span> <span class="token function">W25Q32_WritePage</span><span class="token punctuation">(</span><span class="token class-name">uint8_t</span> block<span class="token punctuation">,</span> <span class="token class-name">uint8_t</span> sector<span class="token punctuation">,</span> <span class="token class-name">uint8_t</span> page<span class="token punctuation">,</span> <span class="token class-name">uint8_t</span> innerAddr<span class="token punctuation">,</span> <span class="token class-name">uint8_t</span> <span class="token operator">*</span>data<span class="token punctuation">,</span> <span class="token class-name">uint16_t</span> size<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token keyword">void</span> <span class="token function">W25Q32_ReadBytes</span><span class="token punctuation">(</span><span class="token class-name">uint8_t</span> block<span class="token punctuation">,</span> <span class="token class-name">uint8_t</span> sector<span class="token punctuation">,</span> <span class="token class-name">uint8_t</span> page<span class="token punctuation">,</span> <span class="token class-name">uint8_t</span> innerAddr<span class="token punctuation">,</span> <span class="token class-name">uint8_t</span> <span class="token operator">*</span>buf<span class="token punctuation">,</span> <span class="token class-name">uint16_t</span> size<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">endif</span> <span class="token comment">/* __W25Q32_H__ */</span></span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<h4 id="w-25-q-32-h-2">w25q32.h</h4>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">"w25q32.h"</span></span>
+
+<span class="token keyword">void</span> <span class="token function">W25Q32_Init</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span> <span class="token punctuation">{</span> <span class="token function">SPI_Init</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token punctuation">}</span>
+
+<span class="token keyword">void</span> <span class="token function">W25Q32_ReadID</span><span class="token punctuation">(</span><span class="token class-name">uint8_t</span> <span class="token operator">*</span>manufactureId<span class="token punctuation">,</span> <span class="token class-name">uint16_t</span> <span class="token operator">*</span>deviceId<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token comment">// 片选使能</span>
+    <span class="token function">SPI_Start</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token comment">// 发送Read JEDEC ID指令9Fh，读取生产厂商和设备ID</span>
+    <span class="token function">SPI_SwapByte</span><span class="token punctuation">(</span><span class="token number">0x9F</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token comment">// 读取从设备响应数据</span>
+    <span class="token operator">*</span>manufactureId <span class="token operator">=</span> <span class="token function">SPI_SwapByte</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token operator">*</span>deviceId <span class="token operator">|=</span> <span class="token punctuation">(</span><span class="token function">SPI_SwapByte</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">)</span> <span class="token operator">&lt;&lt;</span> <span class="token number">8</span><span class="token punctuation">)</span> <span class="token operator">&amp;</span> <span class="token number">0xFF00</span><span class="token punctuation">;</span>
+    <span class="token operator">*</span>deviceId <span class="token operator">|=</span> <span class="token function">SPI_SwapByte</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">)</span> <span class="token operator">&amp;</span> <span class="token number">0x00FF</span><span class="token punctuation">;</span>
+
+    <span class="token comment">// 片选失能</span>
+    <span class="token function">SPI_Stop</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">void</span> <span class="token function">W25Q32_WaitNotBusy</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token function">SPI_Start</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token comment">// 发送读取状态寄存器指令</span>
+    <span class="token function">SPI_SwapByte</span><span class="token punctuation">(</span><span class="token number">0x05</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token comment">// 轮询接收从设备响应的状态字节，直到其中的最低位为0</span>
+    <span class="token keyword">while</span> <span class="token punctuation">(</span><span class="token function">SPI_SwapByte</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">)</span> <span class="token operator">&amp;</span> <span class="token number">0x01</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token punctuation">}</span>
+    <span class="token function">SPI_Stop</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">void</span> <span class="token function">W25Q32_WriteEnable</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token function">SPI_Start</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">SPI_SwapByte</span><span class="token punctuation">(</span><span class="token number">0x06</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">SPI_Stop</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+<span class="token keyword">void</span> <span class="token function">W25Q32_WriteDisable</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token function">SPI_Start</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">SPI_SwapByte</span><span class="token punctuation">(</span><span class="token number">0x04</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">SPI_Stop</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">void</span> <span class="token function">W25Q32_SectorErase</span><span class="token punctuation">(</span><span class="token class-name">uint8_t</span> block<span class="token punctuation">,</span> <span class="token class-name">uint8_t</span> sector<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token comment">// 执行擦除前必须等待BUSY状态和开启写使能</span>
+    <span class="token function">W25Q32_WaitNotBusy</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">W25Q32_WriteEnable</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token function">SPI_Start</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">SPI_SwapByte</span><span class="token punctuation">(</span><span class="token number">0x20</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token comment">// 发送24bit地址数据，高8位[23:16]为block地址，[15:12]为sector地址</span>
+    <span class="token class-name">uint32_t</span> addr <span class="token operator">=</span> <span class="token punctuation">(</span>block <span class="token operator">&lt;&lt;</span> <span class="token number">16</span><span class="token punctuation">)</span> <span class="token operator">|</span> <span class="token punctuation">(</span><span class="token punctuation">(</span>sector <span class="token operator">&amp;</span> <span class="token number">0x0F</span><span class="token punctuation">)</span> <span class="token operator">&lt;&lt;</span> <span class="token number">12</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token comment">// 高位优先，逐字节发送24bit</span>
+    <span class="token function">SPI_SwapByte</span><span class="token punctuation">(</span><span class="token punctuation">(</span>addr <span class="token operator">&gt;&gt;</span> <span class="token number">16</span><span class="token punctuation">)</span> <span class="token operator">&amp;</span> <span class="token number">0xFF</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">SPI_SwapByte</span><span class="token punctuation">(</span><span class="token punctuation">(</span>addr <span class="token operator">&gt;&gt;</span> <span class="token number">8</span><span class="token punctuation">)</span> <span class="token operator">&amp;</span> <span class="token number">0xFF</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">SPI_SwapByte</span><span class="token punctuation">(</span>addr <span class="token operator">&amp;</span> <span class="token number">0xFF</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">SPI_Stop</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token function">W25Q32_WriteDisable</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">void</span> <span class="token function">W25Q32_WritePage</span><span class="token punctuation">(</span><span class="token class-name">uint8_t</span> block<span class="token punctuation">,</span> <span class="token class-name">uint8_t</span> sector<span class="token punctuation">,</span> <span class="token class-name">uint8_t</span> page<span class="token punctuation">,</span>
+                      <span class="token class-name">uint8_t</span> innerAddr<span class="token punctuation">,</span> <span class="token class-name">uint8_t</span> <span class="token operator">*</span>data<span class="token punctuation">,</span> <span class="token class-name">uint16_t</span> size<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token comment">// 执行页写前必须等待BUSY状态和开启写使能</span>
+    <span class="token function">W25Q32_WaitNotBusy</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">W25Q32_WriteEnable</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token function">SPI_Start</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">SPI_SwapByte</span><span class="token punctuation">(</span><span class="token number">0x02</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token comment">// 发送24bit地址数据，高8位[23:16]为block地址，[15:12]为sector地址</span>
+    <span class="token class-name">uint32_t</span> addr <span class="token operator">=</span> <span class="token punctuation">(</span>block <span class="token operator">&lt;&lt;</span> <span class="token number">16</span><span class="token punctuation">)</span> <span class="token operator">|</span> <span class="token punctuation">(</span><span class="token punctuation">(</span>sector <span class="token operator">&amp;</span> <span class="token number">0x0F</span><span class="token punctuation">)</span> <span class="token operator">&lt;&lt;</span> <span class="token number">12</span><span class="token punctuation">)</span> <span class="token operator">|</span>
+                    <span class="token punctuation">(</span><span class="token punctuation">(</span>page <span class="token operator">&amp;</span> <span class="token number">0x0F</span><span class="token punctuation">)</span> <span class="token operator">&lt;&lt;</span> <span class="token number">8</span><span class="token punctuation">)</span> <span class="token operator">|</span> innerAddr<span class="token punctuation">;</span>
+    <span class="token comment">// 高位优先，逐字节发送24bit</span>
+    <span class="token function">SPI_SwapByte</span><span class="token punctuation">(</span><span class="token punctuation">(</span>addr <span class="token operator">&gt;&gt;</span> <span class="token number">16</span><span class="token punctuation">)</span> <span class="token operator">&amp;</span> <span class="token number">0xFF</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">SPI_SwapByte</span><span class="token punctuation">(</span><span class="token punctuation">(</span>addr <span class="token operator">&gt;&gt;</span> <span class="token number">8</span><span class="token punctuation">)</span> <span class="token operator">&amp;</span> <span class="token number">0xFF</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">SPI_SwapByte</span><span class="token punctuation">(</span>addr <span class="token operator">&amp;</span> <span class="token number">0xFF</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token comment">// 发送待写入数据</span>
+    <span class="token keyword">for</span> <span class="token punctuation">(</span><span class="token class-name">uint8_t</span> i <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span> i <span class="token operator">&lt;</span> size<span class="token punctuation">;</span> i<span class="token operator">++</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token function">SPI_SwapByte</span><span class="token punctuation">(</span>data<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token function">SPI_Stop</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token function">W25Q32_WriteDisable</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">void</span> <span class="token function">W25Q32_ReadBytes</span><span class="token punctuation">(</span><span class="token class-name">uint8_t</span> block<span class="token punctuation">,</span> <span class="token class-name">uint8_t</span> sector<span class="token punctuation">,</span> <span class="token class-name">uint8_t</span> page<span class="token punctuation">,</span>
+                      <span class="token class-name">uint8_t</span> innerAddr<span class="token punctuation">,</span> <span class="token class-name">uint8_t</span> <span class="token operator">*</span>buf<span class="token punctuation">,</span> <span class="token class-name">uint16_t</span> size<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token comment">// 读取数据前等待BUSY状态</span>
+    <span class="token function">W25Q32_WaitNotBusy</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token function">SPI_Start</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">SPI_SwapByte</span><span class="token punctuation">(</span><span class="token number">0x03</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token comment">// 发送24bit地址数据，高8位[23:16]为block地址，[15:12]为sector地址</span>
+    <span class="token class-name">uint32_t</span> addr <span class="token operator">=</span> <span class="token punctuation">(</span>block <span class="token operator">&lt;&lt;</span> <span class="token number">16</span><span class="token punctuation">)</span> <span class="token operator">|</span> <span class="token punctuation">(</span><span class="token punctuation">(</span>sector <span class="token operator">&amp;</span> <span class="token number">0x0F</span><span class="token punctuation">)</span> <span class="token operator">&lt;&lt;</span> <span class="token number">12</span><span class="token punctuation">)</span> <span class="token operator">|</span>
+                    <span class="token punctuation">(</span><span class="token punctuation">(</span>page <span class="token operator">&amp;</span> <span class="token number">0x0F</span><span class="token punctuation">)</span> <span class="token operator">&lt;&lt;</span> <span class="token number">8</span><span class="token punctuation">)</span> <span class="token operator">|</span> innerAddr<span class="token punctuation">;</span>
+    <span class="token comment">// 高位优先，逐字节发送24bit</span>
+    <span class="token function">SPI_SwapByte</span><span class="token punctuation">(</span><span class="token punctuation">(</span>addr <span class="token operator">&gt;&gt;</span> <span class="token number">16</span><span class="token punctuation">)</span> <span class="token operator">&amp;</span> <span class="token number">0xFF</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">SPI_SwapByte</span><span class="token punctuation">(</span><span class="token punctuation">(</span>addr <span class="token operator">&gt;&gt;</span> <span class="token number">8</span><span class="token punctuation">)</span> <span class="token operator">&amp;</span> <span class="token number">0xFF</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">SPI_SwapByte</span><span class="token punctuation">(</span>addr <span class="token operator">&amp;</span> <span class="token number">0xFF</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token comment">// 发送待写入数据</span>
+    <span class="token keyword">for</span> <span class="token punctuation">(</span><span class="token class-name">uint16_t</span> i <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span> i <span class="token operator">&lt;</span> size<span class="token punctuation">;</span> i<span class="token operator">++</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        buf<span class="token punctuation">[</span>i<span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token function">SPI_SwapByte</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token function">SPI_Stop</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<h4 id="main-c">main.c</h4>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">"stm32f10x.h"</span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">"uart.h"</span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">"logger.h"</span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">"w25q32.h"</span></span>
+
+<span class="token keyword">void</span> <span class="token function">uart1_received_callback</span><span class="token punctuation">(</span><span class="token class-name">uint8_t</span> buf<span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">,</span> <span class="token class-name">uint8_t</span> size<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    
+<span class="token punctuation">}</span>
+
+<span class="token keyword">int</span> <span class="token function">main</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token function">uart_init</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">W25Q32_Init</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">LOG_DEBUG</span><span class="token punctuation">(</span><span class="token string">"main start"</span><span class="token punctuation">)</span>
+
+    <span class="token class-name">uint8_t</span> manufactureId <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
+    <span class="token class-name">uint16_t</span> deviceId <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
+    <span class="token function">W25Q32_ReadID</span><span class="token punctuation">(</span><span class="token operator">&amp;</span>manufactureId<span class="token punctuation">,</span> <span class="token operator">&amp;</span>deviceId<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token comment">// LOG_DEBUG("manufacture = %#x, deviceId = %#x", manufactureId, deviceId)</span>
+
+    <span class="token comment">// 擦除扇区（第63个block，第2个sector）</span>
+    <span class="token function">W25Q32_SectorErase</span><span class="token punctuation">(</span><span class="token number">63</span><span class="token punctuation">,</span> <span class="token number">2</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token comment">// 向 block-63 sector-2 page-10 addr-0写入数据</span>
+    <span class="token function">W25Q32_WritePage</span><span class="token punctuation">(</span><span class="token number">63</span><span class="token punctuation">,</span> <span class="token number">2</span><span class="token punctuation">,</span> <span class="token number">10</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token punctuation">(</span><span class="token class-name">uint8_t</span> <span class="token operator">*</span><span class="token punctuation">)</span><span class="token string">"12345678"</span><span class="token punctuation">,</span> <span class="token number">8</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token class-name">uint8_t</span> buf<span class="token punctuation">[</span><span class="token number">10</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token punctuation">{</span><span class="token number">0</span><span class="token punctuation">}</span><span class="token punctuation">;</span>
+    <span class="token function">W25Q32_ReadBytes</span><span class="token punctuation">(</span><span class="token number">63</span><span class="token punctuation">,</span> <span class="token number">2</span><span class="token punctuation">,</span> <span class="token number">10</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token punctuation">(</span><span class="token class-name">uint8_t</span> <span class="token operator">*</span><span class="token punctuation">)</span>buf<span class="token punctuation">,</span> <span class="token number">8</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">LOG_DEBUG</span><span class="token punctuation">(</span><span class="token string">"buf = %s"</span><span class="token punctuation">,</span> buf<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token comment">// uint8_t buf[10] = {0};</span>
+    <span class="token comment">// // 从 block-63 sector-2 page-10 addr-2 读取数据</span>
+    <span class="token comment">// W25Q32_ReadBytes(63, 2, 10, 2, (uint8_t *)buf, 6);</span>
+    <span class="token comment">// LOG_DEBUG("buf = %s", buf);</span>
+
+    <span class="token keyword">while</span> <span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span> <span class="token punctuation">{</span><span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<h3 id="luo-ji-fen-xi-1">逻辑分析</h3>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241208171056385.png" alt="image-20241208171056385"></p>
+<h1 id="stm-32-spi-wai-she">STM32 SPI外设</h1>
+<h2 id="jian-jie">简介</h2>
+<p>STM32 的 SPI 外设可用作通讯的主机及从机，支持最高的 SCK 时钟频率为 fpclk/2 （STM32F103 型号的芯片默认fpclk1为36MHz，fpclk2为72MHz。），完全支持 SPI 协议的 4 种模式，数据帧长度可设置为 8 位或 16 位，可设置数据 MSB 先行或 LSB 先行。它还支持双线全双工、单线双向以及单线模式。</p>
+<p>STM32F103系列提供了3个SPI，SPI1挂在APB2总线，SPI2/3挂在APB1总线。</p>
+<p>用的比较多还是<strong>双线全双工模式</strong>。</p>
+<h2 id="kuang-tu">框图</h2>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241208170545574.png" alt="image-20241208170545574"></p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241208170738650.png" alt="image-20241208170738650"></p>
+<h3 id="nss-gong-neng-shuo-ming">NSS功能说明</h3>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241208191830342.png" alt="image-20241208191830342"></p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241208191904550.png" alt="image-20241208191904550"></p>
+<h2 id="zhu-she-bei-mo-shi-pei-zhi-liu-cheng-ji-cun-qi-ban-ben">主设备模式配置流程（寄存器版本）</h2>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241208180028612.png" alt="image-20241208180028612"></p>
+<h3 id="spi-h-1">spi.h</h3>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">ifndef</span> <span class="token expression">__SPI_H__</span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name">__SPI_H__</span></span>
+
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">"stm32f10x.h"</span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">"delay.h"</span></span>
+
+<span class="token comment">// CS PC13</span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name">CS_HIGH</span> <span class="token expression"><span class="token punctuation">(</span>GPIOC<span class="token operator">-&gt;</span>ODR <span class="token operator">|=</span> GPIO_ODR_ODR13<span class="token punctuation">)</span></span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name">CS_LOW</span> <span class="token expression"><span class="token punctuation">(</span>GPIOC<span class="token operator">-&gt;</span>ODR <span class="token operator">&amp;=</span> <span class="token operator">~</span>GPIO_ODR_ODR13<span class="token punctuation">)</span></span></span>
+
+<span class="token keyword">void</span> <span class="token function">SPI_Init</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token keyword">void</span> <span class="token function">SPI_Start</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">void</span> <span class="token function">SPI_Stop</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token class-name">uint8_t</span> <span class="token function">SPI_SwapByte</span><span class="token punctuation">(</span><span class="token class-name">uint8_t</span> dataByte<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">endif</span> <span class="token comment">/* __SPI_H__ */</span></span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<h3 id="spi-c-1">spi.c</h3>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">"spi.h"</span></span>
+
+<span class="token keyword">void</span> <span class="token function">SPI_Init</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    RCC<span class="token operator">-&gt;</span>APB2ENR <span class="token operator">|=</span> RCC_APB2ENR_IOPAEN<span class="token punctuation">;</span>
+    RCC<span class="token operator">-&gt;</span>APB2ENR <span class="token operator">|=</span> RCC_APB2ENR_IOPCEN<span class="token punctuation">;</span>
+    RCC<span class="token operator">-&gt;</span>APB2ENR <span class="token operator">|=</span> RCC_APB2ENR_SPI1EN<span class="token punctuation">;</span>
+
+    <span class="token comment">// CS-PC13 通用推挽 MODE=11 CNF=00</span>
+    GPIOC<span class="token operator">-&gt;</span>CRH <span class="token operator">|=</span> GPIO_CRH_MODE13<span class="token punctuation">;</span>
+    GPIOC<span class="token operator">-&gt;</span>CRH <span class="token operator">&amp;=</span> <span class="token operator">~</span>GPIO_CRH_CNF13<span class="token punctuation">;</span>
+
+    <span class="token comment">// SCK-PA5，MOSI-PA7 复用推挽 MODE=11 CNF=10</span>
+    GPIOA<span class="token operator">-&gt;</span>CRL <span class="token operator">|=</span> GPIO_CRL_MODE5<span class="token punctuation">;</span>
+    GPIOA<span class="token operator">-&gt;</span>CRL <span class="token operator">|=</span> GPIO_CRL_CNF5_1<span class="token punctuation">;</span>
+    GPIOA<span class="token operator">-&gt;</span>CRL <span class="token operator">&amp;=</span> <span class="token operator">~</span>GPIO_CRL_CNF5_0<span class="token punctuation">;</span>
+
+    GPIOA<span class="token operator">-&gt;</span>CRL <span class="token operator">|=</span> GPIO_CRL_MODE7<span class="token punctuation">;</span>
+    GPIOA<span class="token operator">-&gt;</span>CRL <span class="token operator">|=</span> GPIO_CRL_CNF7_1<span class="token punctuation">;</span>
+    GPIOA<span class="token operator">-&gt;</span>CRL <span class="token operator">&amp;=</span> <span class="token operator">~</span>GPIO_CRL_CNF7_0<span class="token punctuation">;</span>
+
+    <span class="token comment">// MISO-PA6 浮空输入 MODE=00, CNF=01</span>
+    GPIOA<span class="token operator">-&gt;</span>CRL <span class="token operator">&amp;=</span> <span class="token operator">~</span>GPIO_CRL_MODE6<span class="token punctuation">;</span>
+    GPIOA<span class="token operator">-&gt;</span>CRL <span class="token operator">|=</span> GPIO_CRL_CNF6_0<span class="token punctuation">;</span>
+    GPIOA<span class="token operator">-&gt;</span>CRL <span class="token operator">&amp;=</span> <span class="token operator">~</span>GPIO_CRL_CNF6_1<span class="token punctuation">;</span>
+
+    <span class="token comment">// 波特率配置为PCLK/4 即 72M/4=18M =&gt; 001</span>
+    SPI1<span class="token operator">-&gt;</span>CR1 <span class="token operator">&amp;=</span> <span class="token operator">~</span>SPI_CR1_BR<span class="token punctuation">;</span>
+    SPI1<span class="token operator">-&gt;</span>CR1 <span class="token operator">|=</span> SPI_CR1_BR_0<span class="token punctuation">;</span>
+    <span class="token comment">// SPI模式0（时钟极性=0，相位=0）</span>
+    SPI1<span class="token operator">-&gt;</span>CR1 <span class="token operator">&amp;=</span> <span class="token operator">~</span>SPI_CR1_CPOL<span class="token punctuation">;</span>
+    SPI1<span class="token operator">-&gt;</span>CR1 <span class="token operator">&amp;=</span> <span class="token operator">~</span>SPI_CR1_CPHA<span class="token punctuation">;</span>
+    <span class="token comment">// 数据帧格式 8bit</span>
+    SPI1<span class="token operator">-&gt;</span>CR1 <span class="token operator">&amp;=</span> <span class="token operator">~</span>SPI_CR1_DFF<span class="token punctuation">;</span>
+    <span class="token comment">// 高位优先</span>
+    SPI1<span class="token operator">-&gt;</span>CR1 <span class="token operator">&amp;=</span> <span class="token operator">~</span>SPI_CR1_LSBFIRST<span class="token punctuation">;</span>
+    <span class="token comment">// NSS为当前MCU作为从设备时的片选信号输入，主模式下，要么硬件上将该引脚拉高，要么通过SSM和SSI将其强制置1</span>
+    SPI1<span class="token operator">-&gt;</span>CR1 <span class="token operator">|=</span> SPI_CR1_SSM<span class="token punctuation">;</span> <span class="token comment">// 将NSS输入配置为软件控制</span>
+    SPI1<span class="token operator">-&gt;</span>CR1 <span class="token operator">|=</span> SPI_CR1_SSI<span class="token punctuation">;</span> <span class="token comment">// 通过SSI=1将NSS强制拉高</span>
+    <span class="token comment">// 设置主模式</span>
+    SPI1<span class="token operator">-&gt;</span>CR1 <span class="token operator">|=</span> SPI_CR1_MSTR<span class="token punctuation">;</span>
+    <span class="token comment">// 使能SPI外设</span>
+    SPI1<span class="token operator">-&gt;</span>CR1 <span class="token operator">|=</span> SPI_CR1_SPE<span class="token punctuation">;</span>
+
+    <span class="token comment">// SPI模式0（极性=0，相位=0） 空闲状态 CS拉高（低电平使能），SCK拉低</span>
+    CS_HIGH<span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">void</span> <span class="token function">SPI_Start</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span> <span class="token punctuation">{</span> CS_LOW<span class="token punctuation">;</span> <span class="token punctuation">}</span>
+<span class="token keyword">void</span> <span class="token function">SPI_Stop</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span> <span class="token punctuation">{</span> CS_HIGH<span class="token punctuation">;</span> <span class="token punctuation">}</span>
+
+<span class="token class-name">uint8_t</span> <span class="token function">SPI_SwapByte</span><span class="token punctuation">(</span><span class="token class-name">uint8_t</span> dataByte<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token comment">// 等待发送缓冲区为空</span>
+    <span class="token keyword">while</span> <span class="token punctuation">(</span><span class="token punctuation">(</span>SPI1<span class="token operator">-&gt;</span>SR <span class="token operator">&amp;</span> SPI_SR_TXE<span class="token punctuation">)</span> <span class="token operator">==</span> <span class="token number">0</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token punctuation">}</span>
+    <span class="token comment">// 发送数据</span>
+    SPI1<span class="token operator">-&gt;</span>DR <span class="token operator">=</span> dataByte<span class="token punctuation">;</span>
+    <span class="token comment">// 等待接收缓冲区非空</span>
+    <span class="token keyword">while</span> <span class="token punctuation">(</span><span class="token punctuation">(</span>SPI1<span class="token operator">-&gt;</span>SR <span class="token operator">&amp;</span> SPI_SR_RXNE<span class="token punctuation">)</span> <span class="token operator">==</span> <span class="token number">0</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token punctuation">}</span>
+    <span class="token comment">// 接收数据</span>
+    <span class="token keyword">return</span> <span class="token punctuation">(</span><span class="token class-name">uint8_t</span><span class="token punctuation">)</span>SPI1<span class="token operator">-&gt;</span>DR<span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<h3 id="main-c-1">main.c</h3>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">"stm32f10x.h"</span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">"uart.h"</span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">"logger.h"</span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">"w25q32.h"</span></span>
+
+<span class="token keyword">void</span> <span class="token function">uart1_received_callback</span><span class="token punctuation">(</span><span class="token class-name">uint8_t</span> buf<span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">,</span> <span class="token class-name">uint8_t</span> size<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    
+<span class="token punctuation">}</span>
+
+<span class="token keyword">int</span> <span class="token function">main</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token function">uart_init</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">W25Q32_Init</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">LOG_DEBUG</span><span class="token punctuation">(</span><span class="token string">"main start"</span><span class="token punctuation">)</span>
+
+    <span class="token class-name">uint8_t</span> manufactureId <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
+    <span class="token class-name">uint16_t</span> deviceId <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
+    <span class="token function">W25Q32_ReadID</span><span class="token punctuation">(</span><span class="token operator">&amp;</span>manufactureId<span class="token punctuation">,</span> <span class="token operator">&amp;</span>deviceId<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">LOG_DEBUG</span><span class="token punctuation">(</span><span class="token string">"manufacture = %#x, deviceId = %#x"</span><span class="token punctuation">,</span> manufactureId<span class="token punctuation">,</span> deviceId<span class="token punctuation">)</span>
+
+    <span class="token comment">// 擦除扇区（第63个block，第2个sector）</span>
+    <span class="token function">W25Q32_SectorErase</span><span class="token punctuation">(</span><span class="token number">63</span><span class="token punctuation">,</span> <span class="token number">2</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token comment">// 向 block-63 sector-2 page-10 addr-0写入数据</span>
+    <span class="token function">W25Q32_WritePage</span><span class="token punctuation">(</span><span class="token number">63</span><span class="token punctuation">,</span> <span class="token number">2</span><span class="token punctuation">,</span> <span class="token number">10</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token punctuation">(</span><span class="token class-name">uint8_t</span> <span class="token operator">*</span><span class="token punctuation">)</span><span class="token string">"12345678"</span><span class="token punctuation">,</span> <span class="token number">8</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token class-name">uint8_t</span> buf<span class="token punctuation">[</span><span class="token number">10</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token punctuation">{</span><span class="token number">0</span><span class="token punctuation">}</span><span class="token punctuation">;</span>
+    <span class="token function">W25Q32_ReadBytes</span><span class="token punctuation">(</span><span class="token number">63</span><span class="token punctuation">,</span> <span class="token number">2</span><span class="token punctuation">,</span> <span class="token number">10</span><span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">,</span> <span class="token punctuation">(</span><span class="token class-name">uint8_t</span> <span class="token operator">*</span><span class="token punctuation">)</span>buf<span class="token punctuation">,</span> <span class="token number">7</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">LOG_DEBUG</span><span class="token punctuation">(</span><span class="token string">"buf = %s"</span><span class="token punctuation">,</span> buf<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token keyword">while</span> <span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span> <span class="token punctuation">{</span><span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<h2 id="hal-ku-shi-xian">HAL库实现</h2>
+<h3 id="spi-pei-zhi">SPI配置</h3>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241208201837487.png" alt="image-20241208201837487"></p>
+<h3 id="pian-xuan-yin-jiao-pei-zhi">片选引脚配置</h3>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241208201927169.png" alt="image-20241208201927169"></p>
+<h3 id="shi-li-dai-ma">示例代码</h3>
+<h4 id="spi-h-2">spi.h</h4>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token comment">/* USER CODE BEGIN Prototypes */</span>
+<span class="token keyword">void</span> <span class="token function">SPI_Init</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token keyword">void</span> <span class="token function">SPI_Start</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">void</span> <span class="token function">SPI_Stop</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token class-name">uint8_t</span> <span class="token function">SPI_SwapByte</span><span class="token punctuation">(</span><span class="token class-name">uint8_t</span> dataByte<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token comment">/* USER CODE END Prototypes */</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<h4 id="spi-c-2">spi.c</h4>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token keyword">void</span> <span class="token function">SPI_Start</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token function">HAL_GPIO_WritePin</span><span class="token punctuation">(</span>CS_GPIO_Port<span class="token punctuation">,</span> CS_Pin<span class="token punctuation">,</span> GPIO_PIN_RESET<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+<span class="token keyword">void</span> <span class="token function">SPI_Stop</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+    <span class="token function">HAL_GPIO_WritePin</span><span class="token punctuation">(</span>CS_GPIO_Port<span class="token punctuation">,</span> CS_Pin<span class="token punctuation">,</span> GPIO_PIN_SET<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token class-name">uint8_t</span> <span class="token function">SPI_SwapByte</span><span class="token punctuation">(</span><span class="token class-name">uint8_t</span> dataByte<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token class-name">uint8_t</span> buf <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
+    <span class="token function">HAL_SPI_TransmitReceive</span><span class="token punctuation">(</span><span class="token operator">&amp;</span>hspi1<span class="token punctuation">,</span> <span class="token operator">&amp;</span>dataByte<span class="token punctuation">,</span> <span class="token operator">&amp;</span>buf<span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">,</span> <span class="token number">10</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">return</span> buf<span class="token punctuation">;</span>
+<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<h3 id="main-c-2">main.c</h3>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token comment">/* Initialize all configured peripherals */</span>
+<span class="token function">MX_GPIO_Init</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token function">MX_SPI1_Init</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token function">MX_USART1_UART_Init</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token comment">/* USER CODE BEGIN 2 */</span>
+  <span class="token class-name">uint8_t</span> manufactureId <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
+  <span class="token class-name">uint16_t</span> deviceId <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
+  <span class="token function">W25Q32_ReadID</span><span class="token punctuation">(</span><span class="token operator">&amp;</span>manufactureId<span class="token punctuation">,</span> <span class="token operator">&amp;</span>deviceId<span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token function">printf</span><span class="token punctuation">(</span><span class="token string">"manufacture = %#x, deviceId = %#x\n"</span><span class="token punctuation">,</span> manufactureId<span class="token punctuation">,</span> deviceId<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+  <span class="token comment">// 擦除扇区（第63个block，第2个sector）</span>
+  <span class="token function">W25Q32_SectorErase</span><span class="token punctuation">(</span><span class="token number">63</span><span class="token punctuation">,</span> <span class="token number">2</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token comment">// 向 block-63 sector-2 page-10 addr-0写入数据</span>
+  <span class="token function">W25Q32_WritePage</span><span class="token punctuation">(</span><span class="token number">63</span><span class="token punctuation">,</span> <span class="token number">2</span><span class="token punctuation">,</span> <span class="token number">10</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token punctuation">(</span><span class="token class-name">uint8_t</span> <span class="token operator">*</span><span class="token punctuation">)</span><span class="token string">"12345678"</span><span class="token punctuation">,</span> <span class="token number">8</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token class-name">uint8_t</span> buf<span class="token punctuation">[</span><span class="token number">10</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token punctuation">{</span><span class="token number">0</span><span class="token punctuation">}</span><span class="token punctuation">;</span>
+  <span class="token function">W25Q32_ReadBytes</span><span class="token punctuation">(</span><span class="token number">63</span><span class="token punctuation">,</span> <span class="token number">2</span><span class="token punctuation">,</span> <span class="token number">10</span><span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">,</span> <span class="token punctuation">(</span><span class="token class-name">uint8_t</span> <span class="token operator">*</span><span class="token punctuation">)</span>buf<span class="token punctuation">,</span> <span class="token number">7</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token function">printf</span><span class="token punctuation">(</span><span class="token string">"buf = %s\n"</span><span class="token punctuation">,</span> buf<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token comment">/* USER CODE END 2 */</span>
+
+<span class="token comment">/* Infinite loop */</span>
+<span class="token comment">/* USER CODE BEGIN WHILE */</span>
+<span class="token keyword">while</span> <span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+  <span class="token comment">/* USER CODE END WHILE */</span>
+
+  <span class="token comment">/* USER CODE BEGIN 3 */</span>
+<span class="token punctuation">}</span>
+<span class="token comment">/* USER CODE END 3 */</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<h1 id="an-li-kua-ye-xie-ru">案例-跨页写入</h1>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241208221856087.png" alt="image-20241208221856087"></p>
+<h2 id="spi-c-3">spi.c</h2>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">"w25q32.h"</span></span>
+
+<span class="token keyword">void</span> <span class="token function">W25Q32_Init</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span> <span class="token punctuation">{</span> <span class="token function">SPI_Init</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token punctuation">}</span>
+
+<span class="token keyword">void</span> <span class="token function">W25Q32_ReadID</span><span class="token punctuation">(</span><span class="token class-name">uint8_t</span> <span class="token operator">*</span>manufactureId<span class="token punctuation">,</span> <span class="token class-name">uint16_t</span> <span class="token operator">*</span>deviceId<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token comment">// 片选使能</span>
+    <span class="token function">SPI_Start</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token comment">// 发送Read JEDEC ID指令9Fh，读取生产厂商和设备ID</span>
+    <span class="token function">SPI_SwapByte</span><span class="token punctuation">(</span><span class="token number">0x9F</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token comment">// 读取从设备响应数据</span>
+    <span class="token operator">*</span>manufactureId <span class="token operator">=</span> <span class="token function">SPI_SwapByte</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token operator">*</span>deviceId <span class="token operator">|=</span> <span class="token punctuation">(</span><span class="token function">SPI_SwapByte</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">)</span> <span class="token operator">&lt;&lt;</span> <span class="token number">8</span><span class="token punctuation">)</span> <span class="token operator">&amp;</span> <span class="token number">0xFF00</span><span class="token punctuation">;</span>
+    <span class="token operator">*</span>deviceId <span class="token operator">|=</span> <span class="token function">SPI_SwapByte</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">)</span> <span class="token operator">&amp;</span> <span class="token number">0x00FF</span><span class="token punctuation">;</span>
+
+    <span class="token comment">// 片选失能</span>
+    <span class="token function">SPI_Stop</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">void</span> <span class="token function">W25Q32_WaitNotBusy</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token function">SPI_Start</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token comment">// 发送读取状态寄存器指令</span>
+    <span class="token function">SPI_SwapByte</span><span class="token punctuation">(</span><span class="token number">0x05</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token comment">// 轮询接收从设备响应的状态字节，直到其中的最低位为0</span>
+    <span class="token keyword">while</span> <span class="token punctuation">(</span><span class="token function">SPI_SwapByte</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">)</span> <span class="token operator">&amp;</span> <span class="token number">0x01</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token punctuation">}</span>
+    <span class="token function">SPI_Stop</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">void</span> <span class="token function">W25Q32_WriteEnable</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token function">SPI_Start</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">SPI_SwapByte</span><span class="token punctuation">(</span><span class="token number">0x06</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">SPI_Stop</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+<span class="token keyword">void</span> <span class="token function">W25Q32_WriteDisable</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token function">SPI_Start</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">SPI_SwapByte</span><span class="token punctuation">(</span><span class="token number">0x04</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">SPI_Stop</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">void</span> <span class="token function">W25Q32_SectorErase</span><span class="token punctuation">(</span><span class="token class-name">uint8_t</span> block<span class="token punctuation">,</span> <span class="token class-name">uint8_t</span> sector<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token comment">// 执行擦除前必须等待BUSY状态和开启写使能</span>
+    <span class="token function">W25Q32_WaitNotBusy</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">W25Q32_WriteEnable</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token function">SPI_Start</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">SPI_SwapByte</span><span class="token punctuation">(</span><span class="token number">0x20</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token comment">// 发送24bit地址数据，高8位[23:16]为block地址，[15:12]为sector地址</span>
+    <span class="token class-name">uint32_t</span> addr <span class="token operator">=</span> <span class="token punctuation">(</span>block <span class="token operator">&lt;&lt;</span> <span class="token number">16</span><span class="token punctuation">)</span> <span class="token operator">|</span> <span class="token punctuation">(</span><span class="token punctuation">(</span>sector <span class="token operator">&amp;</span> <span class="token number">0x0F</span><span class="token punctuation">)</span> <span class="token operator">&lt;&lt;</span> <span class="token number">12</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token comment">// 高位优先，逐字节发送24bit</span>
+    <span class="token function">SPI_SwapByte</span><span class="token punctuation">(</span><span class="token punctuation">(</span>addr <span class="token operator">&gt;&gt;</span> <span class="token number">16</span><span class="token punctuation">)</span> <span class="token operator">&amp;</span> <span class="token number">0xFF</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">SPI_SwapByte</span><span class="token punctuation">(</span><span class="token punctuation">(</span>addr <span class="token operator">&gt;&gt;</span> <span class="token number">8</span><span class="token punctuation">)</span> <span class="token operator">&amp;</span> <span class="token number">0xFF</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">SPI_SwapByte</span><span class="token punctuation">(</span>addr <span class="token operator">&amp;</span> <span class="token number">0xFF</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">SPI_Stop</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token function">W25Q32_WriteDisable</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">void</span> <span class="token function">W25Q32_WritePage</span><span class="token punctuation">(</span><span class="token class-name">uint8_t</span> block<span class="token punctuation">,</span> <span class="token class-name">uint8_t</span> sector<span class="token punctuation">,</span> <span class="token class-name">uint8_t</span> page<span class="token punctuation">,</span>
+                      <span class="token class-name">uint8_t</span> innerAddr<span class="token punctuation">,</span> <span class="token class-name">uint8_t</span> <span class="token operator">*</span>data<span class="token punctuation">,</span> <span class="token class-name">uint16_t</span> size<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token comment">// 执行页写前必须等待BUSY状态和开启写使能</span>
+    <span class="token function">W25Q32_WaitNotBusy</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">W25Q32_WriteEnable</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token function">SPI_Start</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">SPI_SwapByte</span><span class="token punctuation">(</span><span class="token number">0x02</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token comment">// 发送24bit地址数据，高8位[23:16]为block地址，[15:12]为sector地址</span>
+    <span class="token class-name">uint32_t</span> addr <span class="token operator">=</span> <span class="token punctuation">(</span>block <span class="token operator">&lt;&lt;</span> <span class="token number">16</span><span class="token punctuation">)</span> <span class="token operator">|</span> <span class="token punctuation">(</span><span class="token punctuation">(</span>sector <span class="token operator">&amp;</span> <span class="token number">0x0F</span><span class="token punctuation">)</span> <span class="token operator">&lt;&lt;</span> <span class="token number">12</span><span class="token punctuation">)</span> <span class="token operator">|</span>
+                    <span class="token punctuation">(</span><span class="token punctuation">(</span>page <span class="token operator">&amp;</span> <span class="token number">0x0F</span><span class="token punctuation">)</span> <span class="token operator">&lt;&lt;</span> <span class="token number">8</span><span class="token punctuation">)</span> <span class="token operator">|</span> innerAddr<span class="token punctuation">;</span>
+    <span class="token comment">// 高位优先，逐字节发送24bit</span>
+    <span class="token function">SPI_SwapByte</span><span class="token punctuation">(</span><span class="token punctuation">(</span>addr <span class="token operator">&gt;&gt;</span> <span class="token number">16</span><span class="token punctuation">)</span> <span class="token operator">&amp;</span> <span class="token number">0xFF</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">SPI_SwapByte</span><span class="token punctuation">(</span><span class="token punctuation">(</span>addr <span class="token operator">&gt;&gt;</span> <span class="token number">8</span><span class="token punctuation">)</span> <span class="token operator">&amp;</span> <span class="token number">0xFF</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">SPI_SwapByte</span><span class="token punctuation">(</span>addr <span class="token operator">&amp;</span> <span class="token number">0xFF</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token comment">// 发送待写入数据</span>
+    <span class="token keyword">for</span> <span class="token punctuation">(</span><span class="token class-name">uint8_t</span> i <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span> i <span class="token operator">&lt;</span> size<span class="token punctuation">;</span> i<span class="token operator">++</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token function">SPI_SwapByte</span><span class="token punctuation">(</span>data<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token function">SPI_Stop</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token function">W25Q32_WriteDisable</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">void</span> <span class="token function">W25Q32_WriteAddr</span><span class="token punctuation">(</span><span class="token class-name">uint32_t</span> addr<span class="token punctuation">,</span> <span class="token class-name">uint8_t</span> <span class="token operator">*</span>data<span class="token punctuation">,</span> <span class="token class-name">uint16_t</span> size<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token comment">// 执行页写前必须等待BUSY状态和开启写使能</span>
+    <span class="token function">W25Q32_WaitNotBusy</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">W25Q32_WriteEnable</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token function">SPI_Start</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">SPI_SwapByte</span><span class="token punctuation">(</span><span class="token number">0x02</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token comment">// 高位优先，逐字节发送24bit</span>
+    <span class="token function">SPI_SwapByte</span><span class="token punctuation">(</span><span class="token punctuation">(</span>addr <span class="token operator">&gt;&gt;</span> <span class="token number">16</span><span class="token punctuation">)</span> <span class="token operator">&amp;</span> <span class="token number">0xFF</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">SPI_SwapByte</span><span class="token punctuation">(</span><span class="token punctuation">(</span>addr <span class="token operator">&gt;&gt;</span> <span class="token number">8</span><span class="token punctuation">)</span> <span class="token operator">&amp;</span> <span class="token number">0xFF</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">SPI_SwapByte</span><span class="token punctuation">(</span>addr <span class="token operator">&amp;</span> <span class="token number">0xFF</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token comment">// 发送待写入数据</span>
+    <span class="token keyword">for</span> <span class="token punctuation">(</span><span class="token class-name">uint8_t</span> i <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span> i <span class="token operator">&lt;</span> size<span class="token punctuation">;</span> i<span class="token operator">++</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token function">SPI_SwapByte</span><span class="token punctuation">(</span>data<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token function">SPI_Stop</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token function">W25Q32_WriteDisable</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">void</span> <span class="token function">W25Q32_ReadBytes</span><span class="token punctuation">(</span><span class="token class-name">uint8_t</span> block<span class="token punctuation">,</span> <span class="token class-name">uint8_t</span> sector<span class="token punctuation">,</span> <span class="token class-name">uint8_t</span> page<span class="token punctuation">,</span>
+                      <span class="token class-name">uint8_t</span> innerAddr<span class="token punctuation">,</span> <span class="token class-name">uint8_t</span> <span class="token operator">*</span>buf<span class="token punctuation">,</span> <span class="token class-name">uint16_t</span> size<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token comment">// 读取数据前等待BUSY状态</span>
+    <span class="token function">W25Q32_WaitNotBusy</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token function">SPI_Start</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">SPI_SwapByte</span><span class="token punctuation">(</span><span class="token number">0x03</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token comment">// 发送24bit地址数据，高8位[23:16]为block地址，[15:12]为sector地址</span>
+    <span class="token class-name">uint32_t</span> addr <span class="token operator">=</span> <span class="token punctuation">(</span>block <span class="token operator">&lt;&lt;</span> <span class="token number">16</span><span class="token punctuation">)</span> <span class="token operator">|</span> <span class="token punctuation">(</span><span class="token punctuation">(</span>sector <span class="token operator">&amp;</span> <span class="token number">0x0F</span><span class="token punctuation">)</span> <span class="token operator">&lt;&lt;</span> <span class="token number">12</span><span class="token punctuation">)</span> <span class="token operator">|</span>
+                    <span class="token punctuation">(</span><span class="token punctuation">(</span>page <span class="token operator">&amp;</span> <span class="token number">0x0F</span><span class="token punctuation">)</span> <span class="token operator">&lt;&lt;</span> <span class="token number">8</span><span class="token punctuation">)</span> <span class="token operator">|</span> innerAddr<span class="token punctuation">;</span>
+    <span class="token comment">// 高位优先，逐字节发送24bit</span>
+    <span class="token function">SPI_SwapByte</span><span class="token punctuation">(</span><span class="token punctuation">(</span>addr <span class="token operator">&gt;&gt;</span> <span class="token number">16</span><span class="token punctuation">)</span> <span class="token operator">&amp;</span> <span class="token number">0xFF</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">SPI_SwapByte</span><span class="token punctuation">(</span><span class="token punctuation">(</span>addr <span class="token operator">&gt;&gt;</span> <span class="token number">8</span><span class="token punctuation">)</span> <span class="token operator">&amp;</span> <span class="token number">0xFF</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">SPI_SwapByte</span><span class="token punctuation">(</span>addr <span class="token operator">&amp;</span> <span class="token number">0xFF</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token comment">// 接收读取的数据</span>
+    <span class="token keyword">for</span> <span class="token punctuation">(</span><span class="token class-name">uint16_t</span> i <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span> i <span class="token operator">&lt;</span> size<span class="token punctuation">;</span> i<span class="token operator">++</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        buf<span class="token punctuation">[</span>i<span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token function">SPI_SwapByte</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token function">SPI_Stop</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">void</span> <span class="token function">W25Q32_ReadFromAddr</span><span class="token punctuation">(</span><span class="token class-name">uint32_t</span> addr<span class="token punctuation">,</span> <span class="token class-name">uint8_t</span> <span class="token operator">*</span>buf<span class="token punctuation">,</span> <span class="token class-name">uint16_t</span> size<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token comment">// 读取数据前等待BUSY状态</span>
+    <span class="token function">W25Q32_WaitNotBusy</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token function">SPI_Start</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">SPI_SwapByte</span><span class="token punctuation">(</span><span class="token number">0x03</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token comment">// 高位优先，逐字节发送24bit</span>
+    <span class="token function">SPI_SwapByte</span><span class="token punctuation">(</span><span class="token punctuation">(</span>addr <span class="token operator">&gt;&gt;</span> <span class="token number">16</span><span class="token punctuation">)</span> <span class="token operator">&amp;</span> <span class="token number">0xFF</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">SPI_SwapByte</span><span class="token punctuation">(</span><span class="token punctuation">(</span>addr <span class="token operator">&gt;&gt;</span> <span class="token number">8</span><span class="token punctuation">)</span> <span class="token operator">&amp;</span> <span class="token number">0xFF</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">SPI_SwapByte</span><span class="token punctuation">(</span>addr <span class="token operator">&amp;</span> <span class="token number">0xFF</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token comment">// 接收读取的数据</span>
+    <span class="token keyword">for</span> <span class="token punctuation">(</span><span class="token class-name">uint16_t</span> i <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span> i <span class="token operator">&lt;</span> size<span class="token punctuation">;</span> i<span class="token operator">++</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        buf<span class="token punctuation">[</span>i<span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token function">SPI_SwapByte</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token function">SPI_Stop</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<h2 id="main-c-3">main.c</h2>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">"logger.h"</span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">"stm32f10x.h"</span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">"uart.h"</span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">"w25q32.h"</span></span>
+
+<span class="token keyword">void</span> <span class="token function">uart1_received_callback</span><span class="token punctuation">(</span><span class="token class-name">uint8_t</span> buf<span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">,</span> <span class="token class-name">uint8_t</span> size<span class="token punctuation">)</span> <span class="token punctuation">{</span><span class="token punctuation">}</span>
+
+<span class="token keyword">int</span> <span class="token function">main</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token function">uart_init</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">W25Q32_Init</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">LOG_DEBUG</span><span class="token punctuation">(</span><span class="token string">"main start"</span><span class="token punctuation">)</span>
+
+    <span class="token class-name">uint8_t</span> manufactureId <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
+    <span class="token class-name">uint16_t</span> deviceId <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
+    <span class="token function">W25Q32_ReadID</span><span class="token punctuation">(</span><span class="token operator">&amp;</span>manufactureId<span class="token punctuation">,</span> <span class="token operator">&amp;</span>deviceId<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">LOG_DEBUG</span><span class="token punctuation">(</span><span class="token string">"manufacture = %#x, deviceId = %#x"</span><span class="token punctuation">,</span> manufactureId<span class="token punctuation">,</span> deviceId<span class="token punctuation">)</span>
+
+    <span class="token comment">// // 擦除扇区（第63个block，第2个sector）</span>
+    <span class="token comment">// W25Q32_SectorErase(63, 2);</span>
+    <span class="token comment">// // 向 block-63 sector-2 page-10 addr-0写入数据</span>
+    <span class="token comment">// W25Q32_WritePage(63, 2, 10, 0, (uint8_t *)"12345678", 8);</span>
+    <span class="token comment">// uint8_t buf[10] = {0};</span>
+    <span class="token comment">// W25Q32_ReadBytes(63, 2, 10, 1, (uint8_t *)buf, 7);</span>
+    <span class="token comment">// LOG_DEBUG("buf = %s", buf);</span>
+
+    <span class="token class-name">uint8_t</span> data<span class="token punctuation">[</span><span class="token number">261</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token punctuation">{</span><span class="token number">0</span><span class="token punctuation">}</span><span class="token punctuation">;</span>
+    <span class="token keyword">for</span> <span class="token punctuation">(</span><span class="token class-name">uint16_t</span> i <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span> i <span class="token operator">&lt;</span> <span class="token number">260</span><span class="token punctuation">;</span> i<span class="token operator">++</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        data<span class="token punctuation">[</span>i<span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token char">'a'</span> <span class="token operator">+</span> <span class="token punctuation">(</span>i <span class="token operator">%</span> <span class="token number">26</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    <span class="token function">LOG_DEBUG</span><span class="token punctuation">(</span><span class="token string">"data = %s"</span><span class="token punctuation">,</span> data<span class="token punctuation">)</span>
+
+    <span class="token class-name">uint32_t</span> addr <span class="token operator">=</span> <span class="token number">0x32f680</span><span class="token punctuation">;</span>
+    <span class="token function">W25Q32_SectorErase</span><span class="token punctuation">(</span><span class="token punctuation">(</span>addr <span class="token operator">&gt;&gt;</span> <span class="token number">16</span><span class="token punctuation">)</span> <span class="token operator">&amp;</span> <span class="token number">0xFF</span><span class="token punctuation">,</span> <span class="token punctuation">(</span>addr <span class="token operator">&gt;&gt;</span> <span class="token number">12</span><span class="token punctuation">)</span> <span class="token operator">&amp;</span> <span class="token number">0x0F</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token class-name">uint16_t</span> size1 <span class="token operator">=</span> <span class="token number">0xFF</span> <span class="token operator">+</span> <span class="token number">1</span> <span class="token operator">-</span> <span class="token punctuation">(</span>addr <span class="token operator">&amp;</span> <span class="token number">0xFF</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">W25Q32_WriteAddr</span><span class="token punctuation">(</span>addr<span class="token punctuation">,</span> data<span class="token punctuation">,</span> size1<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    
+    <span class="token class-name">uint16_t</span> size2 <span class="token operator">=</span> <span class="token number">260</span> <span class="token operator">-</span> size1<span class="token punctuation">;</span>
+    <span class="token function">W25Q32_WritePage</span><span class="token punctuation">(</span><span class="token punctuation">(</span>addr <span class="token operator">&gt;&gt;</span> <span class="token number">16</span><span class="token punctuation">)</span> <span class="token operator">&amp;</span> <span class="token number">0xFF</span><span class="token punctuation">,</span> <span class="token punctuation">(</span>addr <span class="token operator">&gt;&gt;</span> <span class="token number">12</span><span class="token punctuation">)</span> <span class="token operator">&amp;</span> <span class="token number">0x0F</span><span class="token punctuation">,</span> <span class="token punctuation">(</span><span class="token punctuation">(</span>addr <span class="token operator">&gt;&gt;</span> <span class="token number">8</span><span class="token punctuation">)</span> <span class="token operator">&amp;</span> <span class="token number">0x0F</span><span class="token punctuation">)</span> <span class="token operator">+</span> <span class="token number">1</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> data <span class="token operator">+</span> size1<span class="token punctuation">,</span> size2<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token class-name">uint8_t</span> buf<span class="token punctuation">[</span><span class="token number">300</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token punctuation">{</span><span class="token number">0</span><span class="token punctuation">}</span><span class="token punctuation">;</span>
+    <span class="token function">W25Q32_ReadFromAddr</span><span class="token punctuation">(</span>addr<span class="token punctuation">,</span> buf<span class="token punctuation">,</span> <span class="token number">260</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">LOG_DEBUG</span><span class="token punctuation">(</span><span class="token string">"buf = %s"</span><span class="token punctuation">,</span> buf<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token keyword">while</span> <span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+                
+            </div>
+            <hr/>
+
+            
+
+    <div class="reprint" id="reprint-statement">
+        
+            <div class="reprint__author">
+                <span class="reprint-meta" style="font-weight: bold;">
+                    <i class="fas fa-user">
+                        文章作者:
+                    </i>
+                </span>
+                <span class="reprint-info">
+                    <a href="/about" rel="external nofollow noreferrer">安文</a>
+                </span>
+            </div>
+            <div class="reprint__type">
+                <span class="reprint-meta" style="font-weight: bold;">
+                    <i class="fas fa-link">
+                        文章链接:
+                    </i>
+                </span>
+                <span class="reprint-info">
+                    <a href="https://zanwen.github.io/2024/12/08/56962.html">https://zanwen.github.io/2024/12/08/56962.html</a>
+                </span>
+            </div>
+            <div class="reprint__notice">
+                <span class="reprint-meta" style="font-weight: bold;">
+                    <i class="fas fa-copyright">
+                        版权声明:
+                    </i>
+                </span>
+                <span class="reprint-info">
+                    本博客所有文章除特別声明外，均采用
+                    <a href="https://creativecommons.org/licenses/by/4.0/deed.zh" rel="external nofollow noreferrer" target="_blank">CC BY 4.0</a>
+                    许可协议。转载请注明来源
+                    <a href="/about" target="_blank">安文</a>
+                    !
+                </span>
+            </div>
+        
+    </div>
+
+    <script async defer>
+      document.addEventListener("copy", function (e) {
+        let toastHTML = '<span>复制成功，请遵循本文的转载规则</span><button class="btn-flat toast-action" onclick="navToReprintStatement()" style="font-size: smaller">查看</a>';
+        M.toast({html: toastHTML})
+      });
+
+      function navToReprintStatement() {
+        $("html, body").animate({scrollTop: $("#reprint-statement").offset().top - 80}, 800);
+      }
+    </script>
+
+
+
+            <div class="tag_share" style="display: block;">
+                <div class="post-meta__tag-list" style="display: inline-block;">
+                    
+                        <div class="article-tag">
+                            
+                                <a href="/tags/STM32/">
+                                    <span class="chip bg-color">STM32</span>
+                                </a>
+                            
+                                <a href="/tags/SPI/">
+                                    <span class="chip bg-color">SPI</span>
+                                </a>
+                            
+                        </div>
+                    
+                </div>
+                <div class="post_share" style="zoom: 80%; width: fit-content; display: inline-block; float: right; margin: -0.15rem 0;">
+                    <link rel="stylesheet" type="text/css" href="/libs/share/css/share.min.css">
+<div id="article-share">
+
+    
+    <div class="social-share" data-sites="twitter,facebook,google,qq,qzone,wechat,weibo,douban,linkedin" data-wechat-qrcode-helper="<p>微信扫一扫即可分享！</p>"></div>
+    <script src="/libs/share/js/social-share.min.js"></script>
+    
+
+    
+
+</div>
+
+                </div>
+            </div>
+            
+                <div id="reward">
+    <a href="#rewardModal" class="reward-link modal-trigger btn-floating btn-medium waves-effect waves-light red">赏</a>
+
+    <!-- Modal Structure -->
+    <div id="rewardModal" class="modal">
+        <div class="modal-content">
+            <a class="close modal-close"><i class="fas fa-times"></i></a>
+            <h4 class="reward-title">你的赏识是我前进的动力</h4>
+            <div class="reward-content">
+                <div class="reward-tabs">
+                    <ul class="tabs row">
+                        <li class="tab col s6 alipay-tab waves-effect waves-light"><a href="#alipay">支付宝</a></li>
+                        <li class="tab col s6 wechat-tab waves-effect waves-light"><a href="#wechat">微 信</a></li>
+                    </ul>
+                    <div id="alipay">
+                        <img src="/medias/reward/alipay.jpg" class="reward-img" alt="支付宝打赏二维码">
+                    </div>
+                    <div id="wechat">
+                        <img src="/medias/reward/wechat.jpg" class="reward-img" alt="微信打赏二维码">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(function () {
+        $('.tabs').tabs();
+    });
+</script>
+
+            
+        </div>
+    </div>
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+<article id="prenext-posts" class="prev-next articles">
+    <div class="row article-row">
+        
+        <div class="article col s12 m6" data-aos="fade-up">
+            <div class="article-badge left-badge text-color">
+                <i class="fas fa-chevron-left"></i>&nbsp;上一篇</div>
+            <div class="card">
+                <a href="/2024/12/08/34188.html">
+                    <div class="card-image">
+                        
+                        <img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/pexels-therato-1933319.jpg" class="responsive-img" alt="STM32存储器和寄存器分析">
+                        
+                        <span class="card-title">STM32存储器和寄存器分析</span>
+                    </div>
+                </a>
+                <div class="card-content article-content">
+                    <div class="summary block-with-text">
+                        
+                            
+                        
+                    </div>
+                    <div class="publish-info">
+                        <span class="publish-date">
+                            <i class="far fa-clock fa-fw icon-date"></i>2024-12-08
+                        </span>
+                        <span class="publish-author">
+                            
+                            <i class="fas fa-bookmark fa-fw icon-category"></i>
+                            
+                            <a href="/categories/STM32/" class="post-category">
+                                    STM32
+                                </a>
+                            
+                            
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="card-action article-tags">
+                    
+                    <a href="/tags/Memory/">
+                        <span class="chip bg-color">Memory</span>
+                    </a>
+                    
+                    <a href="/tags/%E5%AD%98%E5%82%A8%E5%99%A8/">
+                        <span class="chip bg-color">存储器</span>
+                    </a>
+                    
+                </div>
+                
+            </div>
+        </div>
+        
+        
+        <div class="article col s12 m6" data-aos="fade-up">
+            <div class="article-badge right-badge text-color">
+                下一篇&nbsp;<i class="fas fa-chevron-right"></i>
+            </div>
+            <div class="card">
+                <a href="/2024/12/07/52846.html">
+                    <div class="card-image">
+                        
+                        <img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/pexels-dimengliu-3213577.jpg" class="responsive-img" alt="模数转换ADC(STM32F103ZE)">
+                        
+                        <span class="card-title">模数转换ADC(STM32F103ZE)</span>
+                    </div>
+                </a>
+                <div class="card-content article-content">
+                    <div class="summary block-with-text">
+                        
+                            
+                        
+                    </div>
+                    <div class="publish-info">
+                            <span class="publish-date">
+                                <i class="far fa-clock fa-fw icon-date"></i>2024-12-07
+                            </span>
+                        <span class="publish-author">
+                            
+                            <i class="fas fa-bookmark fa-fw icon-category"></i>
+                            
+                            <a href="/categories/STM32/" class="post-category">
+                                    STM32
+                                </a>
+                            
+                            
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="card-action article-tags">
+                    
+                    <a href="/tags/STM32/">
+                        <span class="chip bg-color">STM32</span>
+                    </a>
+                    
+                    <a href="/tags/ADC/">
+                        <span class="chip bg-color">ADC</span>
+                    </a>
+                    
+                </div>
+                
+            </div>
+        </div>
+        
+    </div>
+</article>
+
+</div>
+
+
+
+<!-- 代码块功能依赖 -->
+<script type="text/javascript" src="/libs/codeBlock/codeBlockFuction.js"></script>
+
+
+  <!-- 是否加载使用自带的 prismjs. -->
+  <script type="text/javascript" src="/libs/prism/prism.min.js"></script>
+
+
+<!-- 代码语言 -->
+
+<script type="text/javascript" src="/libs/codeBlock/codeLang.js"></script>
+
+
+<!-- 代码块复制 -->
+
+<script type="text/javascript" src="/libs/codeBlock/codeCopy.js"></script>
+
+
+<!-- 代码块收缩 -->
+
+<script type="text/javascript" src="/libs/codeBlock/codeShrink.js"></script>
+
+
+
+    </div>
+    <div id="toc-aside" class="expanded col l3 hide-on-med-and-down">
+        <div class="toc-widget card" style="background-color: white;">
+            <div class="toc-title"><i class="far fa-list-alt"></i>&nbsp;&nbsp;目录</div>
+            <div id="toc-content"></div>
+        </div>
+    </div>
+</div>
+
+<!-- TOC 悬浮按钮. -->
+
+<div id="floating-toc-btn" class="hide-on-med-and-down">
+    <a class="btn-floating btn-large bg-color">
+        <i class="fas fa-list-ul"></i>
+    </a>
+</div>
+
+
+<script src="/libs/tocbot/tocbot.min.js"></script>
+<script>
+    $(function () {
+        tocbot.init({
+            tocSelector: '#toc-content',
+            contentSelector: '#articleContent',
+            headingsOffset: -($(window).height() * 0.4 - 45),
+            collapseDepth: Number('0'),
+            headingSelector: 'h1, h2, h3'
+        });
+
+        // Set scroll toc fixed.
+        let tocHeight = parseInt($(window).height() * 0.4 - 64);
+        let $tocWidget = $('.toc-widget');
+        $(window).scroll(function () {
+            let scroll = $(window).scrollTop();
+            /* add post toc fixed. */
+            if (scroll > tocHeight) {
+                $tocWidget.addClass('toc-fixed');
+            } else {
+                $tocWidget.removeClass('toc-fixed');
+            }
+        });
+
+        
+        /* 修复文章卡片 div 的宽度. */
+        let fixPostCardWidth = function (srcId, targetId) {
+            let srcDiv = $('#' + srcId);
+            if (srcDiv.length === 0) {
+                return;
+            }
+
+            let w = srcDiv.width();
+            if (w >= 450) {
+                w = w + 21;
+            } else if (w >= 350 && w < 450) {
+                w = w + 18;
+            } else if (w >= 300 && w < 350) {
+                w = w + 16;
+            } else {
+                w = w + 14;
+            }
+            $('#' + targetId).width(w);
+        };
+
+        // 切换TOC目录展开收缩的相关操作.
+        const expandedClass = 'expanded';
+        let $tocAside = $('#toc-aside');
+        let $mainContent = $('#main-content');
+        $('#floating-toc-btn .btn-floating').click(function () {
+            if ($tocAside.hasClass(expandedClass)) {
+                $tocAside.removeClass(expandedClass).hide();
+                $mainContent.removeClass('l9');
+            } else {
+                $tocAside.addClass(expandedClass).show();
+                $mainContent.addClass('l9');
+            }
+            fixPostCardWidth('artDetail', 'prenext-posts');
+        });
+        
+    });
+</script>
+
+    
+
+</main>
+
+
+
+
+    <footer class="page-footer bg-color">
+    
+
+    <div class="container row center-align"
+         style="margin-bottom: 0px !important;">
+        <div class="col s12 m8 l8 copy-right">
+            Copyright&nbsp;&copy;
+            
+                <span id="year">2019-2024</span>
+            
+            <a href="/about" target="_blank">安文</a>
+            |&nbsp;Powered by&nbsp;<a href="https://hexo.io/" target="_blank">Hexo</a>
+            |&nbsp;Theme&nbsp;<a href="https://github.com/blinkfox/hexo-theme-matery" target="_blank">Matery</a>
+            
+            <br>
+            
+                &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
+                        class="white-color">64.9k</span>
+            
+            
+            
+                
+            
+            
+                <span id="busuanzi_container_site_pv">
+                &nbsp;|&nbsp;<i class="far fa-eye"></i>&nbsp;总访问量:&nbsp;
+                    <span id="busuanzi_value_site_pv" class="white-color"></span>
+            </span>
+            
+            
+                <span id="busuanzi_container_site_uv">
+                &nbsp;|&nbsp;<i class="fas fa-users"></i>&nbsp;总访问人数:&nbsp;
+                    <span id="busuanzi_value_site_uv" class="white-color"></span>
+            </span>
+            
+            <br>
+
+            <!-- 运行天数提醒. -->
+            
+            <br>
+            
+        </div>
+        <div class="col s12 m4 l4 social-link social-statis">
+    <a href="https://github.com/zanwen" class="tooltipped" target="_blank" data-tooltip="访问我的GitHub" data-position="top" data-delay="50">
+        <i class="fab fa-github"></i>
+    </a>
+
+
+
+    <a href="mailto:872852458@qq.com" class="tooltipped" target="_blank" data-tooltip="邮件联系我" data-position="top" data-delay="50">
+        <i class="fas fa-envelope-open"></i>
+    </a>
+
+
+
+
+
+
+
+    <a href="tencent://AddContact/?fromId=50&fromSubId=1&subcmd=all&uin=872852458" class="tooltipped" target="_blank" data-tooltip="QQ联系我: 872852458" data-position="top" data-delay="50">
+        <i class="fab fa-qq"></i>
+    </a>
+
+
+
+
+
+
+
+    <a href="/atom.xml" class="tooltipped" target="_blank" data-tooltip="RSS 订阅" data-position="top" data-delay="50">
+        <i class="fas fa-rss"></i>
+    </a>
+
+</div>
+    </div>
+</footer>
+
+<div class="progress-bar"></div>
+
+
+    <!-- 搜索遮罩框 -->
+<div id="searchModal" class="modal">
+    <div class="modal-content">
+        <div class="search-header">
+            <span class="title"><i class="fas fa-search"></i>&nbsp;&nbsp;搜索</span>
+            <input type="search" id="searchInput" name="s" placeholder="请输入搜索的关键字"
+                   class="search-input">
+        </div>
+        <div id="searchResult"></div>
+    </div>
+</div>
+
+<script type="text/javascript">
+$(function () {
+    var searchFunc = function (path, search_id, content_id) {
+        'use strict';
+        $.ajax({
+            url: path,
+            dataType: "xml",
+            success: function (xmlResponse) {
+                // get the contents from search data
+                var datas = $("entry", xmlResponse).map(function () {
+                    return {
+                        title: $("title", this).text(),
+                        content: $("content", this).text(),
+                        url: $("url", this).text()
+                    };
+                }).get();
+                var $input = document.getElementById(search_id);
+                var $resultContent = document.getElementById(content_id);
+                $input.addEventListener('input', function () {
+                    var str = '<ul class=\"search-result-list\">';
+                    var keywords = this.value.trim().toLowerCase().split(/[\s\-]+/);
+                    $resultContent.innerHTML = "";
+                    if (this.value.trim().length <= 0) {
+                        return;
+                    }
+                    // perform local searching
+                    datas.forEach(function (data) {
+                        var isMatch = true;
+                        var data_title = data.title.trim().toLowerCase();
+                        var data_content = data.content.trim().replace(/<[^>]+>/g, "").toLowerCase();
+                        var data_url = data.url;
+                        data_url = data_url.indexOf('/') === 0 ? data.url : '/' + data_url;
+                        var index_title = -1;
+                        var index_content = -1;
+                        var first_occur = -1;
+                        // only match artiles with not empty titles and contents
+                        if (data_title !== '' && data_content !== '') {
+                            keywords.forEach(function (keyword, i) {
+                                index_title = data_title.indexOf(keyword);
+                                index_content = data_content.indexOf(keyword);
+                                if (index_title < 0 && index_content < 0) {
+                                    isMatch = false;
+                                } else {
+                                    if (index_content < 0) {
+                                        index_content = 0;
+                                    }
+                                    if (i === 0) {
+                                        first_occur = index_content;
+                                    }
+                                }
+                            });
+                        }
+                        // show search results
+                        if (isMatch) {
+                            str += "<li><a href='" + data_url + "' class='search-result-title'>" + data_title + "</a>";
+                            var content = data.content.trim().replace(/<[^>]+>/g, "");
+                            if (first_occur >= 0) {
+                                // cut out 100 characters
+                                var start = first_occur - 20;
+                                var end = first_occur + 80;
+                                if (start < 0) {
+                                    start = 0;
+                                }
+                                if (start === 0) {
+                                    end = 100;
+                                }
+                                if (end > content.length) {
+                                    end = content.length;
+                                }
+                                var match_content = content.substr(start, end);
+                                // highlight all keywords
+                                keywords.forEach(function (keyword) {
+                                    var regS = new RegExp(keyword, "gi");
+                                    match_content = match_content.replace(regS, "<em class=\"search-keyword\">" + keyword + "</em>");
+                                });
+
+                                str += "<p class=\"search-result\">" + match_content + "...</p>"
+                            }
+                            str += "</li>";
+                        }
+                    });
+                    str += "</ul>";
+                    $resultContent.innerHTML = str;
+                });
+            }
+        });
+    };
+
+    searchFunc('/search.xml', 'searchInput', 'searchResult');
+});
+</script>
+
+    <!-- 白天和黑夜主题 -->
+<div class="stars-con">
+    <div id="stars"></div>
+    <div id="stars2"></div>
+    <div id="stars3"></div>  
+</div>
+
+<script>
+    function switchNightMode() {
+        $('<div class="Cuteen_DarkSky"><div class="Cuteen_DarkPlanet"></div></div>').appendTo($('body')),
+        setTimeout(function () {
+            $('body').hasClass('DarkMode') 
+            ? ($('body').removeClass('DarkMode'), localStorage.setItem('isDark', '0'), $('#sum-moon-icon').removeClass("fa-sun").addClass('fa-moon')) 
+            : ($('body').addClass('DarkMode'), localStorage.setItem('isDark', '1'), $('#sum-moon-icon').addClass("fa-sun").removeClass('fa-moon')),
+            
+            setTimeout(function () {
+            $('.Cuteen_DarkSky').fadeOut(1e3, function () {
+                $(this).remove()
+            })
+            }, 2e3)
+        })
+    }
+</script>
+
+    <!-- 回到顶部按钮 -->
+<div id="backTop" class="top-scroll">
+    <a class="btn-floating btn-large waves-effect waves-light" href="#!">
+        <i class="fas fa-arrow-up"></i>
+    </a>
+</div>
+
+
+    <script src="/libs/materialize/materialize.min.js"></script>
+    <script src="/libs/masonry/masonry.pkgd.min.js"></script>
+    <script src="/libs/aos/aos.js"></script>
+    <script src="/libs/scrollprogress/scrollProgress.min.js"></script>
+    <script src="/libs/lightGallery/js/lightgallery-all.min.js"></script>
+    <script src="/js/matery.js"></script>
+
+    
+
+    
+    
+    
+
+    <!-- 雪花特效 -->
+    
+
+    <!-- 鼠标星星特效 -->
+    
+
+     
+        <script src="https://ssl.captcha.qq.com/TCaptcha.js"></script>
+        <script src="/libs/others/TencentCaptcha.js"></script>
+        <button id="TencentCaptcha" data-appid="xxxxxxxxxx" data-cbfn="callback" type="button" hidden></button>
+    
+
+    <!-- Baidu Analytics -->
+
+    <!-- Baidu Push -->
+
+<script>
+    (function () {
+        var bp = document.createElement('script');
+        var curProtocol = window.location.protocol.split(':')[0];
+        if (curProtocol === 'https') {
+            bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+        } else {
+            bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+        }
+        var s = document.getElementsByTagName("script")[0];
+        s.parentNode.insertBefore(bp, s);
+    })();
+</script>
+
+    
+    <script src="/libs/others/clicklove.js" async="async"></script>
+    
+    
+    <script async src="/libs/others/busuanzi.pure.mini.js"></script>
+    
+
+    
+
+    
+
+    <!--腾讯兔小巢-->
+    
+    
+
+    
+
+    
+
+    
+    <script src="/libs/instantpage/instantpage.js" type="module"></script>
+    
+
+</body>
+
+</html>
