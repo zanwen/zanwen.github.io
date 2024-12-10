@@ -6,7 +6,7 @@
   <link href="https://zanwen.github.io/atom.xml" rel="self"/>
   
   <link href="https://zanwen.github.io/"/>
-  <updated>2024-12-08T13:37:25.612Z</updated>
+  <updated>2024-12-10T13:14:37.453Z</updated>
   <id>https://zanwen.github.io/</id>
   
   <author>
@@ -17,11 +17,41 @@
   <generator uri="https://hexo.io/">Hexo</generator>
   
   <entry>
+    <title>STM32存储资源扩展之FSMC</title>
+    <link href="https://zanwen.github.io/2024/12/09/16017.html"/>
+    <id>https://zanwen.github.io/2024/12/09/16017.html</id>
+    <published>2024-12-09T00:58:20.000Z</published>
+    <updated>2024-12-10T13:14:37.453Z</updated>
+    
+    
+      
+      
+        
+        
+    <summary type="html">&lt;h1 id=&quot;can-kao-zi-liao&quot;&gt;参考资料&lt;/h1&gt;
+&lt;p&gt;&lt;strong&gt;STM32&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;STM32F103参考手册：&lt;a</summary>
+        
+      
+    
+    
+    
+    <category term="STM32" scheme="https://zanwen.github.io/categories/STM32/"/>
+    
+    
+    <category term="FSMC" scheme="https://zanwen.github.io/tags/FSMC/"/>
+    
+    <category term="STM32" scheme="https://zanwen.github.io/tags/STM32/"/>
+    
+  </entry>
+  
+  <entry>
     <title>STM32存储器和寄存器分析</title>
     <link href="https://zanwen.github.io/2024/12/08/34188.html"/>
     <id>https://zanwen.github.io/2024/12/08/34188.html</id>
     <published>2024-12-08T12:22:43.000Z</published>
-    <updated>2024-12-08T13:37:25.612Z</updated>
+    <updated>2024-12-09T00:55:03.888Z</updated>
     
     
       
@@ -50,7 +80,7 @@
     <link href="https://zanwen.github.io/2024/12/08/56962.html"/>
     <id>https://zanwen.github.io/2024/12/08/56962.html</id>
     <published>2024-12-08T00:52:36.000Z</published>
-    <updated>2024-12-08T14:19:52.458Z</updated>
+    <updated>2024-12-09T00:55:03.895Z</updated>
     
     
       
@@ -81,7 +111,7 @@
     <link href="https://zanwen.github.io/2024/12/07/52846.html"/>
     <id>https://zanwen.github.io/2024/12/07/52846.html</id>
     <published>2024-12-07T05:18:22.000Z</published>
-    <updated>2024-12-08T00:54:28.090Z</updated>
+    <updated>2024-12-09T00:55:03.893Z</updated>
     
     
       
@@ -109,7 +139,7 @@
     <link href="https://zanwen.github.io/2024/12/06/62380.html"/>
     <id>https://zanwen.github.io/2024/12/06/62380.html</id>
     <published>2024-12-06T14:41:32.000Z</published>
-    <updated>2024-12-07T14:09:15.851Z</updated>
+    <updated>2024-12-09T00:55:03.891Z</updated>
     
     
       
@@ -602,45 +632,6 @@
     <category term="时序要求" scheme="https://zanwen.github.io/tags/%E6%97%B6%E5%BA%8F%E8%A6%81%E6%B1%82/"/>
     
     <category term="移位寄存器" scheme="https://zanwen.github.io/tags/%E7%A7%BB%E4%BD%8D%E5%AF%84%E5%AD%98%E5%99%A8/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>UART接收缓冲区溢出异常（HAL_UART_ERROR_ORE）问题记录</title>
-    <link href="https://zanwen.github.io/2024/11/12/13750.html"/>
-    <id>https://zanwen.github.io/2024/11/12/13750.html</id>
-    <published>2024-11-12T12:40:06.000Z</published>
-    <updated>2024-11-23T11:22:37.466Z</updated>
-    
-    
-      
-      
-        
-        
-    <summary type="html">&lt;h1 id=&quot;wen-ti-bei-jing&quot;&gt;问题背景&lt;/h1&gt;
-&lt;h2 id=&quot;kai-fa-huan-jing&quot;&gt;开发环境&lt;/h2&gt;
-&lt;ul&gt;
-&lt;li&gt;硬件：GD32F407VET6开发版&lt;/li&gt;
-&lt;li&gt;IDE：STM32CubeMX + Clion + ARM</summary>
-        
-      
-    
-    
-    
-    <category term="STM32" scheme="https://zanwen.github.io/categories/STM32/"/>
-    
-    <category term="踩坑记录" scheme="https://zanwen.github.io/categories/STM32/%E8%B8%A9%E5%9D%91%E8%AE%B0%E5%BD%95/"/>
-    
-    
-    <category term="Clion" scheme="https://zanwen.github.io/tags/Clion/"/>
-    
-    <category term="STM32" scheme="https://zanwen.github.io/tags/STM32/"/>
-    
-    <category term="GD32" scheme="https://zanwen.github.io/tags/GD32/"/>
-    
-    <category term="HAL" scheme="https://zanwen.github.io/tags/HAL/"/>
-    
-    <category term="UART" scheme="https://zanwen.github.io/tags/UART/"/>
     
   </entry>
   
