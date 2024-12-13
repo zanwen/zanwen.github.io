@@ -6,7 +6,7 @@
   <link href="https://zanwen.github.io/atom.xml" rel="self"/>
   
   <link href="https://zanwen.github.io/"/>
-  <updated>2024-12-10T13:55:59.429Z</updated>
+  <updated>2024-12-13T07:04:18.735Z</updated>
   <id>https://zanwen.github.io/</id>
   
   <author>
@@ -17,11 +17,43 @@
   <generator uri="https://hexo.io/">Hexo</generator>
   
   <entry>
+    <title>掌握CAN总线：原理解析与开发实践</title>
+    <link href="https://zanwen.github.io/2024/12/11/43974.html"/>
+    <id>https://zanwen.github.io/2024/12/11/43974.html</id>
+    <published>2024-12-11T00:55:19.000Z</published>
+    <updated>2024-12-13T07:04:18.735Z</updated>
+    
+    
+      
+      
+        
+        
+    <summary type="html">&lt;h1 id=&quot;can-kao-zi-liao&quot;&gt;参考资料&lt;/h1&gt;
+&lt;h2 id=&quot;wen-dang-zi-liao&quot;&gt;文档资料&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&quot;http://esd.cs.ucr.edu/webres/can20.pdf&quot;&gt;CAN</summary>
+        
+      
+    
+    
+    
+    <category term="协议" scheme="https://zanwen.github.io/categories/%E5%8D%8F%E8%AE%AE/"/>
+    
+    <category term="STM32" scheme="https://zanwen.github.io/categories/%E5%8D%8F%E8%AE%AE/STM32/"/>
+    
+    
+    <category term="STM32" scheme="https://zanwen.github.io/tags/STM32/"/>
+    
+    <category term="CAN" scheme="https://zanwen.github.io/tags/CAN/"/>
+    
+  </entry>
+  
+  <entry>
     <title>STM32存储资源扩展之FSMC</title>
     <link href="https://zanwen.github.io/2024/12/09/16017.html"/>
     <id>https://zanwen.github.io/2024/12/09/16017.html</id>
     <published>2024-12-09T00:58:20.000Z</published>
-    <updated>2024-12-10T13:55:59.429Z</updated>
+    <updated>2024-12-10T15:00:14.213Z</updated>
     
     
       
@@ -216,9 +248,9 @@
     <category term="STM32" scheme="https://zanwen.github.io/categories/%E5%8D%8F%E8%AE%AE/STM32/"/>
     
     
-    <category term="I2C" scheme="https://zanwen.github.io/tags/I2C/"/>
-    
     <category term="I²C" scheme="https://zanwen.github.io/tags/I%C2%B2C/"/>
+    
+    <category term="I2C" scheme="https://zanwen.github.io/tags/I2C/"/>
     
   </entry>
   
@@ -318,7 +350,7 @@
     <link href="https://zanwen.github.io/2024/11/26/23674.html"/>
     <id>https://zanwen.github.io/2024/11/26/23674.html</id>
     <published>2024-11-26T06:15:30.000Z</published>
-    <updated>2024-12-04T05:38:35.101Z</updated>
+    <updated>2024-12-13T06:28:18.136Z</updated>
     
     
       
@@ -589,49 +621,13 @@
     <category term="协议" scheme="https://zanwen.github.io/categories/%E5%8D%8F%E8%AE%AE/"/>
     
     
+    <category term="I²C" scheme="https://zanwen.github.io/tags/I%C2%B2C/"/>
+    
     <category term="I2C" scheme="https://zanwen.github.io/tags/I2C/"/>
     
     <category term="时序" scheme="https://zanwen.github.io/tags/%E6%97%B6%E5%BA%8F/"/>
     
     <category term="PCF8563" scheme="https://zanwen.github.io/tags/PCF8563/"/>
-    
-    <category term="I²C" scheme="https://zanwen.github.io/tags/I%C2%B2C/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>论时序要求的重要性（移位寄存器控制数码管）</title>
-    <link href="https://zanwen.github.io/2024/11/15/31801.html"/>
-    <id>https://zanwen.github.io/2024/11/15/31801.html</id>
-    <published>2024-11-15T08:10:55.000Z</published>
-    <updated>2024-11-23T11:22:14.866Z</updated>
-    
-    
-      
-      
-        
-        
-    <summary type="html">&lt;h1 id=&quot;1-wen-ti-bei-jing&quot;&gt;1. 问题背景&lt;/h1&gt;
-&lt;h2 id=&quot;ying-jian-bei-jing&quot;&gt;硬件背景&lt;/h2&gt;
-&lt;ul&gt;
-&lt;li&gt;移位寄存器：&lt;a</summary>
-        
-      
-    
-    
-    
-    <category term="GD32" scheme="https://zanwen.github.io/categories/GD32/"/>
-    
-    <category term="踩坑记录" scheme="https://zanwen.github.io/categories/GD32/%E8%B8%A9%E5%9D%91%E8%AE%B0%E5%BD%95/"/>
-    
-    
-    <category term="GD32" scheme="https://zanwen.github.io/tags/GD32/"/>
-    
-    <category term="SN74HC595NSR" scheme="https://zanwen.github.io/tags/SN74HC595NSR/"/>
-    
-    <category term="时序要求" scheme="https://zanwen.github.io/tags/%E6%97%B6%E5%BA%8F%E8%A6%81%E6%B1%82/"/>
-    
-    <category term="移位寄存器" scheme="https://zanwen.github.io/tags/%E7%A7%BB%E4%BD%8D%E5%AF%84%E5%AD%98%E5%99%A8/"/>
     
   </entry>
   

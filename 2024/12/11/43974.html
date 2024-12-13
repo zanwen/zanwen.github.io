@@ -1,0 +1,2108 @@
+<!DOCTYPE HTML>
+<html lang="zh-CN">
+
+
+<head>
+    <meta charset="utf-8">
+    <meta name="keywords" content="掌握CAN总线：原理解析与开发实践, 安文的博客">
+    <meta name="description" content="参考资料
+文档资料
+
+CAN Specification
+瑞萨CAN入门书
+
+https://d1.amobbs.com/bbs_upload782111/files_34/ourdev_592917X7VICE.pdf
+https://w">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="renderer" content="webkit|ie-stand|ie-comp">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="format-detection" content="telephone=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="referrer" content="no-referrer-when-downgrade">
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+
+
+    <title>掌握CAN总线：原理解析与开发实践 | 安文的博客</title>
+    <link rel="icon" type="image/png" href="/medias/logo.png">
+    
+
+
+    <!-- bg-cover style     -->
+
+
+
+<link rel="stylesheet" type="text/css" href="/libs/awesome/css/all.min.css">
+<link rel="stylesheet" type="text/css" href="/libs/materialize/materialize.min.css">
+<link rel="stylesheet" type="text/css" href="/libs/aos/aos.css">
+<link rel="stylesheet" type="text/css" href="/libs/animate/animate.min.css">
+<link rel="stylesheet" type="text/css" href="/libs/lightGallery/css/lightgallery.min.css">
+<link rel="stylesheet" type="text/css" href="/css/matery.css">
+<link rel="stylesheet" type="text/css" href="/css/my.css">
+<link rel="stylesheet" type="text/css" href="/css/dark.css" media="none" onload="if(media!='all')media='all'">
+
+
+
+
+    <link rel="stylesheet" href="/libs/tocbot/tocbot.css">
+    <link rel="stylesheet" href="/css/post.css">
+
+
+
+
+    
+        <link rel="stylesheet" type="text/css" href="/css/reward.css">
+    
+
+
+
+    <script src="/libs/jquery/jquery-3.6.0.min.js"></script>
+
+<meta name="generator" content="Hexo 7.3.0">
+<style>.github-emoji { position: relative; display: inline-block; width: 1.2em; min-height: 1.2em; overflow: hidden; vertical-align: top; color: transparent; }  .github-emoji > span { position: relative; z-index: 10; }  .github-emoji img, .github-emoji .fancybox { margin: 0 !important; padding: 0 !important; border: none !important; outline: none !important; text-decoration: none !important; user-select: none !important; cursor: auto !important; }  .github-emoji img { height: 1.2em !important; width: 1.2em !important; position: absolute !important; left: 50% !important; top: 50% !important; transform: translate(-50%, -50%) !important; user-select: none !important; cursor: auto !important; } .github-emoji-fallback { color: inherit; } .github-emoji-fallback img { opacity: 0 !important; }</style>
+<link rel="alternate" href="/atom.xml" title="安文的博客" type="application/atom+xml">
+</head>
+
+
+<body>
+    <header class="navbar-fixed">
+    <nav id="headNav" class="bg-color nav-transparent">
+        <div id="navContainer" class="nav-wrapper container">
+            <div class="brand-logo">
+                <a href="/" class="waves-effect waves-light">
+                    
+                    <img src="/medias/logo.png" class="logo-img" alt="LOGO">
+                    
+                    <span class="logo-span">安文的博客</span>
+                </a>
+            </div>
+            
+
+<a href="#" data-target="mobile-nav" class="sidenav-trigger button-collapse"><i class="fas fa-bars"></i></a>
+<ul class="right nav-menu">
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/" class="waves-effect waves-light">
+      
+      <i class="fas fa-home" style="zoom: 0.6;"></i>
+      
+      <span>首页</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/tags" class="waves-effect waves-light">
+      
+      <i class="fas fa-tags" style="zoom: 0.6;"></i>
+      
+      <span>标签</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/categories" class="waves-effect waves-light">
+      
+      <i class="fas fa-bookmark" style="zoom: 0.6;"></i>
+      
+      <span>分类</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/archives" class="waves-effect waves-light">
+      
+      <i class="fas fa-archive" style="zoom: 0.6;"></i>
+      
+      <span>归档</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/about" class="waves-effect waves-light">
+      
+      <i class="fas fa-user-circle" style="zoom: 0.6;"></i>
+      
+      <span>关于</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/contact" class="waves-effect waves-light">
+      
+      <i class="fas fa-comments" style="zoom: 0.6;"></i>
+      
+      <span>留言板</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/friends" class="waves-effect waves-light">
+      
+      <i class="fas fa-address-book" style="zoom: 0.6;"></i>
+      
+      <span>友情链接</span>
+    </a>
+    
+  </li>
+  
+  <li>
+    <a href="#searchModal" class="modal-trigger waves-effect waves-light">
+      <i id="searchIcon" class="fas fa-search" title="搜索" style="zoom: 0.85;"></i>
+    </a>
+  </li>
+  <li>
+    <a href="javascript:;" class="waves-effect waves-light" onclick="switchNightMode()" title="深色/浅色模式" >
+      <i id="sum-moon-icon" class="fas fa-sun" style="zoom: 0.85;"></i>
+    </a>
+  </li>
+</ul>
+
+
+<div id="mobile-nav" class="side-nav sidenav">
+
+    <div class="mobile-head bg-color">
+        
+        <img src="/medias/logo.png" class="logo-img circle responsive-img">
+        
+        <div class="logo-name">安文的博客</div>
+        <div class="logo-desc">
+            
+            安文的博客 | 嵌入式 | 算法 | AI | 人工智能
+            
+        </div>
+    </div>
+
+    <ul class="menu-list mobile-menu-list">
+        
+        <li class="m-nav-item">
+	  
+		<a href="/" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-home"></i>
+			
+			首页
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/tags" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-tags"></i>
+			
+			标签
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/categories" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-bookmark"></i>
+			
+			分类
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/archives" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-archive"></i>
+			
+			归档
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/about" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-user-circle"></i>
+			
+			关于
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/contact" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-comments"></i>
+			
+			留言板
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/friends" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-address-book"></i>
+			
+			友情链接
+		</a>
+          
+        </li>
+        
+        
+        <li><div class="divider"></div></li>
+        <li>
+            <a href="https://github.com/blinkfox/hexo-theme-matery" class="waves-effect waves-light" target="_blank">
+                <i class="fab fa-github-square fa-fw"></i>Fork Me
+            </a>
+        </li>
+        
+    </ul>
+</div>
+
+
+        </div>
+
+        
+            <style>
+    .nav-transparent .github-corner {
+        display: none !important;
+    }
+
+    .github-corner {
+        position: absolute;
+        z-index: 10;
+        top: 0;
+        right: 0;
+        border: 0;
+        transform: scale(1.1);
+    }
+
+    .github-corner svg {
+        color: #0f9d58;
+        fill: #fff;
+        height: 64px;
+        width: 64px;
+    }
+
+    .github-corner:hover .octo-arm {
+        animation: a 0.56s ease-in-out;
+    }
+
+    .github-corner .octo-arm {
+        animation: none;
+    }
+
+    @keyframes a {
+        0%,
+        to {
+            transform: rotate(0);
+        }
+        20%,
+        60% {
+            transform: rotate(-25deg);
+        }
+        40%,
+        80% {
+            transform: rotate(10deg);
+        }
+    }
+</style>
+
+<a href="https://github.com/blinkfox/hexo-theme-matery" class="github-corner tooltipped hide-on-med-and-down" target="_blank"
+   data-tooltip="Fork Me" data-position="left" data-delay="50">
+    <svg viewBox="0 0 250 250" aria-hidden="true">
+        <path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path>
+        <path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2"
+              fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path>
+        <path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z"
+              fill="currentColor" class="octo-body"></path>
+    </svg>
+</a>
+        
+    </nav>
+
+</header>
+
+    
+
+
+
+<div class="bg-cover pd-header post-cover" style="background-image: url('https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/dji_fly_20240629_133600_100_1719666485325_photo_optimized.jpg')">
+    <div class="container" style="right: 0px;left: 0px;">
+        <div class="row">
+            <div class="col s12 m12 l12">
+                <div class="brand">
+                    <h1 class="description center-align post-title">掌握CAN总线：原理解析与开发实践</h1>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+<main class="post-container content">
+
+    
+    <div class="row">
+    <div id="main-content" class="col s12 m12 l9">
+        <!-- 文章内容详情 -->
+<div id="artDetail">
+    <div class="card">
+        <div class="card-content article-info">
+            <div class="row tag-cate">
+                <div class="col s7">
+                    
+                    <div class="article-tag">
+                        
+                            <a href="/tags/STM32/">
+                                <span class="chip bg-color">STM32</span>
+                            </a>
+                        
+                            <a href="/tags/CAN/">
+                                <span class="chip bg-color">CAN</span>
+                            </a>
+                        
+                    </div>
+                    
+                </div>
+                <div class="col s5 right-align">
+                    
+                    <div class="post-cate">
+                        <i class="fas fa-bookmark fa-fw icon-category"></i>
+                        
+                            <a href="/categories/%E5%8D%8F%E8%AE%AE/" class="post-category">
+                                协议
+                            </a>
+                        
+                            <a href="/categories/%E5%8D%8F%E8%AE%AE/STM32/" class="post-category">
+                                STM32
+                            </a>
+                        
+                    </div>
+                    
+                </div>
+            </div>
+
+            <div class="post-info">
+                
+                <div class="post-date info-break-policy">
+                    <i class="far fa-calendar-minus fa-fw"></i>发布日期:&nbsp;&nbsp;
+                    2024-12-11
+                </div>
+                
+
+                
+                <div class="post-date info-break-policy">
+                    <i class="far fa-calendar-check fa-fw"></i>更新日期:&nbsp;&nbsp;
+                    2024-12-13
+                </div>
+                
+
+                
+                <div class="info-break-policy">
+                    <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
+                    9.1k
+                </div>
+                
+
+                
+                <div class="info-break-policy">
+                    <i class="far fa-clock fa-fw"></i>阅读时长:&nbsp;&nbsp;
+                    37 分
+                </div>
+                
+
+                
+                    <div id="busuanzi_container_page_pv" class="info-break-policy">
+                        <i class="far fa-eye fa-fw"></i>阅读次数:&nbsp;&nbsp;
+                        <span id="busuanzi_value_page_pv"></span>
+                    </div>
+				
+            </div>
+        </div>
+        <hr class="clearfix">
+
+        
+        <!-- 是否加载使用自带的 prismjs. -->
+        <link rel="stylesheet" href="/libs/prism/prism.min.css">
+        
+
+        
+
+        <div class="card-content article-card-content">
+            <div id="articleContent">
+                <h1 id="can-kao-zi-liao">参考资料</h1>
+<h2 id="wen-dang-zi-liao">文档资料</h2>
+<ul>
+<li><a target="_blank" rel="noopener" href="http://esd.cs.ucr.edu/webres/can20.pdf">CAN Specification</a></li>
+<li>瑞萨CAN入门书
+<ul>
+<li><a target="_blank" rel="noopener" href="https://d1.amobbs.com/bbs_upload782111/files_34/ourdev_592917X7VICE.pdf">https://d1.amobbs.com/bbs_upload782111/files_34/ourdev_592917X7VICE.pdf</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.scribd.com/document/382995112/%E7%91%9E%E8%90%A8CAN-pdf">https://www.scribd.com/document/382995112/瑞萨CAN-pdf</a></li>
+</ul>
+</li>
+</ul>
+<h2 id="shi-pin-jiao-cheng">视频教程</h2>
+<p>江协科技CAN总线教程</p>
+<iframe src="//player.bilibili.com/player.html?isOutside=true&amp;aid=1303451568&amp;bvid=BV1vu4m1F7Gt&amp;cid=1513756504&amp;p=1" scrolling="no" border="0" frameborder="no" framespacing="0" allowfullscreen="true"></iframe>
+<h1 id="yuan-li-jie-xi">原理解析</h1>
+<h2 id="can-jian-jie">CAN简介</h2>
+<ul>
+<li>
+<p>CAN总线（Controller Area Network Bus）控制器局域网总线</p>
+</li>
+<li>
+<p>CAN总线是由BOSCH公司开发的一种<mark>简洁易用、传输速度快、易扩展、可靠性高的串行通信总线</mark>，广泛应用于汽车、嵌入式、工业控制等领域</p>
+</li>
+<li>
+<p>CAN总线特征：</p>
+<ul>
+<li>
+<p>两根通信线（CAN_H、CAN_L），线路少</p>
+</li>
+<li>
+<p>差分信号通信，抗干扰能力强</p>
+</li>
+<li>
+<p>高速CAN（ISO11898）：125k~1Mbps, &lt;40m</p>
+</li>
+<li>
+<p>低速CAN（ISO11519）：10k~125kbps, &lt;1km</p>
+</li>
+<li>
+<p>异步，无需时钟线，通信速率由设备各自约定</p>
+</li>
+<li>
+<p>半双工，可挂载多设备，多设备同时发送数据时通过仲裁判断先后顺序</p>
+</li>
+<li>
+<p>11位/29位报文ID，用于区分消息功能，同时决定优先级</p>
+</li>
+<li>
+<p>可配置1~8字节的有效载荷</p>
+</li>
+<li>
+<p>可实现广播式和请求式两种传输方式</p>
+</li>
+<li>
+<p>应答、CRC校验、位填充、位同步、错误处理等特性</p>
+</li>
+</ul>
+</li>
+</ul>
+<h2 id="wu-li-ceng">物理层</h2>
+<h3 id="zhu-liu-tong-xin-xie-yi-dui-bi">主流通信协议对比</h3>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241211103157423.png" alt="image-20241211103157423"></p>
+<h3 id="can-ying-jian-dian-lu">CAN硬件电路</h3>
+<ul>
+<li>每个设备通过CAN收发器挂载在CAN总线网络上</li>
+<li>CAN控制器引出的TX和RX与CAN收发器相连，CAN收发器引出的CAN_H和CAN_L分别与总线的CAN_H和CAN_L相连</li>
+<li>高速CAN使用闭环网络，CAN_H和CAN_L两端添加120Ω的终端电阻</li>
+<li>低速CAN使用开环网络，CAN_H和CAN_L其中一端添加2.2kΩ的终端电阻</li>
+</ul>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241211103336247.png" alt="image-20241211103336247"></p>
+<h3 id="can-dian-ping-biao-zhun">CAN电平标准</h3>
+<ul>
+<li>CAN总线采用差分信号，即两线电压差（VCAN_H-VCAN_L）传输数据位</li>
+<li>高速CAN规定：
+<ul>
+<li>电压差为0V时表示逻辑1（隐性电平）</li>
+<li>电压差为2V时表示逻辑0（显性电平）</li>
+</ul>
+</li>
+<li>低速CAN规定：
+<ul>
+<li>电压差为-1.5V时表示逻辑1（隐性电平）</li>
+<li>电压差为3V时表示逻辑0（显性电平）</li>
+</ul>
+</li>
+</ul>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241211103423494.png" alt="image-20241211103423494"></p>
+<h3 id="can-shou-fa-qi-tja-1050-gao-su-can">CAN收发器 – TJA1050（高速CAN）</h3>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241211103451188.png" alt="image-20241211103451188"></p>
+<h3 id="can-wu-li-ceng-te-xing">CAN物理层特性</h3>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241211103523971.png" alt="image-20241211103523971"></p>
+<h2 id="can-zong-xian-zheng-ge-shi">CAN总线帧格式</h2>
+<p>CAN协议规定了以下5种类型的帧：</p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241211103713455.png" alt="image-20241211103713455"></p>
+<h3 id="shu-ju-zheng">数据帧</h3>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241211103734684.png" alt="image-20241211103734684"></p>
+<blockquote>
+<p>[!NOTE]</p>
+<p>图例说明：D表示对应颜色bit只能为显性电平（Dominant），R则表示只能为隐形电平（Recessive）；ACK位槽，该bit周期，发送方发送隐形电平，接收方如果要回复ACK则发送显性电平</p>
+</blockquote>
+<ul>
+<li>SOF（Start of Frame）：帧起始，表示后面一段波形为传输的数据位</li>
+<li>ID（Identify）：标识符，区分功能，同时决定优先级</li>
+<li>RTR（Remote Transmission Request ）：远程请求位，区分数据帧和遥控帧</li>
+<li>IDE（Identifier Extension）：扩展标志位，区分标准格式和扩展格式</li>
+<li>SRR（Substitute Remote Request）：替代RTR，协议升级时留下的无意义位</li>
+<li>r0/r1（Reserve）：保留位，为后续协议升级留下空间</li>
+<li>DLC（Data Length Code）：数据长度，指示数据段有几个字节</li>
+<li>Data：数据段的1~8个字节有效数据</li>
+<li>CRC（Cyclic Redundancy Check）：循环冗余校验，校验数据是否正确</li>
+<li>ACK（Acknowledgement）：应答位，判断数据有没有被接收方接收</li>
+<li>CRC/ACK界定符：为应答位前后发送方和接收方释放总线留下时间</li>
+<li>EOF（End of Frame ）：帧结束，表示数据位已经传输完毕</li>
+</ul>
+<h3 id="shu-ju-zheng-de-fa-zhan-li-shi">数据帧的发展历史</h3>
+<p>CAN 1.2时期，仅存在标准格式，IDE位当时仍为保留位r1</p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241211103838836.png" alt="image-20241211103838836"></p>
+<p>CAN 2.0时期，ID不够用，出现了扩展格式，增加了ID的位数，为了区分标准格式与扩展格式，协议将标准格式中的r1赋予了新功能—IDE</p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241211103940322.png" alt="image-20241211103940322"></p>
+<h3 id="yao-kong-zheng">遥控帧</h3>
+<p>遥控帧无数据段，RTR为隐性电平1，其他部分与数据帧相同</p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241211104804170.png" alt="image-20241211104804170"></p>
+<h3 id="cuo-wu-zheng">错误帧</h3>
+<p>总线上所有设备都会监督总线的数据，一旦发现“位错误”或“填充错误”或“CRC错误”或“格式错误”或“应答错误” ，这些设备便会发出错误帧来破坏数据，同时终止当前的发送设备</p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241211105439974.png" alt="image-20241211105439974"></p>
+<h3 id="guo-zai-zheng">过载帧</h3>
+<p>当接收方收到大量数据而无法处理时，其可以发出过载帧，延缓发送方的数据发送，以平衡总线负载，避免数据丢失</p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241211105630400.png" alt="image-20241211105630400"></p>
+<h3 id="zheng-jian-ge">帧间隔</h3>
+<p>将数据帧和遥控帧与前面的帧分离开</p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241211191607718.png" alt="image-20241211191607718"></p>
+<h3 id="wei-tian-chong">位填充</h3>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241211180356925.png" alt="image-20241211180356925"></p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241211180336251.png" alt="image-20241211180336251"></p>
+<h3 id="bo-xing-shi-li">波形实例</h3>
+<h4 id="biao-zhun-shu-ju-zheng-bao-wen-id-wei-0-x-555-shu-ju-chang-du-1-zi-jie-shu-ju-nei-rong-wei-0-x-aa">标准数据帧，报文ID为0x555，数据长度1字节，数据内容为0xAA</h4>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241211113902996.png" alt="image-20241211113902996"></p>
+<blockquote>
+<p>[!NOTE]</p>
+<p>标准格式下，r0默认为显性电平，这样设计是为了让标准格式比扩展格式有更高的优先级。</p>
+<p>黄色高亮表示该bit为5个相同电平后的一个位填充。</p>
+<p>CRC界定符使得发送方能够在ACK槽前提前释放总线，这样接收方能够在ACK槽处发送显性电平。</p>
+<p>ACK界定符给接收方发送ACK后交回总线控制权留出时间，发送方随后能够发送EOF。</p>
+</blockquote>
+<h4 id="biao-zhun-shu-ju-zheng-bao-wen-id-wei-0-x-666-shu-ju-chang-du-2-zi-jie-shu-ju-nei-rong-wei-0-x-12-0-x-34">标准数据帧，报文ID为0x666，数据长度2字节，数据内容为0x12, 0x34</h4>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241211113920115.png" alt="image-20241211113920115"></p>
+<h4 id="kuo-zhan-shu-ju-zheng-bao-wen-id-wei-0-x-0789-abcd-shu-ju-chang-du-1-zi-jie-shu-ju-nei-rong-wei-0-x-56">扩展数据帧，报文ID为0x0789ABCD，数据长度1字节，数据内容为0x56</h4>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241211113931152.png" alt="image-20241211113931152"></p>
+<h4 id="biao-zhun-yao-kong-zheng-bao-wen-id-wei-0-x-088-shu-ju-chang-du-1-zi-jie-wu-shu-ju-nei-rong">标准遥控帧，报文ID为0x088，数据长度1字节，无数据内容</h4>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241211113944116.png" alt="image-20241211113944116"></p>
+<h2 id="jie-shou-fang-shu-ju-cai-yang-he-tong-bu-wen-ti">接收方数据采样和同步问题</h2>
+<ul>
+<li>CAN总线没有时钟线，总线上的所有设备通过约定波特率的方式确定每一个数据位的时长</li>
+<li>发送方以约定的位时长每隔固定时间输出一个数据位</li>
+<li>接收方以约定的位时长每隔固定时间采样总线的电平，输入一个数据位</li>
+<li>理想状态下，接收方能依次采样到发送方发出的每个数据位，且<mark>采样点位于数据位中心附近</mark></li>
+</ul>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241211125847282.png" alt="image-20241211125847282"></p>
+<h3 id="shu-ju-cai-yang-ke-neng-yu-dao-de-wen-ti">数据采样可能遇到的问题</h3>
+<p>接收方以约定的位时长进行采样，但是采样点没有对齐数据位中心附近</p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241211125923383.png" alt="image-20241211125923383"></p>
+<p>接收方刚开始采样正确，但是时钟有误差，随着误差积累，采样点逐渐偏离</p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241211125933990.png" alt="image-20241211125933990"></p>
+<blockquote>
+<p>[!NOTE]</p>
+<p>发送方和接收方的时钟都可能因自身的物理特性或环境因素导致不准的情况。</p>
+</blockquote>
+<h3 id="wei-shi-xu">位时序</h3>
+<p>为了<mark>灵活调整每个采样点的位置</mark>，<mark>使采样点对齐数据位中心附近</mark>，CAN总线对<mark>每一个数据位的时长</mark>进行了更细的划分，分为同步段（SS）、传播时间段（PTS）、相位缓冲段1（PBS1）和相位缓冲段2（PBS2），每个段又由若干个最小时间单位（Tq，Time Quantum）构成</p>
+<img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241211132431579.png" alt="image-20241211132431579" style="zoom:50%;">
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241211130818764.png" alt="image-20241211130818764"></p>
+<h3 id="ying-jian-tong-bu-hard-synchronization">硬件同步（Hard Synchronization）</h3>
+<ul>
+<li>每个设备都有一个位时序计时周期，当某个设备（发送方）率先发送报文，其他所有设备（接收方）收到SOF的下降沿时，接收方会将自己的位时序计时周期拨到SS段的位置，与发送方的位时序计时周期保持同步</li>
+<li>硬同步只在帧的第一个下降沿（SOF下降沿）有效</li>
+<li><mark>经过硬同步后，若发送方和接收方的时钟没有误差</mark>，则后续所有数据位的采样点必然都会对齐数据位中心附近</li>
+</ul>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241211131840885.png" alt="image-20241211131840885"></p>
+<h3 id="zai-tong-bu-resynchronization">再同步（Resynchronization）</h3>
+<ul>
+<li>若发送方或接收方的时钟有误差，随着<mark>误差积累，数据位边沿逐渐偏离SS段</mark>，则此时接收方根据再同步补偿宽度值（SJW）<mark>通过加长PBS1段，或缩短PBS2段，以调整同步</mark></li>
+<li><mark>再同步可以发生在第一个下降沿（SOF）之后的每个数据位跳变边沿</mark></li>
+</ul>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241211133115226.png" alt="image-20241211133115226"></p>
+<h3 id="diao-zheng-tong-bu-de-gui-ze">调整同步的规则</h3>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241211191214713.png" alt="image-20241211191214713"></p>
+<h3 id="bo-te-lu-ji-suan">波特率计算</h3>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241211133136193.png" alt="image-20241211133136193"></p>
+<h2 id="duo-she-bei-tong-shi-fa-song-yu-dao-de-wen-ti">多设备同时发送遇到的问题</h2>
+<ul>
+<li>
+<p>CAN总线只有一对差分信号线，同一时间只能有一个设备操作总线发送数据，若多个设备同时有发送需求，该如何分配总线资源？</p>
+</li>
+<li>
+<p>解决问题的思路：制定资源分配规则，依次满足多个设备的发送需求，确保同一时间只有一个设备操作总线</p>
+</li>
+</ul>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241211174841073.png" alt="image-20241211174841073"></p>
+<h3 id="zi-yuan-fen-pei-gui-ze-yi-xian-dao-xian-de">资源分配规则一：先到先得</h3>
+<ul>
+<li>若当前已经有设备正在操作总线发送数据帧/遥控帧，则其他任何设备不能再同时发送数据帧/遥控帧（可以发送错误帧/过载帧破坏当前数据）</li>
+<li>任何设备检测到<mark>连续11个隐性电平</mark>，即认为<mark>总线空闲</mark>，只有在总线空闲时，设备才能发送数据帧/遥控帧</li>
+<li>一旦有设备正在发送数据帧/遥控帧，总线就会变为活跃状态，必然不会出现连续11个隐性电平，其他设备自然也不会破坏当前发送</li>
+<li>若总线活跃状态其他设备有发送需求，则需要<mark>等待总线变为空闲</mark>，才能执行发送需求</li>
+</ul>
+<h3 id="zi-yuan-fen-pei-gui-ze-er-fei-po-pi-xing-zhong-cai">资源分配规则二：非破坏性仲裁</h3>
+<ul>
+<li>若多个设备的发送需求同时到来或因等待而同时到来，则CAN总线协议会根据ID号（仲裁段）进行非破坏性仲裁，ID号小的（优先级高）取到总线控制权，ID号大的（优先级低）仲裁失利后将转入接收状态，等待下一次总线空闲时再尝试发送</li>
+<li>实现非破坏性仲裁需要两个要求：
+<ul>
+<li><mark>线与特性</mark>：总线上任何一个设备发送显性电平0时，总线就会呈现显性电平0状态，只有当所有设备都发送隐性电平1时，总线才呈现隐性电平1状态，即：<code>0 &amp; X &amp; X = 0</code>，<code>1 &amp; 1 &amp; 1 = 1</code></li>
+<li><mark>回读机制</mark>：每个设备发出一个数据位后，都会读回总线当前的电平状态，以确认自己发出的电平是否被真实地发送出去了，根据线与特性，发出0读回必然是0，发出1读回不一定是1</li>
+</ul>
+</li>
+</ul>
+<h4 id="id-hao-da-de-zhong-cai-shi-li">ID号大的仲裁失利</h4>
+<p>数据位从前到后依次比较，出现差异且数据位为1的设备仲裁失利：</p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241211175242537.png" alt="image-20241211175242537"></p>
+<h4 id="shu-ju-zheng-he-yao-kong-zheng-de-you-xian-ji">数据帧和遥控帧的优先级</h4>
+<p>数据帧和遥控帧ID号一样时，数据帧的优先级高于遥控帧</p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241211175432015.png" alt="image-20241211175432015"></p>
+<h4 id="biao-zhun-ge-shi-he-kuo-zhan-ge-shi-de-you-xian-ji">标准格式和扩展格式的优先级</h4>
+<p>标准格式11位ID号和扩展格式29位ID号的<mark>高11位一样时</mark>，标准格式的优先级高于扩展格式（<mark>SRR必须始终为1，以保证此要求</mark>）</p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241211175707024.png" alt="image-20241211175707024"></p>
+<h2 id="cuo-wu-chu-li">错误处理</h2>
+<h3 id="zai-kan-cuo-wu-zheng-he-guo-zai-zheng">再看错误帧和过载帧</h3>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241211191507549.png" alt="image-20241211191507549"></p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241211191523945.png" alt="image-20241211191523945"></p>
+<h3 id="cuo-wu-de-chong-lei">错误的种类</h3>
+<p>错误共有 5 种。多种错误可能同时发生。</p>
+<ul>
+<li>位错误</li>
+<li>填充错误</li>
+<li>CRC 错误</li>
+<li>格式错误</li>
+<li>ACK 错误</li>
+</ul>
+<p>错误的种类、错误的内容、错误检测帧和检测单元如表 9 所示。</p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241211191701691.png" alt="image-20241211191701691"></p>
+<h3 id="cuo-wu-zhuang-tai-de-chong-lei">错误状态的种类</h3>
+<ul>
+<li>主动错误状态的设备正常参与通信并在检测到错误时发出<mark>主动错误帧</mark></li>
+<li>被动错误状态的设备正常参与通信但检测到错误时只能发出<mark>被动错误帧</mark></li>
+<li><mark>总线关闭状态</mark>的设备不能参与通信</li>
+<li><mark>每个设备内部管理一个TEC和REC，根据TEC和REC的值确定自己的状态</mark></li>
+</ul>
+<blockquote>
+<p>[!NOTE]</p>
+<p>TEC：Transmit Error Count，REC：Receive Error Count</p>
+</blockquote>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241211192417870.png" alt="image-20241211192417870"></p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241211192435203.png" alt="image-20241211192435203"></p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241211192528991.png" alt="image-20241211192528991"></p>
+<h3 id="cuo-wu-ji-shu-zhi">错误计数值</h3>
+<ul>
+<li>发送错误计数值和接收错误计数值根据一定的条件发生变化。错误计数值的变动条件如表 2 所示。</li>
+<li>一次数据的接收和发送可能同时满足多个条件。</li>
+<li>错误计数器在错误标志的第一个位出现的时间点上开始计数</li>
+</ul>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241211192847770.png" alt="image-20241211192847770"></p>
+<h3 id="bo-xing-shi-li-1">波形示例</h3>
+<p>设备处于<mark>主动错误状态</mark>，发送标准数据帧，<mark>正常传输</mark></p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241211194323125.png" alt="image-20241211194323125"></p>
+<p>设备处于<mark>主动错误状态</mark>，发送标准数据帧，<mark>检测到ACK错误</mark></p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241211194335826.png" alt="image-20241211194335826"></p>
+<p>设备处于<mark>被动错误状态</mark>，发送标准数据帧，<mark>检测到ACK错误</mark></p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241211194413309.png" alt="image-20241211194413309"></p>
+<h1 id="stm-32-de-can-wai-she-yi-stm-32-f-103-wei-li">STM32的CAN外设（以STM32F103为例）</h1>
+<p>STM32的芯片中具有bxCAN控制器（Basic Extended CAN），它<mark>支持CAN协议2.0A 和2.0B Active</mark>标准。（CAN2.0A只能处理标准数据帧且扩展帧的内容会织别错误。而CAN2.0 B Active可以处理标准数据帧和扩展数据帧。CAN2.0 B Passive只能处理标准数据帧而扩展帧的内容会被忽略）。</p>
+<ul>
+<li>该CAN控制器支持最高的通讯速率为1Mb/s；</li>
+<li>可以自动地接收和发送CAN报文，支持使用标准ID和扩展ID的报文；</li>
+<li>外设中具有<mark>3个发送邮箱</mark>，发送报文的<mark>优先级可以使用软件控制</mark>，还可以记录发送的时间；</li>
+<li>具有<mark>2个3级深度的接收FIFO</mark>，可使用<mark>过滤功能</mark>只接收或不接收某些ID号的报文；</li>
+<li>可配置成自动重发；</li>
+<li><mark>不支持使用DMA</mark>进行数据收发。</li>
+</ul>
+<h2 id="can-kong-zhi-qi-de-3-chong-gong-zuo-mo-shi">CAN控制器的3种工作模式</h2>
+<p>CAN控制器有3种工作模式：初始化模式，正常模式，睡眠模式。</p>
+<img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241211201002715.png" alt="image-20241211201002715" style="zoom:50%;">
+<p>上电复位后CAN控制器默认会进入睡眠模式，作用是降低功耗。当需要将进行初始的时候（配置寄存器），会进入初始化模式。当需要通讯的时候，就进入正常模式。</p>
+<h2 id="can-kong-zhi-qi-de-3-chong-ce-shi-mo-shi">CAN控制器的3种测试模式</h2>
+<p>有3种测试模式：静默模式、环回模式、环回静默模式。当控制器进入初始化模式的时候才可以配置测试模式。</p>
+<img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241211201844569.png" alt="image-20241211201844569" style="zoom:50%;">
+<h2 id="gong-neng-kuang-tu">功能框图</h2>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241212164440303.png" alt="image-20241212164440303"></p>
+<h3 id="zhu-dong-nei-he">主动内核</h3>
+<p>含各种控制/状态/配置寄存器，可以配置模式、波特率等。在STM32CubeMx中可以非常方便的配置。</p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241212163911496.png" alt="image-20241212163911496"></p>
+<h3 id="fa-song-you-xiang">发送邮箱</h3>
+<p>用来缓存待发送的报文，最多可以缓存3个报文。发送调度决定报文的发送顺序。</p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241212163930213.png" alt="image-20241212163930213"></p>
+<h3 id="jie-shou-fifo">接收FIFO</h3>
+<p>共有2个接收FIFO，每个FIFO都可以存放3个完整的报文。它们完全由硬件来管理。从而节省了CPU的处理负荷，简化了软件并保证了数据的一致性。应用程序只能通过读取FIFO输出邮箱，来读取FIFO中最先收到的报文。</p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241212163947526.png" alt="image-20241212163947526"></p>
+<h3 id="jie-shou-guo-lu-qi">接收过滤器</h3>
+<p>作用：对接到的报文进行过滤。最后放入FIFO 0或FIFO 1。</p>
+<p>当总线上报文数据量很大时，总线上的设备会频繁获取报文，占用CPU。过滤器的存在，选择性接收有效报文，减轻系统负担。</p>
+<p>有2种过滤模式：</p>
+<ul>
+<li>标识符列表模式，它把要接收报文的ID列成一个表，要求报文ID与列表中的某一个标识符完全相同才可以接收，可以理解为白名单管理。</li>
+<li>屏蔽位模式，允许将特定的bit设置为屏蔽模式，即不关心该bit是0还是1。</li>
+</ul>
+<p>如果使能了过滤器，且报文的ID与所有过滤器的配置都不匹配，CAN外设会丢弃该报文，不存入接收FIFO。</p>
+<p>每个CAN提供了14个位宽可变的、可配置的过滤器组(13~0)。每个过滤器组x由2个32位寄存器，CAN_FxR1和 CAN_FxR2组成。</p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241212163630363.png" alt="image-20241212163630363"></p>
+<p>说明：</p>
+<p>（1）当工作于32位屏蔽位模式时，FR1保存标识符，FR2保存屏蔽位。FR2某位是1表示来的ID的这位必须和FR1中对应的位一致，FR2某位是0，表示ID的这位不关心。</p>
+<p>（2）当工作于32位标识符模式时。FR1和FR2分别保存两个标识符。这意味着将来只有两个ID会匹配成功。</p>
+<h3 id="wei-shi-xu-1">位时序</h3>
+<blockquote>
+<p>[!NOTE]</p>
+<p>在协议标准的位时序基础上，STM32的CAN将PROP_SEG（传播缓冲段）和PHASE_SEG1（相位缓冲段1）合并为了一个BS1：</p>
+</blockquote>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241212165355790.png" alt="image-20241212165355790"></p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241212164957235.png" alt="image-20241212164957235"></p>
+<h1 id="shi-yan-1-hui-huan-jing-mo-mo-shi-ce-shi">实验1-回环静默模式测试</h1>
+<h2 id="ying-jian-lian-xian">硬件连线</h2>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241212153436025.png" alt="image-20241212153436025"></p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241212153634218.png" alt="image-20241212153634218"></p>
+<h2 id="rcc-shi-zhong-pei-zhi">RCC-时钟配置</h2>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token comment">/* 开启CAN外设、CAN引脚GPIO、引脚重定义AFIO时钟 */</span>
+RCC<span class="token operator">-&gt;</span>APB1ENR <span class="token operator">|=</span> RCC_APB1ENR_CAN1EN<span class="token punctuation">;</span>
+RCC<span class="token operator">-&gt;</span>APB2ENR <span class="token operator">|=</span> <span class="token punctuation">(</span>RCC_APB2ENR_IOPBEN <span class="token operator">|</span> RCC_APB2ENR_AFIOEN<span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+<h2 id="afio-wai-she-yin-jiao-fu-yong-zhong-ying-she">AFIO-外设引脚复用重映射</h2>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241212160109662.png" alt="image-20241212160109662"></p>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token comment">/* CAN引脚复用重映射 */</span>
+<span class="token comment">// REMAP=10</span>
+AFIO<span class="token operator">-&gt;</span>MAPR <span class="token operator">&amp;=</span> <span class="token operator">~</span>AFIO_MAPR_CAN_REMAP_0<span class="token punctuation">;</span>
+AFIO<span class="token operator">-&gt;</span>MAPR <span class="token operator">|=</span> AFIO_MAPR_CAN_REMAP_1<span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
+<h2 id="gpio-wai-she-yin-jiao-gong-zuo-mo-shi">GPIO-外设引脚工作模式</h2>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241212160148678.png" alt="image-20241212160148678"></p>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token comment">/* 配置CAN引脚的工作模式 PB8-RX：浮空输入 PB9-TX：复用推挽 */</span>
+<span class="token comment">// PB8 MODE=00 CNF=01</span>
+GPIOB<span class="token operator">-&gt;</span>CRH <span class="token operator">&amp;=</span> <span class="token operator">~</span>GPIO_CRH_MODE8<span class="token punctuation">;</span>
+GPIOB<span class="token operator">-&gt;</span>CRH <span class="token operator">|=</span> GPIO_CRH_CNF8_0<span class="token punctuation">;</span>
+GPIOB<span class="token operator">-&gt;</span>CRH <span class="token operator">&amp;=</span> <span class="token operator">~</span>GPIO_CRH_CNF8_1<span class="token punctuation">;</span>
+<span class="token comment">// PB9 MODE=11 CNF=10</span>
+GPIOB<span class="token operator">-&gt;</span>CRH <span class="token operator">|=</span> GPIO_CRH_MODE9<span class="token punctuation">;</span>
+GPIOB<span class="token operator">-&gt;</span>CRH <span class="token operator">&amp;=</span> <span class="token operator">~</span>GPIO_CRH_CNF9_0<span class="token punctuation">;</span>
+GPIOB<span class="token operator">-&gt;</span>CRH <span class="token operator">|=</span> GPIO_CRH_CNF9_1<span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<h2 id="can-wai-she-chu-shi-hua">CAN外设初始化</h2>
+<h3 id="can-ji-cun-qi-fang-wen-bao-hu">CAN寄存器访问保护</h3>
+<blockquote>
+<p>[!NOTE]</p>
+<ul>
+<li>CAN时序配置寄存器只能在CAN外设初始化模式下修改</li>
+<li>发送邮箱只能在其状态为空时被修改</li>
+<li>过滤器值只能在其被停用时修改（FINIT被置位或对应的过滤器组在CAN_FA1R中的状态为停用状态）；此外，过滤器配置（过滤值位宽、过滤模式、关联FIFO）只能在过滤器初始化模式下完成（FINIT为置位状态）</li>
+</ul>
+</blockquote>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241212161458197.png" alt="image-20241212161458197"></p>
+<h3 id="can-wai-she-chu-shi-hua-liu-cheng-fen-xi">CAN外设初始化流程分析</h3>
+<blockquote>
+<p>[!NOTE]</p>
+<ul>
+<li>CAN外设硬件复位后，默认处于睡眠模式以降低功耗
+<ul>
+<li>该模式下通过置位INRQ或SLEEP可以进入初始化/睡眠模式</li>
+<li>一旦模式切换完成，INAK或SLAK会被硬件置位</li>
+</ul>
+</li>
+<li>软件初始化CAN外设需要在其处于初始化模式时完成
+<ul>
+<li>软件可以通过置位INRQ进入CAN初始化模式，并需要等待INAK被硬件置位来确保硬件已进入该模式</li>
+<li>软件可以通过清除INRQ来退出初始化模式，退出完成时INAK会被硬件清除</li>
+<li>在该模式下，软件需要配置CAN参数寄存器（MCR）和位时序寄存器（BTR）来初始化CAN外设</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241212165741348.png" alt="image-20241212165741348"></p>
+<blockquote>
+<p>[!NOTE]</p>
+<ul>
+<li>为了初始化CAN过滤器组相关的寄存器（过滤模式、过滤器位宽、关联FIFO、过滤器激活、过滤值），软件必须置位FINIT</li>
+<li>单个过滤器组中过滤器值的初始化可以在CAN初始化模式中完成，也可以在CAN初始化模式之外操作</li>
+<li>注意
+<ul>
+<li>FINIT置位时，CAN外设接收功能是不工作的。</li>
+<li>如果想修改某个过滤器组的过滤值，可以通过CAN_FA1R先将其失活，然后进行修改。（FINIT是针对整个过滤器模块的全局状态，而CAN_FA1R则是针对某个单独的过滤器组配置激活/停用）</li>
+<li>如果不想使用某个过滤器组了，也建议通过CAN_FA1R将其设置为停用状态。</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241212171538693.png" alt="image-20241212171538693"></p>
+<blockquote>
+<p>[!NOTE]</p>
+<ul>
+<li>一旦完成了CAN外设的初始化，软件必须请求外设进入正常模式，以在CAN总线上取得同步，并开始接收和发送报文。</li>
+<li>通过清除INRQ可以请求外设进入正常模式。请求发出后，当CAN外设和CAN总线上传输的数据取得同步后（等待11个连续的隐形电平，即总线空闲状态），外设会进入正常模式并准备好参与总线活动。外设切换到正常模式后，会清除INAK。</li>
+<li>过滤器值的初始化不依赖CAN外设的初始化模式，但是必须在过滤器停用（见CAN_FA1R）时操作。</li>
+<li>过滤器位宽和过滤模式必须在进入正常模式之前配置。</li>
+</ul>
+</blockquote>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241212193910645.png" alt="image-20241212193910645"></p>
+<h3 id="qing-qiu-can-wai-she-jin-ru-chu-shi-hua-mo-shi">请求CAN外设进入初始化模式</h3>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token comment">/* CAN主要参数配置 */</span>
+<span class="token comment">// 复位后CAN外设默认处于睡眠模式</span>
+CAN1<span class="token operator">-&gt;</span>MCR <span class="token operator">|=</span> CAN_MCR_INRQ<span class="token punctuation">;</span> <span class="token comment">// 请求CAN外设进入初始化模式</span>
+<span class="token keyword">while</span> <span class="token punctuation">(</span><span class="token punctuation">(</span>CAN1<span class="token operator">-&gt;</span>MSR <span class="token operator">&amp;</span> CAN_MSR_INAK<span class="token punctuation">)</span> <span class="token operator">==</span> <span class="token number">0</span><span class="token punctuation">)</span> <span class="token punctuation">{</span> <span class="token comment">// 轮询等待CAN外设确认</span>
+<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<h3 id="can-zhu-yao-kong-zhi-can-shu-pei-zhi-mcr">CAN主要控制参数配置-MCR</h3>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token comment">// 发送FIFO队列中报文发送的优先级 0=&gt;ID小的先发 1=&gt;时间顺序先入队的先发</span>
+CAN1<span class="token operator">-&gt;</span>MCR <span class="token operator">|=</span> CAN_MCR_TXFP<span class="token punctuation">;</span> <span class="token comment">// 先入队先发</span>
+<span class="token comment">// 接收FIFO队列满后入队报文处理：0=&gt;覆盖先前的 1=&gt;丢弃</span>
+CAN1<span class="token operator">-&gt;</span>MCR <span class="token operator">|=</span> CAN_MCR_RFLM<span class="token punctuation">;</span> <span class="token comment">// 丢弃</span>
+<span class="token comment">// 是否停用自动重传（根据CAN协议规范，发生仲裁失利、错误处理等需要重传报文）</span>
+CAN1<span class="token operator">-&gt;</span>MCR <span class="token operator">|=</span> CAN_MCR_NART<span class="token punctuation">;</span> <span class="token comment">// 测试回环静默模式，不需要自动重传</span>
+<span class="token comment">// 是否启用自动唤醒模式（当检测到CAN报文时自动退出睡眠模式）</span>
+CAN1<span class="token operator">-&gt;</span>MCR <span class="token operator">|=</span> CAN_MCR_AWUM<span class="token punctuation">;</span> <span class="token comment">// 启用自动唤醒模式</span>
+<span class="token comment">// 是否启用自动离线管理（根据CAN标准，TEC超过255后节点会进入离线模式，当检测128次连续的11位隐形电平后可以恢复到主动错误状态）</span>
+CAN1<span class="token operator">-&gt;</span>MCR <span class="token operator">|=</span> CAN_MCR_ABOM<span class="token punctuation">;</span> <span class="token comment">// 启用自动离线管理（符合条件后，自动从离线状态恢复到主动错误状态）</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<h3 id="can-shi-xu-pei-zhi">CAN时序配置</h3>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token comment">/* CAN时序配置 */</span>
+<span class="token comment">// 配置1Tq时间 =&gt; (BRP + 1)*Tpclk，CAN1时钟36M，BRP配置为35，则1Tq=1us</span>
+CAN1<span class="token operator">-&gt;</span>BTR <span class="token operator">&amp;=</span> <span class="token operator">~</span>CAN_BTR_BRP<span class="token punctuation">;</span>
+CAN1<span class="token operator">-&gt;</span>BTR <span class="token operator">|=</span> <span class="token punctuation">(</span><span class="token number">36</span> <span class="token operator">-</span> <span class="token number">1</span><span class="token punctuation">)</span> <span class="token operator">&lt;&lt;</span> <span class="token number">0</span><span class="token punctuation">;</span>
+<span class="token comment">// 位时序配置</span>
+<span class="token comment">// 同步段固定为1Tq，TS1配置为3Tq，TS2配置6Tq，1bit时间为10Tq=10us，波特率为100kbps</span>
+CAN1<span class="token operator">-&gt;</span>BTR <span class="token operator">&amp;=</span> <span class="token operator">~</span>CAN_BTR_TS1<span class="token punctuation">;</span>
+CAN1<span class="token operator">-&gt;</span>BTR <span class="token operator">|=</span> <span class="token punctuation">(</span><span class="token number">3</span> <span class="token operator">-</span> <span class="token number">1</span><span class="token punctuation">)</span> <span class="token operator">&lt;&lt;</span> <span class="token number">16</span><span class="token punctuation">;</span>
+CAN1<span class="token operator">-&gt;</span>BTR <span class="token operator">&amp;=</span> <span class="token operator">~</span>CAN_BTR_TS2<span class="token punctuation">;</span>
+CAN1<span class="token operator">-&gt;</span>BTR <span class="token operator">|=</span> <span class="token punctuation">(</span><span class="token number">6</span> <span class="token operator">-</span> <span class="token number">1</span><span class="token punctuation">)</span> <span class="token operator">&lt;&lt;</span> <span class="token number">20</span><span class="token punctuation">;</span>
+<span class="token comment">// 再同步时，需要增加或减少Tq来调整bit时间（调整值称为跳跃宽度），该参数表示允许CAN外设执行再同步时跳跃宽度的最大值（限制过度补偿）</span>
+CAN1<span class="token operator">-&gt;</span>BTR <span class="token operator">&amp;=</span> <span class="token operator">~</span>CAN_BTR_SJW<span class="token punctuation">;</span>
+CAN1<span class="token operator">-&gt;</span>BTR <span class="token operator">|=</span> <span class="token punctuation">(</span><span class="token number">2</span> <span class="token operator">-</span> <span class="token number">1</span><span class="token punctuation">)</span> <span class="token operator">&lt;&lt;</span> <span class="token number">24</span><span class="token punctuation">;</span> <span class="token comment">// 允许的最大跳跃宽度为2Tq</span>
+<span class="token comment">// 开启测试模式：回环模式+静默模式，即不发到总线上，也不从总线接收，仅自己发给自己</span>
+CAN1<span class="token operator">-&gt;</span>BTR <span class="token operator">|=</span> CAN_BTR_LBKM<span class="token punctuation">;</span>
+CAN1<span class="token operator">-&gt;</span>BTR <span class="token operator">|=</span> CAN_BTR_SILM<span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<h3 id="can-guo-lu-qi-pei-zhi">CAN过滤器配置</h3>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241213084354231.png" alt="image-20241213084354231"></p>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token comment">/* 配置过滤器 */</span>
+<span class="token comment">// 过滤模式 0=&gt;掩码模式 1=&gt;清单模式（白名单）</span>
+CAN1<span class="token operator">-&gt;</span>FM1R <span class="token operator">&amp;=</span> <span class="token operator">~</span>CAN_FM1R_FBM0<span class="token punctuation">;</span> <span class="token comment">// 过滤器1配置为掩码模式</span>
+<span class="token comment">// 过滤器位宽配置</span>
+CAN1<span class="token operator">-&gt;</span>FS1R <span class="token operator">|=</span> CAN_FS1R_FSC0<span class="token punctuation">;</span> <span class="token comment">// 过滤值配置为32位（可以过滤11位ID和29位ID）</span>
+<span class="token comment">// 分配FIFO，过滤器匹配后递交给那个接收FIFO</span>
+CAN1<span class="token operator">-&gt;</span>FFA1R <span class="token operator">&amp;=</span> <span class="token operator">~</span>CAN_FFA1R_FFA0<span class="token punctuation">;</span> <span class="token comment">// 过滤器1分配给FIFO0</span>
+<span class="token comment">// 过滤器1的过滤值和屏蔽位</span>
+CAN1<span class="token operator">-&gt;</span>sFilterRegister<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">.</span>FR1 <span class="token operator">=</span> <span class="token number">0x00000000</span><span class="token punctuation">;</span> <span class="token comment">// 过滤值为0</span>
+CAN1<span class="token operator">-&gt;</span>sFilterRegister<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">.</span>FR2 <span class="token operator">=</span>
+    <span class="token number">0x00000000</span><span class="token punctuation">;</span> <span class="token comment">// 屏蔽为0表示该bit不关心，不需要和过滤值相应bit进行比较</span>
+<span class="token comment">// 激活过滤器1</span>
+CAN1<span class="token operator">-&gt;</span>FA1R <span class="token operator">|=</span> CAN_FA1R_FACT0<span class="token punctuation">;</span>
+<span class="token comment">// 进入过滤器激活模式</span>
+CAN1<span class="token operator">-&gt;</span>FMR <span class="token operator">&amp;=</span> <span class="token operator">~</span>CAN_FMR_FINIT<span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<h3 id="qing-qiu-can-wai-she-jin-ru-zheng-chang-mo-shi">请求CAN外设进入正常模式</h3>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token comment">// 请求CAN外设进入正常模式</span>
+CAN1<span class="token operator">-&gt;</span>MCR <span class="token operator">&amp;=</span> <span class="token operator">~</span>CAN_MCR_INRQ<span class="token punctuation">;</span>
+<span class="token comment">// 轮询等待外设确认</span>
+<span class="token keyword">while</span> <span class="token punctuation">(</span><span class="token punctuation">(</span>CAN1<span class="token operator">-&gt;</span>MSR <span class="token operator">&amp;</span> CAN_MSR_INAK<span class="token punctuation">)</span> <span class="token operator">==</span> <span class="token number">1</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<h3 id="wan-zheng-dai-ma">完整代码</h3>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">CAN_GPIOConfig</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token comment">/* CAN引脚复用重映射 */</span>
+    <span class="token comment">// REMAP=10</span>
+    AFIO<span class="token operator">-&gt;</span>MAPR <span class="token operator">&amp;=</span> <span class="token operator">~</span>AFIO_MAPR_CAN_REMAP_0<span class="token punctuation">;</span>
+    AFIO<span class="token operator">-&gt;</span>MAPR <span class="token operator">|=</span> AFIO_MAPR_CAN_REMAP_1<span class="token punctuation">;</span>
+
+    <span class="token comment">/* 配置CAN引脚的工作模式 PB8-RX：浮空输入 PB9-TX：复用推挽 */</span>
+    <span class="token comment">// PB8 MODE=00 CNF=01</span>
+    GPIOB<span class="token operator">-&gt;</span>CRH <span class="token operator">&amp;=</span> <span class="token operator">~</span>GPIO_CRH_MODE8<span class="token punctuation">;</span>
+    GPIOB<span class="token operator">-&gt;</span>CRH <span class="token operator">|=</span> GPIO_CRH_CNF8_0<span class="token punctuation">;</span>
+    GPIOB<span class="token operator">-&gt;</span>CRH <span class="token operator">&amp;=</span> <span class="token operator">~</span>GPIO_CRH_CNF8_1<span class="token punctuation">;</span>
+    <span class="token comment">// PB9 MODE=11 CNF=10</span>
+    GPIOB<span class="token operator">-&gt;</span>CRH <span class="token operator">|=</span> GPIO_CRH_MODE9<span class="token punctuation">;</span>
+    GPIOB<span class="token operator">-&gt;</span>CRH <span class="token operator">&amp;=</span> <span class="token operator">~</span>GPIO_CRH_CNF9_0<span class="token punctuation">;</span>
+    GPIOB<span class="token operator">-&gt;</span>CRH <span class="token operator">|=</span> GPIO_CRH_CNF9_1<span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">void</span> <span class="token function">CAN_Init</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token comment">/* 开启CAN外设、CAN引脚GPIO、引脚重定义AFIO时钟 */</span>
+    RCC<span class="token operator">-&gt;</span>APB1ENR <span class="token operator">|=</span> RCC_APB1ENR_CAN1EN<span class="token punctuation">;</span>
+    RCC<span class="token operator">-&gt;</span>APB2ENR <span class="token operator">|=</span> <span class="token punctuation">(</span>RCC_APB2ENR_IOPBEN <span class="token operator">|</span> RCC_APB2ENR_AFIOEN<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token function">CAN_GPIOConfig</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token comment">/* CAN主要参数配置 */</span>
+    <span class="token comment">// 复位后CAN外设默认处于睡眠模式</span>
+    CAN1<span class="token operator">-&gt;</span>MCR <span class="token operator">|=</span> CAN_MCR_INRQ<span class="token punctuation">;</span> <span class="token comment">// 请求CAN外设进入初始化模式</span>
+    <span class="token keyword">while</span> <span class="token punctuation">(</span><span class="token punctuation">(</span>CAN1<span class="token operator">-&gt;</span>MSR <span class="token operator">&amp;</span> CAN_MSR_INAK<span class="token punctuation">)</span> <span class="token operator">==</span> <span class="token number">0</span><span class="token punctuation">)</span> <span class="token punctuation">{</span> <span class="token comment">// 轮询等待CAN外设确认</span>
+    <span class="token punctuation">}</span>
+    <span class="token comment">// 发送FIFO队列中报文发送的优先级 0=&gt;ID小的先发 1=&gt;时间顺序先入队的先发</span>
+    CAN1<span class="token operator">-&gt;</span>MCR <span class="token operator">|=</span> CAN_MCR_TXFP<span class="token punctuation">;</span> <span class="token comment">// 先入队先发</span>
+    <span class="token comment">// 接收FIFO队列满后入队报文处理：0=&gt;覆盖先前的 1=&gt;丢弃</span>
+    CAN1<span class="token operator">-&gt;</span>MCR <span class="token operator">|=</span> CAN_MCR_RFLM<span class="token punctuation">;</span> <span class="token comment">// 丢弃</span>
+    <span class="token comment">// 是否停用自动重传（根据CAN协议规范，发生仲裁失利、错误处理等需要重传报文）</span>
+    CAN1<span class="token operator">-&gt;</span>MCR <span class="token operator">|=</span> CAN_MCR_NART<span class="token punctuation">;</span> <span class="token comment">// 测试回环静默模式，不需要自动重传</span>
+    <span class="token comment">// 是否启用自动唤醒模式（当检测到CAN报文时自动退出睡眠模式）</span>
+    CAN1<span class="token operator">-&gt;</span>MCR <span class="token operator">|=</span> CAN_MCR_AWUM<span class="token punctuation">;</span> <span class="token comment">// 启用自动唤醒模式</span>
+    <span class="token comment">// 是否启用自动离线管理（根据CAN标准，TEC超过255后节点会进入离线模式，当检测128次连续的11位隐形电平后可以恢复到主动错误状态）</span>
+    CAN1<span class="token operator">-&gt;</span>MCR <span class="token operator">|=</span> CAN_MCR_ABOM<span class="token punctuation">;</span> <span class="token comment">// 启用自动离线管理（符合条件后，自动从离线状态恢复到主动错误状态）</span>
+
+    <span class="token comment">/* CAN时序配置 */</span>
+    <span class="token comment">// 配置1Tq时间 =&gt; (BRP + 1)*Tpclk，CAN1时钟36M，BRP配置为35，则1Tq=1us</span>
+    CAN1<span class="token operator">-&gt;</span>BTR <span class="token operator">&amp;=</span> <span class="token operator">~</span>CAN_BTR_BRP<span class="token punctuation">;</span>
+    CAN1<span class="token operator">-&gt;</span>BTR <span class="token operator">|=</span> <span class="token punctuation">(</span><span class="token number">36</span> <span class="token operator">-</span> <span class="token number">1</span><span class="token punctuation">)</span> <span class="token operator">&lt;&lt;</span> <span class="token number">0</span><span class="token punctuation">;</span>
+    <span class="token comment">// 位时序配置</span>
+    <span class="token comment">// 同步段固定为1Tq，TS1配置为3Tq，TS2配置6Tq，1bit时间为10Tq=10us，波特率为100kbps</span>
+    CAN1<span class="token operator">-&gt;</span>BTR <span class="token operator">&amp;=</span> <span class="token operator">~</span>CAN_BTR_TS1<span class="token punctuation">;</span>
+    CAN1<span class="token operator">-&gt;</span>BTR <span class="token operator">|=</span> <span class="token punctuation">(</span><span class="token number">3</span> <span class="token operator">-</span> <span class="token number">1</span><span class="token punctuation">)</span> <span class="token operator">&lt;&lt;</span> <span class="token number">16</span><span class="token punctuation">;</span>
+    CAN1<span class="token operator">-&gt;</span>BTR <span class="token operator">&amp;=</span> <span class="token operator">~</span>CAN_BTR_TS2<span class="token punctuation">;</span>
+    CAN1<span class="token operator">-&gt;</span>BTR <span class="token operator">|=</span> <span class="token punctuation">(</span><span class="token number">6</span> <span class="token operator">-</span> <span class="token number">1</span><span class="token punctuation">)</span> <span class="token operator">&lt;&lt;</span> <span class="token number">20</span><span class="token punctuation">;</span>
+    <span class="token comment">// 再同步时，需要增加或减少Tq来调整bit时间（调整值称为跳跃宽度），该参数表示允许CAN外设执行再同步时跳跃宽度的最大值（限制过度补偿）</span>
+    CAN1<span class="token operator">-&gt;</span>BTR <span class="token operator">&amp;=</span> <span class="token operator">~</span>CAN_BTR_SJW<span class="token punctuation">;</span>
+    CAN1<span class="token operator">-&gt;</span>BTR <span class="token operator">|=</span> <span class="token punctuation">(</span><span class="token number">2</span> <span class="token operator">-</span> <span class="token number">1</span><span class="token punctuation">)</span> <span class="token operator">&lt;&lt;</span> <span class="token number">24</span><span class="token punctuation">;</span> <span class="token comment">// 允许的最大跳跃宽度为2Tq</span>
+    <span class="token comment">// 开启测试模式：回环模式+静默模式，即不发到总线上，也不从总线接收，仅自己发给自己</span>
+    CAN1<span class="token operator">-&gt;</span>BTR <span class="token operator">|=</span> CAN_BTR_LBKM<span class="token punctuation">;</span>
+    CAN1<span class="token operator">-&gt;</span>BTR <span class="token operator">|=</span> CAN_BTR_SILM<span class="token punctuation">;</span>
+
+    <span class="token comment">/* 配置过滤器 */</span>
+    <span class="token comment">// 过滤模式 0=&gt;掩码模式 1=&gt;清单模式（白名单）</span>
+    CAN1<span class="token operator">-&gt;</span>FM1R <span class="token operator">&amp;=</span> <span class="token operator">~</span>CAN_FM1R_FBM0<span class="token punctuation">;</span> <span class="token comment">// 过滤器1配置为掩码模式</span>
+    <span class="token comment">// 过滤器位宽配置</span>
+    CAN1<span class="token operator">-&gt;</span>FS1R <span class="token operator">|=</span> CAN_FS1R_FSC0<span class="token punctuation">;</span> <span class="token comment">// 过滤值配置为32位（可以过滤11位ID和29位ID）</span>
+    <span class="token comment">// 分配FIFO，过滤器匹配后递交给那个接收FIFO</span>
+    CAN1<span class="token operator">-&gt;</span>FFA1R <span class="token operator">&amp;=</span> <span class="token operator">~</span>CAN_FFA1R_FFA0<span class="token punctuation">;</span> <span class="token comment">// 过滤器1分配给FIFO0</span>
+    <span class="token comment">// 过滤器1的过滤值和屏蔽位</span>
+    CAN1<span class="token operator">-&gt;</span>sFilterRegister<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">.</span>FR1 <span class="token operator">=</span> <span class="token number">0x00000000</span><span class="token punctuation">;</span> <span class="token comment">// 过滤值为0</span>
+    CAN1<span class="token operator">-&gt;</span>sFilterRegister<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">.</span>FR2 <span class="token operator">=</span>
+        <span class="token number">0x00000000</span><span class="token punctuation">;</span> <span class="token comment">// 屏蔽为0表示该bit不关心，不需要和过滤值相应bit进行比较</span>
+    <span class="token comment">// 激活过滤器1</span>
+    CAN1<span class="token operator">-&gt;</span>FA1R <span class="token operator">|=</span> CAN_FA1R_FACT0<span class="token punctuation">;</span>
+    <span class="token comment">// 进入过滤器激活模式</span>
+    CAN1<span class="token operator">-&gt;</span>FMR <span class="token operator">&amp;=</span> <span class="token operator">~</span>CAN_FMR_FINIT<span class="token punctuation">;</span>
+
+    <span class="token comment">// 请求CAN外设进入正常模式</span>
+    CAN1<span class="token operator">-&gt;</span>MCR <span class="token operator">&amp;=</span> <span class="token operator">~</span>CAN_MCR_INRQ<span class="token punctuation">;</span>
+    <span class="token comment">// 轮询等待外设确认</span>
+    <span class="token keyword">while</span> <span class="token punctuation">(</span><span class="token punctuation">(</span>CAN1<span class="token operator">-&gt;</span>MSR <span class="token operator">&amp;</span> CAN_MSR_INAK<span class="token punctuation">)</span> <span class="token operator">==</span> <span class="token number">1</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<h2 id="fa-song-bao-wen">发送报文</h2>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token keyword">void</span> <span class="token function">CAN_SendMsg</span><span class="token punctuation">(</span><span class="token class-name">uint16_t</span> stdId<span class="token punctuation">,</span> <span class="token class-name">uint8_t</span> <span class="token operator">*</span>data<span class="token punctuation">,</span> <span class="token class-name">uint8_t</span> len<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>len <span class="token operator">&gt;</span> <span class="token number">8</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token function">LOG_ERROR</span><span class="token punctuation">(</span><span class="token string">"最多只能发送8个字节"</span><span class="token punctuation">)</span>
+        <span class="token keyword">return</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    <span class="token comment">// 如果发送邮箱0不为空，则轮询等待</span>
+    <span class="token keyword">while</span> <span class="token punctuation">(</span><span class="token punctuation">(</span>CAN1<span class="token operator">-&gt;</span>TSR <span class="token operator">&amp;</span> CAN_TSR_TME0<span class="token punctuation">)</span> <span class="token operator">==</span> <span class="token number">0</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token punctuation">}</span>
+    <span class="token comment">/* 配置发送邮箱0 */</span>
+    <span class="token comment">// ID配置</span>
+    <span class="token comment">// 标准格式，扩展格式</span>
+    CAN1<span class="token operator">-&gt;</span>sTxMailBox<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">.</span>TIR <span class="token operator">&amp;=</span> <span class="token operator">~</span>CAN_TI0R_IDE<span class="token punctuation">;</span>
+    <span class="token comment">// 数据帧，远程帧配置</span>
+    CAN1<span class="token operator">-&gt;</span>sTxMailBox<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">.</span>TIR <span class="token operator">&amp;=</span> <span class="token operator">~</span>CAN_TI0R_RTR<span class="token punctuation">;</span>
+    <span class="token comment">// 设置ID</span>
+    CAN1<span class="token operator">-&gt;</span>sTxMailBox<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">.</span>TIR <span class="token operator">&amp;=</span> <span class="token operator">~</span>CAN_TI0R_STID<span class="token punctuation">;</span>
+    CAN1<span class="token operator">-&gt;</span>sTxMailBox<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">.</span>TIR <span class="token operator">|=</span> <span class="token punctuation">(</span>stdId <span class="token operator">&lt;&lt;</span> <span class="token number">21</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token comment">// 设置数据长度</span>
+    CAN1<span class="token operator">-&gt;</span>sTxMailBox<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">.</span>TDTR <span class="token operator">&amp;=</span> <span class="token operator">~</span>CAN_TDT0R_DLC<span class="token punctuation">;</span>
+    CAN1<span class="token operator">-&gt;</span>sTxMailBox<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">.</span>TDTR <span class="token operator">|=</span> <span class="token punctuation">(</span><span class="token punctuation">(</span>len <span class="token operator">&amp;</span> <span class="token number">0x0F</span><span class="token punctuation">)</span> <span class="token operator">&lt;&lt;</span> <span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token comment">// 设置数据字节</span>
+    CAN1<span class="token operator">-&gt;</span>sTxMailBox<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">.</span>TDLR <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
+    CAN1<span class="token operator">-&gt;</span>sTxMailBox<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">.</span>TDHR <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
+    <span class="token keyword">for</span> <span class="token punctuation">(</span><span class="token class-name">uint8_t</span> i <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span> i <span class="token operator">&lt;</span> len<span class="token punctuation">;</span> i<span class="token operator">++</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>i <span class="token operator">&lt;</span> <span class="token number">4</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            CAN1<span class="token operator">-&gt;</span>sTxMailBox<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">.</span>TDLR <span class="token operator">|=</span> <span class="token punctuation">(</span>data<span class="token punctuation">[</span>i<span class="token punctuation">]</span> <span class="token operator">&lt;&lt;</span> <span class="token punctuation">(</span>i <span class="token operator">*</span> <span class="token number">8</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
+            CAN1<span class="token operator">-&gt;</span>sTxMailBox<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">.</span>TDHR <span class="token operator">|=</span> <span class="token punctuation">(</span>data<span class="token punctuation">[</span>i<span class="token punctuation">]</span> <span class="token operator">&lt;&lt;</span> <span class="token punctuation">(</span><span class="token punctuation">(</span>i <span class="token operator">-</span> <span class="token number">4</span><span class="token punctuation">)</span> <span class="token operator">*</span> <span class="token number">8</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+    <span class="token comment">// 请求发送数据</span>
+    CAN1<span class="token operator">-&gt;</span>sTxMailBox<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">.</span>TIR <span class="token operator">|=</span> CAN_TI0R_TXRQ<span class="token punctuation">;</span>
+<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<h2 id="jie-shou-bao-wen">接收报文</h2>
+<blockquote>
+<p>[!NOTE]</p>
+<p>接收时使用的是封装好的FIFO模型，虽然我们知道FIFO中有3个邮箱，但是在STM32的API设计中，我们只能通过 <code>CAN_TypeDef#sFIFOMailBox[0]</code>访问FIFO0中的队首报文，并通过 <code>CAN1-&gt;RF0R |= CAN_RF0R_RFOM0</code>来释放（出队）FIFO0的队首报文。</p>
+</blockquote>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token keyword">void</span> <span class="token function">CAN_ReceiveMsg</span><span class="token punctuation">(</span>CAN_RxMsgStruct <span class="token operator">*</span>msgBuf<span class="token punctuation">,</span> <span class="token class-name">uint8_t</span> <span class="token operator">*</span>msgSize<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token comment">// 获取接收FIFO0中的报文数量</span>
+ 	<span class="token operator">*</span>msgSize <span class="token operator">=</span> <span class="token punctuation">(</span>CAN1<span class="token operator">-&gt;</span>RF0R <span class="token operator">&amp;</span> CAN_RF0R_FMP0<span class="token punctuation">)</span> <span class="token operator">&gt;&gt;</span> <span class="token number">0</span><span class="token punctuation">;</span>
+    <span class="token keyword">for</span> <span class="token punctuation">(</span><span class="token class-name">uint8_t</span> i <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span> i <span class="token operator">&lt;</span> <span class="token operator">*</span>msgSize<span class="token punctuation">;</span> i<span class="token operator">++</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        CAN_RxMsgStruct <span class="token operator">*</span>buf <span class="token operator">=</span> msgBuf <span class="token operator">+</span> i<span class="token punctuation">;</span>
+        <span class="token comment">// 获取FIFO0队首报文</span>
+        CAN_FIFOMailBox_TypeDef <span class="token operator">*</span>msg <span class="token operator">=</span> <span class="token operator">&amp;</span><span class="token punctuation">(</span>CAN1<span class="token operator">-&gt;</span>sFIFOMailBox<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token comment">// 解析报文</span>
+        buf<span class="token operator">-&gt;</span>stdId <span class="token operator">=</span> <span class="token punctuation">(</span>msg<span class="token operator">-&gt;</span>RIR <span class="token operator">&amp;</span> CAN_RI0R_STID<span class="token punctuation">)</span> <span class="token operator">&gt;&gt;</span> <span class="token number">21</span><span class="token punctuation">;</span>
+        buf<span class="token operator">-&gt;</span>len <span class="token operator">=</span> <span class="token punctuation">(</span>msg<span class="token operator">-&gt;</span>RDTR <span class="token operator">&amp;</span> CAN_RDT0R_DLC<span class="token punctuation">)</span> <span class="token operator">&gt;&gt;</span> <span class="token number">0</span><span class="token punctuation">;</span>
+        <span class="token keyword">for</span> <span class="token punctuation">(</span><span class="token class-name">uint8_t</span> j <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span> j <span class="token operator">&lt;</span> buf<span class="token operator">-&gt;</span>len<span class="token punctuation">;</span> j<span class="token operator">++</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token keyword">if</span> <span class="token punctuation">(</span>j <span class="token operator">&lt;</span> <span class="token number">4</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                buf<span class="token operator">-&gt;</span>data<span class="token punctuation">[</span>j<span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token punctuation">(</span>msg<span class="token operator">-&gt;</span>RDLR <span class="token operator">&gt;&gt;</span> <span class="token punctuation">(</span>j <span class="token operator">*</span> <span class="token number">8</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token operator">&amp;</span> <span class="token number">0xFF</span><span class="token punctuation">;</span>
+            <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
+                buf<span class="token operator">-&gt;</span>data<span class="token punctuation">[</span>j<span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token punctuation">(</span>msg<span class="token operator">-&gt;</span>RDHR <span class="token operator">&gt;&gt;</span> <span class="token punctuation">(</span><span class="token punctuation">(</span>j <span class="token operator">-</span> <span class="token number">4</span><span class="token punctuation">)</span> <span class="token operator">*</span> <span class="token number">8</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token operator">&amp;</span> <span class="token number">0xFF</span><span class="token punctuation">;</span>
+            <span class="token punctuation">}</span>
+        <span class="token punctuation">}</span>
+        <span class="token comment">// 释放FIFO0队首报文（出队）</span>
+        CAN1<span class="token operator">-&gt;</span>RF0R <span class="token operator">|=</span> CAN_RF0R_RFOM0<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<h2 id="gou-jian-jie-xi-bao-wen-you-hua-wei-yun-suan">构建/解析报文优化（位运算）</h2>
+<blockquote>
+<p>[!NOTE]</p>
+<p>⚠️值得注意的是：通过掩码和按位与从寄存器中取某个字段的值时，经常容易忘记右移以让其最低有效位和bit0对齐。可以封装一个从寄存器取字段值的函数，并通过入参强制传入移位参数。</p>
+</blockquote>
+<h3 id="wei-yun-suan-feng-zhuang-gui-fan-bi-yao-ru-can">位运算封装，规范必要入参</h3>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name function">GET_REG_FIELD</span><span class="token expression"><span class="token punctuation">(</span>regVal<span class="token punctuation">,</span> fieldMask<span class="token punctuation">,</span> shift<span class="token punctuation">)</span> <span class="token punctuation">(</span><span class="token punctuation">(</span>regVal <span class="token operator">&amp;</span> fieldMask<span class="token punctuation">)</span> <span class="token operator">&gt;&gt;</span> shift<span class="token punctuation">)</span></span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name function">GET_REG_BYTE</span><span class="token expression"><span class="token punctuation">(</span>regVal<span class="token punctuation">,</span> byteIndex<span class="token punctuation">)</span> <span class="token punctuation">(</span><span class="token punctuation">(</span>regVal <span class="token operator">&gt;&gt;</span> <span class="token punctuation">(</span>byteIndex <span class="token operator">*</span> <span class="token number">8</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token operator">&amp;</span> <span class="token number">0xFF</span><span class="token punctuation">)</span></span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name function">SET_REG_BYTE</span><span class="token expression"><span class="token punctuation">(</span>reg<span class="token punctuation">,</span> byteIndex<span class="token punctuation">,</span> byteData<span class="token punctuation">)</span> <span class="token punctuation">(</span>reg <span class="token operator">|=</span> <span class="token punctuation">(</span>byteData <span class="token operator">&lt;&lt;</span> <span class="token punctuation">(</span><span class="token punctuation">(</span>byteIndex<span class="token punctuation">)</span> <span class="token operator">*</span> <span class="token number">8</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span></span></span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+<h3 id="gou-jian-bao-wen">构建报文</h3>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token comment">// 设置数据字节</span>
+CAN1<span class="token operator">-&gt;</span>sTxMailBox<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">.</span>TDLR <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
+CAN1<span class="token operator">-&gt;</span>sTxMailBox<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">.</span>TDHR <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
+<span class="token keyword">for</span> <span class="token punctuation">(</span><span class="token class-name">uint8_t</span> i <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span> i <span class="token operator">&lt;</span> len<span class="token punctuation">;</span> i<span class="token operator">++</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>i <span class="token operator">&lt;</span> <span class="token number">4</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token function">SET_REG_BYTE</span><span class="token punctuation">(</span>CAN1<span class="token operator">-&gt;</span>sTxMailBox<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">.</span>TDLR<span class="token punctuation">,</span> i<span class="token punctuation">,</span> data<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
+        <span class="token function">SET_REG_BYTE</span><span class="token punctuation">(</span>CAN1<span class="token operator">-&gt;</span>sTxMailBox<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">.</span>TDHR<span class="token punctuation">,</span> i <span class="token operator">-</span> <span class="token number">4</span><span class="token punctuation">,</span> data<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<h3 id="jie-xi-bao-wen">解析报文</h3>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token comment">// 解析报文</span>
+buf<span class="token operator">-&gt;</span>stdId <span class="token operator">=</span> <span class="token function">GET_REG_FIELD</span><span class="token punctuation">(</span>msg<span class="token operator">-&gt;</span>RIR<span class="token punctuation">,</span> CAN_RI0R_STID<span class="token punctuation">,</span> <span class="token number">21</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+buf<span class="token operator">-&gt;</span>len <span class="token operator">=</span> <span class="token function">GET_REG_FIELD</span><span class="token punctuation">(</span>msg<span class="token operator">-&gt;</span>RDTR<span class="token punctuation">,</span> CAN_RDT0R_DLC<span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">for</span> <span class="token punctuation">(</span><span class="token class-name">uint8_t</span> j <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span> j <span class="token operator">&lt;</span> buf<span class="token operator">-&gt;</span>len<span class="token punctuation">;</span> j<span class="token operator">++</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>j <span class="token operator">&lt;</span> <span class="token number">4</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        buf<span class="token operator">-&gt;</span>data<span class="token punctuation">[</span>j<span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token function">GET_REG_BYTE</span><span class="token punctuation">(</span>msg<span class="token operator">-&gt;</span>RDLR<span class="token punctuation">,</span> j<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
+        buf<span class="token operator">-&gt;</span>data<span class="token punctuation">[</span>j<span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token function">GET_REG_BYTE</span><span class="token punctuation">(</span>msg<span class="token operator">-&gt;</span>RDHR<span class="token punctuation">,</span> <span class="token punctuation">(</span>j <span class="token operator">-</span> <span class="token number">4</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<h2 id="shi-li-dai-ma">示例代码</h2>
+<h3 id="can-h">can.h</h3>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">ifndef</span> <span class="token expression">__CAN_H__</span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name">__CAN_H__</span></span>
+
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">"stm32f10x.h"</span></span>
+
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name function">GET_REG_FIELD</span><span class="token expression"><span class="token punctuation">(</span>regVal<span class="token punctuation">,</span> fieldMask<span class="token punctuation">,</span> shift<span class="token punctuation">)</span> <span class="token punctuation">(</span><span class="token punctuation">(</span>regVal <span class="token operator">&amp;</span> fieldMask<span class="token punctuation">)</span> <span class="token operator">&gt;&gt;</span> shift<span class="token punctuation">)</span></span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name function">GET_REG_BYTE</span><span class="token expression"><span class="token punctuation">(</span>regVal<span class="token punctuation">,</span> byteIndex<span class="token punctuation">)</span> <span class="token punctuation">(</span><span class="token punctuation">(</span>regVal <span class="token operator">&gt;&gt;</span> <span class="token punctuation">(</span>byteIndex <span class="token operator">*</span> <span class="token number">8</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token operator">&amp;</span> <span class="token number">0xFF</span><span class="token punctuation">)</span></span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name function">SET_REG_BYTE</span><span class="token expression"><span class="token punctuation">(</span>reg<span class="token punctuation">,</span> byteIndex<span class="token punctuation">,</span> byteData<span class="token punctuation">)</span> <span class="token punctuation">(</span>reg <span class="token operator">|=</span> <span class="token punctuation">(</span>byteData <span class="token operator">&lt;&lt;</span> <span class="token punctuation">(</span><span class="token punctuation">(</span>byteIndex<span class="token punctuation">)</span> <span class="token operator">*</span> <span class="token number">8</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span></span></span>
+
+<span class="token keyword">typedef</span> <span class="token keyword">struct</span> <span class="token punctuation">{</span>
+    <span class="token class-name">uint16_t</span> stdId<span class="token punctuation">;</span>
+    <span class="token class-name">uint8_t</span> len<span class="token punctuation">;</span>
+    <span class="token class-name">uint8_t</span> data<span class="token punctuation">[</span><span class="token number">8</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span> CAN_RxMsgStruct<span class="token punctuation">;</span>
+
+<span class="token keyword">void</span> <span class="token function">CAN_Init</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token keyword">void</span> <span class="token function">CAN_SendMsg</span><span class="token punctuation">(</span><span class="token class-name">uint16_t</span> stdId<span class="token punctuation">,</span> <span class="token class-name">uint8_t</span> <span class="token operator">*</span>data<span class="token punctuation">,</span> <span class="token class-name">uint8_t</span> len<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">void</span> <span class="token function">CAN_ReceiveMsg</span><span class="token punctuation">(</span>CAN_RxMsgStruct <span class="token operator">*</span>msgBuf<span class="token punctuation">,</span> <span class="token class-name">uint8_t</span> <span class="token operator">*</span>msgSize<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">endif</span> <span class="token comment">/* __CAN_H__ */</span></span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<h3 id="can-c">can.c</h3>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">"can.h"</span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">"logger.h"</span></span>
+
+<span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">CAN_GPIOConfig</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token comment">/* CAN引脚复用重映射 */</span>
+    <span class="token comment">// REMAP=10</span>
+    AFIO<span class="token operator">-&gt;</span>MAPR <span class="token operator">&amp;=</span> <span class="token operator">~</span>AFIO_MAPR_CAN_REMAP_0<span class="token punctuation">;</span>
+    AFIO<span class="token operator">-&gt;</span>MAPR <span class="token operator">|=</span> AFIO_MAPR_CAN_REMAP_1<span class="token punctuation">;</span>
+
+    <span class="token comment">/* 配置CAN引脚的工作模式 PB8-RX：浮空输入 PB9-TX：复用推挽 */</span>
+    <span class="token comment">// PB8 MODE=00 CNF=01</span>
+    GPIOB<span class="token operator">-&gt;</span>CRH <span class="token operator">&amp;=</span> <span class="token operator">~</span>GPIO_CRH_MODE8<span class="token punctuation">;</span>
+    GPIOB<span class="token operator">-&gt;</span>CRH <span class="token operator">|=</span> GPIO_CRH_CNF8_0<span class="token punctuation">;</span>
+    GPIOB<span class="token operator">-&gt;</span>CRH <span class="token operator">&amp;=</span> <span class="token operator">~</span>GPIO_CRH_CNF8_1<span class="token punctuation">;</span>
+    <span class="token comment">// PB9 MODE=11 CNF=10</span>
+    GPIOB<span class="token operator">-&gt;</span>CRH <span class="token operator">|=</span> GPIO_CRH_MODE9<span class="token punctuation">;</span>
+    GPIOB<span class="token operator">-&gt;</span>CRH <span class="token operator">&amp;=</span> <span class="token operator">~</span>GPIO_CRH_CNF9_0<span class="token punctuation">;</span>
+    GPIOB<span class="token operator">-&gt;</span>CRH <span class="token operator">|=</span> GPIO_CRH_CNF9_1<span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">void</span> <span class="token function">CAN_Init</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token comment">/* 开启CAN外设、CAN引脚GPIO、引脚重定义AFIO时钟 */</span>
+    RCC<span class="token operator">-&gt;</span>APB1ENR <span class="token operator">|=</span> RCC_APB1ENR_CAN1EN<span class="token punctuation">;</span>
+    RCC<span class="token operator">-&gt;</span>APB2ENR <span class="token operator">|=</span> <span class="token punctuation">(</span>RCC_APB2ENR_IOPBEN <span class="token operator">|</span> RCC_APB2ENR_AFIOEN<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token function">CAN_GPIOConfig</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token comment">/* CAN主要参数配置 */</span>
+    <span class="token comment">// 复位后CAN外设默认处于睡眠模式</span>
+    CAN1<span class="token operator">-&gt;</span>MCR <span class="token operator">|=</span> CAN_MCR_INRQ<span class="token punctuation">;</span> <span class="token comment">// 请求CAN外设进入初始化模式</span>
+    <span class="token keyword">while</span> <span class="token punctuation">(</span><span class="token punctuation">(</span>CAN1<span class="token operator">-&gt;</span>MSR <span class="token operator">&amp;</span> CAN_MSR_INAK<span class="token punctuation">)</span> <span class="token operator">==</span> <span class="token number">0</span><span class="token punctuation">)</span> <span class="token punctuation">{</span> <span class="token comment">// 轮询等待CAN外设确认</span>
+    <span class="token punctuation">}</span>
+    <span class="token comment">// 发送FIFO队列中报文发送的优先级 0=&gt;ID小的先发 1=&gt;时间顺序先入队的先发</span>
+    CAN1<span class="token operator">-&gt;</span>MCR <span class="token operator">|=</span> CAN_MCR_TXFP<span class="token punctuation">;</span> <span class="token comment">// 先入队先发</span>
+    <span class="token comment">// 接收FIFO队列满后入队报文处理：0=&gt;覆盖先前的 1=&gt;丢弃</span>
+    CAN1<span class="token operator">-&gt;</span>MCR <span class="token operator">|=</span> CAN_MCR_RFLM<span class="token punctuation">;</span> <span class="token comment">// 丢弃</span>
+    <span class="token comment">// 是否停用自动重传（根据CAN协议规范，发生仲裁失利、错误处理等需要重传报文）</span>
+    CAN1<span class="token operator">-&gt;</span>MCR <span class="token operator">|=</span> CAN_MCR_NART<span class="token punctuation">;</span> <span class="token comment">// 测试回环静默模式，不需要自动重传</span>
+    <span class="token comment">// 是否启用自动唤醒模式（当检测到CAN报文时自动退出睡眠模式）</span>
+    CAN1<span class="token operator">-&gt;</span>MCR <span class="token operator">|=</span> CAN_MCR_AWUM<span class="token punctuation">;</span> <span class="token comment">// 启用自动唤醒模式</span>
+    <span class="token comment">// 是否启用自动离线管理（根据CAN标准，TEC超过255后节点会进入离线模式，当检测128次连续的11位隐形电平后可以恢复到主动错误状态）</span>
+    CAN1<span class="token operator">-&gt;</span>MCR <span class="token operator">|=</span>
+        CAN_MCR_ABOM<span class="token punctuation">;</span> <span class="token comment">// 启用自动离线管理（符合条件后，自动从离线状态恢复到主动错误状态）</span>
+
+    <span class="token comment">/* CAN时序配置 */</span>
+    <span class="token comment">// 配置1Tq时间 =&gt; (BRP + 1)*Tpclk，CAN1时钟36M，BRP配置为35，则1Tq=1us</span>
+    CAN1<span class="token operator">-&gt;</span>BTR <span class="token operator">&amp;=</span> <span class="token operator">~</span>CAN_BTR_BRP<span class="token punctuation">;</span>
+    CAN1<span class="token operator">-&gt;</span>BTR <span class="token operator">|=</span> <span class="token punctuation">(</span><span class="token number">36</span> <span class="token operator">-</span> <span class="token number">1</span><span class="token punctuation">)</span> <span class="token operator">&lt;&lt;</span> <span class="token number">0</span><span class="token punctuation">;</span>
+    <span class="token comment">// 位时序配置</span>
+    <span class="token comment">// 同步段固定为1Tq，TS1配置为3Tq，TS2配置6Tq，1bit时间为10Tq=10us，波特率为100kbps</span>
+    CAN1<span class="token operator">-&gt;</span>BTR <span class="token operator">&amp;=</span> <span class="token operator">~</span>CAN_BTR_TS1<span class="token punctuation">;</span>
+    CAN1<span class="token operator">-&gt;</span>BTR <span class="token operator">|=</span> <span class="token punctuation">(</span><span class="token number">3</span> <span class="token operator">-</span> <span class="token number">1</span><span class="token punctuation">)</span> <span class="token operator">&lt;&lt;</span> <span class="token number">16</span><span class="token punctuation">;</span>
+    CAN1<span class="token operator">-&gt;</span>BTR <span class="token operator">&amp;=</span> <span class="token operator">~</span>CAN_BTR_TS2<span class="token punctuation">;</span>
+    CAN1<span class="token operator">-&gt;</span>BTR <span class="token operator">|=</span> <span class="token punctuation">(</span><span class="token number">6</span> <span class="token operator">-</span> <span class="token number">1</span><span class="token punctuation">)</span> <span class="token operator">&lt;&lt;</span> <span class="token number">20</span><span class="token punctuation">;</span>
+    <span class="token comment">// 再同步时，需要增加或减少Tq来调整bit时间（调整值称为跳跃宽度），该参数表示允许CAN外设执行再同步时跳跃宽度的最大值（限制过度补偿）</span>
+    CAN1<span class="token operator">-&gt;</span>BTR <span class="token operator">&amp;=</span> <span class="token operator">~</span>CAN_BTR_SJW<span class="token punctuation">;</span>
+    CAN1<span class="token operator">-&gt;</span>BTR <span class="token operator">|=</span> <span class="token punctuation">(</span><span class="token number">2</span> <span class="token operator">-</span> <span class="token number">1</span><span class="token punctuation">)</span> <span class="token operator">&lt;&lt;</span> <span class="token number">24</span><span class="token punctuation">;</span> <span class="token comment">// 允许的最大跳跃宽度为2Tq</span>
+    <span class="token comment">// 开启测试模式：回环模式+静默模式，即不发到总线上，也不从总线接收，仅自己发给自己</span>
+    CAN1<span class="token operator">-&gt;</span>BTR <span class="token operator">|=</span> CAN_BTR_LBKM<span class="token punctuation">;</span>
+    CAN1<span class="token operator">-&gt;</span>BTR <span class="token operator">|=</span> CAN_BTR_SILM<span class="token punctuation">;</span>
+
+    <span class="token comment">/* 配置过滤器 */</span>
+    <span class="token comment">// 过滤模式 0=&gt;掩码模式 1=&gt;清单模式（白名单）</span>
+    CAN1<span class="token operator">-&gt;</span>FM1R <span class="token operator">&amp;=</span> <span class="token operator">~</span>CAN_FM1R_FBM0<span class="token punctuation">;</span> <span class="token comment">// 过滤器1配置为掩码模式</span>
+    <span class="token comment">// 过滤器位宽配置</span>
+    CAN1<span class="token operator">-&gt;</span>FS1R <span class="token operator">|=</span> CAN_FS1R_FSC0<span class="token punctuation">;</span> <span class="token comment">// 过滤值配置为32位（可以过滤11位ID和29位ID）</span>
+    <span class="token comment">// 分配FIFO，过滤器匹配后递交给那个接收FIFO</span>
+    CAN1<span class="token operator">-&gt;</span>FFA1R <span class="token operator">&amp;=</span> <span class="token operator">~</span>CAN_FFA1R_FFA0<span class="token punctuation">;</span> <span class="token comment">// 过滤器1分配给FIFO0</span>
+    <span class="token comment">// 过滤器1的过滤值和屏蔽位</span>
+    CAN1<span class="token operator">-&gt;</span>sFilterRegister<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">.</span>FR1 <span class="token operator">=</span> <span class="token number">0x00000000</span><span class="token punctuation">;</span> <span class="token comment">// 过滤值为0</span>
+    CAN1<span class="token operator">-&gt;</span>sFilterRegister<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">.</span>FR2 <span class="token operator">=</span>
+        <span class="token number">0x00000000</span><span class="token punctuation">;</span> <span class="token comment">// 屏蔽为0表示该bit不关心，不需要和过滤值相应bit进行比较</span>
+    <span class="token comment">// 激活过滤器1</span>
+    CAN1<span class="token operator">-&gt;</span>FA1R <span class="token operator">|=</span> CAN_FA1R_FACT0<span class="token punctuation">;</span>
+    <span class="token comment">// 进入过滤器激活模式</span>
+    CAN1<span class="token operator">-&gt;</span>FMR <span class="token operator">&amp;=</span> <span class="token operator">~</span>CAN_FMR_FINIT<span class="token punctuation">;</span>
+
+    <span class="token comment">// 请求CAN外设进入正常模式</span>
+    CAN1<span class="token operator">-&gt;</span>MCR <span class="token operator">&amp;=</span> <span class="token operator">~</span>CAN_MCR_INRQ<span class="token punctuation">;</span>
+    <span class="token comment">// 轮询等待外设确认</span>
+    <span class="token keyword">while</span> <span class="token punctuation">(</span><span class="token punctuation">(</span>CAN1<span class="token operator">-&gt;</span>MSR <span class="token operator">&amp;</span> CAN_MSR_INAK<span class="token punctuation">)</span> <span class="token operator">==</span> <span class="token number">1</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">void</span> <span class="token function">CAN_SendMsg</span><span class="token punctuation">(</span><span class="token class-name">uint16_t</span> stdId<span class="token punctuation">,</span> <span class="token class-name">uint8_t</span> <span class="token operator">*</span>data<span class="token punctuation">,</span> <span class="token class-name">uint8_t</span> len<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>len <span class="token operator">&gt;</span> <span class="token number">8</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token function">LOG_ERROR</span><span class="token punctuation">(</span><span class="token string">"最多只能发送8个字节"</span><span class="token punctuation">)</span>
+        <span class="token keyword">return</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    <span class="token comment">// 如果发送邮箱0不为空，则轮询等待</span>
+    <span class="token keyword">while</span> <span class="token punctuation">(</span><span class="token punctuation">(</span>CAN1<span class="token operator">-&gt;</span>TSR <span class="token operator">&amp;</span> CAN_TSR_TME0<span class="token punctuation">)</span> <span class="token operator">==</span> <span class="token number">0</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token punctuation">}</span>
+    <span class="token comment">/* 配置发送邮箱0 */</span>
+    <span class="token comment">// ID配置</span>
+    <span class="token comment">// 标准格式，扩展格式</span>
+    CAN1<span class="token operator">-&gt;</span>sTxMailBox<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">.</span>TIR <span class="token operator">&amp;=</span> <span class="token operator">~</span>CAN_TI0R_IDE<span class="token punctuation">;</span>
+    <span class="token comment">// 数据帧，远程帧配置</span>
+    CAN1<span class="token operator">-&gt;</span>sTxMailBox<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">.</span>TIR <span class="token operator">&amp;=</span> <span class="token operator">~</span>CAN_TI0R_RTR<span class="token punctuation">;</span>
+    <span class="token comment">// 设置ID</span>
+    CAN1<span class="token operator">-&gt;</span>sTxMailBox<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">.</span>TIR <span class="token operator">&amp;=</span> <span class="token operator">~</span>CAN_TI0R_STID<span class="token punctuation">;</span>
+    CAN1<span class="token operator">-&gt;</span>sTxMailBox<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">.</span>TIR <span class="token operator">|=</span> <span class="token punctuation">(</span>stdId <span class="token operator">&lt;&lt;</span> <span class="token number">21</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token comment">// 设置数据长度</span>
+    CAN1<span class="token operator">-&gt;</span>sTxMailBox<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">.</span>TDTR <span class="token operator">&amp;=</span> <span class="token operator">~</span>CAN_TDT0R_DLC<span class="token punctuation">;</span>
+    CAN1<span class="token operator">-&gt;</span>sTxMailBox<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">.</span>TDTR <span class="token operator">|=</span> <span class="token punctuation">(</span><span class="token punctuation">(</span>len <span class="token operator">&amp;</span> <span class="token number">0x0F</span><span class="token punctuation">)</span> <span class="token operator">&lt;&lt;</span> <span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token comment">// 设置数据字节</span>
+    CAN1<span class="token operator">-&gt;</span>sTxMailBox<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">.</span>TDLR <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
+    CAN1<span class="token operator">-&gt;</span>sTxMailBox<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">.</span>TDHR <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
+    <span class="token keyword">for</span> <span class="token punctuation">(</span><span class="token class-name">uint8_t</span> i <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span> i <span class="token operator">&lt;</span> len<span class="token punctuation">;</span> i<span class="token operator">++</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>i <span class="token operator">&lt;</span> <span class="token number">4</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token function">SET_REG_BYTE</span><span class="token punctuation">(</span>CAN1<span class="token operator">-&gt;</span>sTxMailBox<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">.</span>TDLR<span class="token punctuation">,</span> i<span class="token punctuation">,</span> data<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
+            <span class="token function">SET_REG_BYTE</span><span class="token punctuation">(</span>CAN1<span class="token operator">-&gt;</span>sTxMailBox<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">.</span>TDHR<span class="token punctuation">,</span> i <span class="token operator">-</span> <span class="token number">4</span><span class="token punctuation">,</span> data<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+    <span class="token comment">// 请求发送数据</span>
+    CAN1<span class="token operator">-&gt;</span>sTxMailBox<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">.</span>TIR <span class="token operator">|=</span> CAN_TI0R_TXRQ<span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">void</span> <span class="token function">CAN_ReceiveMsg</span><span class="token punctuation">(</span>CAN_RxMsgStruct <span class="token operator">*</span>msgBuf<span class="token punctuation">,</span> <span class="token class-name">uint8_t</span> <span class="token operator">*</span>msgSize<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token comment">// 获取接收FIFO0中的报文数量</span>
+    <span class="token operator">*</span>msgSize <span class="token operator">=</span> <span class="token function">GET_REG_FIELD</span><span class="token punctuation">(</span>CAN1<span class="token operator">-&gt;</span>RF0R<span class="token punctuation">,</span> CAN_RF0R_FMP0<span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token keyword">for</span> <span class="token punctuation">(</span><span class="token class-name">uint8_t</span> i <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span> i <span class="token operator">&lt;</span> <span class="token operator">*</span>msgSize<span class="token punctuation">;</span> i<span class="token operator">++</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        CAN_RxMsgStruct <span class="token operator">*</span>buf <span class="token operator">=</span> msgBuf <span class="token operator">+</span> i<span class="token punctuation">;</span>
+        <span class="token comment">// 获取FIFO0队首报文句柄</span>
+        CAN_FIFOMailBox_TypeDef <span class="token operator">*</span>msg <span class="token operator">=</span> <span class="token operator">&amp;</span><span class="token punctuation">(</span>CAN1<span class="token operator">-&gt;</span>sFIFOMailBox<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+        <span class="token comment">// 解析报文</span>
+        buf<span class="token operator">-&gt;</span>stdId <span class="token operator">=</span> <span class="token function">GET_REG_FIELD</span><span class="token punctuation">(</span>msg<span class="token operator">-&gt;</span>RIR<span class="token punctuation">,</span> CAN_RI0R_STID<span class="token punctuation">,</span> <span class="token number">21</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        buf<span class="token operator">-&gt;</span>len <span class="token operator">=</span> <span class="token function">GET_REG_FIELD</span><span class="token punctuation">(</span>msg<span class="token operator">-&gt;</span>RDTR<span class="token punctuation">,</span> CAN_RDT0R_DLC<span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">for</span> <span class="token punctuation">(</span><span class="token class-name">uint8_t</span> j <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span> j <span class="token operator">&lt;</span> buf<span class="token operator">-&gt;</span>len<span class="token punctuation">;</span> j<span class="token operator">++</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token keyword">if</span> <span class="token punctuation">(</span>j <span class="token operator">&lt;</span> <span class="token number">4</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                buf<span class="token operator">-&gt;</span>data<span class="token punctuation">[</span>j<span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token function">GET_REG_BYTE</span><span class="token punctuation">(</span>msg<span class="token operator">-&gt;</span>RDLR<span class="token punctuation">,</span> j<span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
+                buf<span class="token operator">-&gt;</span>data<span class="token punctuation">[</span>j<span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token function">GET_REG_BYTE</span><span class="token punctuation">(</span>msg<span class="token operator">-&gt;</span>RDHR<span class="token punctuation">,</span> <span class="token punctuation">(</span>j <span class="token operator">-</span> <span class="token number">4</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token punctuation">}</span>
+        <span class="token punctuation">}</span>
+        <span class="token comment">// 释放FIFO0队首报文（出队）</span>
+        CAN1<span class="token operator">-&gt;</span>RF0R <span class="token operator">|=</span> CAN_RF0R_RFOM0<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<h3 id="main-c">main.c</h3>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">"can.h"</span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">"delay.h"</span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">"key.h"</span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">"led.h"</span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">"logger.h"</span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">"stdio.h"</span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">"stm32f10x.h"</span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">"string.h"</span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">"uart.h"</span></span>
+
+<span class="token keyword">void</span> <span class="token function">uart1_received_callback</span><span class="token punctuation">(</span><span class="token class-name">uint8_t</span> buf<span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">,</span> <span class="token class-name">uint8_t</span> size<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token function">uart_send_bytes</span><span class="token punctuation">(</span>buf<span class="token punctuation">,</span> size<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">int</span> <span class="token function">main</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token function">uart_init</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">CAN_Init</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">LOG_DEBUG</span><span class="token punctuation">(</span><span class="token string">"main start"</span><span class="token punctuation">)</span>
+
+    <span class="token function">CAN_SendMsg</span><span class="token punctuation">(</span><span class="token number">0x01</span><span class="token punctuation">,</span> <span class="token string">"abcd"</span><span class="token punctuation">,</span> <span class="token number">5</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">CAN_SendMsg</span><span class="token punctuation">(</span><span class="token number">0x02</span><span class="token punctuation">,</span> <span class="token string">"hello"</span><span class="token punctuation">,</span> <span class="token number">6</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">LOG_DEBUG</span><span class="token punctuation">(</span><span class="token string">"send msg done"</span><span class="token punctuation">)</span>
+
+    <span class="token function">delay_ms</span><span class="token punctuation">(</span><span class="token number">1000</span><span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment">// 等待发送到CAN的接收FIFO</span>
+    
+    CAN_RxMsgStruct msgBuf<span class="token punctuation">[</span><span class="token number">2</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token punctuation">{</span><span class="token number">0</span><span class="token punctuation">}</span><span class="token punctuation">;</span>
+    <span class="token class-name">uint8_t</span> msgSize <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
+    <span class="token function">CAN_ReceiveMsg</span><span class="token punctuation">(</span>msgBuf<span class="token punctuation">,</span> <span class="token operator">&amp;</span>msgSize<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">LOG_DEBUG</span><span class="token punctuation">(</span><span class="token string">"msgSize = %d"</span><span class="token punctuation">,</span> msgSize<span class="token punctuation">)</span>
+    <span class="token keyword">for</span> <span class="token punctuation">(</span><span class="token class-name">uint8_t</span> i <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span> i <span class="token operator">&lt;</span> msgSize<span class="token punctuation">;</span> i<span class="token operator">++</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token function">LOG_DEBUG</span><span class="token punctuation">(</span><span class="token string">"id = %#x, msg = %s"</span><span class="token punctuation">,</span> msgBuf<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">.</span>stdId<span class="token punctuation">,</span> msgBuf<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">.</span>data<span class="token punctuation">)</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token keyword">while</span> <span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<h2 id="guo-lu-qi-ce-shi">过滤器测试</h2>
+<p>过滤出ID为1的报文</p>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c">CAN1<span class="token operator">-&gt;</span>sFilterRegister<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">.</span>FR1 <span class="token operator">=</span> <span class="token number">1</span> <span class="token operator">&lt;&lt;</span> <span class="token number">21</span><span class="token punctuation">;</span>
+CAN1<span class="token operator">-&gt;</span>sFilterRegister<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">.</span>FR2 <span class="token operator">=</span> <span class="token number">1</span> <span class="token operator">&lt;&lt;</span> <span class="token number">21</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241213095703620.png" alt="image-20241213095703620" style="zoom:33%;">
+<p>过滤出ID为2的报文</p>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c">CAN1<span class="token operator">-&gt;</span>sFilterRegister<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">.</span>FR1 <span class="token operator">=</span> <span class="token number">2</span> <span class="token operator">&lt;&lt;</span> <span class="token number">21</span><span class="token punctuation">;</span>
+CAN1<span class="token operator">-&gt;</span>sFilterRegister<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">.</span>FR2 <span class="token operator">=</span> <span class="token number">2</span> <span class="token operator">&lt;&lt;</span> <span class="token number">21</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241213095631079.png" alt="image-20241213095631079" style="zoom:33%;">
+<h1 id="ji-cun-qi-zong-jie">寄存器总结</h1>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241213111618075.png" alt="image-20241213111618075"></p>
+<h1 id="shi-yan-1-de-hal-ku-shi-xian">实验1的HAL库实现</h1>
+<h2 id="cube-pei-zhi">Cube配置</h2>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241213122551361.png" alt="image-20241213122551361"></p>
+<h2 id="shi-li-dai-ma-1">示例代码</h2>
+<h3 id="can-h-1">can.h</h3>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token comment">/* USER CODE BEGIN Prototypes */</span>
+<span class="token keyword">void</span> <span class="token function">CAN_Init</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token keyword">void</span> <span class="token function">CAN_SendMsg</span><span class="token punctuation">(</span><span class="token class-name">uint16_t</span> stdId<span class="token punctuation">,</span> <span class="token class-name">uint8_t</span> <span class="token operator">*</span>data<span class="token punctuation">,</span> <span class="token class-name">uint8_t</span> len<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">void</span> <span class="token function">CAN_ReceiveMsg</span><span class="token punctuation">(</span>CAN_RxMsgStruct <span class="token operator">*</span>msgBuf<span class="token punctuation">,</span> <span class="token class-name">uint8_t</span> <span class="token operator">*</span>msgSize<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token comment">/* USER CODE END Prototypes */</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<h3 id="can-c-1">can.c</h3>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token comment">/* USER CODE BEGIN 1 */</span>
+<span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">CAN_FilterConfig</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    CAN_FilterTypeDef filterConfig<span class="token punctuation">;</span>
+    <span class="token comment">// 初始化 CAN_FilterTypeDef 结构体</span>
+    filterConfig<span class="token punctuation">.</span>FilterBank <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>                     <span class="token comment">// 选择过滤器组 0</span>
+    filterConfig<span class="token punctuation">.</span>FilterMode <span class="token operator">=</span> CAN_FILTERMODE_IDMASK<span class="token punctuation">;</span> <span class="token comment">// 掩码模式</span>
+    filterConfig<span class="token punctuation">.</span>FilterScale <span class="token operator">=</span> <span class="token number">1</span><span class="token punctuation">;</span>                    <span class="token comment">// 32 位过滤器</span>
+    filterConfig<span class="token punctuation">.</span>FilterIdHigh <span class="token operator">=</span> <span class="token number">0x0000</span><span class="token punctuation">;</span> <span class="token comment">// 高 16 位标识符，设置为 0x0000</span>
+    filterConfig<span class="token punctuation">.</span>FilterIdLow <span class="token operator">=</span> <span class="token number">0x0000</span><span class="token punctuation">;</span> <span class="token comment">// 低 16 位标识符，设置为 0x0000</span>
+    filterConfig<span class="token punctuation">.</span>FilterMaskIdHigh <span class="token operator">=</span>
+        <span class="token number">0x0000</span><span class="token punctuation">;</span> <span class="token comment">// 高 16 位掩码，设置为 0xFFFF（全屏蔽）</span>
+    filterConfig<span class="token punctuation">.</span>FilterMaskIdLow <span class="token operator">=</span>
+        <span class="token number">0x0000</span><span class="token punctuation">;</span> <span class="token comment">// 低 16 位掩码，设置为 0xFFFF（全屏蔽）</span>
+    filterConfig<span class="token punctuation">.</span>FilterFIFOAssignment <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span> <span class="token comment">// 分配到 FIFO 0</span>
+    filterConfig<span class="token punctuation">.</span>FilterActivation <span class="token operator">=</span> <span class="token number">1</span><span class="token punctuation">;</span>     <span class="token comment">// 启用过滤器</span>
+
+    <span class="token function">HAL_CAN_ConfigFilter</span><span class="token punctuation">(</span><span class="token operator">&amp;</span>hcan<span class="token punctuation">,</span> <span class="token operator">&amp;</span>filterConfig<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">void</span> <span class="token function">CAN_Init</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token comment">// 配置CAN外设主要参数</span>
+    <span class="token function">MX_CAN_Init</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token comment">// 配置自定义过滤规则</span>
+    <span class="token function">CAN_FilterConfig</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token comment">// 请求CAN外设退出初始化模式，进入正常模式</span>
+    <span class="token function">HAL_CAN_Start</span><span class="token punctuation">(</span><span class="token operator">&amp;</span>hcan<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">void</span> <span class="token function">CAN_SendMsg</span><span class="token punctuation">(</span><span class="token class-name">uint16_t</span> stdId<span class="token punctuation">,</span> <span class="token class-name">uint8_t</span> <span class="token operator">*</span>data<span class="token punctuation">,</span> <span class="token class-name">uint8_t</span> len<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token comment">// 等待发送邮箱空闲</span>
+    <span class="token keyword">while</span> <span class="token punctuation">(</span><span class="token function">HAL_CAN_GetTxMailboxesFreeLevel</span><span class="token punctuation">(</span><span class="token operator">&amp;</span>hcan<span class="token punctuation">)</span> <span class="token operator">==</span> <span class="token number">0</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token punctuation">}</span>
+    <span class="token comment">// 将报文添加到发送邮箱</span>
+    CAN_TxHeaderTypeDef header<span class="token punctuation">;</span>
+    <span class="token class-name">uint32_t</span> txMailBox <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
+    header<span class="token punctuation">.</span>IDE <span class="token operator">=</span> CAN_ID_STD<span class="token punctuation">;</span> <span class="token comment">// 标准格式ID</span>
+    header<span class="token punctuation">.</span>StdId <span class="token operator">=</span> stdId<span class="token punctuation">;</span>
+    header<span class="token punctuation">.</span>DLC <span class="token operator">=</span> len<span class="token punctuation">;</span>
+    header<span class="token punctuation">.</span>RTR <span class="token operator">=</span> CAN_RTR_DATA<span class="token punctuation">;</span> <span class="token comment">// 数据帧</span>
+    <span class="token function">HAL_CAN_AddTxMessage</span><span class="token punctuation">(</span><span class="token operator">&amp;</span>hcan<span class="token punctuation">,</span> <span class="token operator">&amp;</span>header<span class="token punctuation">,</span> data<span class="token punctuation">,</span> <span class="token operator">&amp;</span>txMailBox<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">void</span> <span class="token function">CAN_ReceiveMsg</span><span class="token punctuation">(</span>CAN_RxMsgStruct <span class="token operator">*</span>msgBuf<span class="token punctuation">,</span> <span class="token class-name">uint8_t</span> <span class="token operator">*</span>msgSize<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token comment">// 获取接收队列(FIFO0)待处理报文数量</span>
+    <span class="token operator">*</span>msgSize <span class="token operator">=</span> <span class="token function">HAL_CAN_GetRxFifoFillLevel</span><span class="token punctuation">(</span><span class="token operator">&amp;</span>hcan<span class="token punctuation">,</span> CAN_RX_FIFO0<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">for</span> <span class="token punctuation">(</span><span class="token class-name">uint8_t</span> i <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span> i <span class="token operator">&lt;</span> <span class="token operator">*</span>msgSize<span class="token punctuation">;</span> i<span class="token operator">++</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        CAN_RxHeaderTypeDef header<span class="token punctuation">;</span>
+        <span class="token comment">// 从FIFO0中出队报文</span>
+        <span class="token function">HAL_CAN_GetRxMessage</span><span class="token punctuation">(</span><span class="token operator">&amp;</span>hcan<span class="token punctuation">,</span> CAN_RX_FIFO0<span class="token punctuation">,</span> <span class="token operator">&amp;</span>header<span class="token punctuation">,</span> msgBuf<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">.</span>data<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        msgBuf<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">.</span>stdId <span class="token operator">=</span> header<span class="token punctuation">.</span>StdId<span class="token punctuation">;</span>
+        msgBuf<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">.</span>len <span class="token operator">=</span> header<span class="token punctuation">.</span>DLC<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+<span class="token comment">/* USER CODE END 1 */</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<h3 id="main-c-1">main.c</h3>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token comment">/* Initialize all configured peripherals */</span>
+  <span class="token function">MX_GPIO_Init</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token comment">//MX_CAN_Init();</span>
+  <span class="token function">MX_USART1_UART_Init</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token comment">/* USER CODE BEGIN 2 */</span>
+    <span class="token function">CAN_Init</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token function">printf</span><span class="token punctuation">(</span><span class="token string">"main start\n"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token function">CAN_SendMsg</span><span class="token punctuation">(</span><span class="token number">0x01</span><span class="token punctuation">,</span> <span class="token string">"abcd"</span><span class="token punctuation">,</span> <span class="token number">5</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">CAN_SendMsg</span><span class="token punctuation">(</span><span class="token number">0x02</span><span class="token punctuation">,</span> <span class="token string">"hello"</span><span class="token punctuation">,</span> <span class="token number">6</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">CAN_SendMsg</span><span class="token punctuation">(</span><span class="token number">0x03</span><span class="token punctuation">,</span> <span class="token string">"world"</span><span class="token punctuation">,</span> <span class="token number">6</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">printf</span><span class="token punctuation">(</span><span class="token string">"send msg done\n"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token function">HAL_Delay</span><span class="token punctuation">(</span><span class="token number">1000</span><span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment">// 等待发送到CAN的接收FIFO</span>
+    
+    CAN_RxMsgStruct msgBuf<span class="token punctuation">[</span><span class="token number">3</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token punctuation">{</span><span class="token number">0</span><span class="token punctuation">}</span><span class="token punctuation">;</span>
+    <span class="token class-name">uint8_t</span> msgSize <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
+    <span class="token function">CAN_ReceiveMsg</span><span class="token punctuation">(</span>msgBuf<span class="token punctuation">,</span> <span class="token operator">&amp;</span>msgSize<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">printf</span><span class="token punctuation">(</span><span class="token string">"msgSize = %d\n"</span><span class="token punctuation">,</span> msgSize<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">for</span> <span class="token punctuation">(</span><span class="token class-name">uint8_t</span> i <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span> i <span class="token operator">&lt;</span> msgSize<span class="token punctuation">;</span> i<span class="token operator">++</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token function">printf</span><span class="token punctuation">(</span><span class="token string">"id = %#x, msg = %s\n"</span><span class="token punctuation">,</span> msgBuf<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">.</span>stdId<span class="token punctuation">,</span> msgBuf<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">.</span>data<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+  <span class="token comment">/* USER CODE END 2 */</span>
+
+  <span class="token comment">/* Infinite loop */</span>
+  <span class="token comment">/* USER CODE BEGIN WHILE */</span>
+  <span class="token keyword">while</span> <span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span>
+  <span class="token punctuation">{</span>
+    <span class="token comment">/* USER CODE END WHILE */</span>
+
+    <span class="token comment">/* USER CODE BEGIN 3 */</span>
+  <span class="token punctuation">}</span>
+  <span class="token comment">/* USER CODE END 3 */</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<h1 id="shi-yan-2-liang-ge-can-jie-dian-yi-shou-yi-fa">实验2-两个CAN节点一收一发</h1>
+<h2 id="guan-bi-ce-shi-mo-shi">关闭测试模式</h2>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token comment">// 关闭测试模式</span>
+CAN1<span class="token operator">-&gt;</span>BTR <span class="token operator">&amp;=</span> <span class="token operator">~</span>CAN_BTR_LBKM<span class="token punctuation">;</span>
+CAN1<span class="token operator">-&gt;</span>BTR <span class="token operator">&amp;=</span> <span class="token operator">~</span>CAN_BTR_SILM<span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+<h2 id="jie-dian-a-lun-xun-fa-song">节点A轮询发送</h2>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token class-name">uint32_t</span> seq <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
+<span class="token class-name">uint8_t</span> buf<span class="token punctuation">[</span><span class="token number">10</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token punctuation">{</span><span class="token number">0</span><span class="token punctuation">}</span><span class="token punctuation">;</span>
+<span class="token keyword">while</span> <span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token function">sprintf</span><span class="token punctuation">(</span>buf<span class="token punctuation">,</span> <span class="token string">"hello msg, seq = %d"</span><span class="token punctuation">,</span> seq<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">CAN_SendMsg</span><span class="token punctuation">(</span><span class="token number">0x01</span><span class="token punctuation">,</span> buf<span class="token punctuation">,</span> <span class="token function">strlen</span><span class="token punctuation">(</span>buf<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    seq<span class="token operator">++</span><span class="token punctuation">;</span>
+    <span class="token function">delay_ms</span><span class="token punctuation">(</span><span class="token number">1000</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<h2 id="jie-dian-b-lun-xun-jie-shou">节点B轮询接收</h2>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c">CAN_RxMsgStruct msgBuf<span class="token punctuation">[</span><span class="token number">3</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token punctuation">{</span><span class="token number">0</span><span class="token punctuation">}</span><span class="token punctuation">;</span>
+<span class="token class-name">uint8_t</span> msgSize <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
+<span class="token keyword">while</span> <span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token function">CAN_ReceiveMsg</span><span class="token punctuation">(</span>msgBuf<span class="token punctuation">,</span> <span class="token operator">&amp;</span>msgSize<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">for</span> <span class="token punctuation">(</span><span class="token class-name">uint8_t</span> i <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span> i <span class="token operator">&lt;</span> msgSize<span class="token punctuation">;</span> i<span class="token operator">++</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token function">LOG_DEBUG</span><span class="token punctuation">(</span><span class="token string">"id = %#x, msg = %.*s"</span><span class="token punctuation">,</span> msgBuf<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">.</span>stdId<span class="token punctuation">,</span> msgBuf<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">.</span>len<span class="token punctuation">,</span> msgBuf<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">.</span>data<span class="token punctuation">)</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<h2 id="jie-shou-bao-wen-jie-gou-ti-shu-ju-can-liu-wen-ti">接收报文结构体数据残留问题</h2>
+<blockquote>
+<p>[!NOTE]</p>
+<p><code>CAN_RxMsgStruct#data</code>大小为8字节，可能残留了上次接收的数据，可以根据业务需要来清除。但最好还是根据 <code>CAN_RxMsgStruct#len</code>指示的字节数量来处理报文数据</p>
+</blockquote>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token keyword">void</span> <span class="token function">CAN_ReceiveMsg</span><span class="token punctuation">(</span>CAN_RxMsgStruct <span class="token operator">*</span>msgBuf<span class="token punctuation">,</span> <span class="token class-name">uint8_t</span> <span class="token operator">*</span>msgSize<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token comment">// 获取接收FIFO0中的报文数量</span>
+    <span class="token operator">*</span>msgSize <span class="token operator">=</span> <span class="token function">GET_REG_FIELD</span><span class="token punctuation">(</span>CAN1<span class="token operator">-&gt;</span>RF0R<span class="token punctuation">,</span> CAN_RF0R_FMP0<span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token keyword">for</span> <span class="token punctuation">(</span><span class="token class-name">uint8_t</span> i <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span> i <span class="token operator">&lt;</span> <span class="token operator">*</span>msgSize<span class="token punctuation">;</span> i<span class="token operator">++</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        CAN_RxMsgStruct <span class="token operator">*</span>buf <span class="token operator">=</span> msgBuf <span class="token operator">+</span> i<span class="token punctuation">;</span>
+        <span class="token comment">// 获取FIFO0队首报文句柄</span>
+        CAN_FIFOMailBox_TypeDef <span class="token operator">*</span>msg <span class="token operator">=</span> <span class="token operator">&amp;</span><span class="token punctuation">(</span>CAN1<span class="token operator">-&gt;</span>sFIFOMailBox<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+        <span class="token comment">// 解析报文</span>
+        buf<span class="token operator">-&gt;</span>stdId <span class="token operator">=</span> <span class="token function">GET_REG_FIELD</span><span class="token punctuation">(</span>msg<span class="token operator">-&gt;</span>RIR<span class="token punctuation">,</span> CAN_RI0R_STID<span class="token punctuation">,</span> <span class="token number">21</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        buf<span class="token operator">-&gt;</span>len <span class="token operator">=</span> <span class="token function">GET_REG_FIELD</span><span class="token punctuation">(</span>msg<span class="token operator">-&gt;</span>RDTR<span class="token punctuation">,</span> CAN_RDT0R_DLC<span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token comment">// buf.data可能残留了上次接收到的数据，可以按需清除</span>
+        <span class="token function">memset</span><span class="token punctuation">(</span>buf<span class="token operator">-&gt;</span>data<span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token keyword">sizeof</span><span class="token punctuation">(</span>buf<span class="token operator">-&gt;</span>data<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">for</span> <span class="token punctuation">(</span><span class="token class-name">uint8_t</span> j <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span> j <span class="token operator">&lt;</span> buf<span class="token operator">-&gt;</span>len<span class="token punctuation">;</span> j<span class="token operator">++</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token keyword">if</span> <span class="token punctuation">(</span>j <span class="token operator">&lt;</span> <span class="token number">4</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                buf<span class="token operator">-&gt;</span>data<span class="token punctuation">[</span>j<span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token function">GET_REG_BYTE</span><span class="token punctuation">(</span>msg<span class="token operator">-&gt;</span>RDLR<span class="token punctuation">,</span> j<span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
+                buf<span class="token operator">-&gt;</span>data<span class="token punctuation">[</span>j<span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token function">GET_REG_BYTE</span><span class="token punctuation">(</span>msg<span class="token operator">-&gt;</span>RDHR<span class="token punctuation">,</span> <span class="token punctuation">(</span>j <span class="token operator">-</span> <span class="token number">4</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token punctuation">}</span>
+        <span class="token punctuation">}</span>
+        <span class="token comment">// 释放FIFO0队首报文（出队）</span>
+        CAN1<span class="token operator">-&gt;</span>RF0R <span class="token operator">|=</span> CAN_RF0R_RFOM0<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<h1 id="the-end">THE END</h1>
+
+                
+            </div>
+            <hr/>
+
+            
+
+    <div class="reprint" id="reprint-statement">
+        
+            <div class="reprint__author">
+                <span class="reprint-meta" style="font-weight: bold;">
+                    <i class="fas fa-user">
+                        文章作者:
+                    </i>
+                </span>
+                <span class="reprint-info">
+                    <a href="/about" rel="external nofollow noreferrer">安文</a>
+                </span>
+            </div>
+            <div class="reprint__type">
+                <span class="reprint-meta" style="font-weight: bold;">
+                    <i class="fas fa-link">
+                        文章链接:
+                    </i>
+                </span>
+                <span class="reprint-info">
+                    <a href="https://zanwen.github.io/2024/12/11/43974.html">https://zanwen.github.io/2024/12/11/43974.html</a>
+                </span>
+            </div>
+            <div class="reprint__notice">
+                <span class="reprint-meta" style="font-weight: bold;">
+                    <i class="fas fa-copyright">
+                        版权声明:
+                    </i>
+                </span>
+                <span class="reprint-info">
+                    本博客所有文章除特別声明外，均采用
+                    <a href="https://creativecommons.org/licenses/by/4.0/deed.zh" rel="external nofollow noreferrer" target="_blank">CC BY 4.0</a>
+                    许可协议。转载请注明来源
+                    <a href="/about" target="_blank">安文</a>
+                    !
+                </span>
+            </div>
+        
+    </div>
+
+    <script async defer>
+      document.addEventListener("copy", function (e) {
+        let toastHTML = '<span>复制成功，请遵循本文的转载规则</span><button class="btn-flat toast-action" onclick="navToReprintStatement()" style="font-size: smaller">查看</a>';
+        M.toast({html: toastHTML})
+      });
+
+      function navToReprintStatement() {
+        $("html, body").animate({scrollTop: $("#reprint-statement").offset().top - 80}, 800);
+      }
+    </script>
+
+
+
+            <div class="tag_share" style="display: block;">
+                <div class="post-meta__tag-list" style="display: inline-block;">
+                    
+                        <div class="article-tag">
+                            
+                                <a href="/tags/STM32/">
+                                    <span class="chip bg-color">STM32</span>
+                                </a>
+                            
+                                <a href="/tags/CAN/">
+                                    <span class="chip bg-color">CAN</span>
+                                </a>
+                            
+                        </div>
+                    
+                </div>
+                <div class="post_share" style="zoom: 80%; width: fit-content; display: inline-block; float: right; margin: -0.15rem 0;">
+                    <link rel="stylesheet" type="text/css" href="/libs/share/css/share.min.css">
+<div id="article-share">
+
+    
+    <div class="social-share" data-sites="twitter,facebook,google,qq,qzone,wechat,weibo,douban,linkedin" data-wechat-qrcode-helper="<p>微信扫一扫即可分享！</p>"></div>
+    <script src="/libs/share/js/social-share.min.js"></script>
+    
+
+    
+
+</div>
+
+                </div>
+            </div>
+            
+                <div id="reward">
+    <a href="#rewardModal" class="reward-link modal-trigger btn-floating btn-medium waves-effect waves-light red">赏</a>
+
+    <!-- Modal Structure -->
+    <div id="rewardModal" class="modal">
+        <div class="modal-content">
+            <a class="close modal-close"><i class="fas fa-times"></i></a>
+            <h4 class="reward-title">你的赏识是我前进的动力</h4>
+            <div class="reward-content">
+                <div class="reward-tabs">
+                    <ul class="tabs row">
+                        <li class="tab col s6 alipay-tab waves-effect waves-light"><a href="#alipay">支付宝</a></li>
+                        <li class="tab col s6 wechat-tab waves-effect waves-light"><a href="#wechat">微 信</a></li>
+                    </ul>
+                    <div id="alipay">
+                        <img src="/medias/reward/alipay.jpg" class="reward-img" alt="支付宝打赏二维码">
+                    </div>
+                    <div id="wechat">
+                        <img src="/medias/reward/wechat.jpg" class="reward-img" alt="微信打赏二维码">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(function () {
+        $('.tabs').tabs();
+    });
+</script>
+
+            
+        </div>
+    </div>
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+<article id="prenext-posts" class="prev-next articles">
+    <div class="row article-row">
+        
+        <div class="article col s12 m6" data-aos="fade-up" data-aos="fade-up">
+            <div class="article-badge left-badge text-color">
+                <i class="far fa-dot-circle"></i>&nbsp;本篇
+            </div>
+            <div class="card">
+                <a href="/2024/12/11/43974.html">
+                    <div class="card-image">
+                        
+                        <img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/dji_fly_20240629_133600_100_1719666485325_photo_optimized.jpg" class="responsive-img" alt="掌握CAN总线：原理解析与开发实践">
+                        
+                        <span class="card-title">掌握CAN总线：原理解析与开发实践</span>
+                    </div>
+                </a>
+                <div class="card-content article-content">
+                    <div class="summary block-with-text">
+                        
+                            
+                        
+                    </div>
+                    <div class="publish-info">
+                            <span class="publish-date">
+                                <i class="far fa-clock fa-fw icon-date"></i>2024-12-11
+                            </span>
+                        <span class="publish-author">
+                            
+                            <i class="fas fa-bookmark fa-fw icon-category"></i>
+                            
+                            <a href="/categories/%E5%8D%8F%E8%AE%AE/" class="post-category">
+                                    协议
+                                </a>
+                            
+                            <a href="/categories/%E5%8D%8F%E8%AE%AE/STM32/" class="post-category">
+                                    STM32
+                                </a>
+                            
+                            
+                        </span>
+                    </div>
+                </div>
+
+                
+                <div class="card-action article-tags">
+                    
+                    <a href="/tags/STM32/">
+                        <span class="chip bg-color">STM32</span>
+                    </a>
+                    
+                    <a href="/tags/CAN/">
+                        <span class="chip bg-color">CAN</span>
+                    </a>
+                    
+                </div>
+                
+            </div>
+        </div>
+        
+        
+        <div class="article col s12 m6" data-aos="fade-up">
+            <div class="article-badge right-badge text-color">
+                下一篇&nbsp;<i class="fas fa-chevron-right"></i>
+            </div>
+            <div class="card">
+                <a href="/2024/12/09/16017.html">
+                    <div class="card-image">
+                        
+                        <img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/pexels-frans-van-heerden-201846-3025005.jpg" class="responsive-img" alt="STM32存储资源扩展之FSMC">
+                        
+                        <span class="card-title">STM32存储资源扩展之FSMC</span>
+                    </div>
+                </a>
+                <div class="card-content article-content">
+                    <div class="summary block-with-text">
+                        
+                            
+                        
+                    </div>
+                    <div class="publish-info">
+                            <span class="publish-date">
+                                <i class="far fa-clock fa-fw icon-date"></i>2024-12-09
+                            </span>
+                        <span class="publish-author">
+                            
+                            <i class="fas fa-bookmark fa-fw icon-category"></i>
+                            
+                            <a href="/categories/STM32/" class="post-category">
+                                    STM32
+                                </a>
+                            
+                            
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="card-action article-tags">
+                    
+                    <a href="/tags/STM32/">
+                        <span class="chip bg-color">STM32</span>
+                    </a>
+                    
+                    <a href="/tags/FSMC/">
+                        <span class="chip bg-color">FSMC</span>
+                    </a>
+                    
+                </div>
+                
+            </div>
+        </div>
+        
+    </div>
+</article>
+
+</div>
+
+
+
+<!-- 代码块功能依赖 -->
+<script type="text/javascript" src="/libs/codeBlock/codeBlockFuction.js"></script>
+
+
+  <!-- 是否加载使用自带的 prismjs. -->
+  <script type="text/javascript" src="/libs/prism/prism.min.js"></script>
+
+
+<!-- 代码语言 -->
+
+<script type="text/javascript" src="/libs/codeBlock/codeLang.js"></script>
+
+
+<!-- 代码块复制 -->
+
+<script type="text/javascript" src="/libs/codeBlock/codeCopy.js"></script>
+
+
+<!-- 代码块收缩 -->
+
+<script type="text/javascript" src="/libs/codeBlock/codeShrink.js"></script>
+
+
+
+    </div>
+    <div id="toc-aside" class="expanded col l3 hide-on-med-and-down">
+        <div class="toc-widget card" style="background-color: white;">
+            <div class="toc-title"><i class="far fa-list-alt"></i>&nbsp;&nbsp;目录</div>
+            <div id="toc-content"></div>
+        </div>
+    </div>
+</div>
+
+<!-- TOC 悬浮按钮. -->
+
+<div id="floating-toc-btn" class="hide-on-med-and-down">
+    <a class="btn-floating btn-large bg-color">
+        <i class="fas fa-list-ul"></i>
+    </a>
+</div>
+
+
+<script src="/libs/tocbot/tocbot.min.js"></script>
+<script>
+    $(function () {
+        tocbot.init({
+            tocSelector: '#toc-content',
+            contentSelector: '#articleContent',
+            headingsOffset: -($(window).height() * 0.4 - 45),
+            collapseDepth: Number('0'),
+            headingSelector: 'h1, h2, h3'
+        });
+
+        // Set scroll toc fixed.
+        let tocHeight = parseInt($(window).height() * 0.4 - 64);
+        let $tocWidget = $('.toc-widget');
+        $(window).scroll(function () {
+            let scroll = $(window).scrollTop();
+            /* add post toc fixed. */
+            if (scroll > tocHeight) {
+                $tocWidget.addClass('toc-fixed');
+            } else {
+                $tocWidget.removeClass('toc-fixed');
+            }
+        });
+
+        
+        /* 修复文章卡片 div 的宽度. */
+        let fixPostCardWidth = function (srcId, targetId) {
+            let srcDiv = $('#' + srcId);
+            if (srcDiv.length === 0) {
+                return;
+            }
+
+            let w = srcDiv.width();
+            if (w >= 450) {
+                w = w + 21;
+            } else if (w >= 350 && w < 450) {
+                w = w + 18;
+            } else if (w >= 300 && w < 350) {
+                w = w + 16;
+            } else {
+                w = w + 14;
+            }
+            $('#' + targetId).width(w);
+        };
+
+        // 切换TOC目录展开收缩的相关操作.
+        const expandedClass = 'expanded';
+        let $tocAside = $('#toc-aside');
+        let $mainContent = $('#main-content');
+        $('#floating-toc-btn .btn-floating').click(function () {
+            if ($tocAside.hasClass(expandedClass)) {
+                $tocAside.removeClass(expandedClass).hide();
+                $mainContent.removeClass('l9');
+            } else {
+                $tocAside.addClass(expandedClass).show();
+                $mainContent.addClass('l9');
+            }
+            fixPostCardWidth('artDetail', 'prenext-posts');
+        });
+        
+    });
+</script>
+
+    
+
+</main>
+
+
+
+
+    <footer class="page-footer bg-color">
+    
+
+    <div class="container row center-align"
+         style="margin-bottom: 0px !important;">
+        <div class="col s12 m8 l8 copy-right">
+            Copyright&nbsp;&copy;
+            
+                <span id="year">2019-2024</span>
+            
+            <a href="/about" target="_blank">安文</a>
+            |&nbsp;Powered by&nbsp;<a href="https://hexo.io/" target="_blank">Hexo</a>
+            |&nbsp;Theme&nbsp;<a href="https://github.com/blinkfox/hexo-theme-matery" target="_blank">Matery</a>
+            
+            <br>
+            
+                &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
+                        class="white-color">85.4k</span>
+            
+            
+            
+                
+            
+            
+                <span id="busuanzi_container_site_pv">
+                &nbsp;|&nbsp;<i class="far fa-eye"></i>&nbsp;总访问量:&nbsp;
+                    <span id="busuanzi_value_site_pv" class="white-color"></span>
+            </span>
+            
+            
+                <span id="busuanzi_container_site_uv">
+                &nbsp;|&nbsp;<i class="fas fa-users"></i>&nbsp;总访问人数:&nbsp;
+                    <span id="busuanzi_value_site_uv" class="white-color"></span>
+            </span>
+            
+            <br>
+
+            <!-- 运行天数提醒. -->
+            
+            <br>
+            
+        </div>
+        <div class="col s12 m4 l4 social-link social-statis">
+    <a href="https://github.com/zanwen" class="tooltipped" target="_blank" data-tooltip="访问我的GitHub" data-position="top" data-delay="50">
+        <i class="fab fa-github"></i>
+    </a>
+
+
+
+    <a href="mailto:872852458@qq.com" class="tooltipped" target="_blank" data-tooltip="邮件联系我" data-position="top" data-delay="50">
+        <i class="fas fa-envelope-open"></i>
+    </a>
+
+
+
+
+
+
+
+    <a href="tencent://AddContact/?fromId=50&fromSubId=1&subcmd=all&uin=872852458" class="tooltipped" target="_blank" data-tooltip="QQ联系我: 872852458" data-position="top" data-delay="50">
+        <i class="fab fa-qq"></i>
+    </a>
+
+
+
+
+
+
+
+    <a href="/atom.xml" class="tooltipped" target="_blank" data-tooltip="RSS 订阅" data-position="top" data-delay="50">
+        <i class="fas fa-rss"></i>
+    </a>
+
+</div>
+    </div>
+</footer>
+
+<div class="progress-bar"></div>
+
+
+    <!-- 搜索遮罩框 -->
+<div id="searchModal" class="modal">
+    <div class="modal-content">
+        <div class="search-header">
+            <span class="title"><i class="fas fa-search"></i>&nbsp;&nbsp;搜索</span>
+            <input type="search" id="searchInput" name="s" placeholder="请输入搜索的关键字"
+                   class="search-input">
+        </div>
+        <div id="searchResult"></div>
+    </div>
+</div>
+
+<script type="text/javascript">
+$(function () {
+    var searchFunc = function (path, search_id, content_id) {
+        'use strict';
+        $.ajax({
+            url: path,
+            dataType: "xml",
+            success: function (xmlResponse) {
+                // get the contents from search data
+                var datas = $("entry", xmlResponse).map(function () {
+                    return {
+                        title: $("title", this).text(),
+                        content: $("content", this).text(),
+                        url: $("url", this).text()
+                    };
+                }).get();
+                var $input = document.getElementById(search_id);
+                var $resultContent = document.getElementById(content_id);
+                $input.addEventListener('input', function () {
+                    var str = '<ul class=\"search-result-list\">';
+                    var keywords = this.value.trim().toLowerCase().split(/[\s\-]+/);
+                    $resultContent.innerHTML = "";
+                    if (this.value.trim().length <= 0) {
+                        return;
+                    }
+                    // perform local searching
+                    datas.forEach(function (data) {
+                        var isMatch = true;
+                        var data_title = data.title.trim().toLowerCase();
+                        var data_content = data.content.trim().replace(/<[^>]+>/g, "").toLowerCase();
+                        var data_url = data.url;
+                        data_url = data_url.indexOf('/') === 0 ? data.url : '/' + data_url;
+                        var index_title = -1;
+                        var index_content = -1;
+                        var first_occur = -1;
+                        // only match artiles with not empty titles and contents
+                        if (data_title !== '' && data_content !== '') {
+                            keywords.forEach(function (keyword, i) {
+                                index_title = data_title.indexOf(keyword);
+                                index_content = data_content.indexOf(keyword);
+                                if (index_title < 0 && index_content < 0) {
+                                    isMatch = false;
+                                } else {
+                                    if (index_content < 0) {
+                                        index_content = 0;
+                                    }
+                                    if (i === 0) {
+                                        first_occur = index_content;
+                                    }
+                                }
+                            });
+                        }
+                        // show search results
+                        if (isMatch) {
+                            str += "<li><a href='" + data_url + "' class='search-result-title'>" + data_title + "</a>";
+                            var content = data.content.trim().replace(/<[^>]+>/g, "");
+                            if (first_occur >= 0) {
+                                // cut out 100 characters
+                                var start = first_occur - 20;
+                                var end = first_occur + 80;
+                                if (start < 0) {
+                                    start = 0;
+                                }
+                                if (start === 0) {
+                                    end = 100;
+                                }
+                                if (end > content.length) {
+                                    end = content.length;
+                                }
+                                var match_content = content.substr(start, end);
+                                // highlight all keywords
+                                keywords.forEach(function (keyword) {
+                                    var regS = new RegExp(keyword, "gi");
+                                    match_content = match_content.replace(regS, "<em class=\"search-keyword\">" + keyword + "</em>");
+                                });
+
+                                str += "<p class=\"search-result\">" + match_content + "...</p>"
+                            }
+                            str += "</li>";
+                        }
+                    });
+                    str += "</ul>";
+                    $resultContent.innerHTML = str;
+                });
+            }
+        });
+    };
+
+    searchFunc('/search.xml', 'searchInput', 'searchResult');
+});
+</script>
+
+    <!-- 白天和黑夜主题 -->
+<div class="stars-con">
+    <div id="stars"></div>
+    <div id="stars2"></div>
+    <div id="stars3"></div>  
+</div>
+
+<script>
+    function switchNightMode() {
+        $('<div class="Cuteen_DarkSky"><div class="Cuteen_DarkPlanet"></div></div>').appendTo($('body')),
+        setTimeout(function () {
+            $('body').hasClass('DarkMode') 
+            ? ($('body').removeClass('DarkMode'), localStorage.setItem('isDark', '0'), $('#sum-moon-icon').removeClass("fa-sun").addClass('fa-moon')) 
+            : ($('body').addClass('DarkMode'), localStorage.setItem('isDark', '1'), $('#sum-moon-icon').addClass("fa-sun").removeClass('fa-moon')),
+            
+            setTimeout(function () {
+            $('.Cuteen_DarkSky').fadeOut(1e3, function () {
+                $(this).remove()
+            })
+            }, 2e3)
+        })
+    }
+</script>
+
+    <!-- 回到顶部按钮 -->
+<div id="backTop" class="top-scroll">
+    <a class="btn-floating btn-large waves-effect waves-light" href="#!">
+        <i class="fas fa-arrow-up"></i>
+    </a>
+</div>
+
+
+    <script src="/libs/materialize/materialize.min.js"></script>
+    <script src="/libs/masonry/masonry.pkgd.min.js"></script>
+    <script src="/libs/aos/aos.js"></script>
+    <script src="/libs/scrollprogress/scrollProgress.min.js"></script>
+    <script src="/libs/lightGallery/js/lightgallery-all.min.js"></script>
+    <script src="/js/matery.js"></script>
+
+    
+
+    
+    
+    
+
+    <!-- 雪花特效 -->
+    
+
+    <!-- 鼠标星星特效 -->
+    
+
+     
+        <script src="https://ssl.captcha.qq.com/TCaptcha.js"></script>
+        <script src="/libs/others/TencentCaptcha.js"></script>
+        <button id="TencentCaptcha" data-appid="xxxxxxxxxx" data-cbfn="callback" type="button" hidden></button>
+    
+
+    <!-- Baidu Analytics -->
+
+    <!-- Baidu Push -->
+
+<script>
+    (function () {
+        var bp = document.createElement('script');
+        var curProtocol = window.location.protocol.split(':')[0];
+        if (curProtocol === 'https') {
+            bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+        } else {
+            bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+        }
+        var s = document.getElementsByTagName("script")[0];
+        s.parentNode.insertBefore(bp, s);
+    })();
+</script>
+
+    
+    <script src="/libs/others/clicklove.js" async="async"></script>
+    
+    
+    <script async src="/libs/others/busuanzi.pure.mini.js"></script>
+    
+
+    
+
+    
+
+    <!--腾讯兔小巢-->
+    
+    
+
+    
+
+    
+
+    
+    <script src="/libs/instantpage/instantpage.js" type="module"></script>
+    
+
+</body>
+
+</html>

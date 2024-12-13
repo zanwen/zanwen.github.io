@@ -413,14 +413,14 @@ STM32103ZE数据手册：STM32F10">
                 
                 <div class="info-break-policy">
                     <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
-                    11k
+                    11.2k
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-clock fa-fw"></i>阅读时长:&nbsp;&nbsp;
-                    51 分
+                    52 分
                 </div>
                 
 
@@ -458,13 +458,27 @@ STM32103ZE数据手册：STM32F10">
 <li>LCD驱动模组：中景园ZJY350IT002</li>
 <li>LCD驱动芯片：<a target="_blank" rel="noopener" href="https://www.hpinfotech.ro/ILI9486.pdf">ILI9486</a></li>
 </ul>
-<p>字模取模工具</p>
+<p><strong>字模取模工具</strong></p>
 <ul>
 <li><a target="_blank" rel="noopener" href="https://github.com/materone/Arduino/blob/master/TFTToolsDocs/%E6%96%87%E5%AD%97%E5%8F%96%E6%A8%A1%E8%BD%AF%E4%BB%B6(%E8%B5%A0%E9%80%81)/PCtoLCD2002%E5%AE%8C%E7%BE%8E%E7%89%88/PCtoLCD2002.exe">PCtoLCD2002完美版</a></li>
 </ul>
-<p>图片取模工具</p>
+<p><strong>图片取模工具</strong></p>
 <ul>
 <li><a target="_blank" rel="noopener" href="https://www.e-paper-display.com/download_detail/downloadsId=625.html">Image2Lcd Ver3.2</a></li>
+</ul>
+<p><strong>MDK参考手册</strong></p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://www.keil.com/arm/man/arm.htm">ARM Product Manuals</a></li>
+<li>[µVision User’s Guide]<a target="_blank" rel="noopener" href="https://www.keil.com/support/man/docs/uv4/">https://www.keil.com/support/man/docs/uv4/</a>)
+<ul>
+<li><a target="_blank" rel="noopener" href="https://developer.arm.com/documentation/101407/0541/Dialogs/Project/Options/Compiler/Arm-C-C---Compiler?lang=en">Optimization</a></li>
+</ul>
+</li>
+<li><a target="_blank" rel="noopener" href="https://developer.arm.com/documentation/100748/0623/Using-Common-Compiler-Options/Selecting-optimization-options">Arm® Compiler for Embedded User Guide 6.23</a>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://developer.arm.com/documentation/100748/0623/Using-Common-Compiler-Options/Selecting-optimization-options">Selecting optimization options</a></li>
+</ul>
+</li>
 </ul>
 <h1 id="fsmc-gai-shu">FSMC概述</h1>
 <p>MCU自带的FLASH和SRAM资源是十分有限的，相比于PC机的存储空间而言要小的可怜。一般情况对于嵌入式应用来说这点存储空间一般也就够用了，但避免不了一些<mark>大量消耗内存的应用</mark>， 比如说<mark>图像处理</mark>。对于这类<mark>对内存要求较高的应用，我们往往需要扩展一个FLASH或者SRAM</mark>。STM32提供的FSMC就是用来完成这项功能的。</p>
@@ -2383,12 +2397,20 @@ STM32103ZE数据手册：STM32F10">
   <span class="token comment">/* USER CODE BEGIN 3 */</span>
 <span class="token punctuation">}</span>
 <span class="token comment">/* USER CODE END 3 */</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<h3 id="zhu-yi-shi-xiang">注意事项</h3>
+<h3 id="bian-yi-you-hua-ji-bie-dao-zhi-de-bug">编译优化级别导致的bug</h3>
+<blockquote>
+<p>[!WARNING]</p>
+<p>CubeMX生成的MDK项目，编译器优化选项为<code>-O3</code>（最大程度优化），可能会导致程序被过度优化，可以调整为默认优化级别 <code>-O2</code>或不优化。</p>
+<p>可以配合Keil的调试功能，单步调试确认FSMC相关的寄存器是否如期配置了，以及LCD初始化时 <code>LCD_RegConfig</code> 中的程序是否因编译器优化而没有执行。</p>
+</blockquote>
+<img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241210215443940.png" alt="image-20241210215443940" style="zoom:50%;">
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241210222542846.png" alt="image-20241210222542846"></p>
 <blockquote>
 <p>[!NOTE]</p>
-<p>如果因为Keil配置的编译器优化选项（<code>-O3</code>为最大程度优化），影响了程序时序，可以调整为<code>-O0</code>（不优化）试下。</p>
+<p><a target="_blank" rel="noopener" href="https://developer.arm.com/documentation/101407/0541/Dialogs/Project/Options/Compiler/Arm-C-C---Compiler">https://developer.arm.com/documentation/101407/0541/Dialogs/Project/Options/Compiler/Arm-C-C---Compiler</a></p>
 </blockquote>
-<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241210215443940.png" alt="image-20241210215443940"></p>
+<img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241210221627343.png" alt="image-20241210221627343" style="zoom: 33%;">
+<p>如上，有时编译器优化会认为重复调用同一函数是无效代码，从而将前面n-1的调用直接优化为不执行。</p>
 <h1 id="yi-liu-wen-ti">遗留问题</h1>
 <h2 id="fsmc-busturn-can-shu">FSMC BUSTURN参数</h2>
 <h3 id="strong-1-is-62-wv-51216-bll-de-guan-jian-can-shu-strong"><strong>1. IS62WV51216BLL 的关键参数</strong></h3>
@@ -2434,6 +2456,13 @@ STM32103ZE数据手册：STM32F10">
 <li>STM32F103 的 HCLK 假设为 72MHz（周期约为 13.88ns）。</li>
 <li>因此，<strong>BUSRUN 通常设置为 1</strong>（对应 1 个 HCLK 周期）。</li>
 </ul>
+<h2 id="cube-mx-sheng-cheng-de-keil-bian-yi-you-hua-ji-bie-dao-zhi-cheng-xu-mei-you-bei-zhi-xing">CubeMX生成的Keil编译优化级别导致程序没有被执行</h2>
+<blockquote>
+<p>[!NOTE]</p>
+<p><a target="_blank" rel="noopener" href="https://developer.arm.com/documentation/101407/0541/Dialogs/Project/Options/Compiler/Arm-C-C---Compiler">https://developer.arm.com/documentation/101407/0541/Dialogs/Project/Options/Compiler/Arm-C-C---Compiler</a></p>
+</blockquote>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241210222959574.png" alt="image-20241210222959574"></p>
+<img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241210223838925.png" alt="image-20241210223838925" style="zoom:50%;">
 <h1 id="fu-lu">附录</h1>
 <h2 id="lcd-zi-mo">LCD字模</h2>
 <ul>
@@ -2593,17 +2622,16 @@ STM32103ZE数据手册：STM32F10">
 <article id="prenext-posts" class="prev-next articles">
     <div class="row article-row">
         
-        <div class="article col s12 m6" data-aos="fade-up" data-aos="fade-up">
+        <div class="article col s12 m6" data-aos="fade-up">
             <div class="article-badge left-badge text-color">
-                <i class="far fa-dot-circle"></i>&nbsp;本篇
-            </div>
+                <i class="fas fa-chevron-left"></i>&nbsp;上一篇</div>
             <div class="card">
-                <a href="/2024/12/09/16017.html">
+                <a href="/2024/12/11/43974.html">
                     <div class="card-image">
                         
-                        <img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/pexels-frans-van-heerden-201846-3025005.jpg" class="responsive-img" alt="STM32存储资源扩展之FSMC">
+                        <img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/dji_fly_20240629_133600_100_1719666485325_photo_optimized.jpg" class="responsive-img" alt="掌握CAN总线：原理解析与开发实践">
                         
-                        <span class="card-title">STM32存储资源扩展之FSMC</span>
+                        <span class="card-title">掌握CAN总线：原理解析与开发实践</span>
                     </div>
                 </a>
                 <div class="card-content article-content">
@@ -2613,14 +2641,18 @@ STM32103ZE数据手册：STM32F10">
                         
                     </div>
                     <div class="publish-info">
-                            <span class="publish-date">
-                                <i class="far fa-clock fa-fw icon-date"></i>2024-12-09
-                            </span>
+                        <span class="publish-date">
+                            <i class="far fa-clock fa-fw icon-date"></i>2024-12-11
+                        </span>
                         <span class="publish-author">
                             
                             <i class="fas fa-bookmark fa-fw icon-category"></i>
                             
-                            <a href="/categories/STM32/" class="post-category">
+                            <a href="/categories/%E5%8D%8F%E8%AE%AE/" class="post-category">
+                                    协议
+                                </a>
+                            
+                            <a href="/categories/%E5%8D%8F%E8%AE%AE/STM32/" class="post-category">
                                     STM32
                                 </a>
                             
@@ -2628,7 +2660,6 @@ STM32103ZE数据手册：STM32F10">
                         </span>
                     </div>
                 </div>
-
                 
                 <div class="card-action article-tags">
                     
@@ -2636,8 +2667,8 @@ STM32103ZE数据手册：STM32F10">
                         <span class="chip bg-color">STM32</span>
                     </a>
                     
-                    <a href="/tags/FSMC/">
-                        <span class="chip bg-color">FSMC</span>
+                    <a href="/tags/CAN/">
+                        <span class="chip bg-color">CAN</span>
                     </a>
                     
                 </div>
@@ -2833,7 +2864,7 @@ STM32103ZE数据手册：STM32F10">
             <br>
             
                 &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                        class="white-color">75.9k</span>
+                        class="white-color">85.4k</span>
             
             
             
