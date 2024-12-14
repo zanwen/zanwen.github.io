@@ -1,0 +1,1776 @@
+<!DOCTYPE HTML>
+<html lang="zh-CN">
+
+
+<head>
+    <meta charset="utf-8">
+    <meta name="keywords" content="STM32+W5500：解锁以太网开发的潜力, 安文的博客">
+    <meta name="description" content="参考资料
+
+W5500 Datasheet v1.1.0 - English
+
+实验-Ping
+硬件电路
+
+
+（1）W5500-RST：重置硬件，重置（Reset）低电平有效；该引脚需要保持低电平至少 500 us，才能重置 W5500；（">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="renderer" content="webkit|ie-stand|ie-comp">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="format-detection" content="telephone=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="referrer" content="no-referrer-when-downgrade">
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+
+
+    <title>STM32+W5500：解锁以太网开发的潜力 | 安文的博客</title>
+    <link rel="icon" type="image/png" href="/medias/logo.png">
+    
+
+
+    <!-- bg-cover style     -->
+
+
+
+<link rel="stylesheet" type="text/css" href="/libs/awesome/css/all.min.css">
+<link rel="stylesheet" type="text/css" href="/libs/materialize/materialize.min.css">
+<link rel="stylesheet" type="text/css" href="/libs/aos/aos.css">
+<link rel="stylesheet" type="text/css" href="/libs/animate/animate.min.css">
+<link rel="stylesheet" type="text/css" href="/libs/lightGallery/css/lightgallery.min.css">
+<link rel="stylesheet" type="text/css" href="/css/matery.css">
+<link rel="stylesheet" type="text/css" href="/css/my.css">
+<link rel="stylesheet" type="text/css" href="/css/dark.css" media="none" onload="if(media!='all')media='all'">
+
+
+
+
+    <link rel="stylesheet" href="/libs/tocbot/tocbot.css">
+    <link rel="stylesheet" href="/css/post.css">
+
+
+
+
+    
+        <link rel="stylesheet" type="text/css" href="/css/reward.css">
+    
+
+
+
+    <script src="/libs/jquery/jquery-3.6.0.min.js"></script>
+
+<meta name="generator" content="Hexo 7.3.0">
+<style>.github-emoji { position: relative; display: inline-block; width: 1.2em; min-height: 1.2em; overflow: hidden; vertical-align: top; color: transparent; }  .github-emoji > span { position: relative; z-index: 10; }  .github-emoji img, .github-emoji .fancybox { margin: 0 !important; padding: 0 !important; border: none !important; outline: none !important; text-decoration: none !important; user-select: none !important; cursor: auto !important; }  .github-emoji img { height: 1.2em !important; width: 1.2em !important; position: absolute !important; left: 50% !important; top: 50% !important; transform: translate(-50%, -50%) !important; user-select: none !important; cursor: auto !important; } .github-emoji-fallback { color: inherit; } .github-emoji-fallback img { opacity: 0 !important; }</style>
+<link rel="alternate" href="/atom.xml" title="安文的博客" type="application/atom+xml">
+</head>
+
+
+<body>
+    <header class="navbar-fixed">
+    <nav id="headNav" class="bg-color nav-transparent">
+        <div id="navContainer" class="nav-wrapper container">
+            <div class="brand-logo">
+                <a href="/" class="waves-effect waves-light">
+                    
+                    <img src="/medias/logo.png" class="logo-img" alt="LOGO">
+                    
+                    <span class="logo-span">安文的博客</span>
+                </a>
+            </div>
+            
+
+<a href="#" data-target="mobile-nav" class="sidenav-trigger button-collapse"><i class="fas fa-bars"></i></a>
+<ul class="right nav-menu">
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/" class="waves-effect waves-light">
+      
+      <i class="fas fa-home" style="zoom: 0.6;"></i>
+      
+      <span>首页</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/tags" class="waves-effect waves-light">
+      
+      <i class="fas fa-tags" style="zoom: 0.6;"></i>
+      
+      <span>标签</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/categories" class="waves-effect waves-light">
+      
+      <i class="fas fa-bookmark" style="zoom: 0.6;"></i>
+      
+      <span>分类</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/archives" class="waves-effect waves-light">
+      
+      <i class="fas fa-archive" style="zoom: 0.6;"></i>
+      
+      <span>归档</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/about" class="waves-effect waves-light">
+      
+      <i class="fas fa-user-circle" style="zoom: 0.6;"></i>
+      
+      <span>关于</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/contact" class="waves-effect waves-light">
+      
+      <i class="fas fa-comments" style="zoom: 0.6;"></i>
+      
+      <span>留言板</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/friends" class="waves-effect waves-light">
+      
+      <i class="fas fa-address-book" style="zoom: 0.6;"></i>
+      
+      <span>友情链接</span>
+    </a>
+    
+  </li>
+  
+  <li>
+    <a href="#searchModal" class="modal-trigger waves-effect waves-light">
+      <i id="searchIcon" class="fas fa-search" title="搜索" style="zoom: 0.85;"></i>
+    </a>
+  </li>
+  <li>
+    <a href="javascript:;" class="waves-effect waves-light" onclick="switchNightMode()" title="深色/浅色模式" >
+      <i id="sum-moon-icon" class="fas fa-sun" style="zoom: 0.85;"></i>
+    </a>
+  </li>
+</ul>
+
+
+<div id="mobile-nav" class="side-nav sidenav">
+
+    <div class="mobile-head bg-color">
+        
+        <img src="/medias/logo.png" class="logo-img circle responsive-img">
+        
+        <div class="logo-name">安文的博客</div>
+        <div class="logo-desc">
+            
+            安文的博客 | 嵌入式 | 算法 | AI | 人工智能
+            
+        </div>
+    </div>
+
+    <ul class="menu-list mobile-menu-list">
+        
+        <li class="m-nav-item">
+	  
+		<a href="/" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-home"></i>
+			
+			首页
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/tags" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-tags"></i>
+			
+			标签
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/categories" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-bookmark"></i>
+			
+			分类
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/archives" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-archive"></i>
+			
+			归档
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/about" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-user-circle"></i>
+			
+			关于
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/contact" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-comments"></i>
+			
+			留言板
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/friends" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-address-book"></i>
+			
+			友情链接
+		</a>
+          
+        </li>
+        
+        
+        <li><div class="divider"></div></li>
+        <li>
+            <a href="https://github.com/blinkfox/hexo-theme-matery" class="waves-effect waves-light" target="_blank">
+                <i class="fab fa-github-square fa-fw"></i>Fork Me
+            </a>
+        </li>
+        
+    </ul>
+</div>
+
+
+        </div>
+
+        
+            <style>
+    .nav-transparent .github-corner {
+        display: none !important;
+    }
+
+    .github-corner {
+        position: absolute;
+        z-index: 10;
+        top: 0;
+        right: 0;
+        border: 0;
+        transform: scale(1.1);
+    }
+
+    .github-corner svg {
+        color: #0f9d58;
+        fill: #fff;
+        height: 64px;
+        width: 64px;
+    }
+
+    .github-corner:hover .octo-arm {
+        animation: a 0.56s ease-in-out;
+    }
+
+    .github-corner .octo-arm {
+        animation: none;
+    }
+
+    @keyframes a {
+        0%,
+        to {
+            transform: rotate(0);
+        }
+        20%,
+        60% {
+            transform: rotate(-25deg);
+        }
+        40%,
+        80% {
+            transform: rotate(10deg);
+        }
+    }
+</style>
+
+<a href="https://github.com/blinkfox/hexo-theme-matery" class="github-corner tooltipped hide-on-med-and-down" target="_blank"
+   data-tooltip="Fork Me" data-position="left" data-delay="50">
+    <svg viewBox="0 0 250 250" aria-hidden="true">
+        <path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path>
+        <path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2"
+              fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path>
+        <path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z"
+              fill="currentColor" class="octo-body"></path>
+    </svg>
+</a>
+        
+    </nav>
+
+</header>
+
+    
+
+
+
+<div class="bg-cover pd-header post-cover" style="background-image: url('https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/pexels-aidun-10792604.jpg')">
+    <div class="container" style="right: 0px;left: 0px;">
+        <div class="row">
+            <div class="col s12 m12 l12">
+                <div class="brand">
+                    <h1 class="description center-align post-title">STM32+W5500：解锁以太网开发的潜力</h1>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+<main class="post-container content">
+
+    
+    <div class="row">
+    <div id="main-content" class="col s12 m12 l9">
+        <!-- 文章内容详情 -->
+<div id="artDetail">
+    <div class="card">
+        <div class="card-content article-info">
+            <div class="row tag-cate">
+                <div class="col s7">
+                    
+                    <div class="article-tag">
+                        
+                            <a href="/tags/W5500/">
+                                <span class="chip bg-color">W5500</span>
+                            </a>
+                        
+                            <a href="/tags/STM32/">
+                                <span class="chip bg-color">STM32</span>
+                            </a>
+                        
+                            <a href="/tags/%E4%BB%A5%E5%A4%AA%E7%BD%91/">
+                                <span class="chip bg-color">以太网</span>
+                            </a>
+                        
+                    </div>
+                    
+                </div>
+                <div class="col s5 right-align">
+                    
+                    <div class="post-cate">
+                        <i class="fas fa-bookmark fa-fw icon-category"></i>
+                        
+                            <a href="/categories/STM32/" class="post-category">
+                                STM32
+                            </a>
+                        
+                            <a href="/categories/STM32/%E5%8D%8F%E8%AE%AE/" class="post-category">
+                                协议
+                            </a>
+                        
+                    </div>
+                    
+                </div>
+            </div>
+
+            <div class="post-info">
+                
+                <div class="post-date info-break-policy">
+                    <i class="far fa-calendar-minus fa-fw"></i>发布日期:&nbsp;&nbsp;
+                    2024-12-14
+                </div>
+                
+
+                
+                <div class="post-date info-break-policy">
+                    <i class="far fa-calendar-check fa-fw"></i>更新日期:&nbsp;&nbsp;
+                    2024-12-14
+                </div>
+                
+
+                
+                <div class="info-break-policy">
+                    <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
+                    2.4k
+                </div>
+                
+
+                
+                <div class="info-break-policy">
+                    <i class="far fa-clock fa-fw"></i>阅读时长:&nbsp;&nbsp;
+                    12 分
+                </div>
+                
+
+                
+                    <div id="busuanzi_container_page_pv" class="info-break-policy">
+                        <i class="far fa-eye fa-fw"></i>阅读次数:&nbsp;&nbsp;
+                        <span id="busuanzi_value_page_pv"></span>
+                    </div>
+				
+            </div>
+        </div>
+        <hr class="clearfix">
+
+        
+        <!-- 是否加载使用自带的 prismjs. -->
+        <link rel="stylesheet" href="/libs/prism/prism.min.css">
+        
+
+        
+
+        <div class="card-content article-card-content">
+            <div id="articleContent">
+                <h1 id="can-kao-zi-liao">参考资料</h1>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://docs.wiznet.io/img/products/w5500/W5500_ds_v110e.pdf">W5500 Datasheet v1.1.0 - English</a></li>
+</ul>
+<h1 id="shi-yan-ping">实验-Ping</h1>
+<h2 id="ying-jian-dian-lu">硬件电路</h2>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241214160129237.png" alt="image-20241214160129237"></p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241214160135462.png" alt="image-20241214160135462"></p>
+<p>（1）W5500-RST：重置硬件，重置（Reset）低电平有效；该引脚需要保持低电平至少 500 us，才能重置 W5500；（正常使用应该高电平，需要重置芯片的时候置为低电平不少500us）。连接的是PG7。</p>
+<p>（2）W5500-INT：中断输出（Interrupt output）低电平有效；低电平：W5500的中断生效。高电平：无中断；连接的是PG6。</p>
+<p>（3）W5500-CS片选引脚。连接的是PD3</p>
+<p>（4）连接的是STM32的SPI2外设。</p>
+<h2 id="w-5500-guan-fang-qu-dong-yi-zhi">W5500官方驱动移植</h2>
+<p><a target="_blank" rel="noopener" href="https://github.com/Wiznet/ioLibrary_Driver">https://github.com/Wiznet/ioLibrary_Driver</a></p>
+<img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241214160231952.png" alt="image-20241214160231952" style="zoom:50%;">
+<h3 id="yi-zhi-wo-men-xu-yao-de">移植我们需要的</h3>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241214160305162.png" alt="image-20241214160305162"></p>
+<h3 id="xiu-gai-hong-ding-yi">修改宏定义</h3>
+<p>修改<code>wizchip_conf.h</code></p>
+<p>找到宏定义<code>_WIZCHIP_</code>，如果不是W5500，就改成W5500。</p>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">ifndef</span> <span class="token expression">_WIZCHIP_</span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name">_WIZCHIP_</span> <span class="token expression">W5500 </span><span class="token comment">// W5100, W5100S, W5200, W5300, W5500</span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">endif</span></span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+<p>修改工作模式为可变数据长度模式（大致在155行，<code>_WIZCHIP_IO_MODE_SPI_FDM_</code>）</p>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">elif</span> <span class="token expression"><span class="token punctuation">(</span>_WIZCHIP_ <span class="token operator">==</span> W5500<span class="token punctuation">)</span></span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name">_WIZCHIP_ID_</span> <span class="token string">"W5500\0"</span></span>
+
+<span class="token comment">/**
+ * @brief Define interface mode. \n
+ * @todo Should select interface mode as chip.
+ *        - @ref \_WIZCHIP_IO_MODE_SPI_ \n
+ *          -@ref \_WIZCHIP_IO_MODE_SPI_VDM_ : Valid only in @ref \_WIZCHIP_ == W5500 \n
+ *          -@ref \_WIZCHIP_IO_MODE_SPI_FDM_ : Valid only in @ref \_WIZCHIP_ == W5500 \n
+ *        - @ref \_WIZCHIP_IO_MODE_BUS_ \n
+ *          - @ref \_WIZCHIP_IO_MODE_BUS_DIR_ \n
+ *          - @ref \_WIZCHIP_IO_MODE_BUS_INDIR_ \n
+ *        - Others will be defined in future. \n\n
+ *        ex&gt; &lt;code&gt; #define \_WIZCHIP_IO_MODE_ \_WIZCHIP_IO_MODE_SPI_VDM_ &lt;/code&gt;
+ *
+ */</span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">ifndef</span> <span class="token expression">_WIZCHIP_IO_MODE_</span></span>
+<span class="token comment">// #define _WIZCHIP_IO_MODE_           _WIZCHIP_IO_MODE_SPI_FDM_</span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name">_WIZCHIP_IO_MODE_</span> <span class="token expression">_WIZCHIP_IO_MODE_SPI_VDM_</span></span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<h3 id="gou-zi-han-shu-amp-zhu-ce">钩子函数 &amp; 注册</h3>
+<p><code>wizchip_conf.c</code>文件中，官方提供了一些接口，待用户补充。</p>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token keyword">void</span>    <span class="token function">wizchip_cris_enter</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span>  <span class="token punctuation">{</span><span class="token punctuation">}</span> <span class="token comment">// 进入临界区(没有上系统,默认即可)</span>
+<span class="token keyword">void</span>    <span class="token function">wizchip_cris_exit</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span> <span class="token punctuation">{</span><span class="token punctuation">}</span> <span class="token comment">// 退出临界区(没有上系统,默认即可)</span>
+<span class="token keyword">void</span>    <span class="token function">wizchip_cs_select</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span>  <span class="token punctuation">{</span><span class="token punctuation">}</span> <span class="token comment">// 片选使能</span>
+<span class="token keyword">void</span>    <span class="token function">wizchip_cs_deselect</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span> <span class="token punctuation">{</span><span class="token punctuation">}</span> <span class="token comment">// 片选失能</span>
+<span class="token class-name">iodata_t</span> <span class="token function">wizchip_bus_readdata</span><span class="token punctuation">(</span><span class="token class-name">uint32_t</span> AddrSel<span class="token punctuation">)</span> <span class="token punctuation">{</span> <span class="token keyword">return</span> <span class="token operator">*</span> <span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token keyword">volatile</span> <span class="token class-name">iodata_t</span> <span class="token operator">*</span><span class="token punctuation">)</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token class-name">ptrdiff_t</span><span class="token punctuation">)</span> AddrSel<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token punctuation">}</span> <span class="token comment">// 总线读函数</span>
+<span class="token keyword">void</span>    <span class="token function">wizchip_bus_writedata</span><span class="token punctuation">(</span><span class="token class-name">uint32_t</span> AddrSel<span class="token punctuation">,</span> <span class="token class-name">iodata_t</span> wb<span class="token punctuation">)</span>  <span class="token punctuation">{</span> <span class="token operator">*</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token keyword">volatile</span> <span class="token class-name">iodata_t</span><span class="token operator">*</span><span class="token punctuation">)</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token class-name">ptrdiff_t</span><span class="token punctuation">)</span>AddrSel<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token operator">=</span> wb<span class="token punctuation">;</span> <span class="token punctuation">}</span> <span class="token comment">// 总线写函数</span>
+<span class="token class-name">uint8_t</span> <span class="token function">wizchip_spi_readbyte</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span>        <span class="token punctuation">{</span><span class="token keyword">return</span> <span class="token number">0</span><span class="token punctuation">;</span><span class="token punctuation">}</span> <span class="token comment">// 读一个字节</span>
+<span class="token keyword">void</span>    <span class="token function">wizchip_spi_writebyte</span><span class="token punctuation">(</span><span class="token class-name">uint8_t</span> wb<span class="token punctuation">)</span> <span class="token punctuation">{</span><span class="token punctuation">}</span> <span class="token comment">// 写一个字节</span>
+<span class="token keyword">void</span>    <span class="token function">wizchip_spi_readburst</span><span class="token punctuation">(</span><span class="token class-name">uint8_t</span><span class="token operator">*</span> pBuf<span class="token punctuation">,</span> <span class="token class-name">uint16_t</span> len<span class="token punctuation">)</span>  <span class="token punctuation">{</span><span class="token punctuation">}</span> <span class="token comment">//按长度读</span>
+<span class="token keyword">void</span>    <span class="token function">wizchip_spi_writeburst</span><span class="token punctuation">(</span><span class="token class-name">uint8_t</span><span class="token operator">*</span> pBuf<span class="token punctuation">,</span> <span class="token class-name">uint16_t</span> len<span class="token punctuation">)</span> <span class="token punctuation">{</span><span class="token punctuation">}</span> <span class="token comment">// 按长度写</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>实现上述函数后需要通过如下函数进行注册</p>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token comment">//注册进入/退出临界区函数</span>
+<span class="token keyword">void</span> <span class="token function">reg_wizchip_cris_cbfunc</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">(</span><span class="token operator">*</span>cris_en<span class="token punctuation">)</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token keyword">void</span><span class="token punctuation">(</span><span class="token operator">*</span>cris_ex<span class="token punctuation">)</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+<span class="token comment">//注册SPI片选(CS)使能/失能函数</span>
+<span class="token keyword">void</span> <span class="token function">reg_wizchip_cs_cbfunc</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">(</span><span class="token operator">*</span>cs_sel<span class="token punctuation">)</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token keyword">void</span><span class="token punctuation">(</span><span class="token operator">*</span>cs_desel<span class="token punctuation">)</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+<span class="token comment">//注册总线 读/写 函数</span>
+<span class="token keyword">void</span> <span class="token function">reg_wizchip_bus_cbfunc</span><span class="token punctuation">(</span><span class="token class-name">iodata_t</span><span class="token punctuation">(</span><span class="token operator">*</span>bus_rb<span class="token punctuation">)</span><span class="token punctuation">(</span><span class="token class-name">uint32_t</span> addr<span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token keyword">void</span> <span class="token punctuation">(</span><span class="token operator">*</span>bus_wb<span class="token punctuation">)</span><span class="token punctuation">(</span><span class="token class-name">uint32_t</span> addr<span class="token punctuation">,</span> <span class="token class-name">iodata_t</span> wb<span class="token punctuation">)</span><span class="token punctuation">)</span>
+<span class="token comment">//注册 SPI 按字节 读/写 函数</span>
+<span class="token keyword">void</span> <span class="token function">reg_wizchip_spi_cbfunc</span><span class="token punctuation">(</span><span class="token class-name">uint8_t</span> <span class="token punctuation">(</span><span class="token operator">*</span>spi_rb<span class="token punctuation">)</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token keyword">void</span> <span class="token punctuation">(</span><span class="token operator">*</span>spi_wb<span class="token punctuation">)</span><span class="token punctuation">(</span><span class="token class-name">uint8_t</span> wb<span class="token punctuation">)</span><span class="token punctuation">)</span>
+<span class="token comment">//注册 SPI 按长度 读/写函数</span>
+<span class="token keyword">void</span> <span class="token function">reg_wizchip_spiburst_cbfunc</span><span class="token punctuation">(</span><span class="token keyword">void</span> <span class="token punctuation">(</span><span class="token operator">*</span>spi_rb<span class="token punctuation">)</span><span class="token punctuation">(</span><span class="token class-name">uint8_t</span><span class="token operator">*</span> pBuf<span class="token punctuation">,</span> <span class="token class-name">uint16_t</span> len<span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token keyword">void</span> <span class="token punctuation">(</span><span class="token operator">*</span>spi_wb<span class="token punctuation">)</span><span class="token punctuation">(</span><span class="token class-name">uint8_t</span><span class="token operator">*</span> pBuf<span class="token punctuation">,</span> <span class="token class-name">uint16_t</span> len<span class="token punctuation">)</span><span class="token punctuation">)</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<h3 id="dui-jie-spi">对接SPI</h3>
+<h4 id="spi-h">spi.h</h4>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">ifndef</span> <span class="token expression">__SPI_H__</span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name">__SPI_H__</span></span>
+
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">"stm32f10x.h"</span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">"delay.h"</span></span>
+
+<span class="token comment">// CS</span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name">CS_HIGH</span> <span class="token expression"><span class="token punctuation">(</span>GPIOD<span class="token operator">-&gt;</span>ODR <span class="token operator">|=</span> GPIO_ODR_ODR3<span class="token punctuation">)</span></span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name">CS_LOW</span> <span class="token expression"><span class="token punctuation">(</span>GPIOD<span class="token operator">-&gt;</span>ODR <span class="token operator">&amp;=</span> <span class="token operator">~</span>GPIO_ODR_ODR3<span class="token punctuation">)</span></span></span>
+
+<span class="token keyword">void</span> <span class="token function">SPI_Init</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token keyword">void</span> <span class="token function">SPI_Start</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">void</span> <span class="token function">SPI_Stop</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token class-name">uint8_t</span> <span class="token function">SPI_SwapByte</span><span class="token punctuation">(</span><span class="token class-name">uint8_t</span> dataByte<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">endif</span> <span class="token comment">/* __SPI_H__ */</span></span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<h4 id="wizchip-conf-c">wizchip_conf.c</h4>
+<p>实现钩子函数</p>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token keyword">void</span> 	<span class="token function">wizchip_cs_select</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span>            <span class="token punctuation">{</span>
+    CS_LOW<span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">void</span> 	<span class="token function">wizchip_cs_deselect</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span>          <span class="token punctuation">{</span>
+    CS_HIGH<span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token class-name">uint8_t</span> <span class="token function">wizchip_spi_readbyte</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span>        <span class="token punctuation">{</span>
+    <span class="token keyword">return</span> <span class="token function">SPI_SwapByte</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">void</span> 	<span class="token function">wizchip_spi_writebyte</span><span class="token punctuation">(</span><span class="token class-name">uint8_t</span> wb<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token function">SPI_SwapByte</span><span class="token punctuation">(</span>wb<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>新增注册接口</p>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token keyword">void</span> <span class="token function">wizchip_register_callbacks</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token function">reg_wizchip_cris_cbfunc</span><span class="token punctuation">(</span>wizchip_cris_enter<span class="token punctuation">,</span> wizchip_cris_exit<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">reg_wizchip_cs_cbfunc</span><span class="token punctuation">(</span>wizchip_cs_select<span class="token punctuation">,</span> wizchip_cs_deselect<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">reg_wizchip_spi_cbfunc</span><span class="token punctuation">(</span>wizchip_spi_readbyte<span class="token punctuation">,</span> wizchip_spi_writebyte<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<h2 id="spi-stm-32-f-103-wai-she-spi-2">SPI（STM32F103外设SPI2）</h2>
+<h3 id="spi-h-1">spi.h</h3>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">ifndef</span> <span class="token expression">__SPI_H__</span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name">__SPI_H__</span></span>
+
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">"stm32f10x.h"</span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">"delay.h"</span></span>
+
+<span class="token comment">// CS</span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name">CS_HIGH</span> <span class="token expression"><span class="token punctuation">(</span>GPIOD<span class="token operator">-&gt;</span>ODR <span class="token operator">|=</span> GPIO_ODR_ODR3<span class="token punctuation">)</span></span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name">CS_LOW</span> <span class="token expression"><span class="token punctuation">(</span>GPIOD<span class="token operator">-&gt;</span>ODR <span class="token operator">&amp;=</span> <span class="token operator">~</span>GPIO_ODR_ODR3<span class="token punctuation">)</span></span></span>
+
+<span class="token keyword">void</span> <span class="token function">SPI_Init</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token keyword">void</span> <span class="token function">SPI_Start</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">void</span> <span class="token function">SPI_Stop</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token class-name">uint8_t</span> <span class="token function">SPI_SwapByte</span><span class="token punctuation">(</span><span class="token class-name">uint8_t</span> dataByte<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">endif</span> <span class="token comment">/* __SPI_H__ */</span></span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<h3 id="spi-c">spi.c</h3>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">"spi.h"</span></span>
+
+<span class="token keyword">void</span> <span class="token function">SPI_Init</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    RCC<span class="token operator">-&gt;</span>APB1ENR <span class="token operator">|=</span> RCC_APB1ENR_SPI2EN<span class="token punctuation">;</span>
+    RCC<span class="token operator">-&gt;</span>APB2ENR <span class="token operator">|=</span> RCC_APB2ENR_IOPBEN<span class="token punctuation">;</span>
+    RCC<span class="token operator">-&gt;</span>APB2ENR <span class="token operator">|=</span> RCC_APB2ENR_IOPDEN<span class="token punctuation">;</span>
+
+    <span class="token comment">// CS-PD3 通用推挽 MODE=11 CNF=00</span>
+    GPIOD<span class="token operator">-&gt;</span>CRL <span class="token operator">|=</span> GPIO_CRL_MODE3<span class="token punctuation">;</span>
+    GPIOD<span class="token operator">-&gt;</span>CRL <span class="token operator">&amp;=</span> <span class="token operator">~</span>GPIO_CRL_CNF3<span class="token punctuation">;</span>
+
+    <span class="token comment">// SCK-PB13，MOSI-PB15 复用推挽 MODE=11 CNF=10</span>
+    GPIOB<span class="token operator">-&gt;</span>CRH <span class="token operator">|=</span> GPIO_CRH_MODE13<span class="token punctuation">;</span>
+    GPIOB<span class="token operator">-&gt;</span>CRH <span class="token operator">|=</span> GPIO_CRH_CNF13_1<span class="token punctuation">;</span>
+    GPIOB<span class="token operator">-&gt;</span>CRH <span class="token operator">&amp;=</span> <span class="token operator">~</span>GPIO_CRH_CNF13_0<span class="token punctuation">;</span>
+
+    GPIOB<span class="token operator">-&gt;</span>CRH <span class="token operator">|=</span> GPIO_CRH_MODE15<span class="token punctuation">;</span>
+    GPIOB<span class="token operator">-&gt;</span>CRH <span class="token operator">|=</span> GPIO_CRH_CNF15_1<span class="token punctuation">;</span>
+    GPIOB<span class="token operator">-&gt;</span>CRH <span class="token operator">&amp;=</span> <span class="token operator">~</span>GPIO_CRH_CNF15_0<span class="token punctuation">;</span>
+
+    <span class="token comment">// MISO-PB14 浮空输入 MODE=00, CNF=01</span>
+    GPIOB<span class="token operator">-&gt;</span>CRH <span class="token operator">&amp;=</span> <span class="token operator">~</span>GPIO_CRH_MODE14<span class="token punctuation">;</span>
+    GPIOB<span class="token operator">-&gt;</span>CRH <span class="token operator">|=</span> GPIO_CRH_CNF14_0<span class="token punctuation">;</span>
+    GPIOB<span class="token operator">-&gt;</span>CRH <span class="token operator">&amp;=</span> <span class="token operator">~</span>GPIO_CRH_CNF14_1<span class="token punctuation">;</span>
+
+    <span class="token comment">// 波特率配置为PCLK/4 即 72M/4=18M =&gt; 001</span>
+    SPI2<span class="token operator">-&gt;</span>CR1 <span class="token operator">&amp;=</span> <span class="token operator">~</span>SPI_CR1_BR<span class="token punctuation">;</span>
+    SPI2<span class="token operator">-&gt;</span>CR1 <span class="token operator">|=</span> SPI_CR1_BR_0<span class="token punctuation">;</span>
+    <span class="token comment">// SPI模式0（时钟极性=0，相位=0）</span>
+    SPI2<span class="token operator">-&gt;</span>CR1 <span class="token operator">&amp;=</span> <span class="token operator">~</span>SPI_CR1_CPOL<span class="token punctuation">;</span>
+    SPI2<span class="token operator">-&gt;</span>CR1 <span class="token operator">&amp;=</span> <span class="token operator">~</span>SPI_CR1_CPHA<span class="token punctuation">;</span>
+    <span class="token comment">// 数据帧格式 8bit</span>
+    SPI2<span class="token operator">-&gt;</span>CR1 <span class="token operator">&amp;=</span> <span class="token operator">~</span>SPI_CR1_DFF<span class="token punctuation">;</span>
+    <span class="token comment">// 高位优先</span>
+    SPI2<span class="token operator">-&gt;</span>CR1 <span class="token operator">&amp;=</span> <span class="token operator">~</span>SPI_CR1_LSBFIRST<span class="token punctuation">;</span>
+    <span class="token comment">// NSS为当前MCU作为从设备时的片选信号输入，主模式下，要么硬件上将该引脚拉高，要么通过SSM和SSI将其强制置1</span>
+    SPI2<span class="token operator">-&gt;</span>CR1 <span class="token operator">|=</span> SPI_CR1_SSM<span class="token punctuation">;</span> <span class="token comment">// 将NSS输入配置为软件控制</span>
+    SPI2<span class="token operator">-&gt;</span>CR1 <span class="token operator">|=</span> SPI_CR1_SSI<span class="token punctuation">;</span> <span class="token comment">// 通过SSI=1将NSS强制拉高</span>
+    <span class="token comment">// 设置主模式</span>
+    SPI2<span class="token operator">-&gt;</span>CR1 <span class="token operator">|=</span> SPI_CR1_MSTR<span class="token punctuation">;</span>
+    <span class="token comment">// 使能SPI外设</span>
+    SPI2<span class="token operator">-&gt;</span>CR1 <span class="token operator">|=</span> SPI_CR1_SPE<span class="token punctuation">;</span>
+
+    <span class="token comment">// SPI模式0（极性=0，相位=0） 空闲状态 CS拉高（低电平使能），SCK拉低</span>
+    CS_HIGH<span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">void</span> <span class="token function">SPI_Start</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span> <span class="token punctuation">{</span> CS_LOW<span class="token punctuation">;</span> <span class="token punctuation">}</span>
+<span class="token keyword">void</span> <span class="token function">SPI_Stop</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span> <span class="token punctuation">{</span> CS_HIGH<span class="token punctuation">;</span> <span class="token punctuation">}</span>
+
+<span class="token class-name">uint8_t</span> <span class="token function">SPI_SwapByte</span><span class="token punctuation">(</span><span class="token class-name">uint8_t</span> dataByte<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token comment">// 等待发送缓冲区为空</span>
+    <span class="token keyword">while</span> <span class="token punctuation">(</span><span class="token punctuation">(</span>SPI2<span class="token operator">-&gt;</span>SR <span class="token operator">&amp;</span> SPI_SR_TXE<span class="token punctuation">)</span> <span class="token operator">==</span> <span class="token number">0</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token punctuation">}</span>
+    <span class="token comment">// 发送数据</span>
+    SPI2<span class="token operator">-&gt;</span>DR <span class="token operator">=</span> dataByte<span class="token punctuation">;</span>
+    <span class="token comment">// 等待接收缓冲区非空</span>
+    <span class="token keyword">while</span> <span class="token punctuation">(</span><span class="token punctuation">(</span>SPI2<span class="token operator">-&gt;</span>SR <span class="token operator">&amp;</span> SPI_SR_RXNE<span class="token punctuation">)</span> <span class="token operator">==</span> <span class="token number">0</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token punctuation">}</span>
+    <span class="token comment">// 接收数据</span>
+    <span class="token keyword">return</span> <span class="token punctuation">(</span><span class="token class-name">uint8_t</span><span class="token punctuation">)</span>SPI2<span class="token operator">-&gt;</span>DR<span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<h2 id="yi-tai-qu-dong-feng-zhuang">以太驱动封装</h2>
+<h3 id="logger-h">logger.h</h3>
+<blockquote>
+<p>[!NOTE]</p>
+<p>增加打印IP信息的工具接口 <code>LOG_ARR</code></p>
+</blockquote>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">ifndef</span> <span class="token expression">LOGGER_H</span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name">LOGGER_H</span></span>
+
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">ifdef</span> <span class="token expression">__cplusplus</span></span>
+<span class="token keyword">extern</span> <span class="token string">"C"</span> <span class="token punctuation">{</span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">endif</span></span>
+
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">"stdio.h"</span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">"stm32f10x.h"</span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;string.h&gt;</span></span>
+
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">ifndef</span> <span class="token expression">USE_LOG</span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name">USE_LOG</span> <span class="token expression"><span class="token number">1</span></span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">endif</span></span>
+
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">ifndef</span> <span class="token expression">USE_DUMP</span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name">USE_DUMP</span> <span class="token expression"><span class="token number">1</span></span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">endif</span></span>
+
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">ifndef</span> <span class="token expression">USE_BLOCK</span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name">USE_BLOCK</span> <span class="token expression"><span class="token number">1</span></span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">endif</span></span>
+
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name function">ONLY_FILENAME</span><span class="token expression"><span class="token punctuation">(</span>x<span class="token punctuation">)</span> <span class="token punctuation">(</span><span class="token function">strrchr</span><span class="token punctuation">(</span>x<span class="token punctuation">,</span> </span><span class="token char">'\\'</span><span class="token expression"><span class="token punctuation">)</span> <span class="token operator">?</span> <span class="token function">strrchr</span><span class="token punctuation">(</span>x<span class="token punctuation">,</span> </span><span class="token char">'\\'</span><span class="token expression"><span class="token punctuation">)</span> <span class="token operator">+</span> <span class="token number">1</span> <span class="token operator">:</span> x<span class="token punctuation">)</span></span></span>
+
+<span class="token keyword">void</span> <span class="token function">log_arr</span><span class="token punctuation">(</span><span class="token keyword">const</span> <span class="token class-name">uint8_t</span> <span class="token operator">*</span>data<span class="token punctuation">,</span> <span class="token class-name">uint16_t</span> len<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">if</span> <span class="token expression">USE_BLOCK <span class="token operator">&gt;</span> <span class="token number">0</span></span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name function">BLOCK</span><span class="token expression"><span class="token punctuation">(</span>s<span class="token punctuation">,</span> <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">)</span>                                                          </span><span class="token punctuation">\</span>
+    <span class="token expression"><span class="token keyword">do</span> <span class="token punctuation">{</span>                                                                       </span><span class="token punctuation">\</span>
+        <span class="token expression"><span class="token function">printf</span><span class="token punctuation">(</span></span><span class="token string">"\r\n[BLOCK %s:%d] "</span><span class="token expression"><span class="token punctuation">,</span> <span class="token function">ONLY_FILENAME</span><span class="token punctuation">(</span><span class="token constant">__FILE__</span><span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token constant">__LINE__</span><span class="token punctuation">)</span><span class="token punctuation">;</span>       </span><span class="token punctuation">\</span>
+        <span class="token expression"><span class="token function">printf</span><span class="token punctuation">(</span>s<span class="token punctuation">,</span> </span><span class="token punctuation">##</span><span class="token expression">__VA_ARGS__<span class="token punctuation">)</span><span class="token punctuation">;</span>                                              </span><span class="token punctuation">\</span>
+        <span class="token expression"><span class="token function">printf</span><span class="token punctuation">(</span></span><span class="token string">",按任意键继续"</span><span class="token expression"><span class="token punctuation">)</span><span class="token punctuation">;</span>                                               </span><span class="token punctuation">\</span>
+        <span class="token expression">block_flag <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>                                                        </span><span class="token punctuation">\</span>
+        <span class="token expression"><span class="token keyword">while</span> <span class="token punctuation">(</span>block_flag <span class="token operator">==</span> <span class="token number">0</span><span class="token punctuation">)</span>                                                </span><span class="token punctuation">\</span>
+            <span class="token expression"><span class="token punctuation">;</span>                                                                  </span><span class="token punctuation">\</span>
+        <span class="token expression"><span class="token function">printf</span><span class="token punctuation">(</span></span><span class="token string">"\r\n"</span><span class="token expression"><span class="token punctuation">)</span><span class="token punctuation">;</span>                                                        </span><span class="token punctuation">\</span>
+    <span class="token expression"><span class="token punctuation">}</span> <span class="token keyword">while</span> <span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">)</span></span></span>
+
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">else</span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name function">BLOCK</span><span class="token expression"><span class="token punctuation">(</span>x<span class="token punctuation">)</span></span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">endif</span></span>
+
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">if</span> <span class="token expression">USE_LOG <span class="token operator">&gt;</span> <span class="token number">0</span></span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name function">LOG_ARR</span><span class="token expression"><span class="token punctuation">(</span>info<span class="token punctuation">,</span> data<span class="token punctuation">,</span> len<span class="token punctuation">,</span> <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">)</span>                                          </span><span class="token punctuation">\</span>
+    <span class="token expression"><span class="token keyword">do</span> <span class="token punctuation">{</span>                                                                       </span><span class="token punctuation">\</span>
+        <span class="token expression"><span class="token function">printf</span><span class="token punctuation">(</span></span><span class="token string">"\033[1;36m\r\n[DEBUG %s:%d] "</span><span class="token expression"><span class="token punctuation">,</span> <span class="token function">ONLY_FILENAME</span><span class="token punctuation">(</span><span class="token constant">__FILE__</span><span class="token punctuation">)</span><span class="token punctuation">,</span>        </span><span class="token punctuation">\</span>
+               <span class="token expression"><span class="token constant">__LINE__</span><span class="token punctuation">)</span><span class="token punctuation">;</span>                                                      </span><span class="token punctuation">\</span>
+        <span class="token expression"><span class="token function">printf</span><span class="token punctuation">(</span>info<span class="token punctuation">,</span> </span><span class="token punctuation">##</span><span class="token expression">__VA_ARGS__<span class="token punctuation">)</span><span class="token punctuation">;</span>                                           </span><span class="token punctuation">\</span>
+        <span class="token expression"><span class="token function">printf</span><span class="token punctuation">(</span></span><span class="token string">" =&gt; "</span><span class="token expression"><span class="token punctuation">)</span><span class="token punctuation">;</span>                                                        </span><span class="token punctuation">\</span>
+        <span class="token expression"><span class="token function">log_arr</span><span class="token punctuation">(</span>data<span class="token punctuation">,</span> len<span class="token punctuation">)</span><span class="token punctuation">;</span>                                                    </span><span class="token punctuation">\</span>
+        <span class="token expression"><span class="token function">printf</span><span class="token punctuation">(</span></span><span class="token string">"\33[0m\r\n"</span><span class="token expression"><span class="token punctuation">)</span><span class="token punctuation">;</span>                                                  </span><span class="token punctuation">\</span>
+    <span class="token expression"><span class="token punctuation">}</span> <span class="token keyword">while</span> <span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">;</span></span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name function">LOG_DEBUG</span><span class="token expression"><span class="token punctuation">(</span>s<span class="token punctuation">,</span> <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">)</span>                                                      </span><span class="token punctuation">\</span>
+    <span class="token expression"><span class="token keyword">do</span> <span class="token punctuation">{</span>                                                                       </span><span class="token punctuation">\</span>
+        <span class="token expression"><span class="token function">printf</span><span class="token punctuation">(</span></span><span class="token string">"\033[1;36m\r\n[DEBUG %s:%d] "</span><span class="token expression"><span class="token punctuation">,</span> <span class="token function">ONLY_FILENAME</span><span class="token punctuation">(</span><span class="token constant">__FILE__</span><span class="token punctuation">)</span><span class="token punctuation">,</span>        </span><span class="token punctuation">\</span>
+               <span class="token expression"><span class="token constant">__LINE__</span><span class="token punctuation">)</span><span class="token punctuation">;</span>                                                      </span><span class="token punctuation">\</span>
+        <span class="token expression"><span class="token function">printf</span><span class="token punctuation">(</span>s<span class="token punctuation">,</span> </span><span class="token punctuation">##</span><span class="token expression">__VA_ARGS__<span class="token punctuation">)</span><span class="token punctuation">;</span>                                              </span><span class="token punctuation">\</span>
+        <span class="token expression"><span class="token function">printf</span><span class="token punctuation">(</span></span><span class="token string">"\33[0m\r\n"</span><span class="token expression"><span class="token punctuation">)</span><span class="token punctuation">;</span>                                                  </span><span class="token punctuation">\</span>
+    <span class="token expression"><span class="token punctuation">}</span> <span class="token keyword">while</span> <span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">;</span></span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name function">LOG_INFO</span><span class="token expression"><span class="token punctuation">(</span>s<span class="token punctuation">,</span> <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">)</span>                                                       </span><span class="token punctuation">\</span>
+    <span class="token expression"><span class="token keyword">do</span> <span class="token punctuation">{</span>                                                                       </span><span class="token punctuation">\</span>
+        <span class="token expression"><span class="token function">printf</span><span class="token punctuation">(</span></span><span class="token string">"\033[0;32m\r\n[INFO] "</span><span class="token expression"><span class="token punctuation">)</span><span class="token punctuation">;</span>                                       </span><span class="token punctuation">\</span>
+        <span class="token expression"><span class="token function">printf</span><span class="token punctuation">(</span>s<span class="token punctuation">,</span> </span><span class="token punctuation">##</span><span class="token expression">__VA_ARGS__<span class="token punctuation">)</span><span class="token punctuation">;</span>                                              </span><span class="token punctuation">\</span>
+        <span class="token expression"><span class="token function">printf</span><span class="token punctuation">(</span></span><span class="token string">"\33[0m\r\n"</span><span class="token expression"><span class="token punctuation">)</span><span class="token punctuation">;</span>                                                  </span><span class="token punctuation">\</span>
+    <span class="token expression"><span class="token punctuation">}</span> <span class="token keyword">while</span> <span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">;</span></span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name function">LOG_ERROR</span><span class="token expression"><span class="token punctuation">(</span>s<span class="token punctuation">,</span> <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">)</span>                                                      </span><span class="token punctuation">\</span>
+    <span class="token expression"><span class="token keyword">do</span> <span class="token punctuation">{</span>                                                                       </span><span class="token punctuation">\</span>
+        <span class="token expression"><span class="token function">printf</span><span class="token punctuation">(</span></span><span class="token string">"\033[0;31m\r\n[ERROR %s:%d] "</span><span class="token expression"><span class="token punctuation">,</span> <span class="token function">ONLY_FILENAME</span><span class="token punctuation">(</span><span class="token constant">__FILE__</span><span class="token punctuation">)</span><span class="token punctuation">,</span>        </span><span class="token punctuation">\</span>
+               <span class="token expression"><span class="token constant">__LINE__</span><span class="token punctuation">)</span><span class="token punctuation">;</span>                                                      </span><span class="token punctuation">\</span>
+        <span class="token expression"><span class="token function">printf</span><span class="token punctuation">(</span>s<span class="token punctuation">,</span> </span><span class="token punctuation">##</span><span class="token expression">__VA_ARGS__<span class="token punctuation">)</span><span class="token punctuation">;</span>                                              </span><span class="token punctuation">\</span>
+        <span class="token expression"><span class="token function">printf</span><span class="token punctuation">(</span></span><span class="token string">"\33[0m\r\n"</span><span class="token expression"><span class="token punctuation">)</span><span class="token punctuation">;</span>                                                  </span><span class="token punctuation">\</span>
+    <span class="token expression"><span class="token punctuation">}</span> <span class="token keyword">while</span> <span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">;</span></span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name function">LOG_ASSERT</span><span class="token expression"><span class="token punctuation">(</span>cond<span class="token punctuation">)</span>                                                       </span><span class="token punctuation">\</span>
+    <span class="token expression"><span class="token keyword">do</span> <span class="token punctuation">{</span>                                                                       </span><span class="token punctuation">\</span>
+        <span class="token expression"><span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span><span class="token punctuation">(</span>cond<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>                                                         </span><span class="token punctuation">\</span>
+            <span class="token expression"><span class="token function">printf</span><span class="token punctuation">(</span></span><span class="token string">"\r\n[ASSERT] File=[%s],Line=[%ld] Failed to vertify thc "</span>  <span class="token punctuation">\</span>
+                   <span class="token string">"condition [\"%s\"]\r\n"</span><span class="token expression"><span class="token punctuation">,</span>                                   </span><span class="token punctuation">\</span>
+                   <span class="token expression"><span class="token constant">__FILE__</span><span class="token punctuation">,</span> <span class="token constant">__LINE__</span><span class="token punctuation">,</span> #cond<span class="token punctuation">)</span><span class="token punctuation">;</span>                                 </span><span class="token punctuation">\</span>
+        <span class="token expression"><span class="token punctuation">}</span>                                                                      </span><span class="token punctuation">\</span>
+    <span class="token expression"><span class="token punctuation">}</span> <span class="token keyword">while</span> <span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">;</span></span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">else</span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name function">LOG_DEBUG</span><span class="token expression"><span class="token punctuation">(</span>s<span class="token punctuation">,</span> <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">)</span></span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name function">LOG_INFO</span><span class="token expression"><span class="token punctuation">(</span>s<span class="token punctuation">,</span> <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">)</span></span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name function">LOG_ERROR</span><span class="token expression"><span class="token punctuation">(</span>s<span class="token punctuation">,</span> <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">)</span></span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name function">LOG_ERROR2</span><span class="token expression"><span class="token punctuation">(</span><span class="token punctuation">)</span></span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name function">LOG_ERROR3</span><span class="token expression"><span class="token punctuation">(</span>cond<span class="token punctuation">)</span></span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name function">LOG_ERROR4</span><span class="token expression"><span class="token punctuation">(</span>s<span class="token punctuation">,</span> <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">)</span></span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name function">LOG_ASSERT</span><span class="token expression"><span class="token punctuation">(</span>cond<span class="token punctuation">)</span></span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">endif</span></span>
+
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">if</span> <span class="token expression">USE_DUMP <span class="token operator">&gt;</span> <span class="token number">0</span></span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name function">LOG_DUMP</span><span class="token expression"><span class="token punctuation">(</span>info<span class="token punctuation">,</span> data<span class="token punctuation">,</span> len<span class="token punctuation">,</span> <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">)</span>                                         </span><span class="token punctuation">\</span>
+    <span class="token expression"><span class="token keyword">do</span> <span class="token punctuation">{</span>                                                                       </span><span class="token punctuation">\</span>
+        <span class="token expression"><span class="token function">printf</span><span class="token punctuation">(</span></span><span class="token string">"\033[1;36m\r\n[DUMP] "</span><span class="token expression"><span class="token punctuation">)</span><span class="token punctuation">;</span>                                       </span><span class="token punctuation">\</span>
+        <span class="token expression"><span class="token function">printf</span><span class="token punctuation">(</span>info<span class="token punctuation">,</span> </span><span class="token punctuation">##</span><span class="token expression">__VA_ARGS__<span class="token punctuation">)</span><span class="token punctuation">;</span>                                           </span><span class="token punctuation">\</span>
+        <span class="token expression"><span class="token function">printf</span><span class="token punctuation">(</span></span><span class="token string">"\r\n\r\n"</span><span class="token expression"><span class="token punctuation">)</span><span class="token punctuation">;</span>                                                    </span><span class="token punctuation">\</span>
+        <span class="token expression"><span class="token function">log_dump</span><span class="token punctuation">(</span>data<span class="token punctuation">,</span> len<span class="token punctuation">)</span><span class="token punctuation">;</span>                                                   </span><span class="token punctuation">\</span>
+        <span class="token expression"><span class="token function">printf</span><span class="token punctuation">(</span></span><span class="token string">"\33[0m\r\n"</span><span class="token expression"><span class="token punctuation">)</span><span class="token punctuation">;</span>                                                  </span><span class="token punctuation">\</span>
+    <span class="token expression"><span class="token punctuation">}</span> <span class="token keyword">while</span> <span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">;</span></span></span>
+
+<span class="token keyword">void</span> <span class="token function">log_dump</span><span class="token punctuation">(</span><span class="token keyword">const</span> <span class="token class-name">uint8_t</span> <span class="token operator">*</span>data<span class="token punctuation">,</span> <span class="token class-name">uint16_t</span> len<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">else</span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name function">LOG_DUMP</span><span class="token expression"><span class="token punctuation">(</span>info<span class="token punctuation">,</span> data<span class="token punctuation">,</span> len<span class="token punctuation">)</span></span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">endif</span></span>
+
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">ifdef</span> <span class="token expression">__cplusplus</span></span>
+<span class="token punctuation">}</span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">endif</span></span>
+
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">endif</span> <span class="token comment">/* LOGGER_H */</span></span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<h3 id="logger-c">logger.c</h3>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">"logger.h"</span></span>
+
+<span class="token keyword">void</span> <span class="token function">log_dump</span><span class="token punctuation">(</span><span class="token keyword">const</span> <span class="token class-name">uint8_t</span> <span class="token operator">*</span>data<span class="token punctuation">,</span> <span class="token class-name">uint16_t</span> len<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token class-name">uint8_t</span> ch<span class="token punctuation">,</span> cl<span class="token punctuation">;</span>
+    <span class="token keyword">for</span> <span class="token punctuation">(</span><span class="token keyword">int</span> i <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span> i <span class="token operator">&lt;</span> len<span class="token punctuation">;</span> i<span class="token operator">++</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        ch <span class="token operator">=</span> data<span class="token punctuation">[</span>i<span class="token punctuation">]</span> <span class="token operator">&gt;&gt;</span> <span class="token number">4</span><span class="token punctuation">;</span>
+        cl <span class="token operator">=</span> data<span class="token punctuation">[</span>i<span class="token punctuation">]</span> <span class="token operator">&amp;</span> <span class="token number">0x0F</span><span class="token punctuation">;</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>ch <span class="token operator">&lt;</span> <span class="token number">10</span><span class="token punctuation">)</span> ch <span class="token operator">+=</span> <span class="token char">'0'</span><span class="token punctuation">;</span>
+        <span class="token keyword">else</span>
+            ch <span class="token operator">+=</span> <span class="token char">'A'</span> <span class="token operator">-</span> <span class="token number">10</span><span class="token punctuation">;</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>cl <span class="token operator">&lt;</span> <span class="token number">10</span><span class="token punctuation">)</span> cl <span class="token operator">+=</span> <span class="token char">'0'</span><span class="token punctuation">;</span>
+        <span class="token keyword">else</span>
+            cl <span class="token operator">+=</span> <span class="token char">'A'</span> <span class="token operator">-</span> <span class="token number">10</span><span class="token punctuation">;</span>
+        <span class="token function">putchar</span><span class="token punctuation">(</span>ch<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token function">putchar</span><span class="token punctuation">(</span>cl<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token function">printf</span><span class="token punctuation">(</span><span class="token string">" "</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token punctuation">(</span>i <span class="token operator">+</span> <span class="token number">1</span><span class="token punctuation">)</span> <span class="token operator">%</span> <span class="token number">16</span> <span class="token operator">==</span> <span class="token number">0</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token function">printf</span><span class="token punctuation">(</span><span class="token string">"\r\n"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token punctuation">(</span>i <span class="token operator">+</span> <span class="token number">1</span><span class="token punctuation">)</span> <span class="token operator">%</span> <span class="token number">8</span> <span class="token operator">==</span> <span class="token number">0</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            ch <span class="token operator">=</span> <span class="token char">' '</span><span class="token punctuation">;</span>
+            <span class="token function">putchar</span><span class="token punctuation">(</span>ch<span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token function">putchar</span><span class="token punctuation">(</span>ch<span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token function">putchar</span><span class="token punctuation">(</span>ch<span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token function">putchar</span><span class="token punctuation">(</span>ch<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
+            ch <span class="token operator">=</span> <span class="token char">' '</span><span class="token punctuation">;</span>
+            <span class="token function">putchar</span><span class="token punctuation">(</span>ch<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">void</span> <span class="token function">log_arr</span><span class="token punctuation">(</span><span class="token keyword">const</span> <span class="token class-name">uint8_t</span> <span class="token operator">*</span>data<span class="token punctuation">,</span> <span class="token class-name">uint16_t</span> len<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">for</span> <span class="token punctuation">(</span><span class="token keyword">int</span> i <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span> i <span class="token operator">&lt;</span> len<span class="token punctuation">;</span> i<span class="token operator">++</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token function">printf</span><span class="token punctuation">(</span><span class="token string">"%d "</span><span class="token punctuation">,</span> data<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<h3 id="ethernet-h">ethernet.h</h3>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">ifndef</span> <span class="token expression">__ETHERNET_H__</span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name">__ETHERNET_H__</span></span>
+
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">"w5500.h"</span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">"logger.h"</span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">"delay.h"</span></span>
+
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name function">RST_HIGH</span><span class="token expression"><span class="token punctuation">(</span><span class="token punctuation">)</span> GPIOG<span class="token operator">-&gt;</span>ODR <span class="token operator">|=</span> GPIO_ODR_ODR7</span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name function">RST_LOW</span><span class="token expression"><span class="token punctuation">(</span><span class="token punctuation">)</span> GPIOG<span class="token operator">-&gt;</span>ODR <span class="token operator">&amp;=</span> <span class="token operator">~</span>GPIO_ODR_ODR7</span></span>
+
+<span class="token keyword">void</span> <span class="token function">Ethernet_Init</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token keyword">void</span> <span class="token function">Ethernet_SetMac</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token keyword">void</span> <span class="token function">Ethernet_SetIP</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token keyword">void</span> <span class="token function">Ethernet_Test</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">endif</span> <span class="token comment">/* __ETHERNET_H__ */</span></span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<h3 id="ethernet-c">ethernet.c</h3>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">"ethernet.h"</span></span>
+
+<span class="token class-name">uint8_t</span> mac<span class="token punctuation">[</span><span class="token number">6</span><span class="token punctuation">]</span>        <span class="token operator">=</span> <span class="token punctuation">{</span><span class="token number">110</span><span class="token punctuation">,</span> <span class="token number">120</span><span class="token punctuation">,</span> <span class="token number">130</span><span class="token punctuation">,</span> <span class="token number">140</span><span class="token punctuation">,</span> <span class="token number">150</span><span class="token punctuation">,</span> <span class="token number">160</span><span class="token punctuation">}</span><span class="token punctuation">;</span>
+<span class="token class-name">uint8_t</span> ip<span class="token punctuation">[</span><span class="token number">4</span><span class="token punctuation">]</span>         <span class="token operator">=</span> <span class="token punctuation">{</span><span class="token number">192</span><span class="token punctuation">,</span> <span class="token number">168</span><span class="token punctuation">,</span> <span class="token number">39</span><span class="token punctuation">,</span> <span class="token number">222</span><span class="token punctuation">}</span><span class="token punctuation">;</span>
+<span class="token class-name">uint8_t</span> gateway<span class="token punctuation">[</span><span class="token number">4</span><span class="token punctuation">]</span>    <span class="token operator">=</span> <span class="token punctuation">{</span><span class="token number">192</span><span class="token punctuation">,</span> <span class="token number">168</span><span class="token punctuation">,</span> <span class="token number">39</span><span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">}</span><span class="token punctuation">;</span>
+<span class="token class-name">uint8_t</span> subnetMask<span class="token punctuation">[</span><span class="token number">4</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token punctuation">{</span><span class="token number">255</span><span class="token punctuation">,</span> <span class="token number">255</span><span class="token punctuation">,</span> <span class="token number">255</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">}</span><span class="token punctuation">;</span>
+
+<span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">Ethernet_GPIOConfig</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    RCC<span class="token operator">-&gt;</span>APB2ENR <span class="token operator">|=</span> RCC_APB2ENR_IOPGEN<span class="token punctuation">;</span>
+    <span class="token comment">// RST-PG7 推挽输出 MODE=11 CNF=00</span>
+    GPIOG<span class="token operator">-&gt;</span>CRL <span class="token operator">|=</span> GPIO_CRL_MODE7<span class="token punctuation">;</span>
+    GPIOG<span class="token operator">-&gt;</span>CRL <span class="token operator">&amp;=</span> <span class="token operator">~</span>GPIO_CRL_CNF7<span class="token punctuation">;</span>
+    <span class="token comment">// INT-PG6 上拉输入 MODE=00 CNF=10 ODR=1</span>
+    GPIOG<span class="token operator">-&gt;</span>CRL <span class="token operator">&amp;=</span> <span class="token operator">~</span>GPIO_CRL_MODE6<span class="token punctuation">;</span>
+    GPIOG<span class="token operator">-&gt;</span>CRL <span class="token operator">|=</span> GPIO_CRL_CNF6_1<span class="token punctuation">;</span>
+    GPIOG<span class="token operator">-&gt;</span>CRL <span class="token operator">&amp;=</span> <span class="token operator">~</span>GPIO_CRL_CNF6_0<span class="token punctuation">;</span>
+    GPIOG<span class="token operator">-&gt;</span>ODR <span class="token operator">|=</span> GPIO_ODR_ODR6<span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">void</span> <span class="token function">Ethernet_Reset</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token function">RST_LOW</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">delay_ms</span><span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">RST_HIGH</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">delay_ms</span><span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">void</span> <span class="token function">Ethernet_Init</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token function">SPI_Init</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">wizchip_register_callbacks</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token function">Ethernet_GPIOConfig</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">Ethernet_Reset</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">Ethernet_SetMac</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">Ethernet_SetIP</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token class-name">uint8_t</span> macBuf<span class="token punctuation">[</span><span class="token number">6</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token punctuation">{</span><span class="token number">0</span><span class="token punctuation">}</span><span class="token punctuation">;</span>
+    <span class="token function">getSHAR</span><span class="token punctuation">(</span>macBuf<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">LOG_ARR</span><span class="token punctuation">(</span><span class="token string">"mac"</span><span class="token punctuation">,</span> macBuf<span class="token punctuation">,</span> <span class="token number">6</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token class-name">uint8_t</span> ipBuf<span class="token punctuation">[</span><span class="token number">4</span><span class="token punctuation">]</span>      <span class="token operator">=</span> <span class="token punctuation">{</span><span class="token number">0</span><span class="token punctuation">}</span><span class="token punctuation">;</span>
+    <span class="token class-name">uint8_t</span> gatewayBuf<span class="token punctuation">[</span><span class="token number">4</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token punctuation">{</span><span class="token number">0</span><span class="token punctuation">}</span><span class="token punctuation">;</span>
+    <span class="token class-name">uint8_t</span> subBuf<span class="token punctuation">[</span><span class="token number">4</span><span class="token punctuation">]</span>     <span class="token operator">=</span> <span class="token punctuation">{</span><span class="token number">0</span><span class="token punctuation">}</span><span class="token punctuation">;</span>
+
+    <span class="token function">getSHAR</span><span class="token punctuation">(</span>macBuf<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">getSIPR</span><span class="token punctuation">(</span>ipBuf<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">getGAR</span><span class="token punctuation">(</span>gatewayBuf<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">getSUBR</span><span class="token punctuation">(</span>subBuf<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token function">LOG_ARR</span><span class="token punctuation">(</span><span class="token string">"ip"</span><span class="token punctuation">,</span> ipBuf<span class="token punctuation">,</span> <span class="token number">4</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">LOG_ARR</span><span class="token punctuation">(</span><span class="token string">"gateway"</span><span class="token punctuation">,</span> gatewayBuf<span class="token punctuation">,</span> <span class="token number">4</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">LOG_ARR</span><span class="token punctuation">(</span><span class="token string">"sub"</span><span class="token punctuation">,</span> subBuf<span class="token punctuation">,</span> <span class="token number">4</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token class-name">uint8_t</span> mr <span class="token operator">=</span> <span class="token function">getMR</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">LOG_ARR</span><span class="token punctuation">(</span><span class="token string">"mr"</span><span class="token punctuation">,</span> <span class="token operator">&amp;</span>mr<span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">void</span> <span class="token function">Ethernet_SetMac</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span> <span class="token punctuation">{</span> <span class="token function">setSHAR</span><span class="token punctuation">(</span>mac<span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token punctuation">}</span>
+
+<span class="token keyword">void</span> <span class="token function">Ethernet_SetIP</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token function">setSIPR</span><span class="token punctuation">(</span>ip<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">setGAR</span><span class="token punctuation">(</span>gateway<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">setSUBR</span><span class="token punctuation">(</span>subnetMask<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<h3 id="ip-pei-zhi-zhu-yi-shi-xiang">IP配置注意事项</h3>
+<blockquote>
+<p>[!IMPORTANT]</p>
+<ul>
+<li>要和电脑在同一局域网下，STM32可以通过水晶头网线接入交换机</li>
+<li>MAC地址要保持唯一性</li>
+<li>静态IP地址：网段、网关要和电脑保持一一致，同时确保IP地址没有被占用（可以换一些IP多试下）</li>
+</ul>
+</blockquote>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241214162538777.png" alt="image-20241214162538777"></p>
+<h2 id="ce-shi-ping-gong-neng">测试Ping功能</h2>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">"logger.h"</span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">"stm32f10x.h"</span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">"uart.h"</span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">"ethernet.h"</span></span>
+
+<span class="token keyword">void</span> <span class="token function">uart1_received_callback</span><span class="token punctuation">(</span><span class="token class-name">uint8_t</span> buf<span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">,</span> <span class="token class-name">uint8_t</span> size<span class="token punctuation">)</span> <span class="token punctuation">{</span><span class="token punctuation">}</span>
+
+<span class="token keyword">int</span> <span class="token function">main</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token function">uart_init</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">Ethernet_Init</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">LOG_DEBUG</span><span class="token punctuation">(</span><span class="token string">"main start"</span><span class="token punctuation">)</span>
+
+    <span class="token keyword">while</span> <span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241214205658007.png" alt="image-20241214205658007"></p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241214162450520.png" alt="image-20241214162450520"></p>
+<h2 id="shi-xu-zhu-yi-shi-xiang">时序——注意事项</h2>
+<blockquote>
+<p>[!IMPORTANT]</p>
+<ul>
+<li>复位低电平至少保持500us</li>
+<li>复位拉高后，W5500需要最多1ms来稳定自身内部的PLL时钟，因此我们需要在复位拉高后至少1ms之后才开始与其通信</li>
+</ul>
+</blockquote>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241214162046415.png" alt="image-20241214162046415"></p>
+<h1 id="spi-w-5500-luo-ji-fen-xi-cha-jian">SPI-W5500逻辑分析插件</h1>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241214164451376.png" alt="image-20241214164451376"></p>
+<h1 id="shi-yan-tcp-jian-li-lian-jie">实验-TCP建立连接</h1>
+<h2 id="shi-li-dai-ma">示例代码</h2>
+<h3 id="w-5500-tcpserver-h">w5500_tcpserver.h</h3>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">ifndef</span> <span class="token expression">__W5500_TCPSERVER_H__</span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name">__W5500_TCPSERVER_H__</span></span>
+
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">"socket.h"</span></span>
+
+<span class="token keyword">void</span> <span class="token function">W5500_TCPServer_Handle</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">endif</span> <span class="token comment">/* __W5500_TCPSERVER_H__ */</span></span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<h3 id="w-5500-tcpserver-c">w5500_tcpserver.c</h3>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">"w5500_tcpserver.h"</span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">"logger.h"</span></span>
+
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name">SOCK_SN</span> <span class="token expression"><span class="token number">0</span></span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name">TCP_PORT</span> <span class="token expression"><span class="token number">8080</span></span></span>
+
+<span class="token keyword">void</span> <span class="token function">W5500_TCPServer_Handle</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token class-name">uint8_t</span> sockStatus <span class="token operator">=</span> <span class="token function">getSn_SR</span><span class="token punctuation">(</span>SOCK_SN<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token class-name">int8_t</span> result     <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
+    <span class="token class-name">uint8_t</span> clientIP<span class="token punctuation">[</span><span class="token number">4</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token punctuation">{</span><span class="token number">0</span><span class="token punctuation">}</span><span class="token punctuation">;</span>
+    <span class="token class-name">uint16_t</span> clientPort <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
+
+    <span class="token keyword">switch</span> <span class="token punctuation">(</span>sockStatus<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">case</span> SOCK_CLOSED<span class="token operator">:</span>
+            <span class="token comment">/*
+            1. 要打开的socket序列号sn
+            2. socket协议模式：TCP
+            3. TCP Nagle算法配置：不延迟ack的发送
+            */</span>
+            result <span class="token operator">=</span> <span class="token function">socket</span><span class="token punctuation">(</span>SOCK_SN<span class="token punctuation">,</span> Sn_MR_TCP<span class="token punctuation">,</span> TCP_PORT<span class="token punctuation">,</span> SF_TCP_NODELAY<span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token keyword">if</span> <span class="token punctuation">(</span>result <span class="token operator">!=</span> SOCK_SN<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                <span class="token function">LOG_ERROR</span><span class="token punctuation">(</span><span class="token string">"socket open failed, result = %d"</span><span class="token punctuation">,</span> result<span class="token punctuation">)</span>
+            <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
+                <span class="token function">LOG_DEBUG</span><span class="token punctuation">(</span><span class="token string">"socket open success"</span><span class="token punctuation">)</span>
+            <span class="token punctuation">}</span>
+            <span class="token keyword">break</span><span class="token punctuation">;</span>
+
+        <span class="token keyword">case</span> SOCK_INIT<span class="token operator">:</span>
+            result <span class="token operator">=</span> <span class="token function">listen</span><span class="token punctuation">(</span>SOCK_SN<span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token keyword">if</span> <span class="token punctuation">(</span>result <span class="token operator">!=</span> SOCK_OK<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                <span class="token function">LOG_ERROR</span><span class="token punctuation">(</span><span class="token string">"socket listen failed, result = %d"</span><span class="token punctuation">,</span> result<span class="token punctuation">)</span>
+            <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
+                <span class="token function">LOG_DEBUG</span><span class="token punctuation">(</span><span class="token string">"socket listen success"</span><span class="token punctuation">)</span>
+            <span class="token punctuation">}</span>
+            <span class="token keyword">break</span><span class="token punctuation">;</span>
+
+        <span class="token keyword">case</span> SOCK_ESTABLISHED<span class="token operator">:</span>
+            <span class="token function">getSn_DIPR</span><span class="token punctuation">(</span>SOCK_SN<span class="token punctuation">,</span> <span class="token operator">&amp;</span>clientIP<span class="token punctuation">)</span><span class="token punctuation">;</span>
+            clientPort <span class="token operator">=</span> <span class="token function">getSn_DPORT</span><span class="token punctuation">(</span>SOCK_SN<span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token function">LOG_ARR</span><span class="token punctuation">(</span><span class="token string">"client port = %d, ip"</span><span class="token punctuation">,</span> clientIP<span class="token punctuation">,</span> <span class="token number">4</span><span class="token punctuation">,</span> clientPort<span class="token punctuation">)</span>
+            <span class="token keyword">while</span> <span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span>
+            <span class="token punctuation">{</span>
+                <span class="token comment">// handle client socket</span>
+            <span class="token punctuation">}</span>
+            
+            <span class="token keyword">break</span><span class="token punctuation">;</span>
+        
+        <span class="token keyword">default</span><span class="token operator">:</span>
+            <span class="token keyword">break</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<h3 id="main-c">main.c</h3>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">"stm32f10x.h"</span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">"uart.h"</span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">"logger.h"</span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">"ethernet.h"</span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">"w5500_tcpserver.h"</span></span>
+
+<span class="token keyword">void</span> <span class="token function">uart1_received_callback</span><span class="token punctuation">(</span><span class="token class-name">uint8_t</span> buf<span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">,</span> <span class="token class-name">uint8_t</span> size<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    
+<span class="token punctuation">}</span>
+
+<span class="token keyword">int</span> <span class="token function">main</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token function">uart_init</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">LOG_DEBUG</span><span class="token punctuation">(</span><span class="token string">"usart test"</span><span class="token punctuation">)</span>
+    <span class="token function">Ethernet_Init</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">LOG_DEBUG</span><span class="token punctuation">(</span><span class="token string">"main start"</span><span class="token punctuation">)</span>
+
+    <span class="token keyword">while</span> <span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token function">W5500_TCPServer_Handle</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<h2 id="ce-shi">测试</h2>
+<img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241214205734147.png" alt="image-20241214205734147" style="zoom:33%;">
+<h3 id="ke-hu-duan-qing-qiu-lian-jie">客户端请求连接</h3>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241214214202495.png" alt="image-20241214214202495"></p>
+<h3 id="fu-wu-duan-socket-lian-jie-jian-li">服务端socket连接建立</h3>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241214205922046.png" alt="image-20241214205922046"></p>
+<h1 id="shi-yan-tcp-shou-fa">实验-TCP收发</h1>
+<h2 id="shi-li-dai-ma-1">示例代码</h2>
+<h3 id="w-5500-tcpserver-c-1">w5500_tcpserver.c</h3>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">"w5500_tcpserver.h"</span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">"logger.h"</span></span>
+
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name">SOCK_SN</span> <span class="token expression"><span class="token number">0</span></span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name">TCP_PORT</span> <span class="token expression"><span class="token number">8080</span></span></span>
+<span class="token comment">// W5500每个socket有2kb的接收缓冲区、2kb的发送缓冲区</span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name">SOCK_TX_BUFFER_MAX_SIZE</span> <span class="token expression"><span class="token number">2048</span></span></span>
+
+<span class="token class-name">uint8_t</span> rxbuf<span class="token punctuation">[</span>SOCK_TX_BUFFER_MAX_SIZE<span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token punctuation">{</span><span class="token number">0</span><span class="token punctuation">}</span><span class="token punctuation">;</span>
+
+<span class="token keyword">void</span> <span class="token function">W5500_TCPServer_Handle</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token class-name">uint8_t</span> sockStatus    <span class="token operator">=</span> <span class="token function">getSn_SR</span><span class="token punctuation">(</span>SOCK_SN<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token class-name">int8_t</span> result         <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
+    <span class="token class-name">uint8_t</span> clientIP<span class="token punctuation">[</span><span class="token number">4</span><span class="token punctuation">]</span>   <span class="token operator">=</span> <span class="token punctuation">{</span><span class="token number">0</span><span class="token punctuation">}</span><span class="token punctuation">;</span>
+    <span class="token class-name">uint16_t</span> clientPort   <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
+    <span class="token class-name">uint16_t</span> receivedSize <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
+
+    <span class="token keyword">switch</span> <span class="token punctuation">(</span>sockStatus<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">case</span> SOCK_CLOSED<span class="token operator">:</span>
+            <span class="token comment">/*
+            1. 要打开的socket序列号sn
+            2. socket协议模式：TCP
+            3. TCP Nagle算法配置：不延迟ack的发送
+            */</span>
+            result <span class="token operator">=</span> <span class="token function">socket</span><span class="token punctuation">(</span>SOCK_SN<span class="token punctuation">,</span> Sn_MR_TCP<span class="token punctuation">,</span> TCP_PORT<span class="token punctuation">,</span> SF_TCP_NODELAY<span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token keyword">if</span> <span class="token punctuation">(</span>result <span class="token operator">!=</span> SOCK_SN<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                <span class="token function">LOG_ERROR</span><span class="token punctuation">(</span><span class="token string">"socket open failed, result = %d"</span><span class="token punctuation">,</span> result<span class="token punctuation">)</span>
+            <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
+                <span class="token function">LOG_DEBUG</span><span class="token punctuation">(</span><span class="token string">"socket open success"</span><span class="token punctuation">)</span>
+            <span class="token punctuation">}</span>
+            <span class="token keyword">break</span><span class="token punctuation">;</span>
+
+        <span class="token keyword">case</span> SOCK_INIT<span class="token operator">:</span>
+            result <span class="token operator">=</span> <span class="token function">listen</span><span class="token punctuation">(</span>SOCK_SN<span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token keyword">if</span> <span class="token punctuation">(</span>result <span class="token operator">!=</span> SOCK_OK<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                <span class="token function">LOG_ERROR</span><span class="token punctuation">(</span><span class="token string">"socket listen failed, result = %d"</span><span class="token punctuation">,</span> result<span class="token punctuation">)</span>
+            <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
+                <span class="token function">LOG_DEBUG</span><span class="token punctuation">(</span><span class="token string">"socket listen success"</span><span class="token punctuation">)</span>
+            <span class="token punctuation">}</span>
+            <span class="token keyword">break</span><span class="token punctuation">;</span>
+
+        <span class="token keyword">case</span> SOCK_ESTABLISHED<span class="token operator">:</span>
+            <span class="token function">getSn_DIPR</span><span class="token punctuation">(</span>SOCK_SN<span class="token punctuation">,</span> clientIP<span class="token punctuation">)</span><span class="token punctuation">;</span>
+            clientPort <span class="token operator">=</span> <span class="token function">getSn_DPORT</span><span class="token punctuation">(</span>SOCK_SN<span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token function">LOG_ARR</span><span class="token punctuation">(</span><span class="token string">"client port = %d, ip"</span><span class="token punctuation">,</span> clientIP<span class="token punctuation">,</span> <span class="token number">4</span><span class="token punctuation">,</span> clientPort<span class="token punctuation">)</span>
+            <span class="token keyword">while</span> <span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                <span class="token comment">// 轮询方式处理接收事件中断标志位，当有数据可读时进行处理</span>
+                <span class="token keyword">while</span> <span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token function">getSn_IR</span><span class="token punctuation">(</span>SOCK_SN<span class="token punctuation">)</span> <span class="token operator">&amp;</span> Sn_IR_RECV<span class="token punctuation">)</span> <span class="token operator">==</span> <span class="token number">0</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                    <span class="token comment">// 轮询过程中，如果客户端断开连接，则关闭socket，走重新监听的流程</span>
+                    <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token function">getSn_SR</span><span class="token punctuation">(</span>SOCK_SN<span class="token punctuation">)</span> <span class="token operator">!=</span> SOCK_ESTABLISHED<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                        <span class="token function">LOG_DEBUG</span><span class="token punctuation">(</span><span class="token string">"socket state changed, close socket."</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                        <span class="token function">close</span><span class="token punctuation">(</span>SOCK_SN<span class="token punctuation">)</span><span class="token punctuation">;</span>
+                        <span class="token keyword">return</span><span class="token punctuation">;</span>
+                    <span class="token punctuation">}</span>
+                <span class="token punctuation">}</span>
+                <span class="token comment">// 轮询结束，清除中断标志</span>
+                <span class="token function">setSn_IR</span><span class="token punctuation">(</span>SOCK_SN<span class="token punctuation">,</span> Sn_IR_RECV<span class="token punctuation">)</span><span class="token punctuation">;</span>
+                <span class="token comment">// 获取socket接收缓冲区中的数据大小</span>
+                receivedSize <span class="token operator">=</span> <span class="token function">getSn_RX_RSR</span><span class="token punctuation">(</span>SOCK_SN<span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment">// received size</span>
+                <span class="token function">recv</span><span class="token punctuation">(</span>SOCK_SN<span class="token punctuation">,</span> rxbuf<span class="token punctuation">,</span> receivedSize<span class="token punctuation">)</span><span class="token punctuation">;</span>
+                <span class="token function">LOG_ARR</span><span class="token punctuation">(</span><span class="token string">"received msg = %.*s, port = %d, ip"</span><span class="token punctuation">,</span> clientIP<span class="token punctuation">,</span> <span class="token number">4</span><span class="token punctuation">,</span>
+                        receivedSize<span class="token punctuation">,</span> rxbuf<span class="token punctuation">,</span> clientPort<span class="token punctuation">)</span><span class="token punctuation">;</span>
+                <span class="token comment">// 回送消息</span>
+                <span class="token function">send</span><span class="token punctuation">(</span>SOCK_SN<span class="token punctuation">,</span> rxbuf<span class="token punctuation">,</span> receivedSize<span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token punctuation">}</span>
+
+        <span class="token keyword">default</span><span class="token operator">:</span>
+            <span class="token keyword">break</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<h2 id="ce-shi-1">测试</h2>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241214214514823.png" alt="image-20241214214514823"></p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241214214755653.png" alt="image-20241214214755653"></p>
+
+                
+            </div>
+            <hr/>
+
+            
+
+    <div class="reprint" id="reprint-statement">
+        
+            <div class="reprint__author">
+                <span class="reprint-meta" style="font-weight: bold;">
+                    <i class="fas fa-user">
+                        文章作者:
+                    </i>
+                </span>
+                <span class="reprint-info">
+                    <a href="/about" rel="external nofollow noreferrer">安文</a>
+                </span>
+            </div>
+            <div class="reprint__type">
+                <span class="reprint-meta" style="font-weight: bold;">
+                    <i class="fas fa-link">
+                        文章链接:
+                    </i>
+                </span>
+                <span class="reprint-info">
+                    <a href="https://zanwen.github.io/2024/12/14/25286.html">https://zanwen.github.io/2024/12/14/25286.html</a>
+                </span>
+            </div>
+            <div class="reprint__notice">
+                <span class="reprint-meta" style="font-weight: bold;">
+                    <i class="fas fa-copyright">
+                        版权声明:
+                    </i>
+                </span>
+                <span class="reprint-info">
+                    本博客所有文章除特別声明外，均采用
+                    <a href="https://creativecommons.org/licenses/by/4.0/deed.zh" rel="external nofollow noreferrer" target="_blank">CC BY 4.0</a>
+                    许可协议。转载请注明来源
+                    <a href="/about" target="_blank">安文</a>
+                    !
+                </span>
+            </div>
+        
+    </div>
+
+    <script async defer>
+      document.addEventListener("copy", function (e) {
+        let toastHTML = '<span>复制成功，请遵循本文的转载规则</span><button class="btn-flat toast-action" onclick="navToReprintStatement()" style="font-size: smaller">查看</a>';
+        M.toast({html: toastHTML})
+      });
+
+      function navToReprintStatement() {
+        $("html, body").animate({scrollTop: $("#reprint-statement").offset().top - 80}, 800);
+      }
+    </script>
+
+
+
+            <div class="tag_share" style="display: block;">
+                <div class="post-meta__tag-list" style="display: inline-block;">
+                    
+                        <div class="article-tag">
+                            
+                                <a href="/tags/W5500/">
+                                    <span class="chip bg-color">W5500</span>
+                                </a>
+                            
+                                <a href="/tags/STM32/">
+                                    <span class="chip bg-color">STM32</span>
+                                </a>
+                            
+                                <a href="/tags/%E4%BB%A5%E5%A4%AA%E7%BD%91/">
+                                    <span class="chip bg-color">以太网</span>
+                                </a>
+                            
+                        </div>
+                    
+                </div>
+                <div class="post_share" style="zoom: 80%; width: fit-content; display: inline-block; float: right; margin: -0.15rem 0;">
+                    <link rel="stylesheet" type="text/css" href="/libs/share/css/share.min.css">
+<div id="article-share">
+
+    
+    <div class="social-share" data-sites="twitter,facebook,google,qq,qzone,wechat,weibo,douban,linkedin" data-wechat-qrcode-helper="<p>微信扫一扫即可分享！</p>"></div>
+    <script src="/libs/share/js/social-share.min.js"></script>
+    
+
+    
+
+</div>
+
+                </div>
+            </div>
+            
+                <div id="reward">
+    <a href="#rewardModal" class="reward-link modal-trigger btn-floating btn-medium waves-effect waves-light red">赏</a>
+
+    <!-- Modal Structure -->
+    <div id="rewardModal" class="modal">
+        <div class="modal-content">
+            <a class="close modal-close"><i class="fas fa-times"></i></a>
+            <h4 class="reward-title">你的赏识是我前进的动力</h4>
+            <div class="reward-content">
+                <div class="reward-tabs">
+                    <ul class="tabs row">
+                        <li class="tab col s6 alipay-tab waves-effect waves-light"><a href="#alipay">支付宝</a></li>
+                        <li class="tab col s6 wechat-tab waves-effect waves-light"><a href="#wechat">微 信</a></li>
+                    </ul>
+                    <div id="alipay">
+                        <img src="/medias/reward/alipay.jpg" class="reward-img" alt="支付宝打赏二维码">
+                    </div>
+                    <div id="wechat">
+                        <img src="/medias/reward/wechat.jpg" class="reward-img" alt="微信打赏二维码">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(function () {
+        $('.tabs').tabs();
+    });
+</script>
+
+            
+        </div>
+    </div>
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+<article id="prenext-posts" class="prev-next articles">
+    <div class="row article-row">
+        
+        <div class="article col s12 m6" data-aos="fade-up" data-aos="fade-up">
+            <div class="article-badge left-badge text-color">
+                <i class="far fa-dot-circle"></i>&nbsp;本篇
+            </div>
+            <div class="card">
+                <a href="/2024/12/14/25286.html">
+                    <div class="card-image">
+                        
+                        <img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/pexels-aidun-10792604.jpg" class="responsive-img" alt="STM32+W5500：解锁以太网开发的潜力">
+                        
+                        <span class="card-title">STM32+W5500：解锁以太网开发的潜力</span>
+                    </div>
+                </a>
+                <div class="card-content article-content">
+                    <div class="summary block-with-text">
+                        
+                            
+                        
+                    </div>
+                    <div class="publish-info">
+                            <span class="publish-date">
+                                <i class="far fa-clock fa-fw icon-date"></i>2024-12-14
+                            </span>
+                        <span class="publish-author">
+                            
+                            <i class="fas fa-bookmark fa-fw icon-category"></i>
+                            
+                            <a href="/categories/STM32/" class="post-category">
+                                    STM32
+                                </a>
+                            
+                            <a href="/categories/STM32/%E5%8D%8F%E8%AE%AE/" class="post-category">
+                                    协议
+                                </a>
+                            
+                            
+                        </span>
+                    </div>
+                </div>
+
+                
+                <div class="card-action article-tags">
+                    
+                    <a href="/tags/W5500/">
+                        <span class="chip bg-color">W5500</span>
+                    </a>
+                    
+                    <a href="/tags/STM32/">
+                        <span class="chip bg-color">STM32</span>
+                    </a>
+                    
+                    <a href="/tags/%E4%BB%A5%E5%A4%AA%E7%BD%91/">
+                        <span class="chip bg-color">以太网</span>
+                    </a>
+                    
+                </div>
+                
+            </div>
+        </div>
+        
+        
+        <div class="article col s12 m6" data-aos="fade-up">
+            <div class="article-badge right-badge text-color">
+                下一篇&nbsp;<i class="fas fa-chevron-right"></i>
+            </div>
+            <div class="card">
+                <a href="/2024/12/13/21754.html">
+                    <div class="card-image">
+                        
+                        <img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/pexels-zekai-zhu-214984943-11827285.jpg" class="responsive-img" alt="开发环境问题杂记">
+                        
+                        <span class="card-title">开发环境问题杂记</span>
+                    </div>
+                </a>
+                <div class="card-content article-content">
+                    <div class="summary block-with-text">
+                        
+                            
+                        
+                    </div>
+                    <div class="publish-info">
+                            <span class="publish-date">
+                                <i class="far fa-clock fa-fw icon-date"></i>2024-12-13
+                            </span>
+                        <span class="publish-author">
+                            
+                            <i class="fas fa-bookmark fa-fw icon-category"></i>
+                            
+                            <a href="/categories/%E6%9D%82%E8%AE%B0/" class="post-category">
+                                    杂记
+                                </a>
+                            
+                            
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="card-action article-tags">
+                    
+                    <a href="/tags/%E6%9D%82%E8%AE%B0/">
+                        <span class="chip bg-color">杂记</span>
+                    </a>
+                    
+                    <a href="/tags/%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/">
+                        <span class="chip bg-color">环境搭建</span>
+                    </a>
+                    
+                </div>
+                
+            </div>
+        </div>
+        
+    </div>
+</article>
+
+</div>
+
+
+
+<!-- 代码块功能依赖 -->
+<script type="text/javascript" src="/libs/codeBlock/codeBlockFuction.js"></script>
+
+
+  <!-- 是否加载使用自带的 prismjs. -->
+  <script type="text/javascript" src="/libs/prism/prism.min.js"></script>
+
+
+<!-- 代码语言 -->
+
+<script type="text/javascript" src="/libs/codeBlock/codeLang.js"></script>
+
+
+<!-- 代码块复制 -->
+
+<script type="text/javascript" src="/libs/codeBlock/codeCopy.js"></script>
+
+
+<!-- 代码块收缩 -->
+
+<script type="text/javascript" src="/libs/codeBlock/codeShrink.js"></script>
+
+
+
+    </div>
+    <div id="toc-aside" class="expanded col l3 hide-on-med-and-down">
+        <div class="toc-widget card" style="background-color: white;">
+            <div class="toc-title"><i class="far fa-list-alt"></i>&nbsp;&nbsp;目录</div>
+            <div id="toc-content"></div>
+        </div>
+    </div>
+</div>
+
+<!-- TOC 悬浮按钮. -->
+
+<div id="floating-toc-btn" class="hide-on-med-and-down">
+    <a class="btn-floating btn-large bg-color">
+        <i class="fas fa-list-ul"></i>
+    </a>
+</div>
+
+
+<script src="/libs/tocbot/tocbot.min.js"></script>
+<script>
+    $(function () {
+        tocbot.init({
+            tocSelector: '#toc-content',
+            contentSelector: '#articleContent',
+            headingsOffset: -($(window).height() * 0.4 - 45),
+            collapseDepth: Number('0'),
+            headingSelector: 'h1, h2, h3'
+        });
+
+        // Set scroll toc fixed.
+        let tocHeight = parseInt($(window).height() * 0.4 - 64);
+        let $tocWidget = $('.toc-widget');
+        $(window).scroll(function () {
+            let scroll = $(window).scrollTop();
+            /* add post toc fixed. */
+            if (scroll > tocHeight) {
+                $tocWidget.addClass('toc-fixed');
+            } else {
+                $tocWidget.removeClass('toc-fixed');
+            }
+        });
+
+        
+        /* 修复文章卡片 div 的宽度. */
+        let fixPostCardWidth = function (srcId, targetId) {
+            let srcDiv = $('#' + srcId);
+            if (srcDiv.length === 0) {
+                return;
+            }
+
+            let w = srcDiv.width();
+            if (w >= 450) {
+                w = w + 21;
+            } else if (w >= 350 && w < 450) {
+                w = w + 18;
+            } else if (w >= 300 && w < 350) {
+                w = w + 16;
+            } else {
+                w = w + 14;
+            }
+            $('#' + targetId).width(w);
+        };
+
+        // 切换TOC目录展开收缩的相关操作.
+        const expandedClass = 'expanded';
+        let $tocAside = $('#toc-aside');
+        let $mainContent = $('#main-content');
+        $('#floating-toc-btn .btn-floating').click(function () {
+            if ($tocAside.hasClass(expandedClass)) {
+                $tocAside.removeClass(expandedClass).hide();
+                $mainContent.removeClass('l9');
+            } else {
+                $tocAside.addClass(expandedClass).show();
+                $mainContent.addClass('l9');
+            }
+            fixPostCardWidth('artDetail', 'prenext-posts');
+        });
+        
+    });
+</script>
+
+    
+
+</main>
+
+
+
+
+    <footer class="page-footer bg-color">
+    
+
+    <div class="container row center-align"
+         style="margin-bottom: 0px !important;">
+        <div class="col s12 m8 l8 copy-right">
+            Copyright&nbsp;&copy;
+            
+                <span id="year">2019-2024</span>
+            
+            <a href="/about" target="_blank">安文</a>
+            |&nbsp;Powered by&nbsp;<a href="https://hexo.io/" target="_blank">Hexo</a>
+            |&nbsp;Theme&nbsp;<a href="https://github.com/blinkfox/hexo-theme-matery" target="_blank">Matery</a>
+            
+            <br>
+            
+                &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
+                        class="white-color">87.9k</span>
+            
+            
+            
+                
+            
+            
+                <span id="busuanzi_container_site_pv">
+                &nbsp;|&nbsp;<i class="far fa-eye"></i>&nbsp;总访问量:&nbsp;
+                    <span id="busuanzi_value_site_pv" class="white-color"></span>
+            </span>
+            
+            
+                <span id="busuanzi_container_site_uv">
+                &nbsp;|&nbsp;<i class="fas fa-users"></i>&nbsp;总访问人数:&nbsp;
+                    <span id="busuanzi_value_site_uv" class="white-color"></span>
+            </span>
+            
+            <br>
+
+            <!-- 运行天数提醒. -->
+            
+            <br>
+            
+        </div>
+        <div class="col s12 m4 l4 social-link social-statis">
+    <a href="https://github.com/zanwen" class="tooltipped" target="_blank" data-tooltip="访问我的GitHub" data-position="top" data-delay="50">
+        <i class="fab fa-github"></i>
+    </a>
+
+
+
+    <a href="mailto:872852458@qq.com" class="tooltipped" target="_blank" data-tooltip="邮件联系我" data-position="top" data-delay="50">
+        <i class="fas fa-envelope-open"></i>
+    </a>
+
+
+
+
+
+
+
+    <a href="tencent://AddContact/?fromId=50&fromSubId=1&subcmd=all&uin=872852458" class="tooltipped" target="_blank" data-tooltip="QQ联系我: 872852458" data-position="top" data-delay="50">
+        <i class="fab fa-qq"></i>
+    </a>
+
+
+
+
+
+
+
+    <a href="/atom.xml" class="tooltipped" target="_blank" data-tooltip="RSS 订阅" data-position="top" data-delay="50">
+        <i class="fas fa-rss"></i>
+    </a>
+
+</div>
+    </div>
+</footer>
+
+<div class="progress-bar"></div>
+
+
+    <!-- 搜索遮罩框 -->
+<div id="searchModal" class="modal">
+    <div class="modal-content">
+        <div class="search-header">
+            <span class="title"><i class="fas fa-search"></i>&nbsp;&nbsp;搜索</span>
+            <input type="search" id="searchInput" name="s" placeholder="请输入搜索的关键字"
+                   class="search-input">
+        </div>
+        <div id="searchResult"></div>
+    </div>
+</div>
+
+<script type="text/javascript">
+$(function () {
+    var searchFunc = function (path, search_id, content_id) {
+        'use strict';
+        $.ajax({
+            url: path,
+            dataType: "xml",
+            success: function (xmlResponse) {
+                // get the contents from search data
+                var datas = $("entry", xmlResponse).map(function () {
+                    return {
+                        title: $("title", this).text(),
+                        content: $("content", this).text(),
+                        url: $("url", this).text()
+                    };
+                }).get();
+                var $input = document.getElementById(search_id);
+                var $resultContent = document.getElementById(content_id);
+                $input.addEventListener('input', function () {
+                    var str = '<ul class=\"search-result-list\">';
+                    var keywords = this.value.trim().toLowerCase().split(/[\s\-]+/);
+                    $resultContent.innerHTML = "";
+                    if (this.value.trim().length <= 0) {
+                        return;
+                    }
+                    // perform local searching
+                    datas.forEach(function (data) {
+                        var isMatch = true;
+                        var data_title = data.title.trim().toLowerCase();
+                        var data_content = data.content.trim().replace(/<[^>]+>/g, "").toLowerCase();
+                        var data_url = data.url;
+                        data_url = data_url.indexOf('/') === 0 ? data.url : '/' + data_url;
+                        var index_title = -1;
+                        var index_content = -1;
+                        var first_occur = -1;
+                        // only match artiles with not empty titles and contents
+                        if (data_title !== '' && data_content !== '') {
+                            keywords.forEach(function (keyword, i) {
+                                index_title = data_title.indexOf(keyword);
+                                index_content = data_content.indexOf(keyword);
+                                if (index_title < 0 && index_content < 0) {
+                                    isMatch = false;
+                                } else {
+                                    if (index_content < 0) {
+                                        index_content = 0;
+                                    }
+                                    if (i === 0) {
+                                        first_occur = index_content;
+                                    }
+                                }
+                            });
+                        }
+                        // show search results
+                        if (isMatch) {
+                            str += "<li><a href='" + data_url + "' class='search-result-title'>" + data_title + "</a>";
+                            var content = data.content.trim().replace(/<[^>]+>/g, "");
+                            if (first_occur >= 0) {
+                                // cut out 100 characters
+                                var start = first_occur - 20;
+                                var end = first_occur + 80;
+                                if (start < 0) {
+                                    start = 0;
+                                }
+                                if (start === 0) {
+                                    end = 100;
+                                }
+                                if (end > content.length) {
+                                    end = content.length;
+                                }
+                                var match_content = content.substr(start, end);
+                                // highlight all keywords
+                                keywords.forEach(function (keyword) {
+                                    var regS = new RegExp(keyword, "gi");
+                                    match_content = match_content.replace(regS, "<em class=\"search-keyword\">" + keyword + "</em>");
+                                });
+
+                                str += "<p class=\"search-result\">" + match_content + "...</p>"
+                            }
+                            str += "</li>";
+                        }
+                    });
+                    str += "</ul>";
+                    $resultContent.innerHTML = str;
+                });
+            }
+        });
+    };
+
+    searchFunc('/search.xml', 'searchInput', 'searchResult');
+});
+</script>
+
+    <!-- 白天和黑夜主题 -->
+<div class="stars-con">
+    <div id="stars"></div>
+    <div id="stars2"></div>
+    <div id="stars3"></div>  
+</div>
+
+<script>
+    function switchNightMode() {
+        $('<div class="Cuteen_DarkSky"><div class="Cuteen_DarkPlanet"></div></div>').appendTo($('body')),
+        setTimeout(function () {
+            $('body').hasClass('DarkMode') 
+            ? ($('body').removeClass('DarkMode'), localStorage.setItem('isDark', '0'), $('#sum-moon-icon').removeClass("fa-sun").addClass('fa-moon')) 
+            : ($('body').addClass('DarkMode'), localStorage.setItem('isDark', '1'), $('#sum-moon-icon').addClass("fa-sun").removeClass('fa-moon')),
+            
+            setTimeout(function () {
+            $('.Cuteen_DarkSky').fadeOut(1e3, function () {
+                $(this).remove()
+            })
+            }, 2e3)
+        })
+    }
+</script>
+
+    <!-- 回到顶部按钮 -->
+<div id="backTop" class="top-scroll">
+    <a class="btn-floating btn-large waves-effect waves-light" href="#!">
+        <i class="fas fa-arrow-up"></i>
+    </a>
+</div>
+
+
+    <script src="/libs/materialize/materialize.min.js"></script>
+    <script src="/libs/masonry/masonry.pkgd.min.js"></script>
+    <script src="/libs/aos/aos.js"></script>
+    <script src="/libs/scrollprogress/scrollProgress.min.js"></script>
+    <script src="/libs/lightGallery/js/lightgallery-all.min.js"></script>
+    <script src="/js/matery.js"></script>
+
+    
+
+    
+    
+    
+
+    <!-- 雪花特效 -->
+    
+
+    <!-- 鼠标星星特效 -->
+    
+
+     
+        <script src="https://ssl.captcha.qq.com/TCaptcha.js"></script>
+        <script src="/libs/others/TencentCaptcha.js"></script>
+        <button id="TencentCaptcha" data-appid="xxxxxxxxxx" data-cbfn="callback" type="button" hidden></button>
+    
+
+    <!-- Baidu Analytics -->
+
+    <!-- Baidu Push -->
+
+<script>
+    (function () {
+        var bp = document.createElement('script');
+        var curProtocol = window.location.protocol.split(':')[0];
+        if (curProtocol === 'https') {
+            bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+        } else {
+            bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+        }
+        var s = document.getElementsByTagName("script")[0];
+        s.parentNode.insertBefore(bp, s);
+    })();
+</script>
+
+    
+    <script src="/libs/others/clicklove.js" async="async"></script>
+    
+    
+    <script async src="/libs/others/busuanzi.pure.mini.js"></script>
+    
+
+    
+
+    
+
+    <!--腾讯兔小巢-->
+    
+    
+
+    
+
+    
+
+    
+    <script src="/libs/instantpage/instantpage.js" type="module"></script>
+    
+
+</body>
+
+</html>
