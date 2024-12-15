@@ -6,7 +6,7 @@
   <link href="https://zanwen.github.io/atom.xml" rel="self"/>
   
   <link href="https://zanwen.github.io/"/>
-  <updated>2024-12-15T04:11:22.491Z</updated>
+  <updated>2024-12-15T13:29:57.844Z</updated>
   <id>https://zanwen.github.io/</id>
   
   <author>
@@ -15,6 +15,44 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>STM32 与 ESP32-C3 的“无线配对”：WiFi 和蓝牙功能大揭秘</title>
+    <link href="https://zanwen.github.io/2024/12/15/32686.html"/>
+    <id>https://zanwen.github.io/2024/12/15/32686.html</id>
+    <published>2024-12-15T12:57:00.000Z</published>
+    <updated>2024-12-15T13:29:57.844Z</updated>
+    
+    
+      
+      
+        
+        
+    <summary type="html">&lt;h1 id=&quot;can-kao-zi-liao&quot;&gt;参考资料&lt;/h1&gt;
+&lt;h2 id=&quot;esp-32-c-3&quot;&gt;ESP32-C3&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a</summary>
+        
+      
+    
+    
+    
+    <category term="STM32" scheme="https://zanwen.github.io/categories/STM32/"/>
+    
+    <category term="ESP32" scheme="https://zanwen.github.io/categories/STM32/ESP32/"/>
+    
+    
+    <category term="STM32" scheme="https://zanwen.github.io/tags/STM32/"/>
+    
+    <category term="ESP32" scheme="https://zanwen.github.io/tags/ESP32/"/>
+    
+    <category term="WIFI" scheme="https://zanwen.github.io/tags/WIFI/"/>
+    
+    <category term="蓝牙" scheme="https://zanwen.github.io/tags/%E8%93%9D%E7%89%99/"/>
+    
+    <category term="无线通讯" scheme="https://zanwen.github.io/tags/%E6%97%A0%E7%BA%BF%E9%80%9A%E8%AE%AF/"/>
+    
+  </entry>
   
   <entry>
     <title>STM32+W5500：解锁以太网开发的潜力</title>
@@ -41,9 +79,9 @@
     <category term="协议" scheme="https://zanwen.github.io/categories/STM32/%E5%8D%8F%E8%AE%AE/"/>
     
     
-    <category term="W5500" scheme="https://zanwen.github.io/tags/W5500/"/>
-    
     <category term="STM32" scheme="https://zanwen.github.io/tags/STM32/"/>
+    
+    <category term="W5500" scheme="https://zanwen.github.io/tags/W5500/"/>
     
     <category term="以太网" scheme="https://zanwen.github.io/tags/%E4%BB%A5%E5%A4%AA%E7%BD%91/"/>
     
@@ -587,34 +625,6 @@
     <category term="ARMv7" scheme="https://zanwen.github.io/tags/ARMv7/"/>
     
     <category term="指令集" scheme="https://zanwen.github.io/tags/%E6%8C%87%E4%BB%A4%E9%9B%86/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>ARM核学习（一）工作模式及寄存器资源</title>
-    <link href="https://zanwen.github.io/2024/11/23/1780.html"/>
-    <id>https://zanwen.github.io/2024/11/23/1780.html</id>
-    <published>2024-11-23T11:16:50.000Z</published>
-    <updated>2024-12-01T12:24:03.490Z</updated>
-    
-    
-      
-      
-        
-        
-    <summary type="html">&lt;h1 id=&quot;can-kao-zi-liao&quot;&gt;参考资料&lt;/h1&gt;
-&lt;p&gt;&lt;a href=&quot;https://developer.arm.com/documentation/ddi0406/latest/&quot;&gt;ARM Architecture Reference Manual</summary>
-        
-      
-    
-    
-    
-    <category term="ARM" scheme="https://zanwen.github.io/categories/ARM/"/>
-    
-    
-    <category term="ARM" scheme="https://zanwen.github.io/tags/ARM/"/>
-    
-    <category term="ARMv7" scheme="https://zanwen.github.io/tags/ARMv7/"/>
     
   </entry>
   
