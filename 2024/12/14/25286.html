@@ -7,13 +7,14 @@
     <meta name="keywords" content="STM32+W5500：解锁以太网开发的潜力, 安文的博客">
     <meta name="description" content="参考资料
 
-W5500 Datasheet v1.1.0 - English
+数据手册：W5500 Datasheet v1.1.0 - English
+官方驱动：https://github.com/Wiznet/ioLibrary_Driver
 
 实验-Ping
 硬件电路
 
 
-（1）W5500-RST：重置硬件，重置（Reset）低电平有效；该引脚需要保持低电平至少 500 us，才能重置 W5500；（">
+（1）W5500-RST">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <meta name="renderer" content="webkit|ie-stand|ie-comp">
@@ -418,21 +419,21 @@ W5500 Datasheet v1.1.0 - English
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-check fa-fw"></i>更新日期:&nbsp;&nbsp;
-                    2024-12-14
+                    2024-12-15
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
-                    2.4k
+                    3.5k
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-clock fa-fw"></i>阅读时长:&nbsp;&nbsp;
-                    12 分
+                    18 分
                 </div>
                 
 
@@ -457,7 +458,8 @@ W5500 Datasheet v1.1.0 - English
             <div id="articleContent">
                 <h1 id="can-kao-zi-liao">参考资料</h1>
 <ul>
-<li><a target="_blank" rel="noopener" href="https://docs.wiznet.io/img/products/w5500/W5500_ds_v110e.pdf">W5500 Datasheet v1.1.0 - English</a></li>
+<li>数据手册：<a target="_blank" rel="noopener" href="https://docs.wiznet.io/img/products/w5500/W5500_ds_v110e.pdf">W5500 Datasheet v1.1.0 - English</a></li>
+<li>官方驱动：<a target="_blank" rel="noopener" href="https://github.com/Wiznet/ioLibrary_Driver">https://github.com/Wiznet/ioLibrary_Driver</a></li>
 </ul>
 <h1 id="shi-yan-ping">实验-Ping</h1>
 <h2 id="ying-jian-dian-lu">硬件电路</h2>
@@ -1029,18 +1031,26 @@ W5500 Datasheet v1.1.0 - English
 <p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241214214202495.png" alt="image-20241214214202495"></p>
 <h3 id="fu-wu-duan-socket-lian-jie-jian-li">服务端socket连接建立</h3>
 <p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241214205922046.png" alt="image-20241214205922046"></p>
-<h1 id="shi-yan-tcp-shou-fa">实验-TCP收发</h1>
+<h1 id="shi-yan-tcp-server-shou-fa">实验-TCPServer收发</h1>
+<h2 id="qu-dong-yi-lai">驱动依赖</h2>
+<ul>
+<li><code>socket.h</code></li>
+</ul>
 <h2 id="shi-li-dai-ma-1">示例代码</h2>
 <h3 id="w-5500-tcpserver-c-1">w5500_tcpserver.c</h3>
+<blockquote>
+<p>[!NOTE]</p>
+<p><code>socket</code>的入参 <code>flag</code>可以配置 <code>socket</code>为非阻塞模式</p>
+</blockquote>
 <pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">"w5500_tcpserver.h"</span></span>
 <span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">"logger.h"</span></span>
 
 <span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name">SOCK_SN</span> <span class="token expression"><span class="token number">0</span></span></span>
 <span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name">TCP_PORT</span> <span class="token expression"><span class="token number">8080</span></span></span>
 <span class="token comment">// W5500每个socket有2kb的接收缓冲区、2kb的发送缓冲区</span>
-<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name">SOCK_TX_BUFFER_MAX_SIZE</span> <span class="token expression"><span class="token number">2048</span></span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name">SOCK_RX_BUFFER_MAX_SIZE</span> <span class="token expression"><span class="token number">2048</span></span></span>
 
-<span class="token class-name">uint8_t</span> rxbuf<span class="token punctuation">[</span>SOCK_TX_BUFFER_MAX_SIZE<span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token punctuation">{</span><span class="token number">0</span><span class="token punctuation">}</span><span class="token punctuation">;</span>
+<span class="token class-name">uint8_t</span> rxbuf<span class="token punctuation">[</span>SOCK_RX_BUFFER_MAX_SIZE<span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token punctuation">{</span><span class="token number">0</span><span class="token punctuation">}</span><span class="token punctuation">;</span>
 
 <span class="token keyword">void</span> <span class="token function">W5500_TCPServer_Handle</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
     <span class="token class-name">uint8_t</span> sockStatus    <span class="token operator">=</span> <span class="token function">getSn_SR</span><span class="token punctuation">(</span>SOCK_SN<span class="token punctuation">)</span><span class="token punctuation">;</span>
@@ -1054,7 +1064,7 @@ W5500 Datasheet v1.1.0 - English
             <span class="token comment">/*
             1. 要打开的socket序列号sn
             2. socket协议模式：TCP
-            3. TCP Nagle算法配置：不延迟ack的发送
+            3. socket参数配置：不延迟ack的发送
             */</span>
             result <span class="token operator">=</span> <span class="token function">socket</span><span class="token punctuation">(</span>SOCK_SN<span class="token punctuation">,</span> Sn_MR_TCP<span class="token punctuation">,</span> TCP_PORT<span class="token punctuation">,</span> SF_TCP_NODELAY<span class="token punctuation">)</span><span class="token punctuation">;</span>
             <span class="token keyword">if</span> <span class="token punctuation">(</span>result <span class="token operator">!=</span> SOCK_SN<span class="token punctuation">)</span> <span class="token punctuation">{</span>
@@ -1106,6 +1116,340 @@ W5500 Datasheet v1.1.0 - English
 <h2 id="ce-shi-1">测试</h2>
 <p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241214214514823.png" alt="image-20241214214514823"></p>
 <p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241214214755653.png" alt="image-20241214214755653"></p>
+<h1 id="shi-yan-tcp-client-shou-fa">实验-TCPClient收发</h1>
+<h2 id="qu-dong-yi-lai-1">驱动依赖</h2>
+<ul>
+<li><code>socket.h</code></li>
+</ul>
+<h2 id="shi-li-dai-ma-2">示例代码</h2>
+<h3 id="w-5500-tcpclient-h">w5500_tcpclient.h</h3>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">ifndef</span> <span class="token expression">__W5500_TCPCLIENT_H__</span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name">__W5500_TCPCLIENT_H__</span></span>
+
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">"socket.h"</span></span>
+
+<span class="token keyword">void</span> <span class="token function">W5500_TCPClient_Handle</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">endif</span> <span class="token comment">/* __W5500_TCPCLIENT_H__ */</span></span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<h3 id="w-5500-tcpclient-c">w5500_tcpclient.c</h3>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">"w5500_tcpclient.h"</span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">"logger.h"</span></span>
+
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name">SOCK_SN</span> <span class="token expression"><span class="token number">0</span></span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name">TCP_PORT</span> <span class="token expression"><span class="token number">8080</span></span></span>
+<span class="token comment">// W5500每个socket有2kb的接收缓冲区、2kb的发送缓冲区</span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name">SOCK_RX_BUFFER_MAX_SIZE</span> <span class="token expression"><span class="token number">2048</span></span></span>
+
+<span class="token class-name">uint8_t</span> serverIP<span class="token punctuation">[</span><span class="token number">4</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token punctuation">{</span><span class="token number">192</span><span class="token punctuation">,</span> <span class="token number">168</span><span class="token punctuation">,</span> <span class="token number">39</span><span class="token punctuation">,</span> <span class="token number">57</span><span class="token punctuation">}</span><span class="token punctuation">;</span>
+<span class="token class-name">uint16_t</span> serverPort <span class="token operator">=</span> <span class="token number">8080</span><span class="token punctuation">;</span>
+<span class="token class-name">uint8_t</span> rxbuf<span class="token punctuation">[</span>SOCK_RX_BUFFER_MAX_SIZE<span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token punctuation">{</span><span class="token number">0</span><span class="token punctuation">}</span><span class="token punctuation">;</span>
+
+<span class="token keyword">void</span> <span class="token function">W5500_TCPClient_Handle</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token class-name">uint8_t</span> sockStatus    <span class="token operator">=</span> <span class="token function">getSn_SR</span><span class="token punctuation">(</span>SOCK_SN<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token class-name">int8_t</span> result         <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
+    <span class="token class-name">uint16_t</span> receivedSize <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
+
+    <span class="token keyword">switch</span> <span class="token punctuation">(</span>sockStatus<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">case</span> SOCK_CLOSED<span class="token operator">:</span>
+            <span class="token comment">/*
+            1. 要打开的socket序列号sn
+            2. socket协议模式：TCP
+            3. socket参数配置：不延迟ack的发送
+            */</span>
+            result <span class="token operator">=</span> <span class="token function">socket</span><span class="token punctuation">(</span>SOCK_SN<span class="token punctuation">,</span> Sn_MR_TCP<span class="token punctuation">,</span> TCP_PORT<span class="token punctuation">,</span> SF_TCP_NODELAY<span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token keyword">if</span> <span class="token punctuation">(</span>result <span class="token operator">!=</span> SOCK_SN<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                <span class="token function">LOG_ERROR</span><span class="token punctuation">(</span><span class="token string">"socket open failed, result = %d"</span><span class="token punctuation">,</span> result<span class="token punctuation">)</span>
+            <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
+                <span class="token function">LOG_DEBUG</span><span class="token punctuation">(</span><span class="token string">"socket open success"</span><span class="token punctuation">)</span>
+            <span class="token punctuation">}</span>
+            <span class="token keyword">break</span><span class="token punctuation">;</span>
+
+        <span class="token keyword">case</span> SOCK_INIT<span class="token operator">:</span>
+            result <span class="token operator">=</span> <span class="token function">connect</span><span class="token punctuation">(</span>SOCK_SN<span class="token punctuation">,</span> serverIP<span class="token punctuation">,</span> serverPort<span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token keyword">if</span> <span class="token punctuation">(</span>result <span class="token operator">!=</span> SOCK_OK<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                <span class="token function">LOG_ERROR</span><span class="token punctuation">(</span><span class="token string">"socket connect failed, result = %d"</span><span class="token punctuation">,</span> result<span class="token punctuation">)</span>
+                <span class="token function">close</span><span class="token punctuation">(</span>SOCK_SN<span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
+                <span class="token function">LOG_DEBUG</span><span class="token punctuation">(</span><span class="token string">"socket connect success"</span><span class="token punctuation">)</span>
+            <span class="token punctuation">}</span>
+            <span class="token keyword">break</span><span class="token punctuation">;</span>
+
+        <span class="token keyword">case</span> SOCK_ESTABLISHED<span class="token operator">:</span>
+            <span class="token comment">// 发送数据</span>
+            <span class="token function">send</span><span class="token punctuation">(</span>SOCK_SN<span class="token punctuation">,</span> <span class="token string">"hello server"</span><span class="token punctuation">,</span> <span class="token number">12</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+            <span class="token comment">// 轮询接收数据</span>
+            <span class="token keyword">while</span> <span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                <span class="token comment">// 轮询方式处理接收事件中断标志位，当有数据可读时进行处理</span>
+                <span class="token keyword">while</span> <span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token function">getSn_IR</span><span class="token punctuation">(</span>SOCK_SN<span class="token punctuation">)</span> <span class="token operator">&amp;</span> Sn_IR_RECV<span class="token punctuation">)</span> <span class="token operator">==</span> <span class="token number">0</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                    <span class="token comment">// 轮询过程中，如果socket状态变化，则关闭socket，走重新连接的流程</span>
+                    <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token function">getSn_SR</span><span class="token punctuation">(</span>SOCK_SN<span class="token punctuation">)</span> <span class="token operator">!=</span> SOCK_ESTABLISHED<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                        <span class="token function">LOG_DEBUG</span><span class="token punctuation">(</span><span class="token string">"socket state changed, close socket."</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                        <span class="token function">close</span><span class="token punctuation">(</span>SOCK_SN<span class="token punctuation">)</span><span class="token punctuation">;</span>
+                        <span class="token keyword">return</span><span class="token punctuation">;</span>
+                    <span class="token punctuation">}</span>
+                <span class="token punctuation">}</span>
+                <span class="token comment">// 轮询结束，清除中断标志</span>
+                <span class="token function">setSn_IR</span><span class="token punctuation">(</span>SOCK_SN<span class="token punctuation">,</span> Sn_IR_RECV<span class="token punctuation">)</span><span class="token punctuation">;</span>
+                <span class="token comment">// 获取socket接收缓冲区中的数据大小</span>
+                receivedSize <span class="token operator">=</span> <span class="token function">getSn_RX_RSR</span><span class="token punctuation">(</span>SOCK_SN<span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment">// received size</span>
+                <span class="token function">recv</span><span class="token punctuation">(</span>SOCK_SN<span class="token punctuation">,</span> rxbuf<span class="token punctuation">,</span> receivedSize<span class="token punctuation">)</span><span class="token punctuation">;</span>
+                <span class="token function">LOG_ARR</span><span class="token punctuation">(</span><span class="token string">"received msg = %.*s, port = %d, ip"</span><span class="token punctuation">,</span> serverIP<span class="token punctuation">,</span> <span class="token number">4</span><span class="token punctuation">,</span>
+                        receivedSize<span class="token punctuation">,</span> rxbuf<span class="token punctuation">,</span> serverPort<span class="token punctuation">)</span><span class="token punctuation">;</span>
+                <span class="token comment">// 回送消息</span>
+                <span class="token function">send</span><span class="token punctuation">(</span>SOCK_SN<span class="token punctuation">,</span> rxbuf<span class="token punctuation">,</span> receivedSize<span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token punctuation">}</span>
+
+        <span class="token keyword">default</span><span class="token operator">:</span>
+            <span class="token function">LOG_DEBUG</span><span class="token punctuation">(</span><span class="token string">"unexpected socket status = %d"</span><span class="token punctuation">,</span> sockStatus<span class="token punctuation">)</span>
+            <span class="token keyword">break</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<h2 id="ce-shi-2">测试</h2>
+<h3 id="chuan-kou-zhu-shou-tcp-server-mo-shi">串口助手TCPServer模式</h3>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241215092719982.png" alt="image-20241215092719982"></p>
+<h3 id="mcu-ri-zhi">MCU日志</h3>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241215092801097.png" alt="image-20241215092801097"></p>
+<h1 id="shi-yan-udp-shou-fa">实验-UDP收发</h1>
+<h2 id="shi-li-dai-ma-3">示例代码</h2>
+<h3 id="w-5500-udp-h">w5500_udp.h</h3>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">ifndef</span> <span class="token expression">__W5500_UDP_H__</span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name">__W5500_UDP_H__</span></span>
+
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">"socket.h"</span></span>
+
+<span class="token keyword">void</span> <span class="token function">W5500_UDP_Handle</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">endif</span> <span class="token comment">/* __W5500_UDP_H__ */</span></span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<h3 id="w-5500-udp-c">w5500_udp.c</h3>
+<blockquote>
+<p>[!NOTE]</p>
+<p>通过<code>recvfrom</code>获取报文及其来源IP端口</p>
+</blockquote>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">"w5500_udp.h"</span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">"logger.h"</span></span>
+
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name">SOCK_SN</span> <span class="token expression"><span class="token number">0</span></span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name">UDP_PORT</span> <span class="token expression"><span class="token number">8080</span></span></span>
+<span class="token comment">// W5500每个socket有2kb的接收缓冲区、2kb的发送缓冲区</span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name">SOCK_RX_BUFFER_MAX_SIZE</span> <span class="token expression"><span class="token number">2048</span></span></span>
+
+<span class="token class-name">uint8_t</span> rxbuf<span class="token punctuation">[</span>SOCK_RX_BUFFER_MAX_SIZE<span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token punctuation">{</span><span class="token number">0</span><span class="token punctuation">}</span><span class="token punctuation">;</span>
+
+<span class="token keyword">void</span> <span class="token function">W5500_UDP_Handle</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token class-name">uint8_t</span> sockStatus    <span class="token operator">=</span> <span class="token function">getSn_SR</span><span class="token punctuation">(</span>SOCK_SN<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token class-name">int8_t</span> result         <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
+    <span class="token class-name">uint16_t</span> receivedSize <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
+    <span class="token class-name">uint8_t</span> sourceIP<span class="token punctuation">[</span><span class="token number">4</span><span class="token punctuation">]</span>   <span class="token operator">=</span> <span class="token punctuation">{</span><span class="token number">0</span><span class="token punctuation">}</span><span class="token punctuation">;</span>
+    <span class="token class-name">uint16_t</span> sourcePort   <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
+
+    <span class="token keyword">switch</span> <span class="token punctuation">(</span>sockStatus<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">case</span> SOCK_CLOSED<span class="token operator">:</span>
+            <span class="token comment">/*
+            1. 要打开的socket序列号sn
+            2. socket协议模式：UDP
+            3. socket参数配置：不配置任何参数
+            */</span>
+            result <span class="token operator">=</span> <span class="token function">socket</span><span class="token punctuation">(</span>SOCK_SN<span class="token punctuation">,</span> Sn_MR_UDP<span class="token punctuation">,</span> UDP_PORT<span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token keyword">if</span> <span class="token punctuation">(</span>result <span class="token operator">!=</span> SOCK_SN<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                <span class="token function">LOG_ERROR</span><span class="token punctuation">(</span><span class="token string">"socket open failed, result = %d"</span><span class="token punctuation">,</span> result<span class="token punctuation">)</span>
+            <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
+                <span class="token function">LOG_DEBUG</span><span class="token punctuation">(</span><span class="token string">"socket open success"</span><span class="token punctuation">)</span>
+            <span class="token punctuation">}</span>
+            <span class="token keyword">break</span><span class="token punctuation">;</span>
+
+        <span class="token keyword">case</span> SOCK_UDP<span class="token operator">:</span>
+            <span class="token comment">// 轮询接收数据</span>
+            <span class="token keyword">while</span> <span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                <span class="token comment">// 轮询方式处理接收事件中断标志位，当有数据可读时进行处理</span>
+                <span class="token keyword">while</span> <span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token function">getSn_IR</span><span class="token punctuation">(</span>SOCK_SN<span class="token punctuation">)</span> <span class="token operator">&amp;</span> Sn_IR_RECV<span class="token punctuation">)</span> <span class="token operator">==</span> <span class="token number">0</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                    <span class="token comment">// 轮询过程中，如果socket状态变化，则关闭socket</span>
+                    <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token function">getSn_SR</span><span class="token punctuation">(</span>SOCK_SN<span class="token punctuation">)</span> <span class="token operator">!=</span> SOCK_UDP<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                        <span class="token function">LOG_DEBUG</span><span class="token punctuation">(</span><span class="token string">"socket state changed, close socket."</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                        <span class="token function">close</span><span class="token punctuation">(</span>SOCK_SN<span class="token punctuation">)</span><span class="token punctuation">;</span>
+                        <span class="token keyword">return</span><span class="token punctuation">;</span>
+                    <span class="token punctuation">}</span>
+                <span class="token punctuation">}</span>
+                <span class="token comment">// 轮询结束，清除中断标志</span>
+                <span class="token function">setSn_IR</span><span class="token punctuation">(</span>SOCK_SN<span class="token punctuation">,</span> Sn_IR_RECV<span class="token punctuation">)</span><span class="token punctuation">;</span>
+                <span class="token comment">// 获取报文以及来源IP端口</span>
+                receivedSize <span class="token operator">=</span> <span class="token function">recvfrom</span><span class="token punctuation">(</span>SOCK_SN<span class="token punctuation">,</span> rxbuf<span class="token punctuation">,</span> SOCK_RX_BUFFER_MAX_SIZE<span class="token punctuation">,</span>
+                                        sourceIP<span class="token punctuation">,</span> <span class="token operator">&amp;</span>sourcePort<span class="token punctuation">)</span><span class="token punctuation">;</span>
+                <span class="token function">LOG_ARR</span><span class="token punctuation">(</span><span class="token string">"received msg = %.*s, size = %d, port = %d, ip"</span><span class="token punctuation">,</span>
+                        sourceIP<span class="token punctuation">,</span> <span class="token number">4</span><span class="token punctuation">,</span> receivedSize<span class="token punctuation">,</span> rxbuf<span class="token punctuation">,</span> receivedSize<span class="token punctuation">,</span>
+                        sourcePort<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+                <span class="token comment">// 回送消息</span>
+                <span class="token function">sendto</span><span class="token punctuation">(</span>SOCK_SN<span class="token punctuation">,</span> rxbuf<span class="token punctuation">,</span> receivedSize<span class="token punctuation">,</span> sourceIP<span class="token punctuation">,</span> sourcePort<span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token punctuation">}</span>
+
+        <span class="token keyword">default</span><span class="token operator">:</span>
+            <span class="token function">LOG_DEBUG</span><span class="token punctuation">(</span><span class="token string">"unexpected socket status = %d"</span><span class="token punctuation">,</span> sockStatus<span class="token punctuation">)</span>
+            <span class="token keyword">break</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<h2 id="ce-shi-3">测试</h2>
+<h3 id="chuan-kou-zhu-shou-mo-ni-fa-song-fang">串口助手模拟发送方</h3>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241215101226563.png" alt="image-20241215101226563"></p>
+<h3 id="mcu-ri-zhi-1">MCU日志</h3>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241215101414638.png" alt="image-20241215101414638"></p>
+<h1 id="shi-yan-da-jian-http-server-amp-web-kong-zhi-led">实验-搭建HTTPServer &amp; WEB控制LED</h1>
+<h2 id="bu-shu-web-zi-yuan">部署WEB资源</h2>
+<h3 id="w-5500-httpserver-h">w5500_httpserver.h</h3>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">ifndef</span> <span class="token expression">__W5500_HTTPSERVER_H__</span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name">__W5500_HTTPSERVER_H__</span></span>
+
+<span class="token keyword">void</span> <span class="token function">W5500_HTTPServer_Init</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token keyword">void</span> <span class="token function">W5500_HTTPServer_Start</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">endif</span> <span class="token comment">/* __W5500_HTTPSERVER_H__ */</span></span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<h3 id="w-5500-httpserver-c">w5500_httpserver.c</h3>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">"w5500_httpserver.h"</span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">"httpServer.h"</span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">"logger.h"</span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">"socket.h"</span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">"led.h"</span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">"string.h"</span></span>
+
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name">SOCKET_MAX_BUFFER_SIZE_TX</span> <span class="token expression"><span class="token number">2048</span></span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name">SOCKET_MAX_BUFFER_SIZE_RX</span> <span class="token expression"><span class="token number">2048</span></span></span>
+
+<span class="token class-name">uint8_t</span> txbuf<span class="token punctuation">[</span>SOCKET_MAX_BUFFER_SIZE_TX<span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token punctuation">{</span><span class="token number">0</span><span class="token punctuation">}</span><span class="token punctuation">;</span>
+<span class="token class-name">uint8_t</span> rxbuf<span class="token punctuation">[</span>SOCKET_MAX_BUFFER_SIZE_RX<span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token punctuation">{</span><span class="token number">0</span><span class="token punctuation">}</span><span class="token punctuation">;</span>
+
+<span class="token comment">// socket序号列表</span>
+<span class="token class-name">uint8_t</span> socketList<span class="token punctuation">[</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token punctuation">{</span><span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">,</span> <span class="token number">2</span><span class="token punctuation">,</span> <span class="token number">3</span><span class="token punctuation">,</span> <span class="token number">4</span><span class="token punctuation">,</span> <span class="token number">5</span><span class="token punctuation">,</span> <span class="token number">6</span><span class="token punctuation">,</span> <span class="token number">7</span><span class="token punctuation">}</span><span class="token punctuation">;</span>
+<span class="token class-name">uint8_t</span> socketSize   <span class="token operator">=</span> <span class="token keyword">sizeof</span><span class="token punctuation">(</span>socketList<span class="token punctuation">)</span> <span class="token operator">/</span> <span class="token keyword">sizeof</span><span class="token punctuation">(</span>socketList<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token keyword">const</span> <span class="token class-name">uint8_t</span> <span class="token operator">*</span>contentName <span class="token operator">=</span> <span class="token string">"index.html"</span><span class="token punctuation">;</span>
+
+<span class="token comment">/* 响应的网页的内容 */</span>
+<span class="token keyword">const</span> <span class="token class-name">uint8_t</span> content<span class="token punctuation">[</span><span class="token number">2048</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token string">"&lt;!doctype html&gt;\n"</span>
+                        <span class="token string">"&lt;html lang=\"en\"&gt;\n"</span>
+                        <span class="token string">"&lt;head&gt;\n"</span>
+                        <span class="token string">"    &lt;meta charset=\"GBK\"&gt;\n"</span>
+                        <span class="token string">"    &lt;meta name=\"viewport\"\n"</span>
+                        <span class="token string">"          content=\"width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0\"&gt;\n"</span>
+                        <span class="token string">"    &lt;meta http-equiv=\"X-UA-Compatible\" content=\"ie=edge\"&gt;\n"</span>
+                        <span class="token string">"    &lt;title&gt;尚硅谷嵌入式课程&lt;/title&gt;\n"</span>
+                        <span class="token string">"\n"</span>
+                        <span class="token string">"    &lt;style type=\"text/css\"&gt;\n"</span>
+                        <span class="token string">"        #open_red{\n"</span>
+                        <span class="token string">"            color: red;\n"</span>
+                        <span class="token string">"            width: 100px;\n"</span>
+                        <span class="token string">"            height: 40px;\n"</span>
+                        <span class="token string">"\n"</span>
+                        <span class="token string">"\n"</span>
+                        <span class="token string">"        }\n"</span>
+                        <span class="token string">"        #close_red{\n"</span>
+                        <span class="token string">"            color: black;\n"</span>
+                        <span class="token string">"            width: 100px;\n"</span>
+                        <span class="token string">"            height: 40px;\n"</span>
+                        <span class="token string">"        }\n"</span>
+                        <span class="token string">"    &lt;/style&gt;\n"</span>
+                        <span class="token string">"&lt;/head&gt;\n"</span>
+                        <span class="token string">"&lt;body&gt;\n"</span>
+                        <span class="token string">"&lt;a href=\"/index.html?action=0\"&gt;&lt;button id=\"open_red\" &gt;开灯&lt;/button&gt;&lt;/a&gt;\n"</span>
+                        <span class="token string">"&lt;a href=\"/index.html?action=1\"&gt;&lt;button id=\"close_red\" &gt;关灯&lt;/button&gt;&lt;/a&gt;\n"</span>
+                        <span class="token string">"&lt;a href=\"/index.html?action=2\"&gt;&lt;button id=\"close_red\" &gt;翻转&lt;/button&gt;&lt;/a&gt;\n"</span>
+                        <span class="token string">"&lt;/body&gt;\n"</span>
+                        <span class="token string">"&lt;/html&gt;"</span><span class="token punctuation">;</span>
+
+
+<span class="token keyword">void</span> <span class="token function">W5500_HTTPServer_Init</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token comment">// 初始化httpserver, 使用多少个socket来支撑http服务</span>
+    <span class="token function">httpServer_init</span><span class="token punctuation">(</span>txbuf<span class="token punctuation">,</span> rxbuf<span class="token punctuation">,</span> socketSize<span class="token punctuation">,</span> socketList<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token comment">// 注册web资源</span>
+    <span class="token function">reg_httpServer_webContent</span><span class="token punctuation">(</span>contentName<span class="token punctuation">,</span> content<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">void</span> <span class="token function">W5500_HTTPServer_Start</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">while</span> <span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token comment">// 启动http，监听并处理一次http请求</span>
+        <span class="token function">httpServer_run</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<h3 id="main-c-1">main.c</h3>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">"ethernet.h"</span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">"logger.h"</span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">"stm32f10x.h"</span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">"uart.h"</span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">"w5500_httpserver.h"</span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">"led.h"</span></span>
+
+<span class="token keyword">void</span> <span class="token function">uart1_received_callback</span><span class="token punctuation">(</span><span class="token class-name">uint8_t</span> buf<span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">,</span> <span class="token class-name">uint8_t</span> size<span class="token punctuation">)</span> <span class="token punctuation">{</span><span class="token punctuation">}</span>
+
+<span class="token keyword">int</span> <span class="token function">main</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token function">uart_init</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">LOG_DEBUG</span><span class="token punctuation">(</span><span class="token string">"usart test"</span><span class="token punctuation">)</span>
+    <span class="token function">Ethernet_Init</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">LED_Init</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">LOG_DEBUG</span><span class="token punctuation">(</span><span class="token string">"main start"</span><span class="token punctuation">)</span>
+
+    <span class="token function">W5500_HTTPServer_Init</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">W5500_HTTPServer_Start</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">while</span> <span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<h2 id="liu-lan-qi-fang-wen-web">浏览器访问WEB</h2>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241215120557766.png" alt="image-20241215120557766"></p>
+<h3 id="an-niu-fa-chu-http-qing-qiu">按钮发出HTTP请求</h3>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241215120646017.png" alt="image-20241215120646017"></p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241215120708524.png" alt="image-20241215120708524"></p>
+<h2 id="http-qing-qiu-can-shu-jie-xi">HTTP请求参数解析</h2>
+<h3 id="guan-fang-qu-dong-http-server-c">官方驱动httpServer.c</h3>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241215120814482.png" alt="image-20241215120814482"></p>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token function">parse_http_request</span><span class="token punctuation">(</span>parsed_http_request<span class="token punctuation">,</span> <span class="token punctuation">(</span><span class="token class-name">uint8_t</span> <span class="token operator">*</span><span class="token punctuation">)</span>http_request<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token comment">//LOG_DEBUG("request uri = %s", parsed_http_request-&gt;URI)</span>
+<span class="token function">parse_http_request_post_process</span><span class="token punctuation">(</span>parsed_http_request<span class="token operator">-&gt;</span>URI<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c">__weak <span class="token keyword">void</span> <span class="token function">parse_http_request_post_process</span><span class="token punctuation">(</span><span class="token class-name">uint8_t</span> <span class="token operator">*</span>uri<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+
+<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+<h3 id="http-server-h">httpServer.h</h3>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token keyword">void</span> <span class="token function">parse_http_request_post_process</span><span class="token punctuation">(</span><span class="token class-name">uint8_t</span> <span class="token operator">*</span>uri<span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<h3 id="zi-ding-yi-uri-chu-li-luo-ji">自定义uri处理逻辑</h3>
+<p><code>w5500_httpserver.h</code></p>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token keyword">static</span> <span class="token class-name">int8_t</span> <span class="token function">parse_uri</span><span class="token punctuation">(</span><span class="token class-name">uint8_t</span> <span class="token operator">*</span>uri<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token class-name">size_t</span> len <span class="token operator">=</span> <span class="token function">strlen</span><span class="token punctuation">(</span>uri<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>len <span class="token operator">&gt;</span> <span class="token number">0</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">char</span> <span class="token operator">*</span>token <span class="token operator">=</span> <span class="token function">strstr</span><span class="token punctuation">(</span>uri<span class="token punctuation">,</span> <span class="token string">"action="</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>token <span class="token operator">!=</span> <span class="token constant">NULL</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token keyword">return</span> <span class="token operator">*</span><span class="token punctuation">(</span>token <span class="token operator">+</span> <span class="token number">7</span><span class="token punctuation">)</span> <span class="token operator">-</span> <span class="token char">'0'</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+    <span class="token keyword">return</span> <span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">void</span> <span class="token function">parse_http_request_post_process</span><span class="token punctuation">(</span><span class="token class-name">uint8_t</span> <span class="token operator">*</span>uri<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token function">LOG_DEBUG</span><span class="token punctuation">(</span><span class="token string">"uri = %s"</span><span class="token punctuation">,</span> uri<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token class-name">int8_t</span> actionType <span class="token operator">=</span> <span class="token function">parse_uri</span><span class="token punctuation">(</span>uri<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">LOG_DEBUG</span><span class="token punctuation">(</span><span class="token string">"actionType = %d"</span><span class="token punctuation">,</span> actionType<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">switch</span> <span class="token punctuation">(</span>actionType<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">case</span> <span class="token number">0</span><span class="token operator">:</span>
+            <span class="token function">LED_On</span><span class="token punctuation">(</span>LED1<span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token keyword">break</span><span class="token punctuation">;</span>
+        <span class="token keyword">case</span> <span class="token number">1</span><span class="token operator">:</span>
+            <span class="token function">LED_Off</span><span class="token punctuation">(</span>LED1<span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token keyword">break</span><span class="token punctuation">;</span>
+
+        <span class="token keyword">case</span> <span class="token number">2</span><span class="token operator">:</span>
+            <span class="token function">LED_Toggle</span><span class="token punctuation">(</span>LED1<span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token keyword">break</span><span class="token punctuation">;</span>
+        <span class="token keyword">default</span><span class="token operator">:</span>
+            <span class="token keyword">break</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<h2 id="ce-shi-4">测试</h2>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241215121112679.png" alt="image-20241215121112679"></p>
+<h1 id="the-end">THE END</h1>
 
                 
             </div>
@@ -1506,7 +1850,7 @@ W5500 Datasheet v1.1.0 - English
             <br>
             
                 &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                        class="white-color">87.9k</span>
+                        class="white-color">89k</span>
             
             
             
