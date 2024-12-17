@@ -634,7 +634,7 @@
                 type: 'pie',
                 radius: '50%',
                 color: ['#6772e5', '#ff9e0f', '#fa755a', '#3ecf8e', '#82d3f4', '#ab47bc', '#525f7f', '#f51c47', '#26A69A'],
-                data: [{"name":"ARM","value":5},{"name":"MDK","value":1},{"name":"STM32","value":12},{"name":"ESP32","value":1},{"name":"协议","value":2},{"name":"杂记","value":1},{"name":"协议","value":3},{"name":"源码分析","value":1},{"name":"踩坑记录","value":1},{"name":"架构","value":1},{"name":"算法","value":1},{"name":"GD32","value":1},{"name":"STM32","value":2},{"name":"踩坑记录","value":1}],
+                data: [{"name":"ARM","value":5},{"name":"STM32","value":12},{"name":"MDK","value":1},{"name":"ESP32","value":1},{"name":"源码分析","value":1},{"name":"踩坑记录","value":1},{"name":"杂记","value":1},{"name":"协议","value":2},{"name":"协议","value":3},{"name":"架构","value":1},{"name":"算法","value":1},{"name":"GD32","value":1},{"name":"STM32","value":2},{"name":"踩坑记录","value":1}],
                 itemStyle: {
                     emphasis: {
                         shadowBlur: 10,
@@ -658,7 +658,7 @@
         xAxis: [
             {
                 type: 'category',
-                data: ["STM32","ARM","ARMv7","GD32","UART","I2C","I²C","指令流水线","异常","中断"]
+                data: ["STM32","ARM","ARMv7","GD32","UART","I2C","I²C","指令流水线","ATPCS","指令集"]
             }
         ],
         yAxis: [
@@ -859,38 +859,14 @@
             
             
             
-            <a href="/tags/%E5%BC%82%E5%B8%B8/">
-                <span class="chip center-align waves-effect waves-light chip-default">异常</span>
-            </a>
-            
-            
-            
-            <a href="/tags/%E4%B8%AD%E6%96%AD/">
-                <span class="chip center-align waves-effect waves-light chip-default">中断</span>
-            </a>
-            
-            
-            
             <a href="/tags/ATPCS/">
                 <span class="chip center-align waves-effect waves-light chip-default">ATPCS</span>
             </a>
             
             
             
-            <a href="/tags/MDK/">
-                <span class="chip center-align waves-effect waves-light chip-default">MDK</span>
-            </a>
-            
-            
-            
-            <a href="/tags/Debug/">
-                <span class="chip center-align waves-effect waves-light chip-default">Debug</span>
-            </a>
-            
-            
-            
-            <a href="/tags/%E5%AF%84%E5%AD%98%E5%99%A8%E5%8F%AF%E8%A7%86%E5%8C%96/">
-                <span class="chip center-align waves-effect waves-light chip-default">寄存器可视化</span>
+            <a href="/tags/%E6%8C%87%E4%BB%A4%E9%9B%86/">
+                <span class="chip center-align waves-effect waves-light chip-default">指令集</span>
             </a>
             
             
@@ -925,8 +901,32 @@
             
             
             
-            <a href="/tags/%E6%8C%87%E4%BB%A4%E9%9B%86/">
-                <span class="chip center-align waves-effect waves-light chip-default">指令集</span>
+            <a href="/tags/Memory/">
+                <span class="chip center-align waves-effect waves-light chip-default">Memory</span>
+            </a>
+            
+            
+            
+            <a href="/tags/%E5%AD%98%E5%82%A8%E5%99%A8/">
+                <span class="chip center-align waves-effect waves-light chip-default">存储器</span>
+            </a>
+            
+            
+            
+            <a href="/tags/MDK/">
+                <span class="chip center-align waves-effect waves-light chip-default">MDK</span>
+            </a>
+            
+            
+            
+            <a href="/tags/Debug/">
+                <span class="chip center-align waves-effect waves-light chip-default">Debug</span>
+            </a>
+            
+            
+            
+            <a href="/tags/%E5%AF%84%E5%AD%98%E5%99%A8%E5%8F%AF%E8%A7%86%E5%8C%96/">
+                <span class="chip center-align waves-effect waves-light chip-default">寄存器可视化</span>
             </a>
             
             
@@ -943,14 +943,8 @@
             
             
             
-            <a href="/tags/Memory/">
-                <span class="chip center-align waves-effect waves-light chip-default">Memory</span>
-            </a>
-            
-            
-            
-            <a href="/tags/%E5%AD%98%E5%82%A8%E5%99%A8/">
-                <span class="chip center-align waves-effect waves-light chip-default">存储器</span>
+            <a href="/tags/DMA/">
+                <span class="chip center-align waves-effect waves-light chip-default">DMA</span>
             </a>
             
             
@@ -969,6 +963,30 @@
             
             <a href="/tags/%E6%97%B6%E9%92%9F/">
                 <span class="chip center-align waves-effect waves-light chip-default">时钟</span>
+            </a>
+            
+            
+            
+            <a href="/tags/%E5%A4%96%E9%83%A8%E4%B8%AD%E6%96%AD/">
+                <span class="chip center-align waves-effect waves-light chip-default">外部中断</span>
+            </a>
+            
+            
+            
+            <a href="/tags/EXTI/">
+                <span class="chip center-align waves-effect waves-light chip-default">EXTI</span>
+            </a>
+            
+            
+            
+            <a href="/tags/%E5%BC%82%E5%B8%B8/">
+                <span class="chip center-align waves-effect waves-light chip-default">异常</span>
+            </a>
+            
+            
+            
+            <a href="/tags/%E4%B8%AD%E6%96%AD/">
+                <span class="chip center-align waves-effect waves-light chip-default">中断</span>
             </a>
             
             
@@ -997,26 +1015,8 @@
             
             
             
-            <a href="/tags/DMA/">
-                <span class="chip center-align waves-effect waves-light chip-default">DMA</span>
-            </a>
-            
-            
-            
             <a href="/tags/FSMC/">
                 <span class="chip center-align waves-effect waves-light chip-default">FSMC</span>
-            </a>
-            
-            
-            
-            <a href="/tags/%E5%A4%96%E9%83%A8%E4%B8%AD%E6%96%AD/">
-                <span class="chip center-align waves-effect waves-light chip-default">外部中断</span>
-            </a>
-            
-            
-            
-            <a href="/tags/EXTI/">
-                <span class="chip center-align waves-effect waves-light chip-default">EXTI</span>
             </a>
             
             
@@ -1087,12 +1087,6 @@
             
             
             
-            <a href="/tags/%E4%B8%B2%E5%8F%A3/">
-                <span class="chip center-align waves-effect waves-light chip-default">串口</span>
-            </a>
-            
-            
-            
             <a href="/tags/%E5%A4%9A%E4%BB%BB%E5%8A%A1/">
                 <span class="chip center-align waves-effect waves-light chip-default">多任务</span>
             </a>
@@ -1101,6 +1095,18 @@
             
             <a href="/tags/%E8%B0%83%E5%BA%A6/">
                 <span class="chip center-align waves-effect waves-light chip-default">调度</span>
+            </a>
+            
+            
+            
+            <a href="/tags/%E4%B8%B2%E5%8F%A3/">
+                <span class="chip center-align waves-effect waves-light chip-default">串口</span>
+            </a>
+            
+            
+            
+            <a href="/tags/SPI/">
+                <span class="chip center-align waves-effect waves-light chip-default">SPI</span>
             </a>
             
             
@@ -1131,12 +1137,6 @@
             
             <a href="/tags/%E7%A7%BB%E4%BD%8D%E5%AF%84%E5%AD%98%E5%99%A8/">
                 <span class="chip center-align waves-effect waves-light chip-default">移位寄存器</span>
-            </a>
-            
-            
-            
-            <a href="/tags/SPI/">
-                <span class="chip center-align waves-effect waves-light chip-default">SPI</span>
             </a>
             
             
@@ -1217,7 +1217,7 @@
             <br>
             
                 &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                        class="white-color">89.6k</span>
+                        class="white-color">92.9k</span>
             
             
             
