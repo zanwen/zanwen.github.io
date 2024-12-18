@@ -6,17 +6,9 @@
     <meta charset="utf-8">
     <meta name="keywords" content="STM32 与 ESP32-C3 的“无线配对”：WiFi 和蓝牙功能大揭秘, 安文的博客">
     <meta name="description" content="参考资料
-ESP32-C3
 
-Flash下载工具
-AT固件
-ESP32-C3数据手册
-ESP32-AT官方文档
-
-AT固件烧录成功后，重启，串口输出日志如下：
-
-
-这里要注意以下AT固件的串口波特率配置，稍后STM32和与之通信时，需要配置">
+STM32F103参考手册：rm0008-stm32f101xx-stm32f102xx-stm32f103xx-stm32f105xx-and-stm32f107xx
+STM32103ZE数据手册：STM32F103xC, S">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <meta name="renderer" content="webkit|ie-stand|ie-comp">
@@ -429,7 +421,7 @@ AT固件烧录成功后，重启，串口输出日志如下：
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-check fa-fw"></i>更新日期:&nbsp;&nbsp;
-                    2024-12-17
+                    2024-12-18
                 </div>
                 
 
@@ -467,6 +459,10 @@ AT固件烧录成功后，重启，串口输出日志如下：
         <div class="card-content article-card-content">
             <div id="articleContent">
                 <h1 id="can-kao-zi-liao">参考资料</h1>
+<ul>
+<li>STM32F103参考手册：<a target="_blank" rel="noopener" href="https://www.st.com/resource/en/reference_manual/rm0008-stm32f101xx-stm32f102xx-stm32f103xx-stm32f105xx-and-stm32f107xx-advanced-armbased-32bit-mcus-stmicroelectronics.pdf">rm0008-stm32f101xx-stm32f102xx-stm32f103xx-stm32f105xx-and-stm32f107xx</a></li>
+<li>STM32103ZE数据手册：<a target="_blank" rel="noopener" href="https://www.st.com/resource/en/datasheet/stm32f103rc.pdf">STM32F103xC, STM32F103xD, STM32F103xE </a></li>
+</ul>
 <h2 id="esp-32-c-3">ESP32-C3</h2>
 <ul>
 <li><a target="_blank" rel="noopener" href="https://www.espressif.com.cn/zh-hans/support/download/other-tools?keys=&amp;field_type_tid%5B%5D=785">Flash下载工具</a></li>
@@ -1445,17 +1441,17 @@ ESP32_BLE_STATE <span class="token function">ESP32_Bluetooth_HandleConnChange</s
 <article id="prenext-posts" class="prev-next articles">
     <div class="row article-row">
         
-        <div class="article col s12 m6" data-aos="fade-up" data-aos="fade-up">
+        <div class="article col s12 m6" data-aos="fade-up">
             <div class="article-badge left-badge text-color">
-                <i class="far fa-dot-circle"></i>&nbsp;本篇
-            </div>
+                <i class="fas fa-chevron-left"></i>&nbsp;上一篇</div>
             <div class="card">
-                <a href="/2024/12/15/32686.html">
+                <a href="/2024/12/17/42586.html">
                     <div class="card-image">
                         
-                        <img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/%E5%BE%AE%E4%BF%A1%E5%9B%BE%E7%89%87_20241215210354.jpg" class="responsive-img" alt="STM32 与 ESP32-C3 的“无线配对”：WiFi 和蓝牙功能大揭秘">
                         
-                        <span class="card-title">STM32 与 ESP32-C3 的“无线配对”：WiFi 和蓝牙功能大揭秘</span>
+                        <img src="/medias/featureimages/8.jpg" class="responsive-img" alt="掌握 STM32 PWR 电源管理：降低功耗的策略与技巧">
+                        
+                        <span class="card-title">掌握 STM32 PWR 电源管理：降低功耗的策略与技巧</span>
                     </div>
                 </a>
                 <div class="card-content article-content">
@@ -1465,26 +1461,21 @@ ESP32_BLE_STATE <span class="token function">ESP32_Bluetooth_HandleConnChange</s
                         
                     </div>
                     <div class="publish-info">
-                            <span class="publish-date">
-                                <i class="far fa-clock fa-fw icon-date"></i>2024-12-15
-                            </span>
+                        <span class="publish-date">
+                            <i class="far fa-clock fa-fw icon-date"></i>2024-12-17
+                        </span>
                         <span class="publish-author">
                             
                             <i class="fas fa-bookmark fa-fw icon-category"></i>
                             
-                            <a href="/categories/STM32/" class="post-category">
-                                    STM32
-                                </a>
-                            
-                            <a href="/categories/STM32/ESP32/" class="post-category">
-                                    ESP32
+                            <a href="/categories/STM/" class="post-category">
+                                    STM
                                 </a>
                             
                             
                         </span>
                     </div>
                 </div>
-
                 
                 <div class="card-action article-tags">
                     
@@ -1492,20 +1483,12 @@ ESP32_BLE_STATE <span class="token function">ESP32_Bluetooth_HandleConnChange</s
                         <span class="chip bg-color">STM32</span>
                     </a>
                     
-                    <a href="/tags/ESP32/">
-                        <span class="chip bg-color">ESP32</span>
+                    <a href="/tags/%E4%BD%8E%E5%8A%9F%E8%80%97/">
+                        <span class="chip bg-color">低功耗</span>
                     </a>
                     
-                    <a href="/tags/WIFI/">
-                        <span class="chip bg-color">WIFI</span>
-                    </a>
-                    
-                    <a href="/tags/%E8%93%9D%E7%89%99/">
-                        <span class="chip bg-color">蓝牙</span>
-                    </a>
-                    
-                    <a href="/tags/%E6%97%A0%E7%BA%BF%E9%80%9A%E8%AE%AF/">
-                        <span class="chip bg-color">无线通讯</span>
+                    <a href="/tags/%E7%94%B5%E6%BA%90%E7%AE%A1%E7%90%86/">
+                        <span class="chip bg-color">电源管理</span>
                     </a>
                     
                 </div>
@@ -1709,7 +1692,7 @@ ESP32_BLE_STATE <span class="token function">ESP32_Bluetooth_HandleConnChange</s
             <br>
             
                 &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                        class="white-color">92.9k</span>
+                        class="white-color">94.4k</span>
             
             
             
