@@ -16,11 +16,11 @@
 二叉树
 前中后序遍历（DFS）
 递归实现
-非递归实现
+※非递归实现
 144. 二叉树的前序遍历
 /**
  * Definition for a binary tree node.
- *">
+ ">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <meta name="renderer" content="webkit|ie-stand|ie-comp">
@@ -417,21 +417,21 @@
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-check fa-fw"></i>更新日期:&nbsp;&nbsp;
-                    2024-12-13
+                    2024-12-21
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
-                    2k
+                    3.4k
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-clock fa-fw"></i>阅读时长:&nbsp;&nbsp;
-                    11 分
+                    18 分
                 </div>
                 
 
@@ -465,7 +465,7 @@
 <h1 id="er-cha-shu">二叉树</h1>
 <h2 id="qian-zhong-hou-xu-bian-li-dfs">前中后序遍历（DFS）</h2>
 <h3 id="di-gui-shi-xian">递归实现</h3>
-<h3 id="fei-di-gui-shi-xian">非递归实现</h3>
+<h3 id="fei-di-gui-shi-xian">※非递归实现</h3>
 <h4 id="a-href-https-leetcode-cn-problems-binary-tree-preorder-traversal-144-er-cha-shu-de-qian-xu-bian-li-a"><a target="_blank" rel="noopener" href="https://leetcode.cn/problems/binary-tree-preorder-traversal/">144. 二叉树的前序遍历</a></h4>
 <pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token comment">/**
  * Definition for a binary tree node.
@@ -518,9 +518,9 @@ Frame<span class="token operator">*</span> <span class="token function">peek</sp
         <span class="token keyword">return</span> <span class="token constant">NULL</span><span class="token punctuation">;</span>
     <span class="token punctuation">}</span>
     <span class="token keyword">return</span> stack<span class="token operator">-&gt;</span>frames<span class="token punctuation">[</span>stack<span class="token operator">-&gt;</span>size <span class="token operator">-</span> <span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
-<span class="token punctuation">}</span>
-
-<span class="token keyword">void</span> <span class="token function">pushNode</span><span class="token punctuation">(</span>Stack<span class="token operator">*</span> stack<span class="token punctuation">,</span> <span class="token keyword">struct</span> <span class="token class-name">TreeNode</span><span class="token operator">*</span> node<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241221194944322.png" alt="image-20241221194944322" style="zoom:50%;">
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token keyword">void</span> <span class="token function">pushNode</span><span class="token punctuation">(</span>Stack<span class="token operator">*</span> stack<span class="token punctuation">,</span> <span class="token keyword">struct</span> <span class="token class-name">TreeNode</span><span class="token operator">*</span> node<span class="token punctuation">)</span> <span class="token punctuation">{</span>
     <span class="token keyword">if</span> <span class="token punctuation">(</span>node <span class="token operator">!=</span> <span class="token constant">NULL</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
         Frame<span class="token operator">*</span> tmp <span class="token operator">=</span> <span class="token function">malloc</span><span class="token punctuation">(</span><span class="token keyword">sizeof</span><span class="token punctuation">(</span>Frame<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
         tmp<span class="token operator">-&gt;</span>node <span class="token operator">=</span> node<span class="token punctuation">;</span>
@@ -553,61 +553,10 @@ Frame<span class="token operator">*</span> <span class="token function">peek</sp
         <span class="token punctuation">}</span>
     <span class="token punctuation">}</span>
     <span class="token keyword">return</span> res<span class="token punctuation">;</span>
-<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <h4 id="a-href-https-leetcode-cn-problems-binary-tree-inorder-traversal-94-er-cha-shu-de-zhong-xu-bian-li-a"><a target="_blank" rel="noopener" href="https://leetcode.cn/problems/binary-tree-inorder-traversal/">94. 二叉树的中序遍历</a></h4>
-<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token comment">/**
- * Definition for a binary tree node.
- * struct TreeNode {
- *     int val;
- *     struct TreeNode *left;
- *     struct TreeNode *right;
- * };
- */</span>
-<span class="token comment">/**
- * Note: The returned array must be malloced, assume caller calls free().
- */</span>
-<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name">MAX_STACK_SIZE</span> <span class="token expression"><span class="token number">100</span></span></span>
-
-<span class="token keyword">typedef</span> <span class="token keyword">enum</span> <span class="token punctuation">{</span>
-    LEFT_SUBTREE_UNPROCESSED<span class="token punctuation">,</span>
-    RIGHT_SUBTREE_UNPROCESSED<span class="token punctuation">,</span>
-    SUBTREE_PROCESSED
-<span class="token punctuation">}</span> TraverseState<span class="token punctuation">;</span>
-
-<span class="token keyword">typedef</span> <span class="token keyword">struct</span> <span class="token punctuation">{</span>
-    <span class="token keyword">struct</span> <span class="token class-name">TreeNode</span> <span class="token operator">*</span>node<span class="token punctuation">;</span>
-    TraverseState state<span class="token punctuation">;</span>
-<span class="token punctuation">}</span> Frame<span class="token punctuation">;</span>
-
-<span class="token keyword">typedef</span> <span class="token keyword">struct</span> <span class="token punctuation">{</span>
-    Frame<span class="token operator">*</span> frames<span class="token punctuation">[</span>MAX_STACK_SIZE<span class="token punctuation">]</span><span class="token punctuation">;</span>
-    <span class="token keyword">int</span> size<span class="token punctuation">;</span>
-<span class="token punctuation">}</span> Stack<span class="token punctuation">;</span>
-
-<span class="token keyword">void</span> <span class="token function">push</span><span class="token punctuation">(</span>Stack<span class="token operator">*</span> stack<span class="token punctuation">,</span> Frame<span class="token operator">*</span> frame<span class="token punctuation">)</span> <span class="token punctuation">{</span>
-    <span class="token keyword">if</span> <span class="token punctuation">(</span>stack<span class="token operator">-&gt;</span>size <span class="token operator">==</span> MAX_STACK_SIZE<span class="token punctuation">)</span> <span class="token punctuation">{</span>
-        <span class="token keyword">return</span><span class="token punctuation">;</span>
-    <span class="token punctuation">}</span>
-    stack<span class="token operator">-&gt;</span>frames<span class="token punctuation">[</span>stack<span class="token operator">-&gt;</span>size<span class="token operator">++</span><span class="token punctuation">]</span> <span class="token operator">=</span> frame<span class="token punctuation">;</span>
-<span class="token punctuation">}</span>
-
-<span class="token keyword">void</span> <span class="token function">pop</span><span class="token punctuation">(</span>Stack<span class="token operator">*</span> stack<span class="token punctuation">)</span> <span class="token punctuation">{</span>
-    <span class="token keyword">if</span> <span class="token punctuation">(</span>stack<span class="token operator">-&gt;</span>size <span class="token operator">==</span> MAX_STACK_SIZE<span class="token punctuation">)</span> <span class="token punctuation">{</span>
-        <span class="token keyword">return</span><span class="token punctuation">;</span>
-    <span class="token punctuation">}</span>
-    <span class="token operator">--</span>stack<span class="token operator">-&gt;</span>size<span class="token punctuation">;</span>
-<span class="token punctuation">}</span>
-
-bool <span class="token function">isEmpty</span><span class="token punctuation">(</span>Stack<span class="token operator">*</span> stack<span class="token punctuation">)</span> <span class="token punctuation">{</span> <span class="token keyword">return</span> stack<span class="token operator">-&gt;</span>size <span class="token operator">==</span> <span class="token number">0</span><span class="token punctuation">;</span> <span class="token punctuation">}</span>
-
-Frame<span class="token operator">*</span> <span class="token function">peek</span><span class="token punctuation">(</span>Stack<span class="token operator">*</span> stack<span class="token punctuation">)</span> <span class="token punctuation">{</span>
-    <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token function">isEmpty</span><span class="token punctuation">(</span>stack<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
-        <span class="token keyword">return</span> <span class="token constant">NULL</span><span class="token punctuation">;</span>
-    <span class="token punctuation">}</span>
-    <span class="token keyword">return</span> stack<span class="token operator">-&gt;</span>frames<span class="token punctuation">[</span>stack<span class="token operator">-&gt;</span>size <span class="token operator">-</span> <span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
-<span class="token punctuation">}</span>
-
-<span class="token keyword">void</span> <span class="token function">pushNode</span><span class="token punctuation">(</span>Stack<span class="token operator">*</span> stack<span class="token punctuation">,</span> <span class="token keyword">struct</span> <span class="token class-name">TreeNode</span><span class="token operator">*</span> node<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+<img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241221195037215.png" alt="image-20241221195037215" style="zoom: 50%;">
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token keyword">void</span> <span class="token function">pushNode</span><span class="token punctuation">(</span>Stack<span class="token operator">*</span> stack<span class="token punctuation">,</span> <span class="token keyword">struct</span> <span class="token class-name">TreeNode</span><span class="token operator">*</span> node<span class="token punctuation">)</span> <span class="token punctuation">{</span>
     <span class="token keyword">if</span> <span class="token punctuation">(</span>node <span class="token operator">!=</span> <span class="token constant">NULL</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
         Frame<span class="token operator">*</span> tmp <span class="token operator">=</span> <span class="token function">malloc</span><span class="token punctuation">(</span><span class="token keyword">sizeof</span><span class="token punctuation">(</span>Frame<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
         tmp<span class="token operator">-&gt;</span>node <span class="token operator">=</span> node<span class="token punctuation">;</span>
@@ -641,61 +590,10 @@ Frame<span class="token operator">*</span> <span class="token function">peek</sp
         <span class="token punctuation">}</span>
     <span class="token punctuation">}</span>
     <span class="token keyword">return</span> res<span class="token punctuation">;</span>
-<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <h4 id="a-href-https-leetcode-cn-problems-binary-tree-postorder-traversal-145-er-cha-shu-de-hou-xu-bian-li-a"><a target="_blank" rel="noopener" href="https://leetcode.cn/problems/binary-tree-postorder-traversal/">145. 二叉树的后序遍历</a></h4>
-<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token comment">/**
- * Definition for a binary tree node.
- * struct TreeNode {
- *     int val;
- *     struct TreeNode *left;
- *     struct TreeNode *right;
- * };
- */</span>
-<span class="token comment">/**
- * Note: The returned array must be malloced, assume caller calls free().
- */</span>
-<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name">MAX_STACK_SIZE</span> <span class="token expression"><span class="token number">100</span></span></span>
-
-<span class="token keyword">typedef</span> <span class="token keyword">enum</span> <span class="token punctuation">{</span>
-    LEFT_SUBTREE_UNPROCESSED<span class="token punctuation">,</span>
-    RIGHT_SUBTREE_UNPROCESSED<span class="token punctuation">,</span>
-    SUBTREE_PROCESSED
-<span class="token punctuation">}</span> TraverseState<span class="token punctuation">;</span>
-
-<span class="token keyword">typedef</span> <span class="token keyword">struct</span> <span class="token punctuation">{</span>
-    <span class="token keyword">struct</span> <span class="token class-name">TreeNode</span> <span class="token operator">*</span>node<span class="token punctuation">;</span>
-    TraverseState state<span class="token punctuation">;</span>
-<span class="token punctuation">}</span> Frame<span class="token punctuation">;</span>
-
-<span class="token keyword">typedef</span> <span class="token keyword">struct</span> <span class="token punctuation">{</span>
-    Frame<span class="token operator">*</span> frames<span class="token punctuation">[</span>MAX_STACK_SIZE<span class="token punctuation">]</span><span class="token punctuation">;</span>
-    <span class="token keyword">int</span> size<span class="token punctuation">;</span>
-<span class="token punctuation">}</span> Stack<span class="token punctuation">;</span>
-
-<span class="token keyword">void</span> <span class="token function">push</span><span class="token punctuation">(</span>Stack<span class="token operator">*</span> stack<span class="token punctuation">,</span> Frame<span class="token operator">*</span> frame<span class="token punctuation">)</span> <span class="token punctuation">{</span>
-    <span class="token keyword">if</span> <span class="token punctuation">(</span>stack<span class="token operator">-&gt;</span>size <span class="token operator">==</span> MAX_STACK_SIZE<span class="token punctuation">)</span> <span class="token punctuation">{</span>
-        <span class="token keyword">return</span><span class="token punctuation">;</span>
-    <span class="token punctuation">}</span>
-    stack<span class="token operator">-&gt;</span>frames<span class="token punctuation">[</span>stack<span class="token operator">-&gt;</span>size<span class="token operator">++</span><span class="token punctuation">]</span> <span class="token operator">=</span> frame<span class="token punctuation">;</span>
-<span class="token punctuation">}</span>
-
-<span class="token keyword">void</span> <span class="token function">pop</span><span class="token punctuation">(</span>Stack<span class="token operator">*</span> stack<span class="token punctuation">)</span> <span class="token punctuation">{</span>
-    <span class="token keyword">if</span> <span class="token punctuation">(</span>stack<span class="token operator">-&gt;</span>size <span class="token operator">==</span> MAX_STACK_SIZE<span class="token punctuation">)</span> <span class="token punctuation">{</span>
-        <span class="token keyword">return</span><span class="token punctuation">;</span>
-    <span class="token punctuation">}</span>
-    <span class="token operator">--</span>stack<span class="token operator">-&gt;</span>size<span class="token punctuation">;</span>
-<span class="token punctuation">}</span>
-
-bool <span class="token function">isEmpty</span><span class="token punctuation">(</span>Stack<span class="token operator">*</span> stack<span class="token punctuation">)</span> <span class="token punctuation">{</span> <span class="token keyword">return</span> stack<span class="token operator">-&gt;</span>size <span class="token operator">==</span> <span class="token number">0</span><span class="token punctuation">;</span> <span class="token punctuation">}</span>
-
-Frame<span class="token operator">*</span> <span class="token function">peek</span><span class="token punctuation">(</span>Stack<span class="token operator">*</span> stack<span class="token punctuation">)</span> <span class="token punctuation">{</span>
-    <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token function">isEmpty</span><span class="token punctuation">(</span>stack<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
-        <span class="token keyword">return</span> <span class="token constant">NULL</span><span class="token punctuation">;</span>
-    <span class="token punctuation">}</span>
-    <span class="token keyword">return</span> stack<span class="token operator">-&gt;</span>frames<span class="token punctuation">[</span>stack<span class="token operator">-&gt;</span>size <span class="token operator">-</span> <span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
-<span class="token punctuation">}</span>
-
-<span class="token keyword">void</span> <span class="token function">pushNode</span><span class="token punctuation">(</span>Stack<span class="token operator">*</span> stack<span class="token punctuation">,</span> <span class="token keyword">struct</span> <span class="token class-name">TreeNode</span><span class="token operator">*</span> node<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+<img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241221195106482.png" alt="image-20241221195106482" style="zoom:50%;">
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token keyword">void</span> <span class="token function">pushNode</span><span class="token punctuation">(</span>Stack<span class="token operator">*</span> stack<span class="token punctuation">,</span> <span class="token keyword">struct</span> <span class="token class-name">TreeNode</span><span class="token operator">*</span> node<span class="token punctuation">)</span> <span class="token punctuation">{</span>
     <span class="token keyword">if</span> <span class="token punctuation">(</span>node <span class="token operator">!=</span> <span class="token constant">NULL</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
         Frame<span class="token operator">*</span> tmp <span class="token operator">=</span> <span class="token function">malloc</span><span class="token punctuation">(</span><span class="token keyword">sizeof</span><span class="token punctuation">(</span>Frame<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
         tmp<span class="token operator">-&gt;</span>node <span class="token operator">=</span> node<span class="token punctuation">;</span>
@@ -729,13 +627,14 @@ Frame<span class="token operator">*</span> <span class="token function">peek</sp
         <span class="token punctuation">}</span>
     <span class="token punctuation">}</span>
     <span class="token keyword">return</span> res<span class="token punctuation">;</span>
-<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <h4 id="a-href-https-leetcode-cn-problems-n-ary-tree-preorder-traversal-589-n-cha-shu-de-qian-xu-bian-li-a"><a target="_blank" rel="noopener" href="https://leetcode.cn/problems/n-ary-tree-preorder-traversal/">589. N 叉树的前序遍历</a></h4>
 <h4 id="a-href-https-leetcode-cn-problems-n-ary-tree-postorder-traversal-590-n-cha-shu-de-hou-xu-bian-li-a"><a target="_blank" rel="noopener" href="https://leetcode.cn/problems/n-ary-tree-postorder-traversal/">590. N 叉树的后序遍历</a></h4>
 <h2 id="an-ceng-bian-li-bfs">按层遍历（BFS）</h2>
 <h4 id="a-href-https-leetcode-cn-problems-binary-tree-level-order-traversal-102-er-cha-shu-de-ceng-xu-bian-li-a"><a target="_blank" rel="noopener" href="https://leetcode.cn/problems/binary-tree-level-order-traversal/">102. 二叉树的层序遍历</a></h4>
 <p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241128141110383.png" alt="image-20241128141110383"></p>
 <h5 id="fang-fa-yi-you-size-lai-zuo-mei-yi-ceng-de-fen-ge">🌟方法一：由size来做每一层的分隔</h5>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241221195128656.png" alt="image-20241221195128656"></p>
 <pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token comment">/**
  * Definition for a binary tree node.
  * struct TreeNode {
@@ -857,10 +756,9 @@ ListNode_t<span class="token operator">*</span> <span class="token function">pol
         queue<span class="token operator">-&gt;</span>tail <span class="token operator">=</span> queue<span class="token operator">-&gt;</span>head<span class="token punctuation">;</span>
     <span class="token punctuation">}</span>
     <span class="token keyword">return</span> node<span class="token punctuation">;</span>
-<span class="token punctuation">}</span>
-
-
-<span class="token keyword">int</span><span class="token operator">*</span><span class="token operator">*</span> <span class="token function">levelOrder</span><span class="token punctuation">(</span><span class="token keyword">struct</span> <span class="token class-name">TreeNode</span><span class="token operator">*</span> root<span class="token punctuation">,</span> <span class="token keyword">int</span><span class="token operator">*</span> returnSize<span class="token punctuation">,</span> <span class="token keyword">int</span><span class="token operator">*</span><span class="token operator">*</span> returnColumnSizes<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241221195207127.png" alt="image-20241221195207127"></p>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token keyword">int</span><span class="token operator">*</span><span class="token operator">*</span> <span class="token function">levelOrder</span><span class="token punctuation">(</span><span class="token keyword">struct</span> <span class="token class-name">TreeNode</span><span class="token operator">*</span> root<span class="token punctuation">,</span> <span class="token keyword">int</span><span class="token operator">*</span> returnSize<span class="token punctuation">,</span> <span class="token keyword">int</span><span class="token operator">*</span><span class="token operator">*</span> returnColumnSizes<span class="token punctuation">)</span> <span class="token punctuation">{</span>
     <span class="token keyword">if</span><span class="token punctuation">(</span>root <span class="token operator">==</span> <span class="token constant">NULL</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
         <span class="token operator">*</span>returnSize <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
         <span class="token operator">*</span>returnColumnSizes <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
@@ -904,7 +802,7 @@ ListNode_t<span class="token operator">*</span> <span class="token function">pol
     i<span class="token operator">++</span><span class="token punctuation">;</span>
     <span class="token operator">*</span>returnSize <span class="token operator">=</span> i<span class="token punctuation">;</span>
     <span class="token keyword">return</span> res<span class="token punctuation">;</span>
-<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <h5 id="fang-fa-san-you-null-lai-zuo-mei-ceng-de-fen-ge">方法三：由null来做每层的分隔</h5>
 <pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token keyword">int</span><span class="token operator">*</span><span class="token operator">*</span> <span class="token function">levelOrder</span><span class="token punctuation">(</span><span class="token keyword">struct</span> <span class="token class-name">TreeNode</span><span class="token operator">*</span> root<span class="token punctuation">,</span> <span class="token keyword">int</span><span class="token operator">*</span> returnSize<span class="token punctuation">,</span> <span class="token keyword">int</span><span class="token operator">*</span><span class="token operator">*</span> returnColumnSizes<span class="token punctuation">)</span> <span class="token punctuation">{</span>
     <span class="token keyword">if</span><span class="token punctuation">(</span>root <span class="token operator">==</span> <span class="token constant">NULL</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
@@ -951,6 +849,7 @@ ListNode_t<span class="token operator">*</span> <span class="token function">pol
     <span class="token keyword">return</span> ans<span class="token punctuation">;</span>
 <span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <h5 id="di-gui-jie-fa">递归解法</h5>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241221164200272.png" alt="image-20241221164200272"></p>
 <pre class="line-numbers language-java" data-language="java"><code class="language-java"><span class="token keyword">class</span> <span class="token class-name">Solution</span> <span class="token punctuation">{</span>
     <span class="token keyword">public</span> <span class="token class-name">List</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token class-name">List</span><span class="token punctuation">&lt;</span><span class="token class-name">Integer</span><span class="token punctuation">&gt;</span><span class="token punctuation">&gt;</span></span> <span class="token function">levelOrder</span><span class="token punctuation">(</span><span class="token class-name">TreeNode</span> root<span class="token punctuation">)</span> <span class="token punctuation">{</span>
         <span class="token class-name">List</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token class-name">List</span><span class="token punctuation">&lt;</span><span class="token class-name">Integer</span><span class="token punctuation">&gt;</span><span class="token punctuation">&gt;</span></span> ans <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">ArrayList</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token punctuation">&gt;</span></span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
@@ -1040,6 +939,7 @@ ListNode_t<span class="token operator">*</span> <span class="token function">pol
 <li>扩展左右子树时，先右后左</li>
 <li>如此，遍历到的最后一个一个节点就是“最底层、最左边”</li>
 </ul>
+<img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241221164135012.png" alt="image-20241221164135012" style="zoom:50%;">
 <pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token comment">/**
  * Definition for a binary tree node.
  * struct TreeNode {
@@ -1061,6 +961,353 @@ ListNode_t<span class="token operator">*</span> <span class="token function">pol
     <span class="token punctuation">}</span>
     <span class="token keyword">return</span> result<span class="token punctuation">;</span>
 <span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<h2 id="er-cha-shu-shang-de-di-gui">二叉树上的递归</h2>
+<h3 id="a-href-https-leetcode-cn-problems-maximum-depth-of-binary-tree-104-er-cha-shu-de-zui-da-shen-du-a"><a target="_blank" rel="noopener" href="https://leetcode.cn/problems/maximum-depth-of-binary-tree/">104. 二叉树的最大深度</a></h3>
+<img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241221162533674.png" alt="image-20241221162533674" style="zoom:50%;">
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token comment">/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     struct TreeNode *left;
+ *     struct TreeNode *right;
+ * };
+ */</span>
+<span class="token keyword">int</span> <span class="token function">maxDepth</span><span class="token punctuation">(</span><span class="token keyword">struct</span> <span class="token class-name">TreeNode</span><span class="token operator">*</span> root<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>root <span class="token operator">==</span> <span class="token constant">NULL</span><span class="token punctuation">)</span> <span class="token keyword">return</span> <span class="token number">0</span><span class="token punctuation">;</span>
+    <span class="token keyword">int</span> leftDepth <span class="token operator">=</span> <span class="token function">maxDepth</span><span class="token punctuation">(</span>root<span class="token operator">-&gt;</span>left<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">int</span> rightDepth <span class="token operator">=</span> <span class="token function">maxDepth</span><span class="token punctuation">(</span>root<span class="token operator">-&gt;</span>right<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">return</span> <span class="token number">1</span> <span class="token operator">+</span> <span class="token function">fmax</span><span class="token punctuation">(</span>leftDepth<span class="token punctuation">,</span> rightDepth<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<h3 id="a-href-https-leetcode-cn-problems-maximum-depth-of-n-ary-tree-559-n-cha-shu-de-zui-da-shen-du-a"><a target="_blank" rel="noopener" href="https://leetcode.cn/problems/maximum-depth-of-n-ary-tree/">559. N 叉树的最大深度</a></h3>
+<img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241221162554205.png" alt="image-20241221162554205" style="zoom:50%;">
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token comment">/**
+ * Definition for a Node.
+ * struct Node {
+ *     int val;
+ *     int numChildren;
+ *     struct Node** children;
+ * };
+ */</span>
+
+<span class="token keyword">int</span> <span class="token function">maxDepth</span><span class="token punctuation">(</span><span class="token keyword">struct</span> <span class="token class-name">Node</span><span class="token operator">*</span> root<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">if</span><span class="token punctuation">(</span>root <span class="token operator">==</span> <span class="token constant">NULL</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">return</span> <span class="token number">0</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    <span class="token keyword">int</span> maxChildDepth <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
+    <span class="token keyword">for</span><span class="token punctuation">(</span><span class="token keyword">int</span> i <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span> i <span class="token operator">&lt;</span> root<span class="token operator">-&gt;</span>numChildren<span class="token punctuation">;</span> i<span class="token operator">++</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">int</span> childDepth <span class="token operator">=</span> <span class="token function">maxDepth</span><span class="token punctuation">(</span>root<span class="token operator">-&gt;</span>children<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        maxChildDepth <span class="token operator">=</span> <span class="token function">fmax</span><span class="token punctuation">(</span>childDepth<span class="token punctuation">,</span> maxChildDepth<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    <span class="token keyword">return</span> maxChildDepth <span class="token operator">+</span> <span class="token number">1</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<h3 id="a-href-https-leetcode-cn-problems-balanced-binary-tree-110-ping-heng-er-cha-shu-a"><a target="_blank" rel="noopener" href="https://leetcode.cn/problems/balanced-binary-tree/">110. 平衡二叉树</a></h3>
+<blockquote>
+<p>在《递归求解树的高度》算法基础上</p>
+<ul>
+<li>通过左右子树高度计算每个节点高度时，可顺便判断每个节点的左右子树高度是否超过1</li>
+</ul>
+</blockquote>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241221202149543.png" alt="image-20241221202149543"></p>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token comment">/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     struct TreeNode *left;
+ *     struct TreeNode *right;
+ * };
+ */</span>
+<span class="token keyword">int</span> <span class="token function">height</span><span class="token punctuation">(</span><span class="token keyword">struct</span> <span class="token class-name">TreeNode</span><span class="token operator">*</span> node<span class="token punctuation">,</span> bool <span class="token operator">*</span>balanced<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+bool <span class="token function">isBalanced</span><span class="token punctuation">(</span><span class="token keyword">struct</span> <span class="token class-name">TreeNode</span><span class="token operator">*</span> root<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    bool balanced <span class="token operator">=</span> true<span class="token punctuation">;</span>
+    <span class="token function">height</span><span class="token punctuation">(</span>root<span class="token punctuation">,</span> <span class="token operator">&amp;</span>balanced<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">return</span> balanced<span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token comment">// 平衡二叉树：所有节点的左右子树的高度相差不超过1</span>
+<span class="token comment">// 如果左右子树分别都是平衡二叉树，无法推出根节点是平衡二叉树，因为左右子树高度差不确定</span>
+<span class="token comment">// 将问题转换为递归求解树高度，求每个节点的树高度时需要知道左右子树的高度，这时可以顺便判断该节点是否平衡</span>
+<span class="token comment">// 先写出递归求解树高度的模板，再添加判断平衡的逻辑</span>
+<span class="token keyword">int</span> <span class="token function">height</span><span class="token punctuation">(</span><span class="token keyword">struct</span> <span class="token class-name">TreeNode</span><span class="token operator">*</span> node<span class="token punctuation">,</span> bool <span class="token operator">*</span>balanced<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">if</span><span class="token punctuation">(</span>node <span class="token operator">==</span> <span class="token constant">NULL</span><span class="token punctuation">)</span> <span class="token keyword">return</span> <span class="token number">0</span><span class="token punctuation">;</span>
+
+    <span class="token keyword">int</span> lh <span class="token operator">=</span> <span class="token function">height</span><span class="token punctuation">(</span>node<span class="token operator">-&gt;</span>left<span class="token punctuation">,</span> balanced<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">if</span><span class="token punctuation">(</span><span class="token operator">*</span>balanced <span class="token operator">==</span> false<span class="token punctuation">)</span> <span class="token keyword">return</span> <span class="token number">0</span><span class="token punctuation">;</span> <span class="token comment">// 剪枝</span>
+    <span class="token keyword">int</span> rh <span class="token operator">=</span> <span class="token function">height</span><span class="token punctuation">(</span>node<span class="token operator">-&gt;</span>right<span class="token punctuation">,</span> balanced<span class="token punctuation">)</span><span class="token punctuation">;</span> 
+    
+    <span class="token comment">// 知道左右子树高度后，顺便判断一下平衡</span>
+    <span class="token keyword">if</span><span class="token punctuation">(</span><span class="token function">abs</span><span class="token punctuation">(</span>lh <span class="token operator">-</span> rh<span class="token punctuation">)</span> <span class="token operator">&gt;</span> <span class="token number">1</span><span class="token punctuation">)</span> <span class="token operator">*</span>balanced <span class="token operator">=</span> false<span class="token punctuation">;</span>
+
+    <span class="token keyword">return</span> <span class="token function">fmax</span><span class="token punctuation">(</span>lh<span class="token punctuation">,</span> rh<span class="token punctuation">)</span> <span class="token operator">+</span> <span class="token number">1</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<h3 id="a-href-https-leetcode-cn-problems-merge-two-binary-trees-617-he-bing-er-cha-shu-a"><a target="_blank" rel="noopener" href="https://leetcode.cn/problems/merge-two-binary-trees/">617. 合并二叉树</a></h3>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241221164107805.png" alt="image-20241221164107805"></p>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token comment">/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     struct TreeNode *left;
+ *     struct TreeNode *right;
+ * };
+ */</span>
+<span class="token keyword">struct</span> <span class="token class-name">TreeNode</span><span class="token operator">*</span> <span class="token function">mergeTrees</span><span class="token punctuation">(</span><span class="token keyword">struct</span> <span class="token class-name">TreeNode</span><span class="token operator">*</span> root1<span class="token punctuation">,</span> <span class="token keyword">struct</span> <span class="token class-name">TreeNode</span><span class="token operator">*</span> root2<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token comment">// 4. 递归终止条件</span>
+    <span class="token keyword">if</span><span class="token punctuation">(</span>root1 <span class="token operator">==</span> <span class="token constant">NULL</span> <span class="token operator">||</span> root2 <span class="token operator">==</span> <span class="token constant">NULL</span><span class="token punctuation">)</span> <span class="token keyword">return</span> root1 <span class="token operator">==</span> <span class="token constant">NULL</span> <span class="token operator">?</span> root2 <span class="token operator">:</span> root1<span class="token punctuation">;</span>
+    <span class="token comment">// 1. 假设左子树已经合并</span>
+    <span class="token keyword">struct</span> <span class="token class-name">TreeNode</span><span class="token operator">*</span> left <span class="token operator">=</span> <span class="token function">mergeTrees</span><span class="token punctuation">(</span>root1<span class="token operator">-&gt;</span>left<span class="token punctuation">,</span> root2<span class="token operator">-&gt;</span>left<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token comment">// 2. 假设右子树已经合并</span>
+    <span class="token keyword">struct</span> <span class="token class-name">TreeNode</span><span class="token operator">*</span> right <span class="token operator">=</span> <span class="token function">mergeTrees</span><span class="token punctuation">(</span>root1<span class="token operator">-&gt;</span>right<span class="token punctuation">,</span> root2<span class="token operator">-&gt;</span>right<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token comment">// 3. 合并根节点</span>
+    root1<span class="token operator">-&gt;</span>val <span class="token operator">=</span> root1<span class="token operator">-&gt;</span>val <span class="token operator">+</span> root2<span class="token operator">-&gt;</span>val<span class="token punctuation">;</span>
+    root1<span class="token operator">-&gt;</span>left <span class="token operator">=</span> left<span class="token punctuation">;</span>
+    root1<span class="token operator">-&gt;</span>right <span class="token operator">=</span> right<span class="token punctuation">;</span>
+    <span class="token keyword">return</span> root1<span class="token punctuation">;</span>
+<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<h3 id="a-href-https-leetcode-cn-problems-invert-binary-tree-226-fan-zhuan-er-cha-shu-a"><a target="_blank" rel="noopener" href="https://leetcode.cn/problems/invert-binary-tree/">226. 翻转二叉树</a></h3>
+<img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241221164551015.png" alt="image-20241221164551015" style="zoom:50%;">
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token comment">/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     struct TreeNode *left;
+ *     struct TreeNode *right;
+ * };
+ */</span>
+<span class="token keyword">struct</span> <span class="token class-name">TreeNode</span><span class="token operator">*</span> <span class="token function">invertTree</span><span class="token punctuation">(</span><span class="token keyword">struct</span> <span class="token class-name">TreeNode</span><span class="token operator">*</span> root<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token comment">// 4. 递归终止条件</span>
+    <span class="token keyword">if</span><span class="token punctuation">(</span>root <span class="token operator">==</span> <span class="token constant">NULL</span><span class="token punctuation">)</span> <span class="token keyword">return</span> <span class="token constant">NULL</span><span class="token punctuation">;</span>
+    <span class="token comment">// 1. 假设左子树已经被翻转</span>
+    <span class="token keyword">struct</span> <span class="token class-name">TreeNode</span><span class="token operator">*</span> left <span class="token operator">=</span> <span class="token function">invertTree</span><span class="token punctuation">(</span>root<span class="token operator">-&gt;</span>left<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token comment">// 2. 假设右子树已经被翻转</span>
+    <span class="token keyword">struct</span> <span class="token class-name">TreeNode</span><span class="token operator">*</span> right <span class="token operator">=</span> <span class="token function">invertTree</span><span class="token punctuation">(</span>root<span class="token operator">-&gt;</span>right<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token comment">// 3. 翻转当前节点的左右子树</span>
+    root<span class="token operator">-&gt;</span>left <span class="token operator">=</span> right<span class="token punctuation">;</span>
+    root<span class="token operator">-&gt;</span>right <span class="token operator">=</span> left<span class="token punctuation">;</span>
+    <span class="token keyword">return</span> root<span class="token punctuation">;</span>
+<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<h3 id="a-href-https-leetcode-cn-problems-symmetric-tree-101-dui-cheng-er-cha-shu-a">※<a target="_blank" rel="noopener" href="https://leetcode.cn/problems/symmetric-tree/">101. 对称二叉树</a></h3>
+<blockquote>
+<p>判断一个二叉树是否镜像对称 =&gt; 判断两个二叉树否镜像对称（去掉根节点，考虑其左右子树A、B）</p>
+<ul>
+<li>A.left 与 B.right 是否对称</li>
+<li>A.right 与 B.left 是否对称</li>
+</ul>
+<p>递归理解：</p>
+<ul>
+<li>遍历A：左中右</li>
+<li>遍历B：右中左</li>
+</ul>
+</blockquote>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241221171214602.png" alt="image-20241221171214602"></p>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token comment">/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     struct TreeNode *left;
+ *     struct TreeNode *right;
+ * };
+ */</span>
+bool <span class="token function">check</span><span class="token punctuation">(</span><span class="token keyword">struct</span> <span class="token class-name">TreeNode</span><span class="token operator">*</span> p<span class="token punctuation">,</span> <span class="token keyword">struct</span> <span class="token class-name">TreeNode</span><span class="token operator">*</span> q<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token comment">// 3. 两个树镜像的前提条件 根节点相同</span>
+    <span class="token keyword">if</span><span class="token punctuation">(</span>p <span class="token operator">==</span> <span class="token constant">NULL</span> <span class="token operator">&amp;&amp;</span> q <span class="token operator">==</span> <span class="token constant">NULL</span><span class="token punctuation">)</span> <span class="token keyword">return</span> true<span class="token punctuation">;</span>
+    <span class="token keyword">if</span><span class="token punctuation">(</span><span class="token punctuation">(</span>p <span class="token operator">==</span> <span class="token constant">NULL</span> <span class="token operator">&amp;&amp;</span> q <span class="token operator">!=</span> <span class="token constant">NULL</span><span class="token punctuation">)</span> <span class="token operator">||</span> <span class="token punctuation">(</span>p <span class="token operator">!=</span> <span class="token constant">NULL</span> <span class="token operator">&amp;&amp;</span> q <span class="token operator">==</span> <span class="token constant">NULL</span><span class="token punctuation">)</span> <span class="token operator">||</span> p<span class="token operator">-&gt;</span>val <span class="token operator">!=</span> q<span class="token operator">-&gt;</span>val<span class="token punctuation">)</span> 
+        <span class="token keyword">return</span> false<span class="token punctuation">;</span>
+    <span class="token comment">// 1. 假设已经知道p的左子树和q的右子树是否为镜像</span>
+    <span class="token comment">// 2. 假设已经知道p的右子树和q的左子树是否为镜像</span>
+    <span class="token keyword">return</span> <span class="token function">check</span><span class="token punctuation">(</span>p<span class="token operator">-&gt;</span>left<span class="token punctuation">,</span> q<span class="token operator">-&gt;</span>right<span class="token punctuation">)</span> <span class="token operator">&amp;&amp;</span> <span class="token function">check</span><span class="token punctuation">(</span>p<span class="token operator">-&gt;</span>right<span class="token punctuation">,</span> q<span class="token operator">-&gt;</span>left<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+bool <span class="token function">isSymmetric</span><span class="token punctuation">(</span><span class="token keyword">struct</span> <span class="token class-name">TreeNode</span><span class="token operator">*</span> root<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token comment">// 判断左右子树是否镜像</span>
+    <span class="token keyword">return</span> <span class="token function">check</span><span class="token punctuation">(</span>root<span class="token operator">-&gt;</span>left<span class="token punctuation">,</span> root<span class="token operator">-&gt;</span>right<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<h3 id="a-href-https-leetcode-cn-problems-validate-binary-search-tree-98-yan-zheng-er-cha-sou-suo-shu-a">※<a target="_blank" rel="noopener" href="https://leetcode.cn/problems/validate-binary-search-tree/">98. 验证二叉搜索树</a></h3>
+<h4 id="fang-fa-yi">方法一</h4>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241221213916549.png" alt="image-20241221213916549"></p>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token comment">/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     struct TreeNode *left;
+ *     struct TreeNode *right;
+ * };
+ */</span>
+<span class="token keyword">typedef</span> <span class="token keyword">struct</span> <span class="token punctuation">{</span>
+    <span class="token keyword">int</span> min<span class="token punctuation">;</span>
+    <span class="token keyword">int</span> max<span class="token punctuation">;</span>
+<span class="token punctuation">}</span> Info<span class="token punctuation">;</span>
+
+Info NULL_INFO <span class="token operator">=</span> <span class="token punctuation">{</span><span class="token number">0</span><span class="token punctuation">}</span><span class="token punctuation">;</span>
+
+bool result<span class="token punctuation">;</span>
+
+Info <span class="token function">dfs</span><span class="token punctuation">(</span><span class="token keyword">struct</span> <span class="token class-name">TreeNode</span><span class="token operator">*</span> root<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    Info info <span class="token operator">=</span> <span class="token punctuation">{</span>root<span class="token operator">-&gt;</span>val<span class="token punctuation">,</span> root<span class="token operator">-&gt;</span>val<span class="token punctuation">}</span><span class="token punctuation">;</span> <span class="token comment">// 当前树的min,max默认为root.val</span>
+    <span class="token keyword">if</span><span class="token punctuation">(</span>root<span class="token operator">-&gt;</span>left <span class="token operator">!=</span> <span class="token constant">NULL</span><span class="token punctuation">)</span> <span class="token punctuation">{</span> <span class="token comment">// 左子树不为空才遍历，不然返回的Info没有意义</span>
+        Info left <span class="token operator">=</span> <span class="token function">dfs</span><span class="token punctuation">(</span>root<span class="token operator">-&gt;</span>left<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">if</span><span class="token punctuation">(</span>result <span class="token operator">==</span> false<span class="token punctuation">)</span> <span class="token keyword">return</span> NULL_INFO<span class="token punctuation">;</span> <span class="token comment">// 剪枝</span>
+        <span class="token keyword">if</span><span class="token punctuation">(</span>left<span class="token punctuation">.</span>max <span class="token operator">&gt;=</span> root<span class="token operator">-&gt;</span>val<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            result <span class="token operator">=</span> false<span class="token punctuation">;</span>
+            <span class="token keyword">return</span> NULL_INFO<span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+        <span class="token keyword">if</span><span class="token punctuation">(</span>left<span class="token punctuation">.</span>min <span class="token operator">&lt;</span> info<span class="token punctuation">.</span>min<span class="token punctuation">)</span> info<span class="token punctuation">.</span>min <span class="token operator">=</span> left<span class="token punctuation">.</span>min<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    <span class="token keyword">if</span><span class="token punctuation">(</span>root<span class="token operator">-&gt;</span>right <span class="token operator">!=</span> <span class="token constant">NULL</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        Info right <span class="token operator">=</span> <span class="token function">dfs</span><span class="token punctuation">(</span>root<span class="token operator">-&gt;</span>right<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">if</span><span class="token punctuation">(</span>result <span class="token operator">==</span> false<span class="token punctuation">)</span> <span class="token keyword">return</span> NULL_INFO<span class="token punctuation">;</span>
+        <span class="token keyword">if</span><span class="token punctuation">(</span>right<span class="token punctuation">.</span>min <span class="token operator">&lt;=</span> root<span class="token operator">-&gt;</span>val<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            result <span class="token operator">=</span> false<span class="token punctuation">;</span>
+            <span class="token keyword">return</span> NULL_INFO<span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+        <span class="token keyword">if</span><span class="token punctuation">(</span>right<span class="token punctuation">.</span>max <span class="token operator">&gt;</span> info<span class="token punctuation">.</span>max<span class="token punctuation">)</span> info<span class="token punctuation">.</span>max <span class="token operator">=</span> right<span class="token punctuation">.</span>max<span class="token punctuation">;</span>
+        <span class="token keyword">return</span> info<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    <span class="token keyword">return</span> info<span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+bool <span class="token function">isValidBST</span><span class="token punctuation">(</span><span class="token keyword">struct</span> <span class="token class-name">TreeNode</span><span class="token operator">*</span> root<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">if</span><span class="token punctuation">(</span>root <span class="token operator">==</span> <span class="token constant">NULL</span><span class="token punctuation">)</span> <span class="token keyword">return</span> true<span class="token punctuation">;</span>
+    result <span class="token operator">=</span> true<span class="token punctuation">;</span>
+    <span class="token function">dfs</span><span class="token punctuation">(</span>root<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">return</span> result<span class="token punctuation">;</span>
+<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<h4 id="fang-fa-er">方法二</h4>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241221210731008.png" alt="image-20241221210731008"></p>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token comment">/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     struct TreeNode *left;
+ *     struct TreeNode *right;
+ * };
+ */</span>
+bool <span class="token function">check</span><span class="token punctuation">(</span><span class="token keyword">struct</span> <span class="token class-name">TreeNode</span> <span class="token operator">*</span>root<span class="token punctuation">,</span> <span class="token keyword">long</span> min<span class="token punctuation">,</span> <span class="token keyword">long</span> max<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">if</span><span class="token punctuation">(</span>root <span class="token operator">==</span> <span class="token constant">NULL</span><span class="token punctuation">)</span> <span class="token keyword">return</span> true<span class="token punctuation">;</span>
+    <span class="token comment">// 检查根节点是否在(min, max)中</span>
+    <span class="token keyword">if</span><span class="token punctuation">(</span>root<span class="token operator">-&gt;</span>val <span class="token operator">&lt;=</span> min <span class="token operator">||</span> root<span class="token operator">-&gt;</span>val <span class="token operator">&gt;=</span> max<span class="token punctuation">)</span> <span class="token keyword">return</span> false<span class="token punctuation">;</span>
+    <span class="token comment">// 检查左子树是否满足(min, root-&gt;val)、右子树是否满足(root-&gt;val, max)</span>
+    <span class="token keyword">return</span> <span class="token function">check</span><span class="token punctuation">(</span>root<span class="token operator">-&gt;</span>left<span class="token punctuation">,</span> min<span class="token punctuation">,</span> root<span class="token operator">-&gt;</span>val<span class="token punctuation">)</span> <span class="token operator">&amp;&amp;</span> <span class="token function">check</span><span class="token punctuation">(</span>root<span class="token operator">-&gt;</span>right<span class="token punctuation">,</span> root<span class="token operator">-&gt;</span>val<span class="token punctuation">,</span> max<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+bool <span class="token function">isValidBST</span><span class="token punctuation">(</span><span class="token keyword">struct</span> <span class="token class-name">TreeNode</span><span class="token operator">*</span> root<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token comment">// 如果知道左子树、右子树是BST，也无法推到当前根节点是否为BST</span>
+    <span class="token comment">// 因此在遍历树的过程中要顺带验证左子树节点是否都小于根节点、右子树节点是否都大于根节点</span>
+    <span class="token keyword">return</span> <span class="token function">check</span><span class="token punctuation">(</span>root<span class="token operator">-&gt;</span>left<span class="token punctuation">,</span> LONG_MIN<span class="token punctuation">,</span> root<span class="token operator">-&gt;</span>val<span class="token punctuation">)</span> <span class="token operator">&amp;&amp;</span> <span class="token function">check</span><span class="token punctuation">(</span>root<span class="token operator">-&gt;</span>right<span class="token punctuation">,</span> root<span class="token operator">-&gt;</span>val<span class="token punctuation">,</span> LONG_MAX<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<h4 id="fang-fa-san-yan-zheng-qian-xu-bian-li-jie-guo">方法三：验证前序遍历结果</h4>
+<p>前序遍历结果为有序序列 &lt;=&gt; 二叉树为有效BST</p>
+<h2 id="er-cha-cha-zhao-shu">二叉查找树</h2>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241221182459445.png" alt="image-20241221182459445"></p>
+<h3 id="a-href-https-leetcode-cn-problems-kth-smallest-element-in-a-bst-230-er-cha-sou-suo-shu-zhong-di-k-xiao-de-yuan-su-a"><a target="_blank" rel="noopener" href="https://leetcode.cn/problems/kth-smallest-element-in-a-bst/">230. 二叉搜索树中第 K 小的元素</a></h3>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241221201329530.png" alt="image-20241221201329530"></p>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token comment">/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     struct TreeNode *left;
+ *     struct TreeNode *right;
+ * };
+ */</span>
+<span class="token comment">// BST的前序遍历序列为递增的有序序列，在遍历过程中，每访问一个节点就更新计数值便可找到第N小的节点</span>
+<span class="token comment">// 举一反三：找第K大的节点，按照右、中、左的顺序遍历即可</span>
+<span class="token keyword">void</span> <span class="token function">traverse</span><span class="token punctuation">(</span><span class="token keyword">struct</span> <span class="token class-name">TreeNode</span><span class="token operator">*</span> root<span class="token punctuation">,</span> <span class="token keyword">int</span> <span class="token operator">*</span>k<span class="token punctuation">,</span> <span class="token keyword">int</span> <span class="token operator">*</span>target<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">if</span><span class="token punctuation">(</span>root <span class="token operator">==</span> <span class="token constant">NULL</span><span class="token punctuation">)</span> <span class="token keyword">return</span><span class="token punctuation">;</span>
+    <span class="token function">traverse</span><span class="token punctuation">(</span>root<span class="token operator">-&gt;</span>left<span class="token punctuation">,</span> k<span class="token punctuation">,</span> target<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">if</span><span class="token punctuation">(</span>k <span class="token operator">==</span> <span class="token number">0</span><span class="token punctuation">)</span> <span class="token keyword">return</span><span class="token punctuation">;</span> <span class="token comment">// 剪枝</span>
+    <span class="token punctuation">(</span><span class="token operator">*</span>k<span class="token punctuation">)</span><span class="token operator">--</span><span class="token punctuation">;</span>
+    <span class="token keyword">if</span><span class="token punctuation">(</span><span class="token operator">*</span>k <span class="token operator">==</span> <span class="token number">0</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token operator">*</span>target <span class="token operator">=</span> root<span class="token operator">-&gt;</span>val<span class="token punctuation">;</span>
+        <span class="token keyword">return</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    <span class="token function">traverse</span><span class="token punctuation">(</span>root<span class="token operator">-&gt;</span>right<span class="token punctuation">,</span> k<span class="token punctuation">,</span> target<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">int</span> <span class="token function">kthSmallest</span><span class="token punctuation">(</span><span class="token keyword">struct</span> <span class="token class-name">TreeNode</span><span class="token operator">*</span> root<span class="token punctuation">,</span> <span class="token keyword">int</span> k<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">int</span> target <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
+    <span class="token function">traverse</span><span class="token punctuation">(</span>root<span class="token punctuation">,</span> <span class="token operator">&amp;</span>k<span class="token punctuation">,</span> <span class="token operator">&amp;</span>target<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">return</span> target<span class="token punctuation">;</span>
+<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<h3 id="a-href-https-leetcode-cn-problems-er-cha-sou-suo-shu-de-di-kda-jie-dian-lcof-lcr-174-xun-zhao-er-cha-sou-suo-shu-zhong-de-mu-biao-jie-dian-a"><a target="_blank" rel="noopener" href="https://leetcode.cn/problems/er-cha-sou-suo-shu-de-di-kda-jie-dian-lcof/">LCR 174. 寻找二叉搜索树中的目标节点</a></h3>
+<img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241221201444364.png" alt="image-20241221201444364" style="zoom:50%;">
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token comment">/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     struct TreeNode *left;
+ *     struct TreeNode *right;
+ * };
+ */</span>
+
+<span class="token keyword">void</span> <span class="token function">traverse</span><span class="token punctuation">(</span><span class="token keyword">struct</span> <span class="token class-name">TreeNode</span><span class="token operator">*</span> root<span class="token punctuation">,</span> <span class="token keyword">int</span> <span class="token operator">*</span>cnt<span class="token punctuation">,</span> <span class="token keyword">int</span> <span class="token operator">*</span>target<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">if</span><span class="token punctuation">(</span>root <span class="token operator">==</span> <span class="token constant">NULL</span><span class="token punctuation">)</span> <span class="token keyword">return</span><span class="token punctuation">;</span>
+    <span class="token function">traverse</span><span class="token punctuation">(</span>root<span class="token operator">-&gt;</span>right<span class="token punctuation">,</span> cnt<span class="token punctuation">,</span> target<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">if</span><span class="token punctuation">(</span><span class="token operator">*</span>cnt <span class="token operator">==</span> <span class="token number">0</span><span class="token punctuation">)</span> <span class="token keyword">return</span><span class="token punctuation">;</span> <span class="token comment">// 剪枝</span>
+    <span class="token punctuation">(</span><span class="token operator">*</span>cnt<span class="token punctuation">)</span><span class="token operator">--</span><span class="token punctuation">;</span>
+    <span class="token keyword">if</span><span class="token punctuation">(</span><span class="token operator">*</span>cnt <span class="token operator">==</span> <span class="token number">0</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token operator">*</span>target <span class="token operator">=</span> root<span class="token operator">-&gt;</span>val<span class="token punctuation">;</span>
+        <span class="token keyword">return</span><span class="token punctuation">;</span> <span class="token comment">// 剪枝</span>
+    <span class="token punctuation">}</span>
+    <span class="token function">traverse</span><span class="token punctuation">(</span>root<span class="token operator">-&gt;</span>left<span class="token punctuation">,</span> cnt<span class="token punctuation">,</span> target<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">int</span> <span class="token function">findTargetNode</span><span class="token punctuation">(</span><span class="token keyword">struct</span> <span class="token class-name">TreeNode</span><span class="token operator">*</span> root<span class="token punctuation">,</span> <span class="token keyword">int</span> cnt<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">int</span> target<span class="token punctuation">;</span>
+    <span class="token function">traverse</span><span class="token punctuation">(</span>root<span class="token punctuation">,</span> <span class="token operator">&amp;</span>cnt<span class="token punctuation">,</span> <span class="token operator">&amp;</span>target<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">return</span> target<span class="token punctuation">;</span>
+<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<h3 id="a-href-https-leetcode-cn-problems-convert-bst-to-greater-tree-538-ba-er-cha-sou-suo-shu-zhuan-huan-wei-lei-jia-shu-a"><a target="_blank" rel="noopener" href="https://leetcode.cn/problems/convert-bst-to-greater-tree/">538. 把二叉搜索树转换为累加树</a></h3>
+<img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241221191917650.png" alt="image-20241221191917650" style="zoom:50%;">
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token comment">/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     struct TreeNode *left;
+ *     struct TreeNode *right;
+ * };
+ */</span>
+<span class="token keyword">void</span> <span class="token function">traverse</span><span class="token punctuation">(</span><span class="token keyword">struct</span> <span class="token class-name">TreeNode</span><span class="token operator">*</span> root<span class="token punctuation">,</span> <span class="token keyword">int</span> <span class="token operator">*</span>sum<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">if</span><span class="token punctuation">(</span>root <span class="token operator">==</span> <span class="token constant">NULL</span><span class="token punctuation">)</span> <span class="token keyword">return</span><span class="token punctuation">;</span>
+    <span class="token function">traverse</span><span class="token punctuation">(</span>root<span class="token operator">-&gt;</span>right<span class="token punctuation">,</span> sum<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token operator">*</span>sum <span class="token operator">+=</span> root<span class="token operator">-&gt;</span>val<span class="token punctuation">;</span>
+    root<span class="token operator">-&gt;</span>val <span class="token operator">=</span> <span class="token operator">*</span>sum<span class="token punctuation">;</span>
+    <span class="token function">traverse</span><span class="token punctuation">(</span>root<span class="token operator">-&gt;</span>left<span class="token punctuation">,</span> sum<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+
+<span class="token keyword">struct</span> <span class="token class-name">TreeNode</span><span class="token operator">*</span> <span class="token function">convertBST</span><span class="token punctuation">(</span><span class="token keyword">struct</span> <span class="token class-name">TreeNode</span><span class="token operator">*</span> root<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">int</span> sum <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
+    <span class="token function">traverse</span><span class="token punctuation">(</span>root<span class="token punctuation">,</span> <span class="token operator">&amp;</span>sum<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">return</span> root<span class="token punctuation">;</span>
+<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<h3 id="a-href-https-leetcode-cn-problems-successor-lcci-mian-shi-ti-04-06-hou-ji-zhe-a"><a target="_blank" rel="noopener" href="https://leetcode.cn/problems/successor-lcci/">面试题 04.06. 后继者</a></h3>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241221201807862.png" alt="image-20241221201807862"></p>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token comment">/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     struct TreeNode *left;
+ *     struct TreeNode *right;
+ * };
+ */</span>
+
+<span class="token keyword">void</span> <span class="token function">traverse</span><span class="token punctuation">(</span><span class="token keyword">struct</span> <span class="token class-name">TreeNode</span><span class="token operator">*</span> root<span class="token punctuation">,</span> <span class="token keyword">struct</span> <span class="token class-name">TreeNode</span><span class="token operator">*</span> p<span class="token punctuation">,</span> <span class="token keyword">struct</span> <span class="token class-name">TreeNode</span><span class="token operator">*</span><span class="token operator">*</span> target<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">if</span><span class="token punctuation">(</span>root <span class="token operator">==</span> <span class="token constant">NULL</span><span class="token punctuation">)</span> <span class="token keyword">return</span><span class="token punctuation">;</span>
+    <span class="token function">traverse</span><span class="token punctuation">(</span>root<span class="token operator">-&gt;</span>left<span class="token punctuation">,</span> p<span class="token punctuation">,</span> target<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">if</span><span class="token punctuation">(</span><span class="token operator">*</span>target <span class="token operator">!=</span> <span class="token constant">NULL</span><span class="token punctuation">)</span> <span class="token keyword">return</span><span class="token punctuation">;</span> <span class="token comment">// 剪枝</span>
+    <span class="token keyword">if</span><span class="token punctuation">(</span><span class="token operator">*</span>target <span class="token operator">==</span> <span class="token constant">NULL</span> <span class="token operator">&amp;&amp;</span> root<span class="token operator">-&gt;</span>val <span class="token operator">&gt;</span> p<span class="token operator">-&gt;</span>val<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token operator">*</span>target <span class="token operator">=</span> root<span class="token punctuation">;</span>
+        <span class="token keyword">return</span><span class="token punctuation">;</span> <span class="token comment">// 剪枝</span>
+    <span class="token punctuation">}</span>
+    <span class="token function">traverse</span><span class="token punctuation">(</span>root<span class="token operator">-&gt;</span>right<span class="token punctuation">,</span> p<span class="token punctuation">,</span> target<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">struct</span> <span class="token class-name">TreeNode</span><span class="token operator">*</span> <span class="token function">inorderSuccessor</span><span class="token punctuation">(</span><span class="token keyword">struct</span> <span class="token class-name">TreeNode</span><span class="token operator">*</span> root<span class="token punctuation">,</span> <span class="token keyword">struct</span> <span class="token class-name">TreeNode</span><span class="token operator">*</span> p<span class="token punctuation">)</span><span class="token punctuation">{</span>
+    <span class="token keyword">struct</span> <span class="token class-name">TreeNode</span><span class="token operator">*</span> target <span class="token operator">=</span> <span class="token constant">NULL</span><span class="token punctuation">;</span>
+    <span class="token function">traverse</span><span class="token punctuation">(</span>root<span class="token punctuation">,</span> p<span class="token punctuation">,</span> <span class="token operator">&amp;</span>target<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">return</span> target<span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <h1 id="the-end">THE END</h1>
 
                 
@@ -1452,7 +1699,7 @@ ListNode_t<span class="token operator">*</span> <span class="token function">pol
             <br>
             
                 &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                        class="white-color">96.4k</span>
+                        class="white-color">97.8k</span>
             
             
             

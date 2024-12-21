@@ -6,7 +6,7 @@
   <link href="https://zanwen.github.io/atom.xml" rel="self"/>
   
   <link href="https://zanwen.github.io/"/>
-  <updated>2024-12-19T04:02:25.470Z</updated>
+  <updated>2024-12-21T01:22:58.058Z</updated>
   <id>https://zanwen.github.io/</id>
   
   <author>
@@ -21,7 +21,7 @@
     <link href="https://zanwen.github.io/2024/12/18/36496.html"/>
     <id>https://zanwen.github.io/2024/12/18/36496.html</id>
     <published>2024-12-18T08:45:25.000Z</published>
-    <updated>2024-12-19T04:02:25.470Z</updated>
+    <updated>2024-12-21T01:22:58.058Z</updated>
     
     
       
@@ -139,9 +139,9 @@
     <category term="协议" scheme="https://zanwen.github.io/categories/STM32/%E5%8D%8F%E8%AE%AE/"/>
     
     
-    <category term="STM32" scheme="https://zanwen.github.io/tags/STM32/"/>
-    
     <category term="W5500" scheme="https://zanwen.github.io/tags/W5500/"/>
+    
+    <category term="STM32" scheme="https://zanwen.github.io/tags/STM32/"/>
     
     <category term="以太网" scheme="https://zanwen.github.io/tags/%E4%BB%A5%E5%A4%AA%E7%BD%91/"/>
     
@@ -409,9 +409,9 @@
     <category term="STM32" scheme="https://zanwen.github.io/categories/%E5%8D%8F%E8%AE%AE/STM32/"/>
     
     
-    <category term="I2C" scheme="https://zanwen.github.io/tags/I2C/"/>
-    
     <category term="I²C" scheme="https://zanwen.github.io/tags/I%C2%B2C/"/>
+    
+    <category term="I2C" scheme="https://zanwen.github.io/tags/I2C/"/>
     
   </entry>
   
@@ -511,7 +511,7 @@
     <link href="https://zanwen.github.io/2024/11/26/23674.html"/>
     <id>https://zanwen.github.io/2024/11/26/23674.html</id>
     <published>2024-11-26T06:15:30.000Z</published>
-    <updated>2024-12-13T06:28:18.136Z</updated>
+    <updated>2024-12-21T13:39:39.162Z</updated>
     
     
       
