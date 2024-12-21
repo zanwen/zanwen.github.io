@@ -6,7 +6,7 @@
   <link href="https://zanwen.github.io/atom.xml" rel="self"/>
   
   <link href="https://zanwen.github.io/"/>
-  <updated>2024-12-18T07:40:33.588Z</updated>
+  <updated>2024-12-19T04:02:25.470Z</updated>
   <id>https://zanwen.github.io/</id>
   
   <author>
@@ -17,11 +17,41 @@
   <generator uri="https://hexo.io/">Hexo</generator>
   
   <entry>
+    <title>RTC和BKP：为STM32添加持久化时钟与关键数据存储</title>
+    <link href="https://zanwen.github.io/2024/12/18/36496.html"/>
+    <id>https://zanwen.github.io/2024/12/18/36496.html</id>
+    <published>2024-12-18T08:45:25.000Z</published>
+    <updated>2024-12-19T04:02:25.470Z</updated>
+    
+    
+      
+      
+        
+        
+    <summary type="html">&lt;h1 id=&quot;hou-bei-ji-cun-qi-bkp&quot;&gt;后备寄存器-BKP&lt;/h1&gt;
+&lt;p&gt;&lt;img</summary>
+        
+      
+    
+    
+    
+    <category term="STM32" scheme="https://zanwen.github.io/categories/STM32/"/>
+    
+    
+    <category term="STM32" scheme="https://zanwen.github.io/tags/STM32/"/>
+    
+    <category term="RTC" scheme="https://zanwen.github.io/tags/RTC/"/>
+    
+    <category term="备份域" scheme="https://zanwen.github.io/tags/%E5%A4%87%E4%BB%BD%E5%9F%9F/"/>
+    
+  </entry>
+  
+  <entry>
     <title>掌握 STM32 PWR 电源管理：降低功耗的策略与技巧</title>
     <link href="https://zanwen.github.io/2024/12/17/42586.html"/>
     <id>https://zanwen.github.io/2024/12/17/42586.html</id>
     <published>2024-12-17T14:23:44.000Z</published>
-    <updated>2024-12-18T07:40:33.588Z</updated>
+    <updated>2024-12-18T08:04:12.612Z</updated>
     
     
       
@@ -109,9 +139,9 @@
     <category term="协议" scheme="https://zanwen.github.io/categories/STM32/%E5%8D%8F%E8%AE%AE/"/>
     
     
-    <category term="W5500" scheme="https://zanwen.github.io/tags/W5500/"/>
-    
     <category term="STM32" scheme="https://zanwen.github.io/tags/STM32/"/>
+    
+    <category term="W5500" scheme="https://zanwen.github.io/tags/W5500/"/>
     
     <category term="以太网" scheme="https://zanwen.github.io/tags/%E4%BB%A5%E5%A4%AA%E7%BD%91/"/>
     
@@ -122,7 +152,7 @@
     <link href="https://zanwen.github.io/2024/12/13/21754.html"/>
     <id>https://zanwen.github.io/2024/12/13/21754.html</id>
     <published>2024-12-13T11:52:13.000Z</published>
-    <updated>2024-12-14T13:48:51.223Z</updated>
+    <updated>2024-12-19T06:14:05.166Z</updated>
     
     
       
@@ -541,7 +571,7 @@
     <link href="https://zanwen.github.io/2024/11/25/17360.html"/>
     <id>https://zanwen.github.io/2024/11/25/17360.html</id>
     <published>2024-11-25T13:30:22.000Z</published>
-    <updated>2024-12-17T09:21:25.930Z</updated>
+    <updated>2024-12-21T01:19:40.817Z</updated>
     
     
       
@@ -573,7 +603,7 @@
     <link href="https://zanwen.github.io/2024/11/24/59994.html"/>
     <id>https://zanwen.github.io/2024/11/24/59994.html</id>
     <published>2024-11-24T12:53:04.000Z</published>
-    <updated>2024-12-17T12:01:04.949Z</updated>
+    <updated>2024-12-21T01:22:46.553Z</updated>
     
     
       
@@ -595,36 +625,6 @@
     <category term="ARMv7" scheme="https://zanwen.github.io/tags/ARMv7/"/>
     
     <category term="ATPCS" scheme="https://zanwen.github.io/tags/ATPCS/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>ARM核学习（三）指令流水线分析及伪指令</title>
-    <link href="https://zanwen.github.io/2024/11/24/14899.html"/>
-    <id>https://zanwen.github.io/2024/11/24/14899.html</id>
-    <published>2024-11-24T10:37:03.000Z</published>
-    <updated>2024-11-24T12:54:53.855Z</updated>
-    
-    
-      
-      
-        
-        
-    <summary type="html">&lt;h1 id=&quot;zhi-ling-liu-shui-xian-fen-xi&quot;&gt;指令流水线分析&lt;/h1&gt;
-&lt;h2</summary>
-        
-      
-    
-    
-    
-    <category term="ARM" scheme="https://zanwen.github.io/categories/ARM/"/>
-    
-    
-    <category term="ARM" scheme="https://zanwen.github.io/tags/ARM/"/>
-    
-    <category term="ARMv7" scheme="https://zanwen.github.io/tags/ARMv7/"/>
-    
-    <category term="指令流水线" scheme="https://zanwen.github.io/tags/%E6%8C%87%E4%BB%A4%E6%B5%81%E6%B0%B4%E7%BA%BF/"/>
     
   </entry>
   
