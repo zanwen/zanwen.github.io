@@ -6,7 +6,7 @@
   <link href="https://zanwen.github.io/atom.xml" rel="self"/>
   
   <link href="https://zanwen.github.io/"/>
-  <updated>2024-12-21T01:22:58.058Z</updated>
+  <updated>2024-12-24T11:18:27.774Z</updated>
   <id>https://zanwen.github.io/</id>
   
   <author>
@@ -15,6 +15,35 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>深入理解FreeRTOS：内核特性和底层原理</title>
+    <link href="https://zanwen.github.io/2024/12/24/21034.html"/>
+    <id>https://zanwen.github.io/2024/12/24/21034.html</id>
+    <published>2024-12-24T01:10:58.000Z</published>
+    <updated>2024-12-24T11:18:27.774Z</updated>
+    
+    
+      
+      
+        
+        
+    <summary type="html">&lt;h1 id=&quot;can-kao-zi-liao&quot;&gt;参考资料&lt;/h1&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&quot;https://documentation-service.arm.com/static/606dc36485368c4c2b1bf62f?token=&quot;&gt;ARMv7-M</summary>
+        
+      
+    
+    
+    
+    <category term="RTOS" scheme="https://zanwen.github.io/categories/RTOS/"/>
+    
+    
+    <category term="FreeRTOS" scheme="https://zanwen.github.io/tags/FreeRTOS/"/>
+    
+    <category term="RTOS" scheme="https://zanwen.github.io/tags/RTOS/"/>
+    
+  </entry>
   
   <entry>
     <title>RTC和BKP：为STM32添加持久化时钟与关键数据存储</title>
@@ -139,9 +168,9 @@
     <category term="协议" scheme="https://zanwen.github.io/categories/STM32/%E5%8D%8F%E8%AE%AE/"/>
     
     
-    <category term="W5500" scheme="https://zanwen.github.io/tags/W5500/"/>
-    
     <category term="STM32" scheme="https://zanwen.github.io/tags/STM32/"/>
+    
+    <category term="W5500" scheme="https://zanwen.github.io/tags/W5500/"/>
     
     <category term="以太网" scheme="https://zanwen.github.io/tags/%E4%BB%A5%E5%A4%AA%E7%BD%91/"/>
     
@@ -409,9 +438,9 @@
     <category term="STM32" scheme="https://zanwen.github.io/categories/%E5%8D%8F%E8%AE%AE/STM32/"/>
     
     
-    <category term="I²C" scheme="https://zanwen.github.io/tags/I%C2%B2C/"/>
-    
     <category term="I2C" scheme="https://zanwen.github.io/tags/I2C/"/>
+    
+    <category term="I²C" scheme="https://zanwen.github.io/tags/I%C2%B2C/"/>
     
   </entry>
   
@@ -511,7 +540,7 @@
     <link href="https://zanwen.github.io/2024/11/26/23674.html"/>
     <id>https://zanwen.github.io/2024/11/26/23674.html</id>
     <published>2024-11-26T06:15:30.000Z</published>
-    <updated>2024-12-21T13:39:39.162Z</updated>
+    <updated>2024-12-22T14:45:24.670Z</updated>
     
     
       
@@ -595,36 +624,6 @@
     <category term="异常" scheme="https://zanwen.github.io/tags/%E5%BC%82%E5%B8%B8/"/>
     
     <category term="中断" scheme="https://zanwen.github.io/tags/%E4%B8%AD%E6%96%AD/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>ARM核学习（四）ATPCS标准_汇编与C混合编程_volatile关键字</title>
-    <link href="https://zanwen.github.io/2024/11/24/59994.html"/>
-    <id>https://zanwen.github.io/2024/11/24/59994.html</id>
-    <published>2024-11-24T12:53:04.000Z</published>
-    <updated>2024-12-21T01:22:46.553Z</updated>
-    
-    
-      
-      
-        
-        
-    <summary type="html">&lt;h1 id=&quot;can-kao-zi-liao&quot;&gt;参考资料&lt;/h1&gt;
-&lt;p&gt;&lt;a</summary>
-        
-      
-    
-    
-    
-    <category term="ARM" scheme="https://zanwen.github.io/categories/ARM/"/>
-    
-    
-    <category term="ARM" scheme="https://zanwen.github.io/tags/ARM/"/>
-    
-    <category term="ARMv7" scheme="https://zanwen.github.io/tags/ARMv7/"/>
-    
-    <category term="ATPCS" scheme="https://zanwen.github.io/tags/ATPCS/"/>
     
   </entry>
   

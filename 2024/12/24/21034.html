@@ -1,0 +1,2142 @@
+<!DOCTYPE HTML>
+<html lang="zh-CN">
+
+
+<head>
+    <meta charset="utf-8">
+    <meta name="keywords" content="深入理解FreeRTOS：内核特性和底层原理, 安文的博客">
+    <meta name="description" content="参考资料
+
+ARMv7-M Architecture Reference Manual
+Mastering the FreeRTOS Real Time Kernel - A Hands On Tutorial Guide
+
+https:/">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="renderer" content="webkit|ie-stand|ie-comp">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="format-detection" content="telephone=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="referrer" content="no-referrer-when-downgrade">
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+
+
+    <title>深入理解FreeRTOS：内核特性和底层原理 | 安文的博客</title>
+    <link rel="icon" type="image/png" href="/medias/logo.png">
+    
+
+
+    <!-- bg-cover style     -->
+
+
+
+<link rel="stylesheet" type="text/css" href="/libs/awesome/css/all.min.css">
+<link rel="stylesheet" type="text/css" href="/libs/materialize/materialize.min.css">
+<link rel="stylesheet" type="text/css" href="/libs/aos/aos.css">
+<link rel="stylesheet" type="text/css" href="/libs/animate/animate.min.css">
+<link rel="stylesheet" type="text/css" href="/libs/lightGallery/css/lightgallery.min.css">
+<link rel="stylesheet" type="text/css" href="/css/matery.css">
+<link rel="stylesheet" type="text/css" href="/css/my.css">
+<link rel="stylesheet" type="text/css" href="/css/dark.css" media="none" onload="if(media!='all')media='all'">
+
+
+
+
+    <link rel="stylesheet" href="/libs/tocbot/tocbot.css">
+    <link rel="stylesheet" href="/css/post.css">
+
+
+
+
+    
+        <link rel="stylesheet" type="text/css" href="/css/reward.css">
+    
+
+
+
+    <script src="/libs/jquery/jquery-3.6.0.min.js"></script>
+
+<meta name="generator" content="Hexo 7.3.0">
+<style>.github-emoji { position: relative; display: inline-block; width: 1.2em; min-height: 1.2em; overflow: hidden; vertical-align: top; color: transparent; }  .github-emoji > span { position: relative; z-index: 10; }  .github-emoji img, .github-emoji .fancybox { margin: 0 !important; padding: 0 !important; border: none !important; outline: none !important; text-decoration: none !important; user-select: none !important; cursor: auto !important; }  .github-emoji img { height: 1.2em !important; width: 1.2em !important; position: absolute !important; left: 50% !important; top: 50% !important; transform: translate(-50%, -50%) !important; user-select: none !important; cursor: auto !important; } .github-emoji-fallback { color: inherit; } .github-emoji-fallback img { opacity: 0 !important; }</style>
+<link rel="alternate" href="/atom.xml" title="安文的博客" type="application/atom+xml">
+</head>
+
+
+<body>
+    <header class="navbar-fixed">
+    <nav id="headNav" class="bg-color nav-transparent">
+        <div id="navContainer" class="nav-wrapper container">
+            <div class="brand-logo">
+                <a href="/" class="waves-effect waves-light">
+                    
+                    <img src="/medias/logo.png" class="logo-img" alt="LOGO">
+                    
+                    <span class="logo-span">安文的博客</span>
+                </a>
+            </div>
+            
+
+<a href="#" data-target="mobile-nav" class="sidenav-trigger button-collapse"><i class="fas fa-bars"></i></a>
+<ul class="right nav-menu">
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/" class="waves-effect waves-light">
+      
+      <i class="fas fa-home" style="zoom: 0.6;"></i>
+      
+      <span>首页</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/tags" class="waves-effect waves-light">
+      
+      <i class="fas fa-tags" style="zoom: 0.6;"></i>
+      
+      <span>标签</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/categories" class="waves-effect waves-light">
+      
+      <i class="fas fa-bookmark" style="zoom: 0.6;"></i>
+      
+      <span>分类</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/archives" class="waves-effect waves-light">
+      
+      <i class="fas fa-archive" style="zoom: 0.6;"></i>
+      
+      <span>归档</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/about" class="waves-effect waves-light">
+      
+      <i class="fas fa-user-circle" style="zoom: 0.6;"></i>
+      
+      <span>关于</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/contact" class="waves-effect waves-light">
+      
+      <i class="fas fa-comments" style="zoom: 0.6;"></i>
+      
+      <span>留言板</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/friends" class="waves-effect waves-light">
+      
+      <i class="fas fa-address-book" style="zoom: 0.6;"></i>
+      
+      <span>友情链接</span>
+    </a>
+    
+  </li>
+  
+  <li>
+    <a href="#searchModal" class="modal-trigger waves-effect waves-light">
+      <i id="searchIcon" class="fas fa-search" title="搜索" style="zoom: 0.85;"></i>
+    </a>
+  </li>
+  <li>
+    <a href="javascript:;" class="waves-effect waves-light" onclick="switchNightMode()" title="深色/浅色模式" >
+      <i id="sum-moon-icon" class="fas fa-sun" style="zoom: 0.85;"></i>
+    </a>
+  </li>
+</ul>
+
+
+<div id="mobile-nav" class="side-nav sidenav">
+
+    <div class="mobile-head bg-color">
+        
+        <img src="/medias/logo.png" class="logo-img circle responsive-img">
+        
+        <div class="logo-name">安文的博客</div>
+        <div class="logo-desc">
+            
+            安文的博客 | 嵌入式 | 算法 | AI | 人工智能
+            
+        </div>
+    </div>
+
+    <ul class="menu-list mobile-menu-list">
+        
+        <li class="m-nav-item">
+	  
+		<a href="/" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-home"></i>
+			
+			首页
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/tags" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-tags"></i>
+			
+			标签
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/categories" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-bookmark"></i>
+			
+			分类
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/archives" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-archive"></i>
+			
+			归档
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/about" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-user-circle"></i>
+			
+			关于
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/contact" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-comments"></i>
+			
+			留言板
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/friends" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-address-book"></i>
+			
+			友情链接
+		</a>
+          
+        </li>
+        
+        
+        <li><div class="divider"></div></li>
+        <li>
+            <a href="https://github.com/blinkfox/hexo-theme-matery" class="waves-effect waves-light" target="_blank">
+                <i class="fab fa-github-square fa-fw"></i>Fork Me
+            </a>
+        </li>
+        
+    </ul>
+</div>
+
+
+        </div>
+
+        
+            <style>
+    .nav-transparent .github-corner {
+        display: none !important;
+    }
+
+    .github-corner {
+        position: absolute;
+        z-index: 10;
+        top: 0;
+        right: 0;
+        border: 0;
+        transform: scale(1.1);
+    }
+
+    .github-corner svg {
+        color: #0f9d58;
+        fill: #fff;
+        height: 64px;
+        width: 64px;
+    }
+
+    .github-corner:hover .octo-arm {
+        animation: a 0.56s ease-in-out;
+    }
+
+    .github-corner .octo-arm {
+        animation: none;
+    }
+
+    @keyframes a {
+        0%,
+        to {
+            transform: rotate(0);
+        }
+        20%,
+        60% {
+            transform: rotate(-25deg);
+        }
+        40%,
+        80% {
+            transform: rotate(10deg);
+        }
+    }
+</style>
+
+<a href="https://github.com/blinkfox/hexo-theme-matery" class="github-corner tooltipped hide-on-med-and-down" target="_blank"
+   data-tooltip="Fork Me" data-position="left" data-delay="50">
+    <svg viewBox="0 0 250 250" aria-hidden="true">
+        <path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path>
+        <path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2"
+              fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path>
+        <path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z"
+              fill="currentColor" class="octo-body"></path>
+    </svg>
+</a>
+        
+    </nav>
+
+</header>
+
+    
+
+
+
+<div class="bg-cover pd-header post-cover" style="background-image: url('https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/pexels-pixabay-206359.jpg')">
+    <div class="container" style="right: 0px;left: 0px;">
+        <div class="row">
+            <div class="col s12 m12 l12">
+                <div class="brand">
+                    <h1 class="description center-align post-title">深入理解FreeRTOS：内核特性和底层原理</h1>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+<main class="post-container content">
+
+    
+    <div class="row">
+    <div id="main-content" class="col s12 m12 l9">
+        <!-- 文章内容详情 -->
+<div id="artDetail">
+    <div class="card">
+        <div class="card-content article-info">
+            <div class="row tag-cate">
+                <div class="col s7">
+                    
+                    <div class="article-tag">
+                        
+                            <a href="/tags/FreeRTOS/">
+                                <span class="chip bg-color">FreeRTOS</span>
+                            </a>
+                        
+                            <a href="/tags/RTOS/">
+                                <span class="chip bg-color">RTOS</span>
+                            </a>
+                        
+                    </div>
+                    
+                </div>
+                <div class="col s5 right-align">
+                    
+                    <div class="post-cate">
+                        <i class="fas fa-bookmark fa-fw icon-category"></i>
+                        
+                            <a href="/categories/RTOS/" class="post-category">
+                                RTOS
+                            </a>
+                        
+                    </div>
+                    
+                </div>
+            </div>
+
+            <div class="post-info">
+                
+                <div class="post-date info-break-policy">
+                    <i class="far fa-calendar-minus fa-fw"></i>发布日期:&nbsp;&nbsp;
+                    2024-12-24
+                </div>
+                
+
+                
+                <div class="post-date info-break-policy">
+                    <i class="far fa-calendar-check fa-fw"></i>更新日期:&nbsp;&nbsp;
+                    2024-12-24
+                </div>
+                
+
+                
+                <div class="info-break-policy">
+                    <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
+                    9.8k
+                </div>
+                
+
+                
+                <div class="info-break-policy">
+                    <i class="far fa-clock fa-fw"></i>阅读时长:&nbsp;&nbsp;
+                    35 分
+                </div>
+                
+
+                
+                    <div id="busuanzi_container_page_pv" class="info-break-policy">
+                        <i class="far fa-eye fa-fw"></i>阅读次数:&nbsp;&nbsp;
+                        <span id="busuanzi_value_page_pv"></span>
+                    </div>
+				
+            </div>
+        </div>
+        <hr class="clearfix">
+
+        
+        <!-- 是否加载使用自带的 prismjs. -->
+        <link rel="stylesheet" href="/libs/prism/prism.min.css">
+        
+
+        
+
+        <div class="card-content article-card-content">
+            <div id="articleContent">
+                <h1 id="can-kao-zi-liao">参考资料</h1>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://documentation-service.arm.com/static/606dc36485368c4c2b1bf62f?token=">ARMv7-M Architecture Reference Manual</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.freertos.org/Documentation/02-Kernel/07-Books-and-manual/01-RTOS_book">Mastering the FreeRTOS Real Time Kernel - A Hands On Tutorial Guide</a>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://github.com/FreeRTOS/FreeRTOS-Kernel-Book/blob/main/toc.md">https://github.com/FreeRTOS/FreeRTOS-Kernel-Book/blob/main/toc.md</a></li>
+</ul>
+</li>
+<li>《The Definitive Guide to ARM Cortex-M3 and Cortex-M4 processors 3rd edition》</li>
+<li>《清华开发者书库 ARM Cortex-M3与Cortex-M4权威指南》</li>
+<li><a target="_blank" rel="noopener" href="https://rtos.100ask.net/zh/FreeRTOS/DShanMCU-F103/">百问网《FreeRTOS入门与工程实践-基于STM32F103》教程-基于DShanMCU-103(STM32F103)</a></li>
+</ul>
+<h1 id="ar-mv-7-m-jia-gou">ARMv7-M架构</h1>
+<h2 id="cong-c-cheng-xu-dao-hui-bian">从C程序到汇编</h2>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241224100940681.png" alt="image-20241224100940681"></p>
+<h2 id="arm-he-ji-cun-qi">ARM核寄存器</h2>
+<img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241224102230446.png" alt="《The Definitive Guide to ARM Cortex-M3 and Cortex-M4 processors 3rd edition》" style="zoom: 50%;">
+<h2 id="aapcs-arm-jia-gou-guo-cheng-diao-yong-biao-zhun">AAPCS（ARM架构过程调用标准）</h2>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241224094127013.png" alt="《The Definitive Guide to ARM Cortex-M3 and Cortex-M4 processors 3rd edition》"></p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241224094418134.png" alt="《The Definitive Guide to ARM Cortex-M3 and Cortex-M4 processors 3rd edition》"></p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241224094512683.png" alt="《The Definitive Guide to ARM Cortex-M3 and Cortex-M4 processors 3rd edition》"></p>
+<h3 id="yi-chang-chu-li">异常处理</h3>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241224131251232.png" alt="《The Definitive Guide to ARM Cortex-M3 and Cortex-M4 processors 3rd edition》"></p>
+<h2 id="c-han-shu-diao-yong-fan-hui-bian-fen-xi">C函数调用反汇编分析</h2>
+<h3 id="keil-sheng-cheng-fan-hui-bian">Keil生成反汇编</h3>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241224103049492.png" alt="image-20241224103049492"></p>
+<pre class="line-numbers language-bash" data-language="bash"><code class="language-bash">fromelf  <span class="token parameter variable">--text</span>  <span class="token parameter variable">-a</span> <span class="token parameter variable">-c</span>  <span class="token parameter variable">--output</span><span class="token operator">=</span>xxx.dis  xxx.axf
+示例：fromelf  <span class="token parameter variable">--text</span>  <span class="token parameter variable">-a</span> <span class="token parameter variable">-c</span>  <span class="token parameter variable">--output</span><span class="token operator">=</span>test.dis  01_freertos_template<span class="token punctuation">\</span>01_freertos_template.axf<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<h3 id="jie-he-aapcs-fen-xi-c-han-shu-diao-yong">结合AAPCS分析C函数调用</h3>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241224103854969.png" alt="image-20241224103854969"></p>
+<ul>
+<li>局部变量不一定保存在栈中，经过编译器优化后可能保存在Rn寄存器中；通过 <code>volatile</code>关键字可以强制将其保存在栈中</li>
+</ul>
+<h1 id="nei-cun-guan-li">内存管理</h1>
+<h2 id="wei-shi-yao-yao-zi-ji-shi-xian-nei-cun-guan-li">为什么要自己实现内存管理</h2>
+<p>FreeRTOS中有内核对象：task、queue、semaphores和event group等。为了让FreeRTOS更容易使用，这些内核对象一般都是动态分配：用到时分配，不使用时释放。使用内存的动态管理功能，简化了程序设计：不再需要小心翼翼地提前规划各类对象，简化API函数的涉及，甚至可以减少内存的使用。</p>
+<p>在C语言的库函数中，有mallc、free等函数，但是在FreeRTOS中，它们不适用：</p>
+<ul>
+<li>不适合用在资源紧缺的嵌入式系统中</li>
+<li>这些函数的实现过于复杂、占据的代码空间太大</li>
+<li>并非线程安全的(thread- safe)</li>
+<li>运行有不确定性：每次调用这些函数时花费的时间可能都不相同</li>
+<li>内存碎片化</li>
+<li>使用不同的编译器时，需要进行复杂的配置</li>
+<li>有时候难以调试</li>
+</ul>
+<h2 id="dui-guan-li-suan-fa">堆管理算法</h2>
+<h3 id="zhi-fen-pei-bu-hui-shou">只分配不回收</h3>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241224114401326.png" alt="image-20241224114401326"></p>
+<h3 id="yuan-shu-ju-header-kong-xian-lian-biao">元数据header+空闲链表</h3>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241224114431719.png" alt="image-20241224114431719"></p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241224114858195.png" alt="image-20241224114858195"></p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241224115022035.png" alt="image-20241224115022035"></p>
+<h2 id="dui-he-zhan">堆和栈</h2>
+<p><strong>注意：我们经常"堆栈"混合着说，其实它们不是同一个东西</strong>：</p>
+<ul>
+<li>堆，heap，就是一块空闲的内存，需要提供管理函数
+<ul>
+<li>malloc：从堆里划出一块空间给程序使用</li>
+<li>free：用完后，再把它标记为"空闲"的，可以再次使用</li>
+</ul>
+</li>
+<li>栈，stack，<strong>函数调用时局部变量保存在栈中，当前程序的环境也是保存在栈中</strong>
+<ul>
+<li><strong>可以从堆中分配一块空间用作栈</strong></li>
+</ul>
+</li>
+</ul>
+<img src="http://photos.100ask.net/rtos-docs/FreeRTOS/DShanMCU-F103/chapter-8/image1.png" alt="img" style="zoom:50%;">
+<h3 id="free-rtos-zhong-ren-wu-zhan-de-chuang-jian-he-shi-fang">FreeRTOS中任务栈的创建和释放</h3>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241224105255478.png" alt="xTaskCreate"></p>
+<h2 id="free-rtos-zhong-de-nei-cun-guan-li">FreeRTOS中的内存管理</h2>
+<p>FreeRTOS中内存管理的接口函数为：<code>pvPortMalloc</code> 、<code>vPortFree</code>，对应于C库的<code>malloc</code>、<code>free</code>。 文件在<code>FreeRTOS/Source/portable/MemMang</code>下，它也是放在<code>portable</code>目录下，表示你可以提供自己的函数。</p>
+<p>源码中默认提供了5个文件，对应内存管理的5种方法：</p>
+<table>
+<thead>
+<tr>
+<th><strong>文件</strong></th>
+<th><strong>优点</strong></th>
+<th><strong>缺点</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>heap_1.c</td>
+<td>分配简单，时间确定</td>
+<td>只分配、不回收</td>
+</tr>
+<tr>
+<td>heap_2.c</td>
+<td>动态分配、最佳匹配</td>
+<td>碎片、时间不定</td>
+</tr>
+<tr>
+<td>heap_3.c</td>
+<td>调用标准库函数</td>
+<td>速度慢、时间不定</td>
+</tr>
+<tr>
+<td>heap_4.c</td>
+<td>相邻空闲内存可合并</td>
+<td>可解决碎片问题、时间不定</td>
+</tr>
+<tr>
+<td>heap_5.c</td>
+<td>在heap_4基础上支持分隔的内存块</td>
+<td>可解决碎片问题、时间不定</td>
+</tr>
+</tbody>
+</table>
+<h3 id="heap-1">heap_1</h3>
+<p>它只实现了<code>pvPortMalloc</code>，没有实现<code>vPortFree</code>。</p>
+<p>如果你的程序<strong>不需要删除内核对象</strong>，那么可以使用<code>heap_1</code>：</p>
+<ul>
+<li>实现最简单</li>
+<li>没有碎片问题</li>
+<li>一些要求非常严格的系统里，不允许使用动态内存，就可以使用<code>heap_1</code></li>
+</ul>
+<p>它的实现原理很简单，首先定义一个大数组：</p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241224110238896.png" alt="image-20241224110238896"></p>
+<p>然后，对于pvPortMalloc调用时，从这个数组中分配空间。</p>
+<p>FreeRTOS在创建任务时，需要2个内核对象：task control block(TCB)、stack。 使用heap_1时，内存分配过程如下图所示：</p>
+<ul>
+<li>A：创建任务之前整个数组都是空闲的</li>
+<li>B：创建第1个任务之后，蓝色区域被分配出去了</li>
+<li>C：创建3个任务之后的数组使用情况</li>
+</ul>
+<img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241224110934902.png" alt="Mastering the FreeRTOS™ Real Time Kernel" style="zoom:50%;">
+<h3 id="heap-2">heap_2</h3>
+<p>Heap_2之所以还保留，只是为了兼容以前的代码。新设计中不再推荐使用Heap_2。建议使用Heap_4来替代Heap_2，更加高效。</p>
+<p>Heap_2也是在数组上分配内存，跟Heap_1不一样的地方在于：</p>
+<ul>
+<li>Heap_2使用**最佳匹配算法(best fit)**来分配内存</li>
+<li>它支持vPortFree</li>
+</ul>
+<p><strong>最佳匹配算法</strong>：</p>
+<ul>
+<li>假设heap有3块空闲内存：5字节、25字节、100字节</li>
+<li>pvPortMalloc想申请20字节</li>
+<li><strong>找出最小的、能满足pvPortMalloc的内存</strong>：25字节</li>
+<li>把它划分为20字节、5字节
+<ul>
+<li>返回这20字节的地址</li>
+<li>剩下的5字节仍然是空闲状态，留给后续的pvPortMalloc使用</li>
+</ul>
+</li>
+</ul>
+<p><strong>与Heap_4相比，Heap_2不会合并相邻的空闲内存，所以Heap_2会导致严重的"碎片化"问题。</strong></p>
+<p>但是，如果申请、分配内存时大小总是相同的，这类场景下Heap_2没有碎片化的问题。所以<strong>它适合这种场景：频繁地创建、删除任务，但是任务的栈大小都是相同的(创建任务时，需要分配TCB和栈，TCB总是一样的)</strong>。</p>
+<p>虽然不再推荐使用heap_2，但是它的效率还是远高于malloc、free。</p>
+<p>使用heap_2时，内存分配过程如下图所示：</p>
+<ul>
+<li>A：创建了3个任务</li>
+<li>B：删除了一个任务，空闲内存有3部分：顶层的、被删除任务的TCB空间、被删除任务的Stack空间</li>
+<li>C：创建了一个新任务，因为TCB、栈大小跟前面被删除任务的TCB、栈大小一致，所以刚好分配到原来的内存</li>
+</ul>
+<img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241224111525286.png" alt="Mastering the FreeRTOS™ Real Time Kernel" style="zoom:50%;">
+<h3 id="heap-3">heap_3</h3>
+<p>Heap_3使用标准C库里的<code>malloc</code>、<code>free</code>函数，所以<strong>堆大小由链接器的配置决定，配置项<code>configTOTAL_HEAP_SIZE</code>不再起作用</strong>。</p>
+<p><strong>C库里的malloc、free函数并非线程安全</strong>的，<strong>Heap_3中先暂停FreeRTOS的调度器，再去调用这些函数，使用这种方法实现了线程安全</strong>。</p>
+<h3 id="heap-4">heap_4</h3>
+<p>跟Heap_1、Heap_2一样，Heap_4也是使用大数组来分配内存。</p>
+<p>Heap_4使用 <strong>首次适应算法(first fit)来分配内存</strong> 。它还<strong>会把相邻的空闲内存合并为一个更大的空闲内存</strong>，这有助于较少内存的碎片问题。</p>
+<p>首次适应算法：</p>
+<ul>
+<li>假设堆中有3块空闲内存：5字节、200字节、100字节</li>
+<li>pvPortMalloc想申请20字节</li>
+<li>找出第1个能满足pvPortMalloc的内存：200字节</li>
+<li>把它划分为20字节、180字节</li>
+<li>返回这20字节的地址</li>
+<li>剩下的180字节仍然是空闲状态，留给后续的pvPortMalloc使用</li>
+</ul>
+<p>Heap_4会把相邻空闲内存合并为一个大的空闲内存，可以较少内存的碎片化问题。适用于这种场景：频繁地分配、释放不同大小的内存。</p>
+<p>Heap_4的使用过程举例如下：</p>
+<ul>
+<li>A：创建了3个任务</li>
+<li>B：删除了一个任务，空闲内存有2部分：
+<ul>
+<li>顶层的</li>
+<li>被删除任务的TCB空间、被删除任务的Stack空间合并起来的</li>
+</ul>
+</li>
+<li>C：分配了一个Queue，从第1个空闲块中分配空间</li>
+<li>D：分配了一个User数据，从Queue之后的空闲块中分配</li>
+<li>E：释放的Queue，User前后都有一块空闲内存</li>
+<li>F：释放了User数据，User前后的内存、User本身占据的内存，合并为一个大的空闲内存</li>
+</ul>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241224111821826.png" alt="Mastering the FreeRTOS™ Real Time Kernel"></p>
+<h3 id="heap-5">heap_5</h3>
+<p>Heap_5分配内存、释放内存的算法跟Heap_4是一样的。</p>
+<p>相比于Heap_4，Heap_5并不局限于管理一个大数组：它可以管理<strong>多块、分隔开的内存</strong>。</p>
+<p>在嵌入式系统中，内存的地址可能并不连续，这种场景下可以使用Heap_5。</p>
+<p>既然内存是分隔开的，那么就需要进行初始化：确定这些内存块在哪、多大：</p>
+<ul>
+<li>在使用<code>pvPortMalloc</code>之前，必须先指定内存块的信息</li>
+<li>使用<code>vPortDefineHeapRegions</code>来指定这些信息</li>
+</ul>
+<p>怎么指定一块内存？使用如下结构体：</p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241224112057765.png" alt="image-20241224112057765"></p>
+<p>怎么指定多块内存？使用一个HeapRegion_t数组，在这个数组中，低地址在前、高地址在后。 比如：</p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241224112149988.png" alt="image-20241224112149988"></p>
+<p><code>vPortDefineHeapRegions</code>函数原型如下：</p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241224112220562.png" alt="image-20241224112220562"></p>
+<h2 id="heap-xiang-guan-de-han-shu">heap相关的函数</h2>
+<h3 id="pv-port-malloc-v-port-free">pvPortMalloc/vPortFree</h3>
+<p>函数原型：</p>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token keyword">void</span> <span class="token operator">*</span> <span class="token function">pvPortMalloc</span><span class="token punctuation">(</span> <span class="token class-name">size_t</span> xWantedSize <span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">void</span> <span class="token function">vPortFree</span><span class="token punctuation">(</span> <span class="token keyword">void</span> <span class="token operator">*</span> pv <span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<p>作用：分配内存、释放内存。</p>
+<p>如果分配内存不成功，则返回值为NULL。</p>
+<h3 id="x-port-get-free-heap-size">xPortGetFreeHeapSize</h3>
+<p>函数原型：</p>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token class-name">size_t</span> <span class="token function">xPortGetFreeHeapSize</span><span class="token punctuation">(</span> <span class="token keyword">void</span> <span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<p>当前还有多少空闲内存，这函数可以用来优化内存的使用情况。比如当所有内核对象都分配好后，执行此函数返回2000，那么configTOTAL_HEAP_SIZE就可减小2000。</p>
+<p>注意：在heap_3中无法使用。</p>
+<h3 id="x-port-get-minimum-ever-free-heap-size">xPortGetMinimumEverFreeHeapSize</h3>
+<p>函数原型：</p>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token class-name">size_t</span> <span class="token function">xPortGetMinimumEverFreeHeapSize</span><span class="token punctuation">(</span> <span class="token keyword">void</span> <span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<p>返回：程序运行过程中，空闲内存容量的最小值。</p>
+<p>注意：只有heap_4、heap_5支持此函数。</p>
+<h3 id="malloc-shi-bai-de-gou-zi-han-shu">malloc失败的钩子函数</h3>
+<p>在<code>pvPortMalloc</code>函数内部：</p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241224112611563.png" alt="image-20241224112611563"></p>
+<p>所以，如果想使用这个钩子函数：</p>
+<ul>
+<li>在<code>FreeRTOSConfig.h</code>中，把<code>configUSE_MALLOC_FAILED_HOOK</code>定义为<code>1</code></li>
+<li>提供<code>vApplicationMallocFailedHook</code>函数</li>
+<li><code>pvPortMalloc</code>失败时，才会调用此函数</li>
+</ul>
+<h1 id="zhan">栈</h1>
+<h2 id="ju-bu-bian-liang-bao-cun-zai-zhan-li-ru-he-ti-xian">局部变量保存在栈里？如何体现？</h2>
+<ul>
+<li>编译器优化后，局部变量可能保存在Rn寄存器中</li>
+<li>使用<code>volatile</code>可以强制编译器从内存中读写变量</li>
+</ul>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241224115549974.png" alt="image-20241224115549974"></p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241224124325959.png" alt="image-20241224124325959"></p>
+<h2 id="han-shu-diao-yong-dui-ying-ya-zhan-chu-zhan">函数调用对应压栈/出栈？</h2>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241224115808926.png" alt="image-20241224115808926"></p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241224124139332.png" alt="image-20241224124139332"></p>
+<h2 id="wei-he-mei-ge-ren-wu-yao-you-zi-ji-de-zhan">为何每个任务要有自己的栈？</h2>
+<ul>
+<li>函数的调用关系/调用深度，调用者需要按需保护的寄存器：R0~R2、R12、LR、PSR</li>
+<li>函数的局部变量
+<ul>
+<li>通用寄存器不够用时，局部变量在栈中分配</li>
+<li><code>volatile</code>变量在栈中分配</li>
+</ul>
+</li>
+<li>被切换前任务的执行现场
+<ul>
+<li>进入PendSV异常，在执行ISR之前，ARM架构异常机制会按照AAPCS标准保护调用者需要保存的寄存器：R0~R2、R12、LR、PSR、<strong>PC</strong>（这些都由硬件自动完成）</li>
+<li>FreeRTOS的 <code>xPortPendSVHandler</code>中，将剩余的R4~R11也都一并保存起来，这样任务的执行现场就都保存到任务的栈中了</li>
+</ul>
+</li>
+</ul>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241224124452571.png" alt="image-20241224124452571"></p>
+<h1 id="ren-wu-guan-li">任务管理</h1>
+<h2 id="ren-wu-de-chuang-jian">任务的创建</h2>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241224130522653.png" alt="image-20241224130522653"></p>
+<h2 id="ping-gu-ren-wu-zhan-da-xiao">评估任务栈大小</h2>
+<ul>
+<li>函数调用链
+<ul>
+<li>每个调用方需要按照AAPCS按需保存自己所用到的R0~R3、R12、LR、PSR</li>
+<li>每个函数的局部变量</li>
+</ul>
+</li>
+<li>任务执行现场
+<ul>
+<li>进入PendSV时由硬件保存：R0~R3、R12、LR、PSR、PC</li>
+<li>FreeRTOS的 <code>xPortPendSVHandler</code>保存：R4~R11</li>
+</ul>
+</li>
+</ul>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241224130621193.png" alt="image-20241224130621193"></p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241224130839772.png" alt="image-20241224130839772"></p>
+<h2 id="ren-wu-zhuang-tai-ji">任务状态机</h2>
+<img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241224142259763.png" alt="Mastering the FreeRTOS Real Time Kernel - A Hands On Tutorial Guide" style="zoom: 50%;">
+<h2 id="ren-wu-diao-du">任务调度</h2>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241224144752049.png" alt="image-20241224144752049"></p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241224150031530.png" alt="image-20241224150031530"></p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241224145415371.png" alt="image-20241224145415371"></p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241224145109913.png" alt="image-20241224145109913"></p>
+<h2 id="kong-xian-ren-wu-amp-la-ji-hui-shou">空闲任务 &amp; 垃圾回收</h2>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241224150154327.png" alt="image-20241224150154327"></p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241224150227503.png" alt="image-20241224150227503"></p>
+<h2 id="liang-chong-yan-shi">两种延时</h2>
+<h3 id="jue-dui-yan-shi">绝对延时</h3>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241224150359183.png" alt="image-20241224150359183"></p>
+<h3 id="xiang-dui-yan-shi">相对延时</h3>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241224150415924.png" alt="image-20241224150415924"></p>
+<h1 id="ren-wu-jian-tong-bu-hu-chi-yu-tong-xin">任务间同步/互斥与通信</h1>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241224150511395.png" alt="image-20241224150511395"></p>
+<h2 id="ji-yu-quan-ju-bian-liang-shi-xian-cun-zai-de-wen-ti">基于全局变量实现存在的问题</h2>
+<h3 id="tong-bu">同步</h3>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241224152011608.png" alt="image-20241224152011608"></p>
+<h3 id="hu-chi">互斥</h3>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241224153008075.png" alt="image-20241224153008075"></p>
+<h2 id="dui-lie">队列</h2>
+<h3 id="ren-wu-zhi-jian-ru-he-chuan-shu-shu-ju">任务之间如何传输数据</h3>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>数据个数</th>
+<th>互斥措施</th>
+<th>阻塞-唤醒</th>
+<th>使用场景</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>全局变量</td>
+<td>1</td>
+<td>无</td>
+<td>无</td>
+<td>一读一写</td>
+</tr>
+<tr>
+<td>环形缓冲区</td>
+<td>多个</td>
+<td>无</td>
+<td>无</td>
+<td>一读一写</td>
+</tr>
+<tr>
+<td>队列</td>
+<td>多个</td>
+<td>有</td>
+<td>有</td>
+<td>多读多写</td>
+</tr>
+</tbody>
+</table>
+<h3 id="huan-xing-huan-chong-qu">环形缓冲区</h3>
+<p>读写分离可以支持一个生产者和一个消费者同时访问，不会产生竞态条件：</p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241224151016122.png" alt="image-20241224151016122"></p>
+<p>使用共享变量，例如缓冲区的数据数量 <code>num</code>则会产生竞态条件：</p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241224154142274.png" alt="image-20241224154142274"></p>
+<h3 id="dui-lie-de-ben-zhi">队列的本质</h3>
+<p>队列中，数据的读写本质就是环形缓冲区，在这个基础上增加了互斥措施、阻塞-唤醒机制。</p>
+<p>如果这个队列不传输数据，只调整"数据个数"，它就是信号量(semaphore)。</p>
+<p>如果信号量中，限定"数据个数"最大值为1，它就是互斥量(mutex)。</p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241224155227682.png" alt="image-20241224155227682"></p>
+<h3 id="shi-yong-dui-lie-shi-xian-kong-zhi-fan-zhuan">使用队列实现控制翻转</h3>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241224160735285.png" alt="image-20241224160735285"></p>
+<h3 id="shi-yong-dui-lie-ji-zheng-he-bu-tong-de-shi-jian-yuan">使用队列集整合不同的事件源</h3>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241224161055197.png" alt="image-20241224161055197"></p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241224161151779.png" alt="image-20241224161151779"></p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241224161325181.png" alt="image-20241224161325181"></p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241224161216093.png" alt="image-20241224161216093"></p>
+<h2 id="xin-hao-liang-hu-chi-liang">信号量/互斥量</h2>
+<h3 id="xin-hao-liang-de-ben-zhi">信号量的本质</h3>
+<blockquote>
+<p>控制并发访问共享资源的数量</p>
+</blockquote>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241224161544902.png" alt="image-20241224161544902"></p>
+<h3 id="you-xian-ji-fan-zhuan-wen-ti">优先级翻转问题</h3>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241224161722878.png" alt="image-20241224161722878"></p>
+<h3 id="hu-chi-liang-amp-you-xian-ji-ji-cheng">互斥量 &amp; 优先级继承</h3>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241224161808946.png" alt="image-20241224161808946"></p>
+<h2 id="shi-jian-zu">事件组</h2>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241224162326740.png" alt="image-20241224162326740"></p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241224162221034.png" alt="image-20241224162221034"></p>
+<h3 id="shi-yong-shi-jian-zu-you-hua-bu-duan-lun-xun-i-2-c-du-qu-mpu-6050-de-wen-ti">使用事件组优化不断轮询I2C读取MPU6050的问题</h3>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241224162518626.png" alt="image-20241224162518626"></p>
+<h2 id="ren-wu-tong-zhi">任务通知</h2>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241224162751206.png" alt="image-20241224162751206"></p>
+<h3 id="tcb-tong-zhi-zhuang-tai">TCB通知状态</h3>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241224162840004.png" alt="image-20241224162840004"></p>
+<h3 id="chang-jing-yi-fa-song-tong-zhi-shi-bei-tong-zhi-fang-bu-shi-deng-dai-tong-zhi-zhuang-tai">场景一：发送通知时，被通知方不是等待通知状态</h3>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241224163035649.png" alt="image-20241224163035649"></p>
+<h3 id="chang-jing-er-fa-song-tong-zhi-shi-bei-tong-zhi-fang-zheng-zai-deng-dai-tong-zhi">场景二：发送通知时，被通知方正在等待通知</h3>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241224163100066.png" alt="image-20241224163100066"></p>
+<h3 id="liang-lei-han-shu">两类函数</h3>
+<p>任务通知有2套函数，简化版、专业版，列表如下：</p>
+<ul>
+<li>简化版函数的使用比较简单，它实际上也是使用专业版函数实现的</li>
+<li>专业版函数支持很多参数，可以实现很多功能</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>简化版</th>
+<th>专业版</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>发出通知</td>
+<td>xTaskNotifyGive vTaskNotifyGiveFromISR</td>
+<td>xTaskNotify xTaskNotifyFromISR</td>
+</tr>
+<tr>
+<td>取出通知</td>
+<td>ulTaskNotifyTake</td>
+<td>xTaskNotifyWait</td>
+</tr>
+</tbody>
+</table>
+<h4 id="jian-hua-ban">简化版</h4>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241224163222931.png" alt="image-20241224163222931"></p>
+<h4 id="zhuan-ye-ban">专业版</h4>
+<p>xTaskNotify函数的参数说明如下：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:center"><strong>参数</strong></th>
+<th><strong>说明</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">xTaskToNotify</td>
+<td>任务句柄(创建任务时得到)，给哪个任务发通知</td>
+</tr>
+<tr>
+<td style="text-align:center">ulValue</td>
+<td>怎么使用ulValue，由eAction参数决定</td>
+</tr>
+<tr>
+<td style="text-align:center">eAction</td>
+<td>见下表</td>
+</tr>
+<tr>
+<td style="text-align:center">返回值</td>
+<td>pdPASS：成功，大部分调用都会成功 pdFAIL：只有一种情况会失败，当eAction为eSetValueWithoutOverwrite， 并且通知状态为"pending"(表示有新数据未读)，这时就会失败。</td>
+</tr>
+</tbody>
+</table>
+<p>eNotifyAction参数说明：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:center"><strong>eNotifyAction取值</strong></th>
+<th><strong>说明</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">eNoAction</td>
+<td>仅仅是更新通知状态为"pending"，未使用ulValue。 这个选项相当于轻量级的、更高效的二进制信号量。</td>
+</tr>
+<tr>
+<td style="text-align:center">eSetBits</td>
+<td>通知值 = 原来的通知值 | ulValue，按位或。 相当于轻量级的、更高效的事件组。</td>
+</tr>
+<tr>
+<td style="text-align:center">eIncrement</td>
+<td>通知值 = 原来的通知值 + 1，未使用ulValue。 相当于轻量级的、更高效的二进制信号量、计数型信号量。 相当于**xTaskNotifyGive()**函数。</td>
+</tr>
+<tr>
+<td style="text-align:center">eSetValueWithoutOverwrite</td>
+<td>不覆盖。 如果通知状态为"pending"(表示有数据未读)， 则此次调用xTaskNotify不做任何事，返回pdFAIL。 如果通知状态不是"pending"(表示没有新数据)， 则：通知值 = ulValue。</td>
+</tr>
+<tr>
+<td style="text-align:center">eSetValueWithOverwrite</td>
+<td>覆盖。 无论如何，不管通知状态是否为"pendng"， 通知值 = ulValue。</td>
+</tr>
+</tbody>
+</table>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241224163627001.png" alt="image-20241224163627001"></p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241224163646903.png" alt="image-20241224163646903"></p>
+<h1 id="ruan-jian-ding-shi-qi">软件定时器</h1>
+<p>软件定时器就是"闹钟"，你可以设置闹钟，</p>
+<ul>
+<li>在30分钟后让你起床工作</li>
+<li>每隔1小时让你例行检查机器运行情况</li>
+</ul>
+<p>软件定时器也可以完成两类事情：</p>
+<ul>
+<li>在"未来"某个时间点，运行函数</li>
+<li>周期性地运行函数</li>
+</ul>
+<p>日常生活中我们可以定无数个"闹钟"，这无数的"闹钟"要基于一个真实的闹钟。</p>
+<p>在FreeRTOS里，我们也可以设置无数个"软件定时器"，它们都是基于系统滴答中断(Tick Interrupt)。</p>
+<h2 id="ruan-jian-ding-shi-qi-de-te-xing">软件定时器的特性</h2>
+<p>我们在手机上添加闹钟时，需要指定时间、指定类型(一次性的，还是周期性的)、指定做什么事；还有一些过时的、不再使用的闹钟。如下图所示：</p>
+<p><img src="http://photos.100ask.net/rtos-docs/FreeRTOS/DShanMCU-F103/chapter-16/image1.png" alt="img"></p>
+<p>使用定时器跟使用手机闹钟是类似的：</p>
+<ul>
+<li>指定时间：启动定时器和运行回调函数，两者的间隔被称为定时器的周期(period)。</li>
+<li>指定类型，定时器有两种类型：
+<ul>
+<li>一次性(One-shot timers)： 这类定时器启动后，它的回调函数只会被调用一次； 可以手工再次启动它，但是不会自动启动它。</li>
+<li>自动加载定时器(Auto-reload timers )： 这类定时器启动后，时间到之后它会自动启动它； 这使得回调函数被周期性地调用。</li>
+</ul>
+</li>
+<li>指定要做什么事，就是指定回调函数</li>
+</ul>
+<p>实际的闹钟分为：有效、无效两类。软件定时器也是类似的，它由两种状态：</p>
+<ul>
+<li>运行(Running、Active)：运行态的定时器，当指定时间到达之后，它的回调函数会被调用</li>
+<li>冬眠(Dormant)：冬眠态的定时器还可以通过句柄来访问它，但是它不再运行，它的回调函数不会被调用</li>
+</ul>
+<p>定时器运行情况示例如下：</p>
+<ul>
+<li>Timer1：它是一次性的定时器，在t1启动，周期是6个Tick。经过6个tick后，在t7执行回调函数。它的回调函数只会被执行一次，然后该定时器进入冬眠状态。</li>
+<li>Timer2：它是自动加载的定时器，在t1启动，周期是5个Tick。每经过5个tick它的回调函数都被执行，比如在t6、t11、t16都会执行。</li>
+</ul>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241224171600019.png" alt="Mastering the FreeRTOS Real Time Kernel - A Hands On Tutorial Guide"></p>
+<h2 id="shang-xia-wen">上下文</h2>
+<p>要理解软件定时器API函数的参数，特别是里面的<em>xTicksToWait</em>，需要知道定时器执行的过程。</p>
+<p>FreeRTOS中有一个Tick中断，软件定时器基于Tick来运行。在哪里执行定时器函数？第一印象就是在Tick中断里执行：</p>
+<ul>
+<li>在Tick中断中判断定时器是否超时</li>
+<li>如果超时了，调用它的回调函数</li>
+</ul>
+<p>FreeRTOS是RTOS，它不允许在内核、在中断中执行不确定的代码：如果定时器函数很耗时，会影响整个系统。</p>
+<p>所以，FreeRTOS中，不在Tick中断中执行定时器函数。</p>
+<p>在哪里执行？在某个任务里执行，这个任务就是：RTOS Damemon Task，RTOS守护任务。以前被称为"Timer server"，但是这个任务要做并不仅仅是定时器相关，所以改名为：RTOS Damemon Task。</p>
+<p>当FreeRTOS的配置项<em>configUSE_TIMERS</em>被设置为1时，在启动调度器时，会自动创建RTOS Damemon Task。</p>
+<p>我们自己编写的任务函数要使用定时器时，是通过"定时器命令队列"(timer command queue)和守护任务交互，如下图所示：</p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241224165840277.png" alt="Mastering the FreeRTOS Real Time Kernel - A Hands On Tutorial Guide"></p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241224165832888.png" alt="Mastering the FreeRTOS Real Time Kernel - A Hands On Tutorial Guide"></p>
+<p>守护任务的优先级为：configTIMER_TASK_PRIORITY；定时器命令队列的长度为configTIMER_QUEUE_LENGTH。</p>
+<h2 id="shou-hu-ren-wu-diao-du">守护任务调度</h2>
+<p>守护任务的调度，跟普通的任务并无差别。当守护任务是当前优先级最高的就绪态任务时，它就可以运行。它的工作有两类：</p>
+<ul>
+<li>处理命令：从命令队列里取出命令、处理</li>
+<li>执行定时器的回调函数</li>
+</ul>
+<p>能否及时处理定时器的命令、能否及时执行定时器的回调函数，严重依赖于守护任务的优先级。下面使用2个例子来演示。</p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241224165918187.png" alt="Mastering the FreeRTOS Real Time Kernel - A Hands On Tutorial Guide"></p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241224165954240.png" alt="Mastering the FreeRTOS Real Time Kernel - A Hands On Tutorial Guide"></p>
+<blockquote>
+<p>注意，定时器的超时时间是基于调用 <strong>xTimerStart()</strong> 的时刻tX，而不是基于守护任务处理命令的时刻tY。假设超时时间是10个Tick，超时时间是"tX+10"，而非"tY+10"。</p>
+</blockquote>
+<h2 id="hui-diao-han-shu">回调函数</h2>
+<p>定时器的回调函数的原型如下：</p>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token keyword">void</span> <span class="token function">ATimerCallback</span><span class="token punctuation">(</span> TimerHandle_t xTimer <span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<p>定时器的回调函数是在守护任务中被调用的，守护任务不是专为某个定时器服务的，它还要处理其他定时器。</p>
+<p>所以，定时器的回调函数不要影响其他人：</p>
+<ul>
+<li>回调函数要尽快实行，不能进入阻塞状态</li>
+<li>不要调用会导致阻塞的API函数，比如 <code>vTaskDelay()</code></li>
+<li>可以调用 <code>xQueueReceive()</code> 之类的函数，但是超时时间要设为0：即刻返回，不可阻塞</li>
+</ul>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241224172257374.png" alt="Mastering the FreeRTOS Real Time Kernel - A Hands On Tutorial Guide"></p>
+<h2 id="zhuang-tai-ji">状态机</h2>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241224164812059.png" alt="Mastering the FreeRTOS Real Time Kernel - A Hands On Tutorial Guide"></p>
+<h1 id="zhong-duan-guan-li">中断管理</h1>
+<p>在RTOS中，需要应对各类事件。这些事件很多时候是通过硬件中断产生，怎么处理中断呢？</p>
+<p>假设当前系统正在运行Task1时，用户按下了按键，触发了按键中断。这个中断的处理流程如下：</p>
+<ul>
+<li>CPU跳到固定地址去执行代码，这个固定地址通常被称为中断向量，这个跳转时硬件实现的</li>
+<li>执行代码做什么？
+<ul>
+<li>保存现场：Task1被打断，需要先保存Task1的运行环境，比如各类寄存器的值</li>
+<li>分辨中断、调用处理函数(这个函数就被称为ISR，interrupt service routine)</li>
+<li>恢复现场：继续运行Task1，或者运行其他优先级更高的任务</li>
+</ul>
+</li>
+</ul>
+<p><strong>你要注意到，ISR是在内核中被调用的，ISR执行过程中，用户的任务无法执行。ISR要尽量快，否则：</strong></p>
+<ul>
+<li><strong>其他低优先级的中断无法被处理：实时性无法保证</strong></li>
+<li><strong>用户任务无法被执行：系统显得很卡顿</strong></li>
+</ul>
+<p>如果这个硬件中断的处理，就是非常耗费时间呢？对于这类中断的处理就要分为2部分：</p>
+<ul>
+<li>ISR：尽快做些清理、记录工作，然后触发某个任务</li>
+<li>任务：更复杂的事情放在任务中处理</li>
+<li>所以：需要ISR和任务之间进行通信</li>
+</ul>
+<p>要在FreeRTOS中熟练使用中断，有几个原则要先说明：</p>
+<ul>
+<li><strong>FreeRTOS把任务认为是硬件无关的，任务的优先级由程序员决定，任务何时运行由调度器决定</strong></li>
+<li><strong>ISR虽然也是使用软件实现的，但是它被认为是硬件特性的一部分，因为它跟硬件密切相关</strong>
+<ul>
+<li><strong>何时执行？由硬件决定</strong></li>
+<li><strong>哪个ISR被执行？由硬件决定</strong></li>
+</ul>
+</li>
+<li><strong>ISR的优先级高于任务：即使是优先级最低的中断，它的优先级也高于任务。任务只有在没有中断的情况下，才能执行。</strong></li>
+</ul>
+<h2 id="liang-tao-api-xxx-he-xxx-from-isr">两套API：Xxx和XxxFromISR</h2>
+<h3 id="wei-shi-yao-xu-yao-liang-tao-api">为什么需要两套API</h3>
+<p>在任务函数中，我们可以调用各类API函数，比如队列操作函数：xQueueSendToBack。但是在ISR中使用这个函数会导致问题，应该使用另一个函数：xQueueSendToBackFromISR，它的函数名含有后缀"FromISR"，表示"从ISR中给队列发送数据"。</p>
+<p>FreeRTOS中很多API函数都有两套：一套在任务中使用，另一套在ISR中使用。后者的函数名含有"FromISR"后缀。</p>
+<p>为什么要引入两套API函数？</p>
+<ul>
+<li><strong>很多API函数会导致任务进入阻塞状态：</strong>
+<ul>
+<li>运行这个函数的 <strong>任务</strong> 进入阻塞状态</li>
+<li>比如写队列时，如果队列已满，可以进入阻塞状态等待一会</li>
+</ul>
+</li>
+<li>ISR调用API函数时，<strong>ISR不是"任务"，ISR不能进入阻塞状态</strong></li>
+<li>所以，在任务中、在ISR中，这些函数的功能是有差别的</li>
+</ul>
+<p>为什么不使用同一套函数，比如在函数里面分辨当前调用者是任务还是ISR呢？示例代码如下</p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241224173004112.png" alt="image-20241224173004112"></p>
+<p>FreeRTOS使用两套函数，而不是使用一套函数，是因为有如下好处：</p>
+<ul>
+<li>使用同一套函数的话，需要增加额外的判断代码、增加额外的分支，使得函数更长、更复杂、难以测试</li>
+<li>在任务、ISR中调用时，需要的参数不一样，比如：
+<ul>
+<li><strong>在任务中调用：需要指定超时时间，表示如果不成功就阻塞一会</strong></li>
+<li><strong>在ISR中调用：不需要指定超时时间，无论是否成功都要即刻返回</strong></li>
+<li><strong>如果强行把两套函数揉在一起，会导致参数臃肿、无效</strong></li>
+</ul>
+</li>
+<li>移植FreeRTOS时，还需要提供监测上下文的函数，比如 <strong>is_in_isr()</strong></li>
+<li>有些处理器架构没有办法轻易分辨当前是处于任务中，还是处于ISR中，就需要额外添加更多、更复杂的代码</li>
+</ul>
+<p>使用两套函数可以让程序更高效，但是也有一些缺点，比如你要使用第三方库函数时，即会在任务中调用它，也会在ISR中调用它。这个第三方库函数用到了FreeRTOS的API函数，你无法修改库函数。这个问题可以解决：</p>
+<ul>
+<li>把中断的处理推迟到任务中进行(Defer interrupt processing)，在任务中调用库函数</li>
+<li>尝试在库函数中使用"FromISR"函数：
+<ul>
+<li>在任务中、在ISR中都可以调用"FromISR"函数</li>
+<li>反过来就不行，非FromISR函数无法在ISR中使用</li>
+</ul>
+</li>
+<li>第三方库函数也许会提供OS抽象层，自行判断当前环境是在任务还是在ISR中，分别调用不同的函数</li>
+</ul>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241224173934944.png" alt="Mastering the FreeRTOS Real Time Kernel - A Hands On Tutorial Guide"></p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241224174028669.png" alt="image-20241224174028669"></p>
+<h3 id="x-higher-priority-task-woken-can-shu">xHigherPriorityTaskWoken参数</h3>
+<p><code>xHigherPriorityTaskWoken</code>的含义是：是否有更高优先级的任务被唤醒了。如果为pdTRUE，则意味着后面要进行任务切换。</p>
+<p>还是以写队列为例。</p>
+<p>任务A调用 <code>xQueueSendToBack()</code> 写队列，有几种情况发生：</p>
+<ul>
+<li>队列满了，任务A阻塞等待，另一个任务B运行</li>
+<li>队列没满，任务A成功写入队列，但是它导致另一个任务B被唤醒，任务B的优先级更高：任务B先运行</li>
+<li>队列没满，任务A成功写入队列，即刻返回</li>
+</ul>
+<p>可以看到，在任务中调用API函数可能导致任务阻塞、任务切换，这叫做"context switch"，上下文切换。这个函数可能很长时间才返回，在函数的内部实现了任务切换。</p>
+<p><code>xQueueSendToBackFromISR()</code> 函数也可能导致任务切换，但是不会在函数内部进行切换，而是返回一个参数：表示是否需要切换，函数原型与用法如下：</p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241224174409929.png" alt="image-20241224174409929"></p>
+<p><code>pxHigherPriorityTaskWoken</code>参数，就是用来保存函数的结果：是否需要切换</p>
+<ul>
+<li><code>pxHigherPriorityTaskWoken</code>等于<code>pdTRUE</code>：函数的操作导致更高优先级的任务就绪了，ISR应该进行任务切换</li>
+<li><code>pxHigherPriorityTaskWoken</code>等于<code>pdFALSE</code>：没有进行任务切换的必要</li>
+</ul>
+<p>为什么不在"FromISR"函数内部进行任务切换，而只是标记一下而已呢？为了效率！示例代码如下：</p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241224174531949.png" alt="image-20241224174531949"></p>
+<p>ISR中有可能多次调用"FromISR"函数，如果在"FromISR"内部进行任务切换，会浪费时间。解决方法是：</p>
+<ul>
+<li>在"FromISR"中标记是否需要切换</li>
+<li>在ISR返回之前再进行任务切换</li>
+</ul>
+<p>示例代码如下</p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241224174553605.png" alt="image-20241224174553605"></p>
+<p>上述的例子很常见，比如UART中断：在UART的ISR中读取多个字符，发现收到回车符时才进行任务切换。</p>
+<p>在ISR中调用API时不进行任务切换，而只是在<code>xHigherPriorityTaskWoken</code>中标记一下，除了效率，还有多种好处：</p>
+<ul>
+<li>效率高：避免不必要的任务切换</li>
+<li>让ISR更可控：中断随机产生，在API中进行任务切换的话，可能导致问题更复杂</li>
+<li>可移植性</li>
+<li>在Tick中断中，调用 <strong>vApplicationTickHook()</strong> ：它运行于ISR，只能使用"FromISR"的函数</li>
+</ul>
+<p>使用"FromISR"函数时，如果不想使用xHigherPriorityTaskWoken参数，可以设置为NULL。</p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241224174832140.png" alt="Mastering the FreeRTOS Real Time Kernel - A Hands On Tutorial Guide"></p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241224174840677.png" alt="Mastering the FreeRTOS Real Time Kernel - A Hands On Tutorial Guide"></p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241224175446319.png" alt="Mastering the FreeRTOS Real Time Kernel - A Hands On Tutorial Guide"></p>
+<h3 id="zen-yao-qie-huan-ren-wu">怎么切换任务</h3>
+<p>FreeRTOS的ISR函数中，使用两个宏进行任务切换：</p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241224175646944.png" alt="image-20241224175646944"></p>
+<p>这两个宏做的事情是完全一样的，在老版本的FreeRTOS中，</p>
+<ul>
+<li><strong>portEND_SWITCHING_ISR</strong> 使用汇编实现</li>
+<li><strong>portYIELD_FROM_ISR</strong> 使用C语言实现</li>
+</ul>
+<p>新版本都统一使用<strong>portYIELD_FROM_ISR</strong>。</p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241224180917055.png" alt="image-20241224180917055"></p>
+<blockquote>
+<p>注意，这里只是将PendSV中断挂起标志位置位，等到合适的时机才会在PendSV中断中执行任务上下文切换</p>
+</blockquote>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241224181121598.png" alt="image-20241224181121598"></p>
+<h2 id="zhong-duan-de-yan-chi-chu-li">中断的延迟处理</h2>
+<p>前面讲过，ISR要尽量快，否则：</p>
+<ul>
+<li>其他低优先级的中断无法被处理：实时性无法保证</li>
+<li>用户任务无法被执行：系统显得很卡顿</li>
+<li>如果运行中断嵌套，这会更复杂，ISR越快执行约有助于中断嵌套</li>
+</ul>
+<p>如果这个硬件中断的处理，就是非常耗费时间呢？对于这类中断的处理就要分为2部分：</p>
+<ul>
+<li>ISR：尽快做些清理、记录工作，然后触发某个任务</li>
+<li>任务：更复杂的事情放在任务中处理</li>
+</ul>
+<p>这种处理方式叫"中断的延迟处理"(Deferring interrupt processing)，处理流程如下图所示：</p>
+<ul>
+<li>t1：任务1运行，任务2阻塞</li>
+<li>t2：发生中断，</li>
+<li>该中断的ISR函数被执行，任务1被打断</li>
+<li>ISR函数要尽快能快速地运行，它做一些必要的操作(比如清除中断)，然后唤醒任务2</li>
+<li>t3：在创建任务时设置任务2的优先级比任务1高(这取决于设计者)，所以ISR返回后，运行的是任务2，它要完成中断的处理。任务2就被称为"deferred processing task"，中断的延迟处理任务。</li>
+<li>t4：任务2处理完中断后，进入阻塞态以等待下一个中断，任务1重新运行</li>
+</ul>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241224181824811.png" alt="image-20241224181824811"></p>
+<h1 id="zi-yuan-guan-li">资源管理</h1>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241224191115080.png" alt="Mastering the FreeRTOS Real Time Kernel - A Hands On Tutorial Guide"></p>
+<p>要独占式地访问临界资源，有3种方法：</p>
+<ul>
+<li>公平竞争：比如使用互斥量，谁先获得互斥量谁就访问临界资源。</li>
+<li>谁要跟我抢，我就灭掉谁：
+<ul>
+<li>中断要跟我抢？我屏蔽中断</li>
+<li>其他任务要跟我抢？我禁止调度器，不运行任务切换</li>
+</ul>
+</li>
+</ul>
+<h2 id="ping-bi-zhong-duan">屏蔽中断</h2>
+<p>屏蔽中断有两套宏：任务中使用、ISR中使用：</p>
+<ul>
+<li>任务中使用：<code>taskENTER_CRITICA()/taskEXIT_CRITICAL()</code></li>
+<li>ISR中使用：<code>taskENTER_CRITICAL_FROM_ISR()/taskEXIT_CRITICAL_FROM_ISR()</code></li>
+</ul>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241224185107470.png" alt="image-20241224185107470"></p>
+<h3 id="zai-ren-wu-zhong-ping-bi-zhong-duan">在任务中屏蔽中断</h3>
+<p>在任务中屏蔽中断的示例代码如下：</p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241224185603376.png" alt="image-20241224185603376"></p>
+<p>在 <code>taskENTER_CRITICA()/taskEXIT_CRITICAL()</code> 之间：</p>
+<ul>
+<li>低优先级的中断被屏蔽了：优先级低于、等于 <code>configMAX_SYSCALL_INTERRUPT_PRIORITY</code></li>
+<li>高优先级的中断可以产生：优先级高于<code>configMAX_SYSCALL_INTERRUPT_PRIORITY</code>
+<ul>
+<li>但是，这些中断ISR里，不允许使用FreeRTOS的API函数</li>
+</ul>
+</li>
+<li>任务调度依赖于中断、依赖于API函数，所以：这两段代码之间，不会有任务调度产生</li>
+</ul>
+<p>这套 <code>taskENTER_CRITICA()/taskEXIT_CRITICAL()</code> 宏，是可以递归使用的（<mark>可重入的</mark>），它的内部会记录嵌套的深度，只有嵌套深度变为0时，调用 <code>taskEXIT_CRITICAL()</code> 才会重新使能中断。</p>
+<p>使用 <code>taskENTER_CRITICA()/taskEXIT_CRITICAL()</code> 来访问临界资源是很粗鲁的方法：</p>
+<ul>
+<li>中断无法正常运行</li>
+<li>任务调度无法进行</li>
+<li>所以，之间的代码要尽可能快速地执行</li>
+</ul>
+<h3 id="zai-isr-zhong-ping-bi-zhong-duan">在ISR中屏蔽中断</h3>
+<p>要使用含有"FROM_ISR"后缀的宏，示例代码如下：</p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241224185531718.png" alt="image-20241224185531718"></p>
+<h2 id="zan-ting-diao-du-qi">暂停调度器</h2>
+<p>如果有别的任务来跟你竞争临界资源，你可以把中断关掉：这当然可以禁止别的任务运行，但是这代价太大了。它会影响到中断的处理。</p>
+<p>如果只是禁止别的任务来跟你竞争，不需要关中断，暂停调度器就可以了：在这期间，中断还是可以发生、处理。</p>
+<p>使用这2个函数来暂停、恢复调度器：</p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241224185654144.png" alt="image-20241224185654144"></p>
+<p>示例代码如下：</p>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241224185712816.png" alt="image-20241224185712816"></p>
+<p>这套 <code>vTaskSuspendScheduler()/xTaskResumeScheduler()</code> 宏，是可以递归使用的，它的内部会记录嵌套的深度，只有嵌套深度变为0时，调用 <code>taskEXIT_CRITICAL()</code> 才会重新使能中断。</p>
+<h2 id="an-li-yuan-zi-hua-dht-11-cao-zuo-shi-xu">案例——原子化DHT11操作时序</h2>
+<img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241224190736242.png" alt="image-20241224190736242" style="zoom:50%;">
+<h1 id="diao-shi-yu-you-hua">调试与优化</h1>
+<p>本节视频源码为：<strong>28_freertos_example_stats</strong></p>
+<h2 id="diao-shi">调试</h2>
+<p>FreeRTOS提供了很多调试手段：</p>
+<ul>
+<li>打印</li>
+<li>断言：<strong>configASSERT</strong></li>
+<li>Trace</li>
+<li>Hook函数(回调函数)</li>
+</ul>
+<h3 id="da-yin">打印</h3>
+<p>printf：FreeRTOS工程里使用了microlib，里面实现了printf函数。</p>
+<p>我们只需实现一下函数即可使用printf：</p>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token keyword">int</span> <span class="token function">fputc</span><span class="token punctuation">(</span> <span class="token keyword">int</span> ch<span class="token punctuation">,</span> FILE <span class="token operator">*</span>f <span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<h3 id="duan-yan">断言</h3>
+<p>一般的C库里面，断言就是一个函数：</p>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token keyword">void</span> <span class="token function">assert</span><span class="token punctuation">(</span>scalar expression<span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<p>它的作用是：确认expression必须为真，如果expression为假的话就中止程序。</p>
+<p>在FreeRTOS里，使用 <strong>configASSERT()</strong>，比如：</p>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c">##define <span class="token function">configASSERT</span><span class="token punctuation">(</span>x<span class="token punctuation">)</span>  <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span>x<span class="token punctuation">)</span> <span class="token keyword">while</span><span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<p>我们可以让它提供更多信息，比如：</p>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c">##define <span class="token function">configASSERT</span><span class="token punctuation">(</span>x<span class="token punctuation">)</span>  \
+	<span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span>x<span class="token punctuation">)</span> \
+	<span class="token punctuation">{</span>
+		<span class="token function">printf</span><span class="token punctuation">(</span><span class="token string">"%s %s %d\r\n"</span><span class="token punctuation">,</span> <span class="token constant">__FILE__</span><span class="token punctuation">,</span> __FUNCTION__<span class="token punctuation">,</span> <span class="token constant">__LINE__</span><span class="token punctuation">)</span><span class="token punctuation">;</span> \
+        <span class="token keyword">while</span><span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">;</span> \
+ 	<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>configASSERT(x)中，如果x为假，表示发生了很严重的错误，必须停止系统的运行。</p>
+<p>它用在很多场合，比如：</p>
+<ul>
+<li>队列操作</li>
+</ul>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"> BaseType_t <span class="token function">xQueueGenericSend</span><span class="token punctuation">(</span> QueueHandle_t xQueue<span class="token punctuation">,</span>
+                              <span class="token keyword">const</span> <span class="token keyword">void</span> <span class="token operator">*</span> <span class="token keyword">const</span> pvItemToQueue<span class="token punctuation">,</span>
+                              TickType_t xTicksToWait<span class="token punctuation">,</span>
+                              <span class="token keyword">const</span> BaseType_t xCopyPosition <span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+    BaseType_t xEntryTimeSet <span class="token operator">=</span> pdFALSE<span class="token punctuation">,</span> xYieldRequired<span class="token punctuation">;</span>
+    TimeOut_t xTimeOut<span class="token punctuation">;</span>
+    Queue_t <span class="token operator">*</span> <span class="token keyword">const</span> pxQueue <span class="token operator">=</span> xQueue<span class="token punctuation">;</span>
+
+    <span class="token function">configASSERT</span><span class="token punctuation">(</span> pxQueue <span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">configASSERT</span><span class="token punctuation">(</span><span class="token operator">!</span><span class="token punctuation">(</span><span class="token punctuation">(</span>pvItemToQueue <span class="token operator">==</span> <span class="token constant">NULL</span><span class="token punctuation">)</span> <span class="token operator">&amp;&amp;</span> <span class="token punctuation">(</span>pxQueue<span class="token operator">-&gt;</span>uxItemSize <span class="token operator">!=</span> <span class="token punctuation">(</span>UBaseType_t<span class="token punctuation">)</span><span class="token number">0U</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">configASSERT</span><span class="token punctuation">(</span> <span class="token operator">!</span><span class="token punctuation">(</span><span class="token punctuation">(</span>xCopyPosition <span class="token operator">==</span> queueOVERWRITE<span class="token punctuation">)</span> <span class="token operator">&amp;&amp;</span> <span class="token punctuation">(</span>pxQueue<span class="token operator">-&gt;</span>uxLength <span class="token operator">!=</span> <span class="token number">1</span> <span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li>中断级别的判断</li>
+</ul>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"> <span class="token keyword">void</span> <span class="token function">vPortValidateInterruptPriority</span><span class="token punctuation">(</span> <span class="token keyword">void</span> <span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+	<span class="token class-name">uint32_t</span> ulCurrentInterrupt<span class="token punctuation">;</span>
+	<span class="token class-name">uint8_t</span> ucCurrentPriority<span class="token punctuation">;</span>
+
+	<span class="token comment">/* Obtain the number of the currently executing interrupt. */</span>
+	ulCurrentInterrupt <span class="token operator">=</span> <span class="token function">vPortGetIPSR</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+	<span class="token comment">/* Is the interrupt number a user defined interrupt? */</span>
+	<span class="token keyword">if</span><span class="token punctuation">(</span> ulCurrentInterrupt <span class="token operator">&gt;=</span> portFIRST_USER_INTERRUPT_NUMBER <span class="token punctuation">)</span>
+	<span class="token punctuation">{</span>
+		<span class="token comment">/* Look up the interrupt's priority. */</span>
+		ucCurrentPriority <span class="token operator">=</span> pcInterruptPriorityRegisters<span class="token punctuation">[</span> ulCurrentInterrupt <span class="token punctuation">]</span><span class="token punctuation">;</span>
+
+		<span class="token function">configASSERT</span><span class="token punctuation">(</span> ucCurrentPriority <span class="token operator">&gt;=</span> ucMaxSysCallPriority <span class="token punctuation">)</span><span class="token punctuation">;</span>
+	<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<h3 id="trace">Trace</h3>
+<p>FreeRTOS中定义了很多trace开头的宏，这些宏被放在系统个关键位置。</p>
+<p>它们一般都是空的宏，这不会影响代码：不影响编程处理的程序大小、不影响运行时间。</p>
+<p>我们要调试某些功能时，可以修改宏：修改某些标记变量、打印信息等待。</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:center"><strong>trace宏</strong></th>
+<th><strong>描述</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">traceTASK_INCREMENT_TICK(xTickCount)</td>
+<td>当tick计数自增之前此宏函数被调用。参数xTickCount当前的Tick值，它还没有增加。</td>
+</tr>
+<tr>
+<td style="text-align:center">traceTASK_SWITCHED_OUT()</td>
+<td>vTaskSwitchContext中，把当前任务切换出去之前调用此宏函数。</td>
+</tr>
+<tr>
+<td style="text-align:center">traceTASK_SWITCHED_IN()</td>
+<td>vTaskSwitchContext中，新的任务已经被切换进来了，就调用此函数。</td>
+</tr>
+<tr>
+<td style="text-align:center">traceBLOCKING_ON_QUEUE_RECEIVE(pxQueue)</td>
+<td>当正在执行的当前任务因为试图去读取一个空的队列、信号或者互斥量而进入阻塞状态时，此函数会被立即调用。参数pxQueue保存的是试图读取的目标队列、信号或者互斥量的句柄，传递给此宏函数。</td>
+</tr>
+<tr>
+<td style="text-align:center">traceBLOCKING_ON_QUEUE_SEND(pxQueue)</td>
+<td>当正在执行的当前任务因为试图往一个已经写满的队列或者信号或者互斥量而进入了阻塞状态时，此函数会被立即调用。参数pxQueue保存的是试图写入的目标队列、信号或者互斥量的句柄，传递给此宏函数。</td>
+</tr>
+<tr>
+<td style="text-align:center">traceQUEUE_SEND(pxQueue)</td>
+<td>当一个队列或者信号发送成功时，此宏函数会在内核函数xQueueSend(),xQueueSendToFront(),xQueueSendToBack(),以及所有的信号give函数中被调用，参数pxQueue是要发送的目标队列或信号的句柄，传递给此宏函数。</td>
+</tr>
+<tr>
+<td style="text-align:center">traceQUEUE_SEND_FAILED(pxQueue)</td>
+<td>当一个队列或者信号发送失败时，此宏函数会在内核函数xQueueSend(),xQueueSendToFront(),xQueueSendToBack(),以及所有的信号give函数中被调用，参数pxQueue是要发送的目标队列或信号的句柄，传递给此宏函数。</td>
+</tr>
+<tr>
+<td style="text-align:center">traceQUEUE_RECEIVE(pxQueue)</td>
+<td>当读取一个队列或者接收信号成功时，此宏函数会在内核函数xQueueReceive()以及所有的信号take函数中被调用，参数pxQueue是要接收的目标队列或信号的句柄，传递给此宏函数。</td>
+</tr>
+<tr>
+<td style="text-align:center">traceQUEUE_RECEIVE_FAILED(pxQueue)</td>
+<td>当读取一个队列或者接收信号失败时，此宏函数会在内核函数xQueueReceive()以及所有的信号take函数中被调用，参数pxQueue是要接收的目标队列或信号的句柄，传递给此宏函数。</td>
+</tr>
+<tr>
+<td style="text-align:center">traceQUEUE_SEND_FROM_ISR(pxQueue)</td>
+<td>当在中断中发送一个队列成功时，此函数会在xQueueSendFromISR()中被调用。参数pxQueue是要发送的目标队列的句柄。</td>
+</tr>
+<tr>
+<td style="text-align:center">traceQUEUE_SEND_FROM_ISR_FAILED(pxQueue)</td>
+<td>当在中断中发送一个队列失败时，此函数会在xQueueSendFromISR()中被调用。参数pxQueue是要发送的目标队列的句柄。</td>
+</tr>
+<tr>
+<td style="text-align:center">traceQUEUE_RECEIVE_FROM_ISR(pxQueue)</td>
+<td>当在中断中读取一个队列成功时，此函数会在xQueueReceiveFromISR()中被调用。参数pxQueue是要发送的目标队列的句柄。</td>
+</tr>
+<tr>
+<td style="text-align:center">traceQUEUE_RECEIVE_FROM_ISR_FAILED(pxQueue)</td>
+<td>当在中断中读取一个队列失败时，此函数会在xQueueReceiveFromISR()中被调用。参数pxQueue是要发送的目标队列的句柄。</td>
+</tr>
+<tr>
+<td style="text-align:center">traceTASK_DELAY_UNTIL()</td>
+<td>当一个任务因为调用了vTaskDelayUntil()进入了阻塞状态的前一刻此宏函数会在vTaskDelayUntil()中被立即调用。</td>
+</tr>
+<tr>
+<td style="text-align:center">traceTASK_DELAY()</td>
+<td>当一个任务因为调用了vTaskDelay()进入了阻塞状态的前一刻此宏函数会在vTaskDelay中被立即调用。</td>
+</tr>
+</tbody>
+</table>
+<h3 id="malloc-hook-han-shu">Malloc Hook函数</h3>
+<p>编程时，一般的逻辑错误都容易解决。难以处理的是内存越界、栈溢出等。</p>
+<p>内存越界经常发生在堆的使用过程总：堆，就是使用malloc得到的内存。</p>
+<p>并没有很好的方法检测内存越界，但是可以提供一些回调函数：</p>
+<ul>
+<li>使用pvPortMalloc失败时，如果在FreeRTOSConfig.h里配置 <strong>configUSE_MALLOC_FAILED_HOOK</strong> 为1，会调用：</li>
+</ul>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token keyword">void</span> <span class="token function">vApplicationMallocFailedHook</span><span class="token punctuation">(</span> <span class="token keyword">void</span> <span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<h3 id="zhan-yi-chu-hook-han-shu">栈溢出Hook函数</h3>
+<p>在切换任务(vTaskSwitchContext)时调用taskCHECK_FOR_STACK_OVERFLOW来检测栈是否溢出，如果溢出会调用：</p>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token keyword">void</span> <span class="token function">vApplicationStackOverflowHook</span><span class="token punctuation">(</span> TaskHandle_t xTask<span class="token punctuation">,</span> <span class="token keyword">char</span> <span class="token operator">*</span> pcTaskName <span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<p>怎么判断栈溢出？有两种方法：</p>
+<ul>
+<li>方法1：
+<ul>
+<li>当前任务被切换出去之前，它的整个运行现场都被保存在栈里，这时 <strong>很可能</strong> 就是它对栈的使用到达了峰值。</li>
+<li>这方法很高效，但是并不精确</li>
+<li>比如：任务在运行过程中调用了函数A大量地使用了栈，调用完函数A后才被调度。</li>
+</ul>
+</li>
+</ul>
+<p><img src="http://photos.100ask.net/rtos-docs/FreeRTOS/DShanMCU-F103/chapter-19/image1.png" alt="img"></p>
+<ul>
+<li>方法2：
+<ul>
+<li>创建任务时，它的栈被填入固定的值，比如：0xa5</li>
+<li>检测栈里最后16字节的数据，如果不是0xa5的话表示栈即将、或者已经被用完了</li>
+<li>没有方法1快速，但是也足够快</li>
+<li>能捕获 <strong>几乎所有</strong> 的栈溢出</li>
+<li>为什么是几乎所有？可能有些函数使用栈时，非常凑巧地把栈设置为0xa5：几乎不可能</li>
+</ul>
+</li>
+</ul>
+<p><img src="http://photos.100ask.net/rtos-docs/FreeRTOS/DShanMCU-F103/chapter-19/image2.png" alt="img"></p>
+<h2 id="you-hua">优化</h2>
+<p>在Windows中，当系统卡顿时我们可以查看任务管理器找到最消耗CPU资源的程序。</p>
+<p>在FreeRTOS中，我们也可以查看任务使用CPU的情况、使用栈的情况，然后针对性地进行优化。</p>
+<p>这就是查看"任务的统计"信息。</p>
+<h3 id="zhan-shi-yong-qing-kuang">栈使用情况</h3>
+<p>在创建任务时分配了栈，可以填入固定的数值比如0xa5，以后可以使用以下函数查看"栈的高水位"，也就是还有多少空余的栈空间：</p>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c">UBaseType_t <span class="token function">uxTaskGetStackHighWaterMark</span><span class="token punctuation">(</span> TaskHandle_t xTask <span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<p>原理是：从栈底往栈顶逐个字节地判断，它们的值持续是0xa5就表示它是空闲的。</p>
+<p>函数说明：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:center"><strong>参数/返回值</strong></th>
+<th style="text-align:center"><strong>说明</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">xTask</td>
+<td style="text-align:center">哪个任务</td>
+</tr>
+<tr>
+<td style="text-align:center">返回值</td>
+<td style="text-align:center">任务运行时、任务被切换时，都会用到栈。栈里原来值(0xa5)就会被覆盖。 逐个函数从栈的尾部判断栈的值连续为0xa5的个数， 它就是任务运行过程中空闲内存容量的最小值。 注意：假设从栈尾开始连续为0xa5的栈空间是N字节，返回值是N/4。</td>
+</tr>
+</tbody>
+</table>
+<h3 id="ren-wu-yun-xing-shi-jian-tong-ji">任务运行时间统计</h3>
+<p>对于同优先级的任务，它们按照时间片轮流运行：你执行一个Tick，我执行一个Tick。</p>
+<p>是否可以在Tick中断函数中，统计当前任务的累计运行时间？</p>
+<p>不行！很不精确，因为有更高优先级的任务就绪时，当前任务还没运行一个完整的Tick就被抢占了。</p>
+<p>我们需要比Tick更快的时钟，比如Tick周期时1ms，我们可以使用另一个定时器，让它发生中断的周期时0.1ms甚至更短。</p>
+<p>使用这个定时器来衡量一个任务的运行时间，原理如下图所示：</p>
+<p><img src="http://photos.100ask.net/rtos-docs/FreeRTOS/DShanMCU-F103/chapter-19/image3.png" alt="img"></p>
+<ul>
+<li>切换到Task1时，使用更快的定时器记录当前时间T1</li>
+<li>Task1被切换出去时，使用更快的定时器记录当前时间T4</li>
+<li>(T4-T1)就是它运行的时间，累加起来</li>
+<li>关键点：在 <strong>vTaskSwitchContext</strong> 函数中，使用 <strong>更快的定时器</strong> 统计运行时间</li>
+</ul>
+<h3 id="she-ji-de-dai-ma">涉及的代码</h3>
+<ul>
+<li>配置</li>
+</ul>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name">configGENERATE_RUN_TIME_STATS</span> <span class="token expression"><span class="token number">1</span></span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name">configUSE_TRACE_FACILITY</span>    <span class="token expression"><span class="token number">1</span></span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name">configUSE_STATS_FORMATTING_FUNCTIONS</span>  <span class="token expression"><span class="token number">1</span></span></span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li>实现宏 <strong>portCONFIGURE_TIMER_FOR_RUN_TIME_STATS()</strong>，它用来初始化更快的定时器</li>
+<li>实现这两个宏之一，它们用来返回当前时钟值(更快的定时器)
+<ul>
+<li>portGET_RUN_TIME_COUNTER_VALUE()：直接返回时钟值</li>
+<li>portALT_GET_RUN_TIME_COUNTER_VALUE(Time)：设置Time变量等于时钟值</li>
+</ul>
+</li>
+</ul>
+<p>代码执行流程：</p>
+<ul>
+<li>初始化更快的定时器：启动调度器时</li>
+</ul>
+<p><img src="http://photos.100ask.net/rtos-docs/FreeRTOS/DShanMCU-F103/chapter-19/image4.png" alt="img"></p>
+<p>在任务切换时统计运行时间</p>
+<p><img src="http://photos.100ask.net/rtos-docs/FreeRTOS/DShanMCU-F103/chapter-19/image5.png" alt="img"></p>
+<ul>
+<li>获得统计信息，可以使用下列函数
+<ul>
+<li>uxTaskGetSystemState：对于每个任务它的统计信息都放在一个TaskStatus_t结构体里</li>
+<li>vTaskList：得到的信息是可读的字符串，比如</li>
+<li>vTaskGetRunTimeStats： 得到的信息是可读的字符串</li>
+</ul>
+</li>
+</ul>
+<h3 id="han-shu-shuo-ming">函数说明</h3>
+<ul>
+<li>uxTaskGetSystemState：获得任务的统计信息</li>
+</ul>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c">UBaseType_t <span class="token function">uxTaskGetSystemState</span><span class="token punctuation">(</span> TaskStatus_t <span class="token operator">*</span> <span class="token keyword">const</span> pxTaskStatusArray<span class="token punctuation">,</span>
+                                        <span class="token keyword">const</span> UBaseType_t uxArraySize<span class="token punctuation">,</span>
+                                        <span class="token class-name">uint32_t</span> <span class="token operator">*</span> <span class="token keyword">const</span> pulTotalRunTime <span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+<table>
+<thead>
+<tr>
+<th style="text-align:center"><strong>参数</strong></th>
+<th style="text-align:center"><strong>描述</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">pxTaskStatusArray</td>
+<td style="text-align:center">指向一个TaskStatus_t结构体数组，用来保存任务的统计信息。 有多少个任务？可以用 <strong>uxTaskGetNumberOfTasks()</strong> 来获得。</td>
+</tr>
+<tr>
+<td style="text-align:center">uxArraySize</td>
+<td style="text-align:center">数组大小、数组项个数，必须大于或等于 <strong>uxTaskGetNumberOfTasks()</strong></td>
+</tr>
+<tr>
+<td style="text-align:center">pulTotalRunTime</td>
+<td style="text-align:center">用来保存当前总的运行时间(更快的定时器)，可以传入NULL</td>
+</tr>
+<tr>
+<td style="text-align:center">返回值</td>
+<td style="text-align:center">传入的pxTaskStatusArray数组，被设置了几个数组项。 注意：如果传入的uxArraySize小于 <strong>uxTaskGetNumberOfTasks()</strong> ，返回值就是0</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>vTaskList ：获得任务的统计信息，形式为可读的字符串。注意，pcWriteBuffer必须足够大。</li>
+</ul>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token keyword">void</span> <span class="token function">vTaskList</span><span class="token punctuation">(</span> <span class="token keyword">signed</span> <span class="token keyword">char</span> <span class="token operator">*</span>pcWriteBuffer <span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<p>可读信息格式如下：</p>
+<p><img src="http://photos.100ask.net/rtos-docs/FreeRTOS/DShanMCU-F103/chapter-19/image6.png" alt="img"></p>
+<ul>
+<li>vTaskGetRunTimeStats：获得任务的运行信息，形式为可读的字符串。注意，pcWriteBuffer必须足够大。</li>
+</ul>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token keyword">void</span> <span class="token function">vTaskGetRunTimeStats</span><span class="token punctuation">(</span> <span class="token keyword">signed</span> <span class="token keyword">char</span> <span class="token operator">*</span>pcWriteBuffer <span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<p>可读信息格式如下：</p>
+<p><img src="http://photos.100ask.net/rtos-docs/FreeRTOS/DShanMCU-F103/chapter-19/image7.png" alt="img"></p>
+<h1 id="the-end">THE END</h1>
+
+                
+            </div>
+            <hr/>
+
+            
+
+    <div class="reprint" id="reprint-statement">
+        
+            <div class="reprint__author">
+                <span class="reprint-meta" style="font-weight: bold;">
+                    <i class="fas fa-user">
+                        文章作者:
+                    </i>
+                </span>
+                <span class="reprint-info">
+                    <a href="/about" rel="external nofollow noreferrer">安文</a>
+                </span>
+            </div>
+            <div class="reprint__type">
+                <span class="reprint-meta" style="font-weight: bold;">
+                    <i class="fas fa-link">
+                        文章链接:
+                    </i>
+                </span>
+                <span class="reprint-info">
+                    <a href="https://zanwen.github.io/2024/12/24/21034.html">https://zanwen.github.io/2024/12/24/21034.html</a>
+                </span>
+            </div>
+            <div class="reprint__notice">
+                <span class="reprint-meta" style="font-weight: bold;">
+                    <i class="fas fa-copyright">
+                        版权声明:
+                    </i>
+                </span>
+                <span class="reprint-info">
+                    本博客所有文章除特別声明外，均采用
+                    <a href="https://creativecommons.org/licenses/by/4.0/deed.zh" rel="external nofollow noreferrer" target="_blank">CC BY 4.0</a>
+                    许可协议。转载请注明来源
+                    <a href="/about" target="_blank">安文</a>
+                    !
+                </span>
+            </div>
+        
+    </div>
+
+    <script async defer>
+      document.addEventListener("copy", function (e) {
+        let toastHTML = '<span>复制成功，请遵循本文的转载规则</span><button class="btn-flat toast-action" onclick="navToReprintStatement()" style="font-size: smaller">查看</a>';
+        M.toast({html: toastHTML})
+      });
+
+      function navToReprintStatement() {
+        $("html, body").animate({scrollTop: $("#reprint-statement").offset().top - 80}, 800);
+      }
+    </script>
+
+
+
+            <div class="tag_share" style="display: block;">
+                <div class="post-meta__tag-list" style="display: inline-block;">
+                    
+                        <div class="article-tag">
+                            
+                                <a href="/tags/FreeRTOS/">
+                                    <span class="chip bg-color">FreeRTOS</span>
+                                </a>
+                            
+                                <a href="/tags/RTOS/">
+                                    <span class="chip bg-color">RTOS</span>
+                                </a>
+                            
+                        </div>
+                    
+                </div>
+                <div class="post_share" style="zoom: 80%; width: fit-content; display: inline-block; float: right; margin: -0.15rem 0;">
+                    <link rel="stylesheet" type="text/css" href="/libs/share/css/share.min.css">
+<div id="article-share">
+
+    
+    <div class="social-share" data-sites="twitter,facebook,google,qq,qzone,wechat,weibo,douban,linkedin" data-wechat-qrcode-helper="<p>微信扫一扫即可分享！</p>"></div>
+    <script src="/libs/share/js/social-share.min.js"></script>
+    
+
+    
+
+</div>
+
+                </div>
+            </div>
+            
+                <div id="reward">
+    <a href="#rewardModal" class="reward-link modal-trigger btn-floating btn-medium waves-effect waves-light red">赏</a>
+
+    <!-- Modal Structure -->
+    <div id="rewardModal" class="modal">
+        <div class="modal-content">
+            <a class="close modal-close"><i class="fas fa-times"></i></a>
+            <h4 class="reward-title">你的赏识是我前进的动力</h4>
+            <div class="reward-content">
+                <div class="reward-tabs">
+                    <ul class="tabs row">
+                        <li class="tab col s6 alipay-tab waves-effect waves-light"><a href="#alipay">支付宝</a></li>
+                        <li class="tab col s6 wechat-tab waves-effect waves-light"><a href="#wechat">微 信</a></li>
+                    </ul>
+                    <div id="alipay">
+                        <img src="/medias/reward/alipay.jpg" class="reward-img" alt="支付宝打赏二维码">
+                    </div>
+                    <div id="wechat">
+                        <img src="/medias/reward/wechat.jpg" class="reward-img" alt="微信打赏二维码">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(function () {
+        $('.tabs').tabs();
+    });
+</script>
+
+            
+        </div>
+    </div>
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+<article id="prenext-posts" class="prev-next articles">
+    <div class="row article-row">
+        
+        <div class="article col s12 m6" data-aos="fade-up" data-aos="fade-up">
+            <div class="article-badge left-badge text-color">
+                <i class="far fa-dot-circle"></i>&nbsp;本篇
+            </div>
+            <div class="card">
+                <a href="/2024/12/24/21034.html">
+                    <div class="card-image">
+                        
+                        <img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/pexels-pixabay-206359.jpg" class="responsive-img" alt="深入理解FreeRTOS：内核特性和底层原理">
+                        
+                        <span class="card-title">深入理解FreeRTOS：内核特性和底层原理</span>
+                    </div>
+                </a>
+                <div class="card-content article-content">
+                    <div class="summary block-with-text">
+                        
+                            
+                        
+                    </div>
+                    <div class="publish-info">
+                            <span class="publish-date">
+                                <i class="far fa-clock fa-fw icon-date"></i>2024-12-24
+                            </span>
+                        <span class="publish-author">
+                            
+                            <i class="fas fa-bookmark fa-fw icon-category"></i>
+                            
+                            <a href="/categories/RTOS/" class="post-category">
+                                    RTOS
+                                </a>
+                            
+                            
+                        </span>
+                    </div>
+                </div>
+
+                
+                <div class="card-action article-tags">
+                    
+                    <a href="/tags/FreeRTOS/">
+                        <span class="chip bg-color">FreeRTOS</span>
+                    </a>
+                    
+                    <a href="/tags/RTOS/">
+                        <span class="chip bg-color">RTOS</span>
+                    </a>
+                    
+                </div>
+                
+            </div>
+        </div>
+        
+        
+        <div class="article col s12 m6" data-aos="fade-up">
+            <div class="article-badge right-badge text-color">
+                下一篇&nbsp;<i class="fas fa-chevron-right"></i>
+            </div>
+            <div class="card">
+                <a href="/2024/12/18/36496.html">
+                    <div class="card-image">
+                        
+                        <img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/pexels-valdemaras-d-784301-1647962.jpg" class="responsive-img" alt="RTC和BKP：为STM32添加持久化时钟与关键数据存储">
+                        
+                        <span class="card-title">RTC和BKP：为STM32添加持久化时钟与关键数据存储</span>
+                    </div>
+                </a>
+                <div class="card-content article-content">
+                    <div class="summary block-with-text">
+                        
+                            
+                        
+                    </div>
+                    <div class="publish-info">
+                            <span class="publish-date">
+                                <i class="far fa-clock fa-fw icon-date"></i>2024-12-18
+                            </span>
+                        <span class="publish-author">
+                            
+                            <i class="fas fa-bookmark fa-fw icon-category"></i>
+                            
+                            <a href="/categories/STM32/" class="post-category">
+                                    STM32
+                                </a>
+                            
+                            
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="card-action article-tags">
+                    
+                    <a href="/tags/STM32/">
+                        <span class="chip bg-color">STM32</span>
+                    </a>
+                    
+                    <a href="/tags/RTC/">
+                        <span class="chip bg-color">RTC</span>
+                    </a>
+                    
+                    <a href="/tags/%E5%A4%87%E4%BB%BD%E5%9F%9F/">
+                        <span class="chip bg-color">备份域</span>
+                    </a>
+                    
+                </div>
+                
+            </div>
+        </div>
+        
+    </div>
+</article>
+
+</div>
+
+
+
+<!-- 代码块功能依赖 -->
+<script type="text/javascript" src="/libs/codeBlock/codeBlockFuction.js"></script>
+
+
+  <!-- 是否加载使用自带的 prismjs. -->
+  <script type="text/javascript" src="/libs/prism/prism.min.js"></script>
+
+
+<!-- 代码语言 -->
+
+<script type="text/javascript" src="/libs/codeBlock/codeLang.js"></script>
+
+
+<!-- 代码块复制 -->
+
+<script type="text/javascript" src="/libs/codeBlock/codeCopy.js"></script>
+
+
+<!-- 代码块收缩 -->
+
+<script type="text/javascript" src="/libs/codeBlock/codeShrink.js"></script>
+
+
+
+    </div>
+    <div id="toc-aside" class="expanded col l3 hide-on-med-and-down">
+        <div class="toc-widget card" style="background-color: white;">
+            <div class="toc-title"><i class="far fa-list-alt"></i>&nbsp;&nbsp;目录</div>
+            <div id="toc-content"></div>
+        </div>
+    </div>
+</div>
+
+<!-- TOC 悬浮按钮. -->
+
+<div id="floating-toc-btn" class="hide-on-med-and-down">
+    <a class="btn-floating btn-large bg-color">
+        <i class="fas fa-list-ul"></i>
+    </a>
+</div>
+
+
+<script src="/libs/tocbot/tocbot.min.js"></script>
+<script>
+    $(function () {
+        tocbot.init({
+            tocSelector: '#toc-content',
+            contentSelector: '#articleContent',
+            headingsOffset: -($(window).height() * 0.4 - 45),
+            collapseDepth: Number('0'),
+            headingSelector: 'h1, h2, h3'
+        });
+
+        // Set scroll toc fixed.
+        let tocHeight = parseInt($(window).height() * 0.4 - 64);
+        let $tocWidget = $('.toc-widget');
+        $(window).scroll(function () {
+            let scroll = $(window).scrollTop();
+            /* add post toc fixed. */
+            if (scroll > tocHeight) {
+                $tocWidget.addClass('toc-fixed');
+            } else {
+                $tocWidget.removeClass('toc-fixed');
+            }
+        });
+
+        
+        /* 修复文章卡片 div 的宽度. */
+        let fixPostCardWidth = function (srcId, targetId) {
+            let srcDiv = $('#' + srcId);
+            if (srcDiv.length === 0) {
+                return;
+            }
+
+            let w = srcDiv.width();
+            if (w >= 450) {
+                w = w + 21;
+            } else if (w >= 350 && w < 450) {
+                w = w + 18;
+            } else if (w >= 300 && w < 350) {
+                w = w + 16;
+            } else {
+                w = w + 14;
+            }
+            $('#' + targetId).width(w);
+        };
+
+        // 切换TOC目录展开收缩的相关操作.
+        const expandedClass = 'expanded';
+        let $tocAside = $('#toc-aside');
+        let $mainContent = $('#main-content');
+        $('#floating-toc-btn .btn-floating').click(function () {
+            if ($tocAside.hasClass(expandedClass)) {
+                $tocAside.removeClass(expandedClass).hide();
+                $mainContent.removeClass('l9');
+            } else {
+                $tocAside.addClass(expandedClass).show();
+                $mainContent.addClass('l9');
+            }
+            fixPostCardWidth('artDetail', 'prenext-posts');
+        });
+        
+    });
+</script>
+
+    
+
+</main>
+
+
+
+
+    <footer class="page-footer bg-color">
+    
+
+    <div class="container row center-align"
+         style="margin-bottom: 0px !important;">
+        <div class="col s12 m8 l8 copy-right">
+            Copyright&nbsp;&copy;
+            
+                <span id="year">2019-2024</span>
+            
+            <a href="/about" target="_blank">安文</a>
+            |&nbsp;Powered by&nbsp;<a href="https://hexo.io/" target="_blank">Hexo</a>
+            |&nbsp;Theme&nbsp;<a href="https://github.com/blinkfox/hexo-theme-matery" target="_blank">Matery</a>
+            
+            <br>
+            
+                &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
+                        class="white-color">108.8k</span>
+            
+            
+            
+                
+            
+            
+                <span id="busuanzi_container_site_pv">
+                &nbsp;|&nbsp;<i class="far fa-eye"></i>&nbsp;总访问量:&nbsp;
+                    <span id="busuanzi_value_site_pv" class="white-color"></span>
+            </span>
+            
+            
+                <span id="busuanzi_container_site_uv">
+                &nbsp;|&nbsp;<i class="fas fa-users"></i>&nbsp;总访问人数:&nbsp;
+                    <span id="busuanzi_value_site_uv" class="white-color"></span>
+            </span>
+            
+            <br>
+
+            <!-- 运行天数提醒. -->
+            
+            <br>
+            
+        </div>
+        <div class="col s12 m4 l4 social-link social-statis">
+    <a href="https://github.com/zanwen" class="tooltipped" target="_blank" data-tooltip="访问我的GitHub" data-position="top" data-delay="50">
+        <i class="fab fa-github"></i>
+    </a>
+
+
+
+    <a href="mailto:872852458@qq.com" class="tooltipped" target="_blank" data-tooltip="邮件联系我" data-position="top" data-delay="50">
+        <i class="fas fa-envelope-open"></i>
+    </a>
+
+
+
+
+
+
+
+    <a href="tencent://AddContact/?fromId=50&fromSubId=1&subcmd=all&uin=872852458" class="tooltipped" target="_blank" data-tooltip="QQ联系我: 872852458" data-position="top" data-delay="50">
+        <i class="fab fa-qq"></i>
+    </a>
+
+
+
+
+
+
+
+    <a href="/atom.xml" class="tooltipped" target="_blank" data-tooltip="RSS 订阅" data-position="top" data-delay="50">
+        <i class="fas fa-rss"></i>
+    </a>
+
+</div>
+    </div>
+</footer>
+
+<div class="progress-bar"></div>
+
+
+    <!-- 搜索遮罩框 -->
+<div id="searchModal" class="modal">
+    <div class="modal-content">
+        <div class="search-header">
+            <span class="title"><i class="fas fa-search"></i>&nbsp;&nbsp;搜索</span>
+            <input type="search" id="searchInput" name="s" placeholder="请输入搜索的关键字"
+                   class="search-input">
+        </div>
+        <div id="searchResult"></div>
+    </div>
+</div>
+
+<script type="text/javascript">
+$(function () {
+    var searchFunc = function (path, search_id, content_id) {
+        'use strict';
+        $.ajax({
+            url: path,
+            dataType: "xml",
+            success: function (xmlResponse) {
+                // get the contents from search data
+                var datas = $("entry", xmlResponse).map(function () {
+                    return {
+                        title: $("title", this).text(),
+                        content: $("content", this).text(),
+                        url: $("url", this).text()
+                    };
+                }).get();
+                var $input = document.getElementById(search_id);
+                var $resultContent = document.getElementById(content_id);
+                $input.addEventListener('input', function () {
+                    var str = '<ul class=\"search-result-list\">';
+                    var keywords = this.value.trim().toLowerCase().split(/[\s\-]+/);
+                    $resultContent.innerHTML = "";
+                    if (this.value.trim().length <= 0) {
+                        return;
+                    }
+                    // perform local searching
+                    datas.forEach(function (data) {
+                        var isMatch = true;
+                        var data_title = data.title.trim().toLowerCase();
+                        var data_content = data.content.trim().replace(/<[^>]+>/g, "").toLowerCase();
+                        var data_url = data.url;
+                        data_url = data_url.indexOf('/') === 0 ? data.url : '/' + data_url;
+                        var index_title = -1;
+                        var index_content = -1;
+                        var first_occur = -1;
+                        // only match artiles with not empty titles and contents
+                        if (data_title !== '' && data_content !== '') {
+                            keywords.forEach(function (keyword, i) {
+                                index_title = data_title.indexOf(keyword);
+                                index_content = data_content.indexOf(keyword);
+                                if (index_title < 0 && index_content < 0) {
+                                    isMatch = false;
+                                } else {
+                                    if (index_content < 0) {
+                                        index_content = 0;
+                                    }
+                                    if (i === 0) {
+                                        first_occur = index_content;
+                                    }
+                                }
+                            });
+                        }
+                        // show search results
+                        if (isMatch) {
+                            str += "<li><a href='" + data_url + "' class='search-result-title'>" + data_title + "</a>";
+                            var content = data.content.trim().replace(/<[^>]+>/g, "");
+                            if (first_occur >= 0) {
+                                // cut out 100 characters
+                                var start = first_occur - 20;
+                                var end = first_occur + 80;
+                                if (start < 0) {
+                                    start = 0;
+                                }
+                                if (start === 0) {
+                                    end = 100;
+                                }
+                                if (end > content.length) {
+                                    end = content.length;
+                                }
+                                var match_content = content.substr(start, end);
+                                // highlight all keywords
+                                keywords.forEach(function (keyword) {
+                                    var regS = new RegExp(keyword, "gi");
+                                    match_content = match_content.replace(regS, "<em class=\"search-keyword\">" + keyword + "</em>");
+                                });
+
+                                str += "<p class=\"search-result\">" + match_content + "...</p>"
+                            }
+                            str += "</li>";
+                        }
+                    });
+                    str += "</ul>";
+                    $resultContent.innerHTML = str;
+                });
+            }
+        });
+    };
+
+    searchFunc('/search.xml', 'searchInput', 'searchResult');
+});
+</script>
+
+    <!-- 白天和黑夜主题 -->
+<div class="stars-con">
+    <div id="stars"></div>
+    <div id="stars2"></div>
+    <div id="stars3"></div>  
+</div>
+
+<script>
+    function switchNightMode() {
+        $('<div class="Cuteen_DarkSky"><div class="Cuteen_DarkPlanet"></div></div>').appendTo($('body')),
+        setTimeout(function () {
+            $('body').hasClass('DarkMode') 
+            ? ($('body').removeClass('DarkMode'), localStorage.setItem('isDark', '0'), $('#sum-moon-icon').removeClass("fa-sun").addClass('fa-moon')) 
+            : ($('body').addClass('DarkMode'), localStorage.setItem('isDark', '1'), $('#sum-moon-icon').addClass("fa-sun").removeClass('fa-moon')),
+            
+            setTimeout(function () {
+            $('.Cuteen_DarkSky').fadeOut(1e3, function () {
+                $(this).remove()
+            })
+            }, 2e3)
+        })
+    }
+</script>
+
+    <!-- 回到顶部按钮 -->
+<div id="backTop" class="top-scroll">
+    <a class="btn-floating btn-large waves-effect waves-light" href="#!">
+        <i class="fas fa-arrow-up"></i>
+    </a>
+</div>
+
+
+    <script src="/libs/materialize/materialize.min.js"></script>
+    <script src="/libs/masonry/masonry.pkgd.min.js"></script>
+    <script src="/libs/aos/aos.js"></script>
+    <script src="/libs/scrollprogress/scrollProgress.min.js"></script>
+    <script src="/libs/lightGallery/js/lightgallery-all.min.js"></script>
+    <script src="/js/matery.js"></script>
+
+    
+
+    
+    
+    
+
+    <!-- 雪花特效 -->
+    
+
+    <!-- 鼠标星星特效 -->
+    
+
+     
+        <script src="https://ssl.captcha.qq.com/TCaptcha.js"></script>
+        <script src="/libs/others/TencentCaptcha.js"></script>
+        <button id="TencentCaptcha" data-appid="xxxxxxxxxx" data-cbfn="callback" type="button" hidden></button>
+    
+
+    <!-- Baidu Analytics -->
+
+    <!-- Baidu Push -->
+
+<script>
+    (function () {
+        var bp = document.createElement('script');
+        var curProtocol = window.location.protocol.split(':')[0];
+        if (curProtocol === 'https') {
+            bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+        } else {
+            bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+        }
+        var s = document.getElementsByTagName("script")[0];
+        s.parentNode.insertBefore(bp, s);
+    })();
+</script>
+
+    
+    <script src="/libs/others/clicklove.js" async="async"></script>
+    
+    
+    <script async src="/libs/others/busuanzi.pure.mini.js"></script>
+    
+
+    
+
+    
+
+    <!--腾讯兔小巢-->
+    
+    
+
+    
+
+    
+
+    
+    <script src="/libs/instantpage/instantpage.js" type="module"></script>
+    
+
+</body>
+
+</html>

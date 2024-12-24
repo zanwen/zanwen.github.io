@@ -417,21 +417,21 @@
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-check fa-fw"></i>更新日期:&nbsp;&nbsp;
-                    2024-12-21
+                    2024-12-22
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
-                    3.4k
+                    4.6k
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-clock fa-fw"></i>阅读时长:&nbsp;&nbsp;
-                    18 分
+                    24 分
                 </div>
                 
 
@@ -1123,7 +1123,7 @@ bool <span class="token function">isSymmetric</span><span class="token punctuati
     <span class="token keyword">return</span> <span class="token function">check</span><span class="token punctuation">(</span>root<span class="token operator">-&gt;</span>left<span class="token punctuation">,</span> root<span class="token operator">-&gt;</span>right<span class="token punctuation">)</span><span class="token punctuation">;</span>
 <span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <h3 id="a-href-https-leetcode-cn-problems-validate-binary-search-tree-98-yan-zheng-er-cha-sou-suo-shu-a">※<a target="_blank" rel="noopener" href="https://leetcode.cn/problems/validate-binary-search-tree/">98. 验证二叉搜索树</a></h3>
-<h4 id="fang-fa-yi">方法一</h4>
+<h4 id="fang-fa-yi-dfs-guo-cheng-zhong-shou-ji-zi-shu-de-zui-zhi">方法一：DFS过程中收集子树的最值</h4>
 <p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241221213916549.png" alt="image-20241221213916549"></p>
 <pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token comment">/**
  * Definition for a binary tree node.
@@ -1172,7 +1172,7 @@ bool <span class="token function">isValidBST</span><span class="token punctuatio
     <span class="token function">dfs</span><span class="token punctuation">(</span>root<span class="token punctuation">)</span><span class="token punctuation">;</span>
     <span class="token keyword">return</span> result<span class="token punctuation">;</span>
 <span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<h4 id="fang-fa-er">方法二</h4>
+<h4 id="fang-fa-er-dfs-guo-cheng-zhong-pan-duan-zi-shu-jie-dian-zhi-shi-fou-man-zu-kai-qu-jian">方法二：DFS过程中判断子树节点值是否满足开区间</h4>
 <p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241221210731008.png" alt="image-20241221210731008"></p>
 <pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token comment">/**
  * Definition for a binary tree node.
@@ -1195,8 +1195,8 @@ bool <span class="token function">isValidBST</span><span class="token punctuatio
     <span class="token comment">// 因此在遍历树的过程中要顺带验证左子树节点是否都小于根节点、右子树节点是否都大于根节点</span>
     <span class="token keyword">return</span> <span class="token function">check</span><span class="token punctuation">(</span>root<span class="token operator">-&gt;</span>left<span class="token punctuation">,</span> LONG_MIN<span class="token punctuation">,</span> root<span class="token operator">-&gt;</span>val<span class="token punctuation">)</span> <span class="token operator">&amp;&amp;</span> <span class="token function">check</span><span class="token punctuation">(</span>root<span class="token operator">-&gt;</span>right<span class="token punctuation">,</span> root<span class="token operator">-&gt;</span>val<span class="token punctuation">,</span> LONG_MAX<span class="token punctuation">)</span><span class="token punctuation">;</span>
 <span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<h4 id="fang-fa-san-yan-zheng-qian-xu-bian-li-jie-guo">方法三：验证前序遍历结果</h4>
-<p>前序遍历结果为有序序列 &lt;=&gt; 二叉树为有效BST</p>
+<h4 id="fang-fa-san-yan-zheng-zhong-xu-bian-li-jie-guo-shi-fou-sheng-xu">方法三：验证中序遍历结果是否升序</h4>
+<p>中序遍历为有序序列 &lt;=&gt; 二叉树为有效BST</p>
 <h2 id="er-cha-cha-zhao-shu">二叉查找树</h2>
 <p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241221182459445.png" alt="image-20241221182459445"></p>
 <h3 id="a-href-https-leetcode-cn-problems-kth-smallest-element-in-a-bst-230-er-cha-sou-suo-shu-zhong-di-k-xiao-de-yuan-su-a"><a target="_blank" rel="noopener" href="https://leetcode.cn/problems/kth-smallest-element-in-a-bst/">230. 二叉搜索树中第 K 小的元素</a></h3>
@@ -1308,6 +1308,190 @@ bool <span class="token function">isValidBST</span><span class="token punctuatio
     <span class="token keyword">return</span> target<span class="token punctuation">;</span>
 <span class="token punctuation">}</span>
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<h2 id="lca-zui-jin-gong-gong-zu-xian">LCA最近公共祖先</h2>
+<h3 id="a-href-https-leetcode-cn-com-problems-lowest-common-ancestor-of-a-binary-tree-236-er-cha-shu-de-zui-jin-gong-gong-zu-xian-a"><a target="_blank" rel="noopener" href="https://leetcode-cn.com/problems/lowest-common-ancestor-of-a-binary-tree/">236. 二叉树的最近公共祖先</a></h3>
+<blockquote>
+<p>节点p和q最近公共祖先x节点的特征：</p>
+<ol>
+<li>p和q不是互为祖孙关系时：p、q分别分布在x的不同子树上</li>
+<li>p和q互为祖孙关系时：x为p和q中的祖先节点</li>
+</ol>
+</blockquote>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241222213439554.png" alt="image-20241222213439554"></p>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token comment">/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     struct TreeNode *left;
+ *     struct TreeNode *right;
+ * };
+ */</span>
+<span class="token keyword">struct</span> <span class="token class-name">TreeNode</span><span class="token operator">*</span> target<span class="token punctuation">;</span>
+<span class="token comment">// dfs过程中记录树中包含p/q的数量, 返回值：树中包含p/q的数量</span>
+<span class="token keyword">static</span> <span class="token keyword">int</span> <span class="token function">dfs</span><span class="token punctuation">(</span><span class="token keyword">struct</span> <span class="token class-name">TreeNode</span><span class="token operator">*</span> root<span class="token punctuation">,</span> <span class="token keyword">struct</span> <span class="token class-name">TreeNode</span><span class="token operator">*</span> p<span class="token punctuation">,</span> <span class="token keyword">struct</span> <span class="token class-name">TreeNode</span><span class="token operator">*</span> q<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">if</span><span class="token punctuation">(</span>root <span class="token operator">==</span> <span class="token constant">NULL</span><span class="token punctuation">)</span> <span class="token keyword">return</span> <span class="token number">0</span><span class="token punctuation">;</span>
+    <span class="token keyword">int</span> left <span class="token operator">=</span> <span class="token function">dfs</span><span class="token punctuation">(</span>root<span class="token operator">-&gt;</span>left<span class="token punctuation">,</span> p<span class="token punctuation">,</span> q<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">if</span><span class="token punctuation">(</span>target <span class="token operator">!=</span> <span class="token constant">NULL</span><span class="token punctuation">)</span> <span class="token keyword">return</span> <span class="token number">0</span><span class="token punctuation">;</span> <span class="token comment">//剪枝</span>
+    <span class="token keyword">int</span> right <span class="token operator">=</span> <span class="token function">dfs</span><span class="token punctuation">(</span>root<span class="token operator">-&gt;</span>right<span class="token punctuation">,</span> p<span class="token punctuation">,</span> q<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token comment">// 左右子树分别有一个p/q =&gt; 命中</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>left <span class="token operator">==</span> <span class="token number">1</span> <span class="token operator">&amp;&amp;</span> right <span class="token operator">==</span> <span class="token number">1</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        target <span class="token operator">=</span> root<span class="token punctuation">;</span>
+        <span class="token keyword">return</span> <span class="token number">2</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    <span class="token comment">// 根节点为p/q，只有一个子树有一个p/q =&gt; 命中</span>
+    bool rootHit <span class="token operator">=</span> <span class="token punctuation">(</span>root <span class="token operator">==</span> p <span class="token operator">||</span> root <span class="token operator">==</span> q<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">if</span><span class="token punctuation">(</span>rootHit <span class="token operator">&amp;&amp;</span> <span class="token punctuation">(</span>left <span class="token operator">==</span> <span class="token number">1</span> <span class="token operator">||</span> right <span class="token operator">==</span> <span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        target <span class="token operator">=</span> root<span class="token punctuation">;</span>
+        <span class="token keyword">return</span> <span class="token number">2</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    <span class="token comment">// 没有命中，计算当前树中包含的p/q数量</span>
+    <span class="token keyword">return</span> left <span class="token operator">+</span> right <span class="token operator">+</span> <span class="token punctuation">(</span>rootHit <span class="token operator">?</span> <span class="token number">1</span> <span class="token operator">:</span> <span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">struct</span> <span class="token class-name">TreeNode</span><span class="token operator">*</span> <span class="token function">lowestCommonAncestor</span><span class="token punctuation">(</span><span class="token keyword">struct</span> <span class="token class-name">TreeNode</span><span class="token operator">*</span> root<span class="token punctuation">,</span> <span class="token keyword">struct</span> <span class="token class-name">TreeNode</span><span class="token operator">*</span> p<span class="token punctuation">,</span> <span class="token keyword">struct</span> <span class="token class-name">TreeNode</span><span class="token operator">*</span> q<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+   <span class="token comment">// 问题转化：在递归过程中找最近祖先节点 =&gt; 在递归过程中记录树中包含p/q的数量</span>
+   <span class="token comment">//   1. 左右子树分别包含一个p/q，根节点为最近祖先节点</span>
+   <span class="token comment">//   2. 只有一个子树包含了一个p/q，根节点为p/q，根节点为最近祖先节点</span>
+   target <span class="token operator">=</span> <span class="token constant">NULL</span><span class="token punctuation">;</span>
+   <span class="token function">dfs</span><span class="token punctuation">(</span>root<span class="token punctuation">,</span> p<span class="token punctuation">,</span> q<span class="token punctuation">)</span><span class="token punctuation">;</span>
+   <span class="token keyword">return</span> target<span class="token punctuation">;</span>
+<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<h3 id="a-href-https-leetcode-cn-com-problems-er-cha-sou-suo-shu-de-zui-jin-gong-gong-zu-xian-lcof-jian-zhi-offer-68-i-er-cha-sou-suo-shu-de-zui-jin-gong-gong-zu-xian-a"><a target="_blank" rel="noopener" href="https://leetcode-cn.com/problems/er-cha-sou-suo-shu-de-zui-jin-gong-gong-zu-xian-lcof/">剑指 Offer 68 - I. 二叉搜索树的最近公共祖先</a></h3>
+<h2 id="er-cha-shu-zhuan-dan-shuang-xun-huan-lian-biao">二叉树转单、双、循环链表</h2>
+<h3 id="a-href-https-leetcode-cn-com-problems-flatten-binary-tree-to-linked-list-114-er-cha-shu-zhan-kai-wei-lian-biao-a"><a target="_blank" rel="noopener" href="https://leetcode-cn.com/problems/flatten-binary-tree-to-linked-list/">114. 二叉树展开为链表</a></h3>
+<blockquote>
+<ul>
+<li>构建链表技巧：dummyHead+append</li>
+<li>在遍历过程中，将节点从树中剥离出来插入链表中；由于剥离会改变节点的left/right指针，因此需要事先保存相关引用</li>
+</ul>
+</blockquote>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241222214956380.png" alt="image-20241222214956380"></p>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token comment">/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     struct TreeNode *left;
+ *     struct TreeNode *right;
+ * };
+ */</span>
+<span class="token keyword">struct</span> <span class="token class-name">TreeNode</span><span class="token operator">*</span> dummyHead<span class="token punctuation">;</span>
+<span class="token keyword">struct</span> <span class="token class-name">TreeNode</span><span class="token operator">*</span> tail<span class="token punctuation">;</span> <span class="token comment">// tail insertion </span>
+
+<span class="token keyword">void</span> <span class="token function">dfs</span><span class="token punctuation">(</span><span class="token keyword">struct</span> <span class="token class-name">TreeNode</span><span class="token operator">*</span> root<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">if</span><span class="token punctuation">(</span>root <span class="token operator">==</span> <span class="token constant">NULL</span><span class="token punctuation">)</span> <span class="token keyword">return</span><span class="token punctuation">;</span>
+    <span class="token comment">// save left/right subtree</span>
+    <span class="token keyword">struct</span> <span class="token class-name">TreeNode</span><span class="token operator">*</span> left <span class="token operator">=</span> root<span class="token operator">-&gt;</span>left<span class="token punctuation">;</span>
+    <span class="token keyword">struct</span> <span class="token class-name">TreeNode</span><span class="token operator">*</span> right <span class="token operator">=</span> root<span class="token operator">-&gt;</span>right<span class="token punctuation">;</span>
+    <span class="token comment">// insert node into linkedlist</span>
+    root<span class="token operator">-&gt;</span>left <span class="token operator">=</span> root<span class="token operator">-&gt;</span>right <span class="token operator">=</span> <span class="token constant">NULL</span><span class="token punctuation">;</span>
+    tail<span class="token operator">-&gt;</span>right <span class="token operator">=</span> root<span class="token punctuation">;</span>
+    tail <span class="token operator">=</span> root<span class="token punctuation">;</span>
+    <span class="token function">dfs</span><span class="token punctuation">(</span>left<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">dfs</span><span class="token punctuation">(</span>right<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">void</span> <span class="token function">flatten</span><span class="token punctuation">(</span><span class="token keyword">struct</span> <span class="token class-name">TreeNode</span><span class="token operator">*</span> root<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    dummyHead <span class="token operator">=</span> <span class="token function">malloc</span><span class="token punctuation">(</span><span class="token keyword">sizeof</span><span class="token punctuation">(</span><span class="token keyword">struct</span> <span class="token class-name">TreeNode</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    dummyHead<span class="token operator">-&gt;</span>left <span class="token operator">=</span> dummyHead<span class="token operator">-&gt;</span>right <span class="token operator">=</span> <span class="token constant">NULL</span><span class="token punctuation">;</span>
+    tail <span class="token operator">=</span> dummyHead<span class="token punctuation">;</span>
+    <span class="token function">dfs</span><span class="token punctuation">(</span>root<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">free</span><span class="token punctuation">(</span>dummyHead<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<h3 id="a-href-https-leetcode-cn-com-problems-binode-lcci-mian-shi-ti-17-12-bi-node-a"><a target="_blank" rel="noopener" href="https://leetcode-cn.com/problems/binode-lcci/">面试题 17.12. BiNode</a></h3>
+<h3 id="a-href-https-leetcode-cn-com-problems-er-cha-sou-suo-shu-yu-shuang-xiang-lian-biao-lcof-jian-zhi-offer-36-er-cha-sou-suo-shu-yu-shuang-xiang-lian-biao-a"><a target="_blank" rel="noopener" href="https://leetcode-cn.com/problems/er-cha-sou-suo-shu-yu-shuang-xiang-lian-biao-lcof/">剑指 Offer 36. 二叉搜索树与双向链表</a></h3>
+<h3 id="a-href-https-leetcode-cn-com-problems-list-of-depth-lcci-mian-shi-ti-04-03-te-ding-shen-du-jie-dian-lian-biao-a"><a target="_blank" rel="noopener" href="https://leetcode-cn.com/problems/list-of-depth-lcci/">面试题 04.03. 特定深度节点链表</a></h3>
+<h2 id="an-zhao-bian-li-jie-guo-fan-xiang-gou-jian-er-cha-shu">按照遍历结果反向构建二叉树</h2>
+<h3 id="a-href-https-leetcode-cn-com-problems-construct-binary-tree-from-preorder-and-inorder-traversal-105-cong-qian-xu-yu-zhong-xu-bian-li-xu-lie-gou-zao-er-cha-shu-a"><a target="_blank" rel="noopener" href="https://leetcode-cn.com/problems/construct-binary-tree-from-preorder-and-inorder-traversal/">105. 从前序与中序遍历序列构造二叉树</a></h3>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241222221356286.png" alt="image-20241222221356286"></p>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token comment">/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     struct TreeNode *left;
+ *     struct TreeNode *right;
+ * };
+ */</span>
+<span class="token comment">// 前序区间[i,j] 中序区间[m,n]</span>
+<span class="token keyword">struct</span> <span class="token class-name">TreeNode</span><span class="token operator">*</span> <span class="token function">myBuildTree</span><span class="token punctuation">(</span><span class="token keyword">int</span><span class="token operator">*</span> preorder<span class="token punctuation">,</span> <span class="token keyword">int</span> i<span class="token punctuation">,</span> <span class="token keyword">int</span> j<span class="token punctuation">,</span> <span class="token keyword">int</span><span class="token operator">*</span> inorder<span class="token punctuation">,</span> <span class="token keyword">int</span> m<span class="token punctuation">,</span> <span class="token keyword">int</span> n<span class="token punctuation">)</span>  <span class="token punctuation">{</span>
+    <span class="token comment">// 4. 递归终止条件</span>
+    <span class="token keyword">if</span><span class="token punctuation">(</span>i <span class="token operator">&gt;</span> j<span class="token punctuation">)</span> <span class="token keyword">return</span> <span class="token constant">NULL</span><span class="token punctuation">;</span>
+    <span class="token keyword">struct</span> <span class="token class-name">TreeNode</span><span class="token operator">*</span> root <span class="token operator">=</span> <span class="token function">malloc</span><span class="token punctuation">(</span><span class="token keyword">sizeof</span><span class="token punctuation">(</span><span class="token keyword">struct</span> <span class="token class-name">TreeNode</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token comment">// 3. 构建左右子树，需要确定前序/中序遍历序列中左右子树的区间</span>
+    <span class="token comment">// 前序遍历的第一个节点就是根节点，找到该节点在中序遍历中的位置后可确认左右子树的区间</span>
+    root<span class="token operator">-&gt;</span>val <span class="token operator">=</span> preorder<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">;</span>
+    <span class="token keyword">int</span> p <span class="token operator">=</span> m<span class="token punctuation">;</span>
+    <span class="token keyword">while</span><span class="token punctuation">(</span>inorder<span class="token punctuation">[</span>p<span class="token punctuation">]</span> <span class="token operator">!=</span> root<span class="token operator">-&gt;</span>val<span class="token punctuation">)</span> p<span class="token operator">++</span><span class="token punctuation">;</span>
+    <span class="token keyword">int</span> leftSize <span class="token operator">=</span> p <span class="token operator">-</span> m<span class="token punctuation">;</span>
+    <span class="token comment">// [i, j] =&gt; [i,i] [i+1, i+leftSize] [i+leftSize+1, j]</span>
+    <span class="token comment">// [m, n] =&gt; [m, p-1] [p,p] [p+1, n]</span>
+    <span class="token comment">// 1. 假设左子树构建好了</span>
+    root<span class="token operator">-&gt;</span>left <span class="token operator">=</span> <span class="token function">myBuildTree</span><span class="token punctuation">(</span>preorder<span class="token punctuation">,</span> i <span class="token operator">+</span> <span class="token number">1</span><span class="token punctuation">,</span> i <span class="token operator">+</span> leftSize<span class="token punctuation">,</span> inorder<span class="token punctuation">,</span> m<span class="token punctuation">,</span> p <span class="token operator">-</span> <span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token comment">// 2. 假设右子树构建好了</span>
+    root<span class="token operator">-&gt;</span>right <span class="token operator">=</span> <span class="token function">myBuildTree</span><span class="token punctuation">(</span>preorder<span class="token punctuation">,</span> i <span class="token operator">+</span> leftSize <span class="token operator">+</span> <span class="token number">1</span><span class="token punctuation">,</span> j<span class="token punctuation">,</span> inorder<span class="token punctuation">,</span> p <span class="token operator">+</span> <span class="token number">1</span><span class="token punctuation">,</span> n<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">return</span> root<span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+<span class="token keyword">struct</span> <span class="token class-name">TreeNode</span><span class="token operator">*</span> <span class="token function">buildTree</span><span class="token punctuation">(</span><span class="token keyword">int</span><span class="token operator">*</span> preorder<span class="token punctuation">,</span> <span class="token keyword">int</span> preorderSize<span class="token punctuation">,</span> <span class="token keyword">int</span><span class="token operator">*</span> inorder<span class="token punctuation">,</span> <span class="token keyword">int</span> inorderSize<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">return</span> <span class="token function">myBuildTree</span><span class="token punctuation">(</span>preorder<span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> preorderSize <span class="token operator">-</span> <span class="token number">1</span><span class="token punctuation">,</span> inorder<span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> inorderSize <span class="token operator">-</span> <span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<h3 id="a-href-https-leetcode-cn-com-problems-construct-binary-tree-from-preorder-and-postorder-traversal-889-gen-ju-qian-xu-he-hou-xu-bian-li-gou-zao-er-cha-shu-a"><a target="_blank" rel="noopener" href="https://leetcode-cn.com/problems/construct-binary-tree-from-preorder-and-postorder-traversal/">889. 根据前序和后序遍历构造二叉树</a></h3>
+<h3 id="a-href-https-leetcode-cn-com-problems-construct-binary-tree-from-inorder-and-postorder-traversal-106-cong-zhong-xu-yu-hou-xu-bian-li-xu-lie-gou-zao-er-cha-shu-a"><a target="_blank" rel="noopener" href="https://leetcode-cn.com/problems/construct-binary-tree-from-inorder-and-postorder-traversal/">106. 从中序与后序遍历序列构造二叉树</a></h3>
+<h3 id="a-href-https-leetcode-cn-com-problems-er-cha-sou-suo-shu-de-hou-xu-bian-li-xu-lie-lcof-jian-zhi-offer-33-er-cha-sou-suo-shu-de-hou-xu-bian-li-xu-lie-a"><a target="_blank" rel="noopener" href="https://leetcode-cn.com/problems/er-cha-sou-suo-shu-de-hou-xu-bian-li-xu-lie-lcof/">剑指 Offer 33. 二叉搜索树的后序遍历序列</a></h3>
+<h2 id="er-cha-shu-shang-de-zui-chang-lu-jing-he">二叉树上的最长路径和</h2>
+<h3 id="a-href-https-leetcode-cn-com-problems-diameter-of-binary-tree-543-er-cha-shu-de-zhi-jing-a"><a target="_blank" rel="noopener" href="https://leetcode-cn.com/problems/diameter-of-binary-tree/">543. 二叉树的直径</a></h3>
+<h3 id="a-href-https-leetcode-cn-com-problems-er-cha-shu-zhong-he-wei-mou-yi-zhi-de-lu-jing-lcof-jian-zhi-offer-34-er-cha-shu-zhong-he-wei-mou-yi-zhi-de-lu-jing-a"><a target="_blank" rel="noopener" href="https://leetcode-cn.com/problems/er-cha-shu-zhong-he-wei-mou-yi-zhi-de-lu-jing-lcof/">剑指 Offer 34. 二叉树中和为某一值的路径</a></h3>
+<p><img src="https://hexo-blog-anwen.oss-cn-beijing.aliyuncs.com/image/image-20241222224520696.png" alt="image-20241222224520696"></p>
+<pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token comment">/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     struct TreeNode *left;
+ *     struct TreeNode *right;
+ * };
+ */</span>
+<span class="token comment">/**
+ * Return an array of arrays of size *returnSize.
+ * The sizes of the arrays are returned as *returnColumnSizes array.
+ * Note: Both returned array and *columnSizes array must be malloced, assume caller calls free().
+ */</span>
+<span class="token keyword">int</span><span class="token operator">*</span> result<span class="token punctuation">[</span><span class="token number">2500</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+<span class="token keyword">int</span> resultCnt<span class="token punctuation">;</span>
+<span class="token keyword">int</span> resultColSize<span class="token punctuation">[</span><span class="token number">2500</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+
+<span class="token keyword">int</span><span class="token operator">*</span> <span class="token function">takeSnapshot</span><span class="token punctuation">(</span><span class="token keyword">int</span> path<span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">,</span> <span class="token keyword">int</span> pathSize<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">int</span><span class="token operator">*</span> result <span class="token operator">=</span> <span class="token function">malloc</span><span class="token punctuation">(</span><span class="token keyword">sizeof</span><span class="token punctuation">(</span><span class="token keyword">int</span><span class="token punctuation">)</span> <span class="token operator">*</span> pathSize<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">memcpy</span><span class="token punctuation">(</span>result<span class="token punctuation">,</span> path<span class="token punctuation">,</span> <span class="token keyword">sizeof</span><span class="token punctuation">(</span><span class="token keyword">int</span><span class="token punctuation">)</span> <span class="token operator">*</span> pathSize<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">return</span> result<span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">void</span> <span class="token function">dfs</span><span class="token punctuation">(</span><span class="token keyword">struct</span> <span class="token class-name">TreeNode</span><span class="token operator">*</span> root<span class="token punctuation">,</span> <span class="token keyword">int</span> target<span class="token punctuation">,</span> <span class="token keyword">int</span> path<span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">,</span> <span class="token keyword">int</span> <span class="token operator">*</span>pathSize<span class="token punctuation">,</span> <span class="token keyword">int</span> pathSum<span class="token punctuation">)</span>  <span class="token punctuation">{</span>
+    <span class="token keyword">if</span><span class="token punctuation">(</span>root <span class="token operator">==</span> <span class="token constant">NULL</span><span class="token punctuation">)</span> <span class="token keyword">return</span><span class="token punctuation">;</span>
+    <span class="token comment">// 第一次来到该节点，将节点添加到路径中</span>
+    pathSum <span class="token operator">+=</span> root<span class="token operator">-&gt;</span>val<span class="token punctuation">;</span>
+    path<span class="token punctuation">[</span><span class="token operator">*</span>pathSize<span class="token punctuation">]</span> <span class="token operator">=</span> root<span class="token operator">-&gt;</span>val<span class="token punctuation">;</span>
+    <span class="token punctuation">(</span><span class="token operator">*</span>pathSize<span class="token punctuation">)</span><span class="token operator">++</span><span class="token punctuation">;</span>
+    <span class="token comment">// 如果该节点为叶子节点，判断路径和是否命中target</span>
+    <span class="token keyword">if</span><span class="token punctuation">(</span>root<span class="token operator">-&gt;</span>left <span class="token operator">==</span> <span class="token constant">NULL</span> <span class="token operator">&amp;&amp;</span> root<span class="token operator">-&gt;</span>right <span class="token operator">==</span> <span class="token constant">NULL</span> <span class="token operator">&amp;&amp;</span> pathSum <span class="token operator">==</span> target<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        result<span class="token punctuation">[</span>resultCnt<span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token function">takeSnapshot</span><span class="token punctuation">(</span>path<span class="token punctuation">,</span> <span class="token operator">*</span>pathSize<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        resultColSize<span class="token punctuation">[</span>resultCnt<span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token operator">*</span>pathSize<span class="token punctuation">;</span>
+        resultCnt<span class="token operator">++</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token function">dfs</span><span class="token punctuation">(</span>root<span class="token operator">-&gt;</span>left<span class="token punctuation">,</span> target<span class="token punctuation">,</span> path<span class="token punctuation">,</span> pathSize<span class="token punctuation">,</span> pathSum<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token comment">// 第二次来到该节点</span>
+    <span class="token function">dfs</span><span class="token punctuation">(</span>root<span class="token operator">-&gt;</span>right<span class="token punctuation">,</span> target<span class="token punctuation">,</span> path<span class="token punctuation">,</span> pathSize<span class="token punctuation">,</span> pathSum<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token comment">// 第三次来到该节点，在出栈该节点前将其从路径中移除</span>
+    <span class="token punctuation">(</span><span class="token operator">*</span>pathSize<span class="token punctuation">)</span><span class="token operator">--</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+<span class="token keyword">int</span><span class="token operator">*</span><span class="token operator">*</span> <span class="token function">pathTarget</span><span class="token punctuation">(</span><span class="token keyword">struct</span> <span class="token class-name">TreeNode</span><span class="token operator">*</span> root<span class="token punctuation">,</span> <span class="token keyword">int</span> target<span class="token punctuation">,</span> <span class="token keyword">int</span><span class="token operator">*</span> returnSize<span class="token punctuation">,</span> <span class="token keyword">int</span><span class="token operator">*</span><span class="token operator">*</span> returnColumnSizes<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    resultCnt <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
+    <span class="token keyword">int</span> path<span class="token punctuation">[</span><span class="token number">5000</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+    <span class="token keyword">int</span> pathSize <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
+    <span class="token function">dfs</span><span class="token punctuation">(</span>root<span class="token punctuation">,</span> target<span class="token punctuation">,</span> path<span class="token punctuation">,</span> <span class="token operator">&amp;</span>pathSize<span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token operator">*</span>returnSize <span class="token operator">=</span> resultCnt<span class="token punctuation">;</span>
+    <span class="token operator">*</span>returnColumnSizes <span class="token operator">=</span> resultColSize<span class="token punctuation">;</span>
+    <span class="token keyword">return</span> result<span class="token punctuation">;</span>
+<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<h3 id="a-href-https-leetcode-cn-com-problems-binary-tree-maximum-path-sum-124-er-cha-shu-zhong-de-zui-da-lu-jing-he-a"><a target="_blank" rel="noopener" href="https://leetcode-cn.com/problems/binary-tree-maximum-path-sum/">124. 二叉树中的最大路径和</a></h3>
 <h1 id="the-end">THE END</h1>
 
                 
@@ -1699,7 +1883,7 @@ bool <span class="token function">isValidBST</span><span class="token punctuatio
             <br>
             
                 &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                        class="white-color">97.8k</span>
+                        class="white-color">108.8k</span>
             
             
             
